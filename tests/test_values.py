@@ -2,9 +2,9 @@ import datamaker.suppliers as suppliers
 from collections import Counter
 
 def test_single_value():
-    supplier = suppliers.values({'data': 42})
+    supplier = suppliers.values({'type': 'values', 'data': 42})
 
-    data = [supplier.next(i) for i in range(0,10)]
+    data = [supplier.next(i) for i in range(0, 10)]
 
     counter = Counter(data)
 
@@ -17,8 +17,8 @@ def test_single_value():
 def test_values_list():
     supplier = suppliers.values({'data': [1, 2, 3, 4, 5]})
 
-    data = [supplier.next(i) for i in range(0,10)]
-    print(data)
+    data = [supplier.next(i) for i in range(0, 10)]
+
     counter = Counter(data)
 
     most_common_keys = [item[0] for item in counter.most_common(10)]
@@ -28,9 +28,23 @@ def test_values_list():
 
 
 def test_weighted_values():
-    supplier = suppliers.values({'data': { 'foo': 0.5, 'bar': 0.4, 'baz': 0.1}})
+    supplier = suppliers.values({'data': {'foo': 0.5, 'bar': 0.4, 'baz': 0.1}})
 
-    data = [supplier.next(i) for i in range(0,10)]
+    data = [supplier.next(i) for i in range(0, 10)]
+
+    counter = Counter(data)
+
+    most_common_keys = [item[0] for item in counter.most_common(2)]
+
+    assert 'foo' in most_common_keys
+    assert 'bar' in most_common_keys
+
+
+def test_shortcut_notation():
+    # not type or data key, just what would have been the value for the data key
+    supplier = suppliers.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1})
+
+    data = [supplier.next(i) for i in range(0, 10)]
 
     counter = Counter(data)
 

@@ -8,42 +8,47 @@ def values(spec):
     """
     Based on data, return the appropriate supplier
     """
-    data = spec['data']
-    if isinstance(data, list):
-        return value_list(spec)
-    elif isinstance(data, dict):
-        return weighted_values(spec)
+    # shortcut notations no type, or data, the spec is the data
+    if 'data' not in spec:
+        data = spec
     else:
-        return single_value(spec)
+        data = spec['data']
+
+    if isinstance(data, list):
+        return value_list(data)
+    elif isinstance(data, dict):
+        return weighted_values(data)
+    else:
+        return single_value(data)
 
 
 class _SingleValue(object):
-    def __init__(self, spec):
-        self.data = spec.get('data')
+    def __init__(self, data):
+        self.data = data
     def next(self, _):
         return self.data
 
 
-def single_value(spec):
-    return _SingleValue(spec)
+def single_value(data):
+    return _SingleValue(data)
 
 
-def value_list(spec):
+def value_list(data):
     """
     creates a value list supplier
     :param spec: for the supplier
     :return: the supplier
     """
-    return ListValueSupplier(spec)
+    return ListValueSupplier(data)
 
 
-def weighted_values(spec):
+def weighted_values(data):
     """
     creates a weighted value supplier
-    :param spec: for the supplier
+    :param data: for the supplier
     :return: the supplier
     """
-    return WeightedValueSupplier(spec)
+    return WeightedValueSupplier(data)
 
 
 def combine(suppliers, config=None):

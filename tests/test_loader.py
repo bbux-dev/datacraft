@@ -69,16 +69,16 @@ def test_load_spec_weighted_ref():
 
         },
         'refs': {
-            'POSITIVE': { 'type': 'values', 'data': ['yes']},
-            'NEGATIVE': { 'type': 'values', 'data': ['no']},
-            'NEUTRAL': { 'type': 'values', 'data': ['meh']}
+            'POSITIVE': {'type': 'values', 'data': ['yes']},
+            'NEGATIVE': {'type': 'values', 'data': ['no']},
+            'NEUTRAL': {'type': 'values', 'data': ['meh']}
         }
     }
     loader = Loader(weighted_ref_spec)
     supplier = loader.get('foo')
 
     # expect mostly positive and negative values
-    data = [supplier.next(i) for i in range(0,10)]
+    data = [supplier.next(i) for i in range(0, 10)]
     counter = Counter(data)
     # get the top two most common entries, which should be yes and no
     most_common_keys = [item[0] for item in counter.most_common(2)]
