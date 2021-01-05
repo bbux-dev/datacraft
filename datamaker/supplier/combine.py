@@ -8,5 +8,5 @@ class CombineValuesSupplier(object):
         if self.config and 'join_with' in self.config:
             joiner = self.config.get('join_with')
         else:
-            joiner = ' '
+            joiner = ''
         return joiner.join(values)

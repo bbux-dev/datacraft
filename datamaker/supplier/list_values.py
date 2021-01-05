@@ -1,6 +1,6 @@
 class ListValueSupplier(object):
-    def __init__(self, spec):
-        self.values = spec.get('data')
+    def __init__(self, data):
+        self.values = data
 
     def next(self, iteration):
         idx = iteration % len(self.values)
