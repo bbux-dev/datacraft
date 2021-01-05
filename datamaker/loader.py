@@ -1,3 +1,4 @@
+import json
 import datamaker.suppliers as suppliers
 from datamaker.exceptions import SpecException
 
@@ -42,7 +43,7 @@ class Loader(object):
         Retrieve the value supplier for the given field spec
         """
         if data['type'] == 'values':
-            return suppliers.value_list(data)
+            return suppliers.values(data)
         if data['type'] == 'combine':
             if not self.refs:
                 raise SpecException("No refs element defined in specification!" + str(self.specs))
@@ -51,5 +52,17 @@ class Loader(object):
             for key in keys:
                 field_spec = self.refs.get(key)
                 supplier = self.get_from_spec(field_spec)
+                if supplier is None:
+                    raise SpecException("Unable to get supplier for ref key: %s, spec: %s" % (key, json.dumps(field_spec)))
                 to_combine.append(supplier)
             return suppliers.combine(to_combine, data.get('config'))
+        if data['type'] == 'weightedref':
+            key_supplier = suppliers.weighted_values(data)
+            values_map = {}
+            for key, weight in data['data'].items():
+                field_spec = self.refs.get(key)
+                supplier = self.get_from_spec(field_spec)
+                if supplier is None:
+                    raise SpecException("Unable to get supplier for ref key: %s, spec: %s" % (key, json.dumps(field_spec)))
+                values_map[key] = supplier
+            return suppliers.weighted_ref(key_supplier, values_map)
