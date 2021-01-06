@@ -3,6 +3,7 @@ import json
 import argparse
 from datamaker import Loader
 from datamaker import StdOutOutputer
+import datamaker.types as types
 
 
 def main():
@@ -17,7 +18,8 @@ def main():
     with open(args.spec, 'r') as handle:
         spec = json.load(handle)
 
-    loader = Loader(spec)
+    registry = types.defaults()
+    loader = Loader(spec, registry)
     output = StdOutOutputer()
     keys = [key for key in spec.keys() if key != 'refs']
 
