@@ -22,9 +22,10 @@ def values(spec):
         return single_value(data)
 
 
-class _SingleValue(object):
+class _SingleValue:
     def __init__(self, data):
         self.data = data
+
     def next(self, _):
         return self.data
 

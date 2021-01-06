@@ -1,4 +1,4 @@
-class StdOutOutputer(object):
+class StdOutOutputer:
     def __init__(self, output_key=False):
         self.output_key = output_key
 

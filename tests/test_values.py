@@ -1,6 +1,7 @@
 import datamaker.suppliers as suppliers
 from collections import Counter
 
+
 def test_single_value():
     supplier = suppliers.values({'type': 'values', 'data': 42})
 
@@ -30,7 +31,7 @@ def test_values_list():
 def test_weighted_values():
     supplier = suppliers.values({'data': {'foo': 0.5, 'bar': 0.4, 'baz': 0.1}})
 
-    data = [supplier.next(i) for i in range(0, 10)]
+    data = [supplier.next(i) for i in range(0, 100)]
 
     counter = Counter(data)
 
@@ -44,7 +45,7 @@ def test_shortcut_notation():
     # not type or data key, just what would have been the value for the data key
     supplier = suppliers.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1})
 
-    data = [supplier.next(i) for i in range(0, 10)]
+    data = [supplier.next(i) for i in range(0, 100)]
 
     counter = Counter(data)
 

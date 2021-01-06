@@ -1,4 +1,4 @@
-class ListValueSupplier(object):
+class ListValueSupplier:
     def __init__(self, data):
         self.values = data
 

@@ -1,6 +1,7 @@
-import random
+from datamaker.exceptions import SpecException
 
-class WeightedRefsSupplier(object):
+
+class WeightedRefsSupplier:
     def __init__(self, key_supplier, values_map):
         self.key_supplier = key_supplier
         self.values_map = values_map
@@ -9,5 +10,5 @@ class WeightedRefsSupplier(object):
         key = self.key_supplier.next(iteration)
         supplier = self.values_map.get(key)
         if supplier is None:
-            raise SpecException('Unknown Key %s for Weighted Reference' % key)
+            raise SpecException("Unknown Key '%s' for Weighted Reference" % key)
         return supplier.next(iteration)

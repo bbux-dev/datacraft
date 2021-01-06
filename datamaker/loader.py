@@ -2,10 +2,11 @@ import datamaker.suppliers as suppliers
 from datamaker.exceptions import SpecException
 
 
-class Refs(object):
+class Refs:
     """
     Holder object for references
     """
+
     def __init__(self, refspec):
         self.refspec = refspec
 
@@ -13,10 +14,11 @@ class Refs(object):
         return self.refspec.get(key)
 
 
-class Loader(object):
+class Loader:
     """
     Parent object for loading value suppliers from specs
     """
+
     def __init__(self, specs, registry):
         self.specs = specs
         self.registry = registry
@@ -45,12 +47,11 @@ class Loader(object):
         Retrieve the value supplier for the given field spec
         """
         if isinstance(data_spec, list):
-            type = None
+            spec_type = None
         else:
-            type = data_spec.get('type')
+            spec_type = data_spec.get('type')
 
-        if type is None or type == 'values':
+        if spec_type is None or spec_type == 'values':
             return suppliers.values(data_spec)
 
-        return self.registry.lookup(type).configure_supplier(data_spec, self)
-
+        return self.registry.lookup(spec_type).configure_supplier(data_spec, self)
