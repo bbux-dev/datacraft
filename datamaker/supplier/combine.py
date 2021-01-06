@@ -1,4 +1,4 @@
-class CombineValuesSupplier(object):
+class CombineValuesSupplier:
     def __init__(self, suppliers, config=None):
         self.suppliers = suppliers
         self.config = config

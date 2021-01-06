@@ -1,5 +1,6 @@
 import datamaker.suppliers as suppliers
 
+
 def test_combine_lists():
     s1 = suppliers.values({'data': ['a', 'b', 'c']})
     s2 = suppliers.values({'data': [1, 2, 3, 4, 5]})

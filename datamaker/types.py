@@ -2,7 +2,7 @@ from .type_handlers import combine
 from .type_handlers import weighted_ref
 
 
-class TypeRegistry(object):
+class TypeRegistry:
     def __init__(self):
         self._internal = {}
 
