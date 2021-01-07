@@ -177,6 +177,14 @@ and the same spec in shorthand notation.
 }
 ```
 
+## Common Configurations
+There are some configuration values that can be applied to all types.  These are listed below
+
+| key   | effect |
+|-------|--------|
+|prefix | Prepends the value to all results |
+|suffix | Appends the value to all results  |
+
 ## Field Spec Types
 These are the built in types
 
