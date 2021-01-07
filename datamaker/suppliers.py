@@ -2,11 +2,12 @@ from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.weighted_refs import WeightedRefsSupplier
+from .supplier.select_list_subset import SelectListSupplier
 
 
 def values(spec):
     """
-    Based on data, return the appropriate supplier
+    Based on data, return the appropriate values supplier
     """
     # shortcut notations no type, or data, the spec is the data
     if 'data' not in spec:
@@ -70,3 +71,13 @@ def weighted_ref(key_supplier, values_map):
     :return: the supplier
     """
     return WeightedRefsSupplier(key_supplier, values_map)
+
+
+def select_list_subset(data, config):
+    """
+    select list subset supplier
+    :param data: list to select subset from
+    :param config: with minimal of mean specified
+    :return: the supplier
+    """
+    return SelectListSupplier(data, config)
