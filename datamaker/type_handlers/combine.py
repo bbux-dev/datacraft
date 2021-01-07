@@ -26,8 +26,10 @@ def configure_supplier(data_spec, loader):
         raise SpecException("No refs element defined in specification! Needed for" + str(data_spec))
 
     if 'refs' in data_spec:
-        return _load_from_refs(data_spec, loader)
-    return _load_from_fields(data_spec, loader)
+        supplier = _load_from_refs(data_spec, loader)
+    else:
+        supplier = _load_from_fields(data_spec, loader)
+    return supplier
 
 
 def _load_from_refs(data_spec, loader):

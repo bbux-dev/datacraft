@@ -54,4 +54,8 @@ class Loader:
         if spec_type is None or spec_type == 'values':
             return suppliers.values(data_spec)
 
-        return self.registry.lookup(spec_type).configure_supplier(data_spec, self)
+        supplier = self.registry.lookup(spec_type).configure_supplier(data_spec, self)
+        if suppliers.isdecorated(data_spec):
+            return suppliers.decorated(data_spec, supplier)
+        else:
+            return supplier

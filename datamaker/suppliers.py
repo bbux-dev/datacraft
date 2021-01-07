@@ -81,3 +81,36 @@ def select_list_subset(data, config):
     :return: the supplier
     """
     return SelectListSupplier(data, config)
+
+
+def isdecorated(data_spec):
+    """
+    is this spec a decorated one
+    :param data_spec: to check
+    :return: true or false
+    """
+    if 'config' not in data_spec:
+        return False
+    config = data_spec.get('config')
+    return 'prefix' in config or 'suffix' in config
+
+
+class DecoratedSupplier:
+    def __init__(self, config, supplier):
+        self.prefix = config.get('prefix', '')
+        self.suffix = config.get('suffix', '')
+        self.wrapped = supplier
+
+    def next(self, iteration):
+        value = self.wrapped.next(iteration)
+        return self.prefix + str(value) + self.suffix
+
+
+def decorated(data_spec, supplier):
+    """
+    Creates a decorated supplier around the provided on
+    :param data_spec: the spec
+    :param supplier: the supplier to decorate
+    :return: the decorated supplier
+    """
+    return DecoratedSupplier(data_spec.get('config'), supplier)

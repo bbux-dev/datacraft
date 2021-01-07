@@ -1,6 +1,7 @@
 """
 Supplies values by selecting and joining elements from a list
 """
+import sys
 import math
 import random
 from random import gauss
@@ -11,8 +12,8 @@ class SelectListSupplier:
         self.values = data
         self.mean = config.get('mean')
         self.stddev = config.get('stddev', 0)
-        self.min = int(config.get('min'))
-        self.max = int(config.get('max'))
+        self.min = int(config.get('min', 1))
+        self.max = int(config.get('max', sys.maxsize))
         self.join_with = config.get('join_with', ' ')
 
     def next(self, iteration):
