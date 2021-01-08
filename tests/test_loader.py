@@ -3,6 +3,8 @@ import datamaker.types as types
 from datamaker.exceptions import SpecException
 from collections import Counter
 import pytest
+# hack to load up all types
+from datamaker.type_handlers import *
 
 
 spec = {
@@ -21,7 +23,7 @@ spec = {
 
 
 def test_load_spec_invalid_key():
-    loader = Loader(spec, types.defaults())
+    loader = Loader(spec)
     with pytest.raises(SpecException):
         loader.get('unknown')
 
@@ -32,7 +34,7 @@ def test_load_spec_missing_type_defaults_to_values():
             'data': ['one', 'two', 'tre']
         }
     }
-    loader = Loader(spec_missing_type, types.defaults())
+    loader = Loader(spec_missing_type)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == 'one'
@@ -47,13 +49,13 @@ def test_load_spec_undefined_refs():
             'refs': ['ONE', 'TWO']
         }
     }
-    loader = Loader(spec_undefined_refs, types.defaults())
+    loader = Loader(spec_undefined_refs)
     with pytest.raises(SpecException):
         loader.get('foo')
 
 
 def test_load_spec_valid():
-    loader = Loader(spec, types.defaults())
+    loader = Loader(spec)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == 'dog'
@@ -78,7 +80,7 @@ def test_load_spec_weighted_ref():
             'NEUTRAL': {'type': 'values', 'data': ['meh']}
         }
     }
-    loader = Loader(weighted_ref_spec, types.defaults())
+    loader = Loader(weighted_ref_spec)
     supplier = loader.get('foo')
 
     # expect mostly positive and negative values

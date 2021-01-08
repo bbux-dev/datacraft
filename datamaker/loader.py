@@ -1,5 +1,7 @@
+import json
 import datamaker.suppliers as suppliers
 from datamaker.exceptions import SpecException
+import datamaker.types as types
 
 
 class Refs:
@@ -19,9 +21,8 @@ class Loader:
     Parent object for loading value suppliers from specs
     """
 
-    def __init__(self, specs, registry):
+    def __init__(self, specs):
         self.specs = specs
-        self.registry = registry
         self.cache = {}
         if 'refs' in specs:
             self.refs = Refs(specs.get('refs'))
@@ -52,7 +53,10 @@ class Loader:
         if spec_type is None or spec_type == 'values':
             return suppliers.values(data_spec)
 
-        supplier = self.registry.lookup(spec_type).configure_supplier(data_spec, self)
+        handler = types.lookup_type(spec_type)
+        if handler is None:
+            raise SpecException('Unable to load handler for: ' + json.dumps(data_spec))
+        supplier = handler(data_spec, self)
         if suppliers.isdecorated(data_spec):
             return suppliers.decorated(data_spec, supplier)
         return supplier
