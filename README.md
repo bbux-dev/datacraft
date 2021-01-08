@@ -23,7 +23,7 @@ See [examples](docs/EXAMPLES.md)
 
 ## Templating
 To populate a template file with the generated values for each iteration, pass the -t /path/to/template arg to the datamaker
-command.  We use the Jinjs2 templating engine under the hood.  The basic format is to put the field names in {{ field name }} notation
+command.  We use the [Jinja2](https://pypi.org/project/Jinja2/) templating engine under the hood.  The basic format is to put the field names in {{ field name }} notation
 wherever they should be substituted.  For example the following is a template for a bulk indexing data into Elasticsearch.
 
 ```json
