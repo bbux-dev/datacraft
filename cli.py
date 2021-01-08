@@ -2,10 +2,14 @@
 import json
 import argparse
 from datamaker import Loader
-import datamaker.types as types
 import datamaker.template_engines as engines
 import datamaker.outputs as outputs
-
+# this activates the decorators, so they will be discoverable
+# cannot use * import due to pyinstaller not recognizing modules as being used
+from datamaker.type_handlers import combine
+from datamaker.type_handlers import range_handler
+from datamaker.type_handlers import select_list_subset
+from datamaker.type_handlers import weighted_ref
 
 def main():
     parser = argparse.ArgumentParser(description='Run datamaker.')
@@ -31,8 +35,7 @@ def main():
     with open(args.spec, 'r') as handle:
         spec = json.load(handle)
 
-    registry = types.defaults()
-    loader = Loader(spec, registry)
+    loader = Loader(spec)
 
     if args.outdir:
         writer = outputs.FileWriter(
