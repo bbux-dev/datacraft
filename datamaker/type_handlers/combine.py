@@ -18,17 +18,17 @@ from datamaker import suppliers
 from datamaker import SpecException
 
 
-def configure_supplier(data_spec, loader):
-    if 'refs' not in data_spec and 'fields' not in data_spec:
-        raise SpecException('Must define one of fields or refs. %s' % json.dumps(data_spec))
+def configure_supplier(field_spec, loader):
+    if 'refs' not in field_spec and 'fields' not in field_spec:
+        raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
 
-    if 'refs' in data_spec and not loader.refs:
-        raise SpecException("No refs element defined in specification! Needed for" + str(data_spec))
+    if 'refs' in field_spec and not loader.refs:
+        raise SpecException("No refs element defined in specification! Needed for" + str(field_spec))
 
-    if 'refs' in data_spec:
-        supplier = _load_from_refs(data_spec, loader)
+    if 'refs' in field_spec:
+        supplier = _load_from_refs(field_spec, loader)
     else:
-        supplier = _load_from_fields(data_spec, loader)
+        supplier = _load_from_fields(field_spec, loader)
     return supplier
 
 
@@ -50,6 +50,6 @@ def _load_from_fields(data_spec, loader):
     for key in keys:
         supplier = loader.get(key)
         if supplier is None:
-            raise SpecException("Unable to get supplier for field key: %s, spec: %s" % (key, json.dumps(field_spec)))
+            raise SpecException("Unable to get supplier for field key: %s" % key)
         to_combine.append(supplier)
     return suppliers.combine(to_combine, data_spec.get('config'))

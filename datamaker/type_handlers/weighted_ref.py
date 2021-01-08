@@ -16,10 +16,10 @@ from datamaker import suppliers
 from datamaker import SpecException
 
 
-def configure_supplier(data_spec, loader):
-    key_supplier = suppliers.values(data_spec)
+def configure_supplier(parent_field_spec, loader):
+    key_supplier = suppliers.values(parent_field_spec)
     values_map = {}
-    for key in data_spec['data'].keys():
+    for key in parent_field_spec['data'].keys():
         field_spec = loader.refs.get(key)
         supplier = loader.get_from_spec(field_spec)
         if supplier is None:

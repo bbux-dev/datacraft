@@ -38,8 +38,6 @@ class Loader:
         data_spec = self.specs.get(key)
         if data_spec is None:
             raise SpecException("No key " + key + " found in specs")
-        if 'type' not in data_spec:
-            raise SpecException('No type defined for: ' + str(data_spec))
         return self.get_from_spec(data_spec)
 
     def get_from_spec(self, data_spec):
@@ -57,5 +55,4 @@ class Loader:
         supplier = self.registry.lookup(spec_type).configure_supplier(data_spec, self)
         if suppliers.isdecorated(data_spec):
             return suppliers.decorated(data_spec, supplier)
-        else:
-            return supplier
+        return supplier
