@@ -21,6 +21,35 @@ The executable will be located in `dist/datamaker`
 ## Examples
 See [examples](docs/EXAMPLES.md)
 
+## Templating
+To populate a template file with the generated values for each iteration, pass the -t /path/to/template arg to the datamaker
+command.  We use the Jinjs2 templating engine under the hood.  The basic format is to put the field names in {{ field name }} notation
+wherever they should be substituted.  For example the following is a template for a bulk indexing data into Elasticsearch.
+
+```json
+{ "index" : { "_index" : "test", "_id" : "{{ id }}" } }
+{ "doc" : {"name" : "{{ name }}", "age": "{{ age }}", "gender": "{{ gender }}" } }
+```
+
+We could the create a spec to populate the id, name, age, and gender fields. Such as:
+```json
+{
+  "id": {"type": "range", "data": [1, 10]},
+  "gender": { "M":  0.48, "F":  0.52 },
+  "name": [ "bob", "rob", "bobby", "bobo", "robert", "roberto", "bobby joe", "roby", "robi", "steve"]
+}
+```
+
+When we run the tool we get the data populated for the template:
+```shell script
+./cli.py -s ~/scratch/es-spec.json -t ~/scratch/template.json -i 10
+#{ "index" : { "_index" : "test", "_id" : "1" } }
+#{ "doc" : {"name" : "bob", "age": "", "gender": "M" } }
+#{ "index" : { "_index" : "test", "_id" : "2" } }
+#{ "doc" : {"name" : "rob", "age": "", "gender": "M" } }
+...
+```
+
 ## Data Spec
 
 A Data Spec is a Dictionary where the keys are the names of the fields to generate and each value is a Field Spec that
@@ -268,6 +297,18 @@ Example below uses the first and last fields to create a full name field.
 }
 ```
 
+### Range
+A range spec is used to generate a range of integers. The ranges are inclusive for start and end.
+
+The weightedref Field Spec structure is:
+```json
+{
+  "<field name>": {
+    "type": "range",
+    "data": [<start>, <end>, <step> (optional)]
+  }
+}
+```
 ### Weighted Ref
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion. 
 
@@ -314,7 +355,7 @@ The select_list_subset Field Spec structure is:
       "max": N,
       "join_with": "<delimiter to join with>"
      },
-    "data": ["data", "to", "secect", "from"],
+    "data": ["data", "to", "select", "from"],
     OR
     "ref": "REF_WITH_DATA_AS_LIST"
   }
@@ -323,8 +364,8 @@ The select_list_subset Field Spec structure is:
 
 The join_with config option is used to specify how the selected values should be combined. The mean and stddev config 
 options tell how many items should be chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items then
-sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen. You can also set a min
-and max. Example:
+sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen (which is the default).
+You can also set a min and max. Example:
 
 ```json
 {
