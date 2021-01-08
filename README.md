@@ -44,11 +44,69 @@ We could then create a spec to populate the id, name, age, and gender fields. Su
 When we run the tool we get the data populated for the template:
 ```shell script
 ./cli.py -s ~/scratch/es-spec.json -t ~/scratch/template.json -i 10
-#{ "index" : { "_index" : "test", "_id" : "1" } }
-#{ "doc" : {"name" : "bob", "age": "", "gender": "M" } }
-#{ "index" : { "_index" : "test", "_id" : "2" } }
-#{ "doc" : {"name" : "rob", "age": "", "gender": "M" } }
+{ "index" : { "_index" : "test", "_id" : "1" } }
+{ "doc" : {"name" : "bob", "age": "", "gender": "M" } }
+{ "index" : { "_index" : "test", "_id" : "2" } }
+{ "doc" : {"name" : "rob", "age": "", "gender": "M" } }
 ...
+```
+
+## Custom Code Loading
+There are a lot of types of data that are not generated with this tool. Instead of adding them all, there is a mechanism
+to bring your own data suppliers. We make use of the awesome [catalogue](https://pypi.org/project/catalogue/) library to
+allow auto discovery of custom functions using decorators.  Below is an example of a custom class which reverses the output
+of another supplier. Types that are amazing and useful should be nominated for core inclusion, please put up a PR if you
+create or use one that solves many of your data generation issues.
+
+```python
+import datamaker
+from datamaker import suppliers
+
+class ReverseStringSupplier:
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+
+    def next(self, iteration):
+        # value from the wrapped supplier
+        value = str(self.wrapped.next(iteration))
+        # python way to reverse a string, hehe
+        return value[::-1]
+
+
+@datamaker.registry.types('reverse_string')
+def configure_supplier(field_spec, loader):
+    # load the supplier for the given ref
+    key = field_spec.get('ref')
+    spec = loader.refs.get(key)
+    wrapped = suppliers.values(spec)
+    # wrap this with our custom reverse string supplier
+    return ReverseStringSupplier(wrapped)
+```
+
+Now when we see a type of "reverse_string" like in the example below, we will use the given function to configure the
+supplier for it. The function name is arbitrary, but the signature must match.
+```
+{
+  "backwards": {
+    "type": "reverse_string",
+    "ref": "ANIMALS"
+  },
+  "refs": { 
+    "ANIMALS": {
+      "type": "values",
+      "data": ["zebra", "hedgehog", "llama", "flamingo"]
+    }
+  }
+}
+```
+
+To supply custom code to the tool use the -c or --code arguments.
+```shell script
+.dist/datamaker -s reverse-spec.json -i 4 -c custom.py another.py
+arbez
+gohegdeh
+amall
+ognimalf
 ```
 
 ## Data Spec
