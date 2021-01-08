@@ -1,9 +1,84 @@
-class StdOutOutputer:
-    def __init__(self, output_key=False):
+"""
+Module holds output related classes and functions
+"""
+import os
+
+
+class SingleFieldOutput:
+    """
+    Writes each field as it is created
+    """
+    def __init__(self, writer, output_key):
+        self.writer = writer
         self.output_key = output_key
 
     def handle(self, key, value):
         if self.output_key:
-            print('%s -> %s' % (key, value))
+            self.writer.write('%s -> %s' % (key, value))
         else:
-            print(value)
+            self.writer.write(value)
+
+    def finished_record(self):
+        pass
+
+
+class RecordLevelOutput:
+    """
+    Class to output after all fields have been generated
+    """
+    def __init__(self, record_processor, writer):
+        """
+        :param record_processor: turns the record into a string for writing
+        :param writer: to write with
+        """
+        self.record_processor = record_processor
+        self.writer = writer
+        self.current = {}
+
+    def handle(self, key, value):
+        self.current[key] = value
+
+    def finished_record(self):
+        processed = self.record_processor.process(self.current)
+        self.writer.write(processed)
+        self.current.clear()
+
+
+class StdOutWriter:
+    """
+    Writes values to stdout
+    """
+    def write(self, value):
+        print(value)
+
+
+class FileWriter:
+    """
+    Writes processed output to disk
+    """
+    def __init__(self, outdir, outname, extension=None, records_per_file=1):
+        self.outdir = outdir
+        self.outname = outname
+        self.extension = extension
+        if self.extension and not extension.startswith('.'):
+            self.extension = '.' + extension
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+        self.count = 0
+        self.records_per_file = records_per_file
+        self.record_count = 0
+
+    def write(self, value):
+        extension = self.extension if self.extension else ''
+        outfile = '%s/%s-%d%s' % (self.outdir, self.outname, self.count, extension)
+        if self.record_count == 0:
+            mode = 'w'
+        else:
+            mode = 'a'
+        with open(outfile, mode) as handle:
+            handle.write(value)
+            handle.write('\n')
+        self.record_count += 1
+        if self.record_count == self.records_per_file:
+            self.record_count = 0
+            self.count += 1

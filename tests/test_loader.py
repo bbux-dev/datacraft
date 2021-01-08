@@ -26,15 +26,18 @@ def test_load_spec_invalid_key():
         loader.get('unknown')
 
 
-def test_load_spec_missing_type():
+def test_load_spec_missing_type_defaults_to_values():
     spec_missing_type = {
         'foo': {
             'data': ['one', 'two', 'tre']
         }
     }
     loader = Loader(spec_missing_type, types.defaults())
-    with pytest.raises(SpecException):
-        loader.get('foo')
+    supplier = loader.get('foo')
+
+    assert supplier.next(0) == 'one'
+    assert supplier.next(1) == 'two'
+    assert supplier.next(2) == 'tre'
 
 
 def test_load_spec_undefined_refs():
