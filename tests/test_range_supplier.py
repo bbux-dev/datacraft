@@ -1,0 +1,33 @@
+import pytest
+
+from datamaker import SpecException
+from datamaker.type_handlers import range_handler
+
+
+def test_ranges_missing_data():
+    with pytest.raises(SpecException):
+        range_handler.configure_supplier({'type': 'range'}, None)
+
+
+def test_ranges_invalid_data_type():
+    with pytest.raises(SpecException):
+        range_handler.configure_supplier({'type': 'range', 'data': 42}, None)
+
+
+def test_ranges_end_before_start():
+    start = 10
+    end = 9
+    with pytest.raises(SpecException):
+        range_handler.configure_supplier({'type': 'range', 'data': [start, end]}, None)
+
+
+def test_ranges_valid():
+    start = 2
+    end = 10
+    step = 2
+    supplier = range_handler.configure_supplier({'type': 'range', 'data': [start, end, step]}, None)
+
+    expected = [2, 4, 6, 8, 10]
+    actual = [supplier.next(i) for i in range(5)]
+
+    assert expected == actual

@@ -18,6 +18,7 @@ class Jinja2Engine:
     """
     A simple class that creates a facade around a Jinja2 templating environment
     """
+
     def __init__(self, template_file):
         template_dir = os.path.dirname(template_file)
         self.template_name = os.path.basename(template_file)
@@ -34,4 +35,3 @@ class Jinja2Engine:
         """
         template = self.env.get_template(self.template_name)
         return template.render(record)
-

@@ -16,7 +16,7 @@ class SelectListSupplier:
         self.max = int(config.get('max', sys.maxsize))
         self.join_with = config.get('join_with', ' ')
 
-    def next(self, iteration):
+    def next(self, _):
         count = math.ceil(gauss(self.mean, self.stddev))
         if count <= 0:
             count = 1
