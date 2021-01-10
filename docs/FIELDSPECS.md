@@ -1,6 +1,15 @@
 Field Spec Definitions
 ========================
 
+# Quick Reference
+| type   | description                            | config                       |
+|--------|----------------------------------------|------------------------------|
+|values  | constant, list, or weighted dictionary |                              |
+|range   | range of integers                      |                              |
+|combine | refs or fields                         | join_with                    |
+|weightedref | produces values from refs in weighted fashion |                   |
+|select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
+
 # Overview
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
 refer to this as a Field Spec.  The simplest type of Field Spec is a values spec.  The main format of a values spec is a

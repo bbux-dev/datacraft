@@ -1,7 +1,7 @@
 # Concrete Examples
 
 ## Generating Sentences to Train a Classifier On
-When training a Machine Learning Classifier, it can be difficult to create labled data from scratch.  By analyzing the structure
+When training a Machine Learning Classifier, it can be difficult to create labeled data from scratch.  By analyzing the structure
 of the data it may be possible to augment the small initial set of examples by generating additional similar data that follows
 the same structure. For example, we want to create an Insult detector. Let's say these are the initial examples we have:
 

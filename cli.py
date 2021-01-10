@@ -1,4 +1,3 @@
-#!/bin/env python3
 import json
 import argparse
 from datamaker import Loader
