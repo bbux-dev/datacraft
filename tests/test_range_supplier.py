@@ -1,7 +1,7 @@
 import pytest
 
-from datamaker import SpecException
-from datamaker.type_handlers import range_handler
+from dataspec import SpecException
+from dataspec.type_handlers import range_handler
 
 
 def test_ranges_missing_data():

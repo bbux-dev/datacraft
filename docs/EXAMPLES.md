@@ -65,7 +65,7 @@ look like:
 
 Looking at some of the insults produced
 ```shell script
-dist/datamaker -s ~/scratch/insults.json -i 100 | grep '1,' | tail
+dist/dataspec -s ~/scratch/insults.json -i 100 | grep '1,' | tail
 1,You're incredibly ugly
 1,You're a idiot
 1,You are so stupid

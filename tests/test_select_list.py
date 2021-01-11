@@ -1,4 +1,4 @@
-from datamaker import suppliers
+from dataspec import suppliers
 
 
 def test_select_list_basic():

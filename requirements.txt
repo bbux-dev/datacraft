@@ -1,5 +1,5 @@
 jinja2~=2.11.2
 pytest~=6.2.1
 setuptools~=45.2.0
-datamaker~=0.1.0
+dataspec~=0.1.0
 catalogue~=2.0.1

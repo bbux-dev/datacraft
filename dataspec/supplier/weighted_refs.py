@@ -1,4 +1,4 @@
-from datamaker.exceptions import SpecException
+from dataspec.exceptions import SpecException
 
 
 class WeightedRefsSupplier:

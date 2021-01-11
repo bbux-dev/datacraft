@@ -14,12 +14,12 @@ The combine field structure is:
 }
 """
 import json
-import datamaker
-from datamaker import suppliers
-from datamaker import SpecException
+import dataspec
+from dataspec import suppliers
+from dataspec import SpecException
 
 
-@datamaker.registry.types('combine')
+@dataspec.registry.types('combine')
 def configure_supplier(field_spec, loader):
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))

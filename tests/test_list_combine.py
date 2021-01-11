@@ -1,4 +1,4 @@
-import datamaker.suppliers as suppliers
+import dataspec.suppliers as suppliers
 
 
 def test_combine_lists():

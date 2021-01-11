@@ -1,18 +1,18 @@
 import json
 import argparse
-from datamaker import Loader
-import datamaker.template_engines as engines
-import datamaker.outputs as outputs
-from datamaker import utils
+from dataspec import Loader
+import dataspec.template_engines as engines
+import dataspec.outputs as outputs
+from dataspec import utils
 # this activates the decorators, so they will be discoverable
 # cannot use * import due to pyinstaller not recognizing modules as being used
-from datamaker.type_handlers import combine
-from datamaker.type_handlers import range_handler
-from datamaker.type_handlers import select_list_subset
-from datamaker.type_handlers import weighted_ref
+from dataspec.type_handlers import combine
+from dataspec.type_handlers import range_handler
+from dataspec.type_handlers import select_list_subset
+from dataspec.type_handlers import weighted_ref
 
 def main():
-    parser = argparse.ArgumentParser(description='Run datamaker.')
+    parser = argparse.ArgumentParser(description='Run dataspec.')
     parser.add_argument('-s', '--spec', required=True,
                         help='Spec to Use')
     parser.add_argument('-i', '--iterations', default=100, type=int,

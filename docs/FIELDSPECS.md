@@ -30,7 +30,7 @@ providers that are lists, they will be combined in incrementing order. i.e:
 Will produce the values A1, B2, C3 continuously. 
 
 ```shell script
-dist/datamaker -s ~/scratch/sample.json -i 7
+dist/dataspec -s ~/scratch/sample.json -i 7
 A1
 B2
 C3
@@ -51,7 +51,7 @@ If an additional number is added to TWO, we now get 12 distinct values:
 }
 ```
 ```shell script
-dist/datamaker -s ~/scratch/sample.json -i 12 | sort
+dist/dataspec -s ~/scratch/sample.json -i 12 | sort
 A1
 A2
 A3
@@ -294,7 +294,7 @@ You can also set a min and max. Example:
 }
 ```
 ```shell script
-dist/datamaker -s ~/scratch/ingredients.json -i 10
+dist/dataspec -s ~/scratch/ingredients.json -i 10
 garlic, onions
 garlic, spinach
 bell peppers, spinach

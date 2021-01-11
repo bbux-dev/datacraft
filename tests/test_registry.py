@@ -1,7 +1,7 @@
-import datamaker
-from datamaker import suppliers
-from datamaker.loader import Loader
-import datamaker.types as types
+import dataspec
+from dataspec import suppliers
+from dataspec.loader import Loader
+import dataspec.types as types
 
 
 spec = {
@@ -24,7 +24,7 @@ class ReverseStringSupplier:
         return value[::-1]
 
 
-@datamaker.registry.types('reverse_string')
+@dataspec.registry.types('reverse_string')
 def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
     myspec = loader.refs.get(key)

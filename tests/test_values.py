@@ -1,4 +1,4 @@
-import datamaker.suppliers as suppliers
+import dataspec.suppliers as suppliers
 from collections import Counter
 
 

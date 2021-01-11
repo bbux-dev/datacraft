@@ -12,13 +12,13 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='datamaker',
+    name='dataspec',
     version='0.1.0',
     description='Data Generation Utility',
     long_description=readme,
     author='Brian Buxton',
     author_email='bbux.aws@gmail.com',
-    url='https://github.com/bbux-aws/datamaker',
+    url='https://github.com/bbux-aws/dataspec',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )

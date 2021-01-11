@@ -23,12 +23,12 @@ The select_list_subset Field Spec structure is:
 ```
 """
 import json
-import datamaker
-from datamaker import suppliers
-from datamaker import SpecException
+import dataspec
+from dataspec import suppliers
+from dataspec import SpecException
 
 
-@datamaker.registry.types('select_list_subset')
+@dataspec.registry.types('select_list_subset')
 def configure_supplier(field_spec, loader):
     config = field_spec.get('config')
     if config is None or 'mean' not in config:

@@ -1,7 +1,7 @@
 import json
-import datamaker.suppliers as suppliers
-from datamaker.exceptions import SpecException
-import datamaker.types as types
+import dataspec.suppliers as suppliers
+from dataspec.exceptions import SpecException
+import dataspec.types as types
 
 
 class Refs:

@@ -1,5 +1,5 @@
-import datamaker.suppliers as suppliers
-from datamaker import SpecException
+import dataspec.suppliers as suppliers
+from dataspec import SpecException
 import pytest
 
 

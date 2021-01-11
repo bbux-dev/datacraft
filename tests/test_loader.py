@@ -1,10 +1,10 @@
-from datamaker.loader import Loader
-import datamaker.types as types
-from datamaker.exceptions import SpecException
+from dataspec.loader import Loader
+import dataspec.types as types
+from dataspec.exceptions import SpecException
 from collections import Counter
 import pytest
 # hack to load up all types
-from datamaker.type_handlers import *
+from dataspec.type_handlers import *
 
 
 spec = {

@@ -1,5 +1,5 @@
 import os
-import datamaker.template_engines as engines
+import dataspec.template_engines as engines
 
 
 def test_basic_template():

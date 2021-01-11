@@ -12,12 +12,12 @@ The weightedref Field Spec structure is:
 }
 """
 import json
-import datamaker
-from datamaker import suppliers
-from datamaker import SpecException
+import dataspec
+from dataspec import suppliers
+from dataspec import SpecException
 
 
-@datamaker.registry.types('weightedref')
+@dataspec.registry.types('weightedref')
 def configure_supplier(parent_field_spec, loader):
     key_supplier = suppliers.values(parent_field_spec)
     values_map = {}

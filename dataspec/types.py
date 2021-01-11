@@ -2,7 +2,7 @@ import catalogue
 
 
 class registry:
-    types = catalogue.create('datamaker', 'type')
+    types = catalogue.create('dataspec', 'type')
 
 
 def lookup_type(key):
