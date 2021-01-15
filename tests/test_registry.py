@@ -41,4 +41,5 @@ def test_registry():
 
     supplier = handler(spec.get('foo'), loader)
 
-    print(all_types.keys())
+    assert supplier.next(0) == 'doe a dear'
+

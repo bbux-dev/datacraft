@@ -31,3 +31,26 @@ def test_ranges_valid():
     actual = [supplier.next(i) for i in range(5)]
 
     assert expected == actual
+
+
+def test_ranges_float_step():
+    start = 0
+    end = 1
+    step = .1
+    supplier = range_handler.configure_supplier({'type': 'range', 'data': [start, end, step]}, None)
+
+    expected = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
+    actual = [supplier.next(i) for i in range(11)]
+
+    assert expected == actual
+
+
+def test_ranges_float_start_end():
+    start = 0.5
+    end = 5.5
+    supplier = range_handler.configure_supplier({'type': 'range', 'data': [start, end]}, None)
+
+    expected = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]
+    actual = [supplier.next(i) for i in range(6)]
+
+    assert expected == actual

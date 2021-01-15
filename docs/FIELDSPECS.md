@@ -5,7 +5,7 @@ Field Spec Definitions
 | type   | description                            | config                       |
 |--------|----------------------------------------|------------------------------|
 |values  | constant, list, or weighted dictionary |                              |
-|range   | range of integers                      |                              |
+|range   | range of values                        |                              |
 |combine | refs or fields                         | join_with                    |
 |weightedref | produces values from refs in weighted fashion |                   |
 |select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
@@ -209,9 +209,10 @@ Example below uses the first and last fields to create a full name field.
 ```
 
 ## Range
-A range spec is used to generate a range of integers. The ranges are inclusive for start and end.
+A range spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and step can be integers or
+floating point numbers.
 
-The weightedref Field Spec structure is:
+The range Field Spec structure is:
 ```json
 {
   "<field name>": {
@@ -220,6 +221,8 @@ The weightedref Field Spec structure is:
   }
 }
 ```
+Example: Range 0 to 10 with a step of 0.5
+{ "zero_to_ten": { "type": "range", "data": [0, 10, 0.5] } }
 ## Weighted Ref
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion. 
 

@@ -11,6 +11,7 @@ Range Spec format:
 }
 """
 import json
+import decimal
 import dataspec
 import dataspec.suppliers as suppliers
 
@@ -30,7 +31,32 @@ def configure_supplier(field_spec, _):
     if not end > start:
         raise dataspec.SpecException('end element must be larger than start: %s' % json.dumps(field_spec))
     if len(data) == 2:
-        range_values = list(range(start, end))
+        step = 1
     else:
-        range_values = list(range(start, end, data[2]))
+        step =  data[2]
+    if _any_is_float(data):
+        range_values = list(float_range(float(start), float(end), float(step)))
+    else:
+        range_values = list(range(start, end, step))
     return suppliers.values(range_values)
+
+
+def _any_is_float(data):
+    for item in data:
+        if isinstance(item, float):
+            return True
+    return False
+
+
+def float_range(start, stop, step):
+    """
+    Fancy foot work to support floating point ranges do to rounding errors with the way floating point numbers are stored
+    """
+    # attempt to defeat some rounding errors prevalent in python
+    current = decimal.Decimal(str(start))
+    dstop = decimal.Decimal(str(stop))
+    dstep = decimal.Decimal(str(step))
+    while current < dstop:
+        # inefficient?
+        yield float(str(current))
+        current = current + dstep
