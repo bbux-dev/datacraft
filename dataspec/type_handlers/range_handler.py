@@ -51,7 +51,7 @@ def _any_is_float(data):
 
 def float_range(start, stop, step):
     """
-    Fancy foot work to support floating point ranges do to rounding errors with the way floating point numbers are stored
+    Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are stored
     """
     # attempt to defeat some rounding errors prevalent in python
     current = decimal.Decimal(str(start))

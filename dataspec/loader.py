@@ -72,37 +72,54 @@ def _preprocess_spec(raw_spec):
     :param raw_spec: to preprocess
     :return: the reformatted spec
     """
-    updated = {}
+    updated_specs = {}
     for key, spec in raw_spec.items():
         if '?' not in key:
             # check for conflicts
-            if key in updated:
+            if key in updated_specs:
                 raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
-            updated[key] = spec
+            updated_specs[key] = spec
         else:
             if ' ' in key:
                 raise SpecException(f'Invalid url key {key}, no spaces allowed')
             newkey, params = key.replace('?', ' ').split(' ', 2)
-            if newkey in updated:
+            if newkey in updated_specs:
                 raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
-            if isinstance(spec, dict) and 'config' in spec:
-                config = spec['config']
+            # the updated spec to populate
+            updated = {}
+
+            if _is_spec_data(spec):
+                updated['data'] = spec
+            else:
+                # copy all existing values
+                updated.update(spec)
+
+            if 'config' in updated:
+                config = updated['config']
             else:
                 config = {}
             for param in params.split('&'):
                 keyvalue = param.split('=')
                 config[keyvalue[0]] = keyvalue[1]
+            updated['config'] = config
 
-            if isinstance(spec, dict) and 'data' in spec:
-                data = spec['data']
-            else:
-                data = spec
-
-            updated[newkey] = {
-                'type': 'values',
-                'data': data,
-                'config': config
-            }
+            updated_specs[newkey] = updated
     if 'refs' in raw_spec:
-        updated['refs'] = _preprocess_spec(raw_spec['refs'])
-    return updated
+        updated_specs['refs'] = _preprocess_spec(raw_spec['refs'])
+    return updated_specs
+
+
+def _is_spec_data(spec):
+    """
+    Checks to see if the spec is data only
+    :return: true if only data, false if it is a spec
+    """
+    # if it is not a dictionary, then it is definitely not a spec
+    if not isinstance(spec, dict):
+        return True
+    for core_field in ['type', 'data', 'config']:
+        if core_field in spec:
+            return False
+    # didn't find any core fields, so this must be data
+    return True
+

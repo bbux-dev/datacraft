@@ -7,6 +7,7 @@ Field Spec Definitions
 |values  | constant, list, or weighted dictionary |                              |
 |range   | range of values                        |                              |
 |combine | refs or fields                         | join_with                    |
+|uuid    | generates valid uuid                   |                              |
 |weightedref | produces values from refs in weighted fashion |                   |
 |select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
 

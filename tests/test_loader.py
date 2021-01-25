@@ -121,6 +121,12 @@ def test_preprocess_spec_simple():
     assert 'foo' in updated
 
 
+def test_preprocess_spec_uuid():
+    config_in_key_spec = {"foo?level=5": {"type": "uuid"}}
+    updated = _preprocess_spec(config_in_key_spec)
+    assert 'foo' in updated
+
+
 def test_preprocess_spec_param_and_config():
     config_in_key_spec = {
         'bar?suffix=END': {
