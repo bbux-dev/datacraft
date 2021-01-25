@@ -23,7 +23,8 @@ def configure_supplier(field_spec, _):
 
     data = field_spec.get('data')
     if not isinstance(data, list) or len(data) < 2:
-        raise dataspec.SpecException('data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
+        raise dataspec.SpecException(
+            'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
     # more intuitive behavior
@@ -33,7 +34,7 @@ def configure_supplier(field_spec, _):
     if len(data) == 2:
         step = 1
     else:
-        step =  data[2]
+        step = data[2]
     if _any_is_float(data):
         range_values = list(float_range(float(start), float(end), float(step)))
     else:

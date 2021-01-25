@@ -1,5 +1,8 @@
 import dataspec.suppliers as suppliers
+from dataspec.loader import _preprocess_spec
+from dataspec.exceptions import SpecException
 from collections import Counter
+import pytest
 
 
 def test_single_value():
@@ -53,3 +56,12 @@ def test_shortcut_notation():
 
     assert 'foo' in most_common_keys
     assert 'bar' in most_common_keys
+
+
+def test_sampling_mode_invalid_for_weighted_values():
+    spec = {
+        'foo?sample=True': {10: 0.5, 20: 0.3, 30: 0.2}
+    }
+    updated = _preprocess_spec(spec)
+    with pytest.raises(SpecException):
+        suppliers.values(updated['foo'])

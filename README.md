@@ -8,7 +8,7 @@ values that populate it. We do this by defining two core concepts the Data Spec 
 to define all of the fields that should be generated for a record. The Data Spec does not care about the structure that the
 data will populate. A single Data Spec could be used to generate JSON, XML, or a csv file. Each field in the Data Spec has its own
 Field Spec that defines how the values for it should be created. There are a variety of core field types that are used to generate
-the data for each field.  Where the built in types are not sufficient, there is an easy way to create custom types and handlers for
+the data for each field.  Where the built-in types are not sufficient, there is an easy way to create custom types and handlers for
 them. The tool supports templating using the [Jinja2](https://pypi.org/project/Jinja2/) templating engine format.
 
 ## Build
@@ -50,13 +50,13 @@ should be joined. Below is an example Data Spec for creating email addresses.
       "type": "values",
       "data": ["zebra", "hedgehog", "llama", "flamingo"]
     },
-    "ACTIONS": {
+    "ACTIONS?sample=true": {
       "type": "values",
       "data": ["fling", "jump", "launch", "dispatch"]
     },
     "DOMAINS": {
       "type": "values",
-      "data": ["gmail.com", "yahoo.com", "hotmail.com"]
+      "data": {"gmail.com":  0.6, "yahoo.com": 0.3, "hotmail.com": 0.1}
     } 
   }
 }
@@ -70,18 +70,18 @@ Running dataspec from the command line against this spec:
 
 ```shell script
 dist/dataspec -s ~/example.json -i 12
-zebra_fling@gmail.com
-hedgehog_jump@yahoo.com
-llama_launch@hotmail.com
-flamingo_dispatch@gmail.com
-zebra_fling@yahoo.com
-hedgehog_jump@hotmail.com
-llama_launch@gmail.com
-flamingo_dispatch@yahoo.com
-zebra_fling@hotmail.com
-hedgehog_jump@gmail.com
+zebra_jump@gmail.com
+hedgehog_launch@yahoo.com
 llama_launch@yahoo.com
-flamingo_dispatch@hotmail.com
+flamingo_launch@gmail.com
+zebra_jump@hotmail.com
+hedgehog_jump@hotmail.com
+llama_dispatch@gmail.com
+flamingo_fling@yahoo.com
+zebra_fling@yahoo.com
+hedgehog_launch@gmail.com
+llama_jump@gmail.com
+flamingo_jump@gmail.com
 ```
 
 ### Field Specs
@@ -131,7 +131,6 @@ create or use one that solves many of your data generation issues.
 
 ```python
 import dataspec
-from dataspec import suppliers
 
 class ReverseStringSupplier:
     def __init__(self, wrapped):
@@ -149,7 +148,7 @@ def configure_supplier(field_spec, loader):
     # load the supplier for the given ref
     key = field_spec.get('ref')
     spec = loader.refs.get(key)
-    wrapped = suppliers.values(spec)
+    wrapped = loader.get_from_spec(spec)
     # wrap this with our custom reverse string supplier
     return ReverseStringSupplier(wrapped)
 ```

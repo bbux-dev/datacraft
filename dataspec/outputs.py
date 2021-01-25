@@ -8,6 +8,7 @@ class SingleFieldOutput:
     """
     Writes each field as it is created
     """
+
     def __init__(self, writer, output_key):
         self.writer = writer
         self.output_key = output_key
@@ -26,6 +27,7 @@ class RecordLevelOutput:
     """
     Class to output after all fields have been generated
     """
+
     def __init__(self, record_processor, writer):
         """
         :param record_processor: turns the record into a string for writing
@@ -48,6 +50,7 @@ class StdOutWriter:
     """
     Writes values to stdout
     """
+
     def write(self, value):
         print(value)
 
@@ -56,6 +59,7 @@ class FileWriter:
     """
     Writes processed output to disk
     """
+
     def __init__(self, outdir, outname, extension=None, records_per_file=1):
         self.outdir = outdir
         self.outname = outname
