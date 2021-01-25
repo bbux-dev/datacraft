@@ -13,7 +13,7 @@ Field Spec Definitions
 # Overview
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
 refer to this as a Field Spec.  The simplest type of Field Spec is a values spec.  The main format of a values spec is a
-list of values to use.  These values are rotated through incrementally.  If the number of increments is larger than the
+list of values to use.  By default, these values are rotated through incrementally.  If the number of increments is larger than the
 number of values in the list, the values start over from the beginning of the list. When combining values from two values
 providers that are lists, they will be combined in incrementing order. i.e:
 
@@ -66,6 +66,7 @@ C3
 C4
 ```
 
+
 ## Field Spec Structure
 There are two types of Field Specs, one is the full format that is valid for all types, and the other is the shorthand
 for values types only.
@@ -103,6 +104,37 @@ and the same spec in shorthand notation.
   "field1": [1, 2, 3, 4, 5],
   "field2": {"A": 0.5, "B":  0.3, "C":  0.2},
   "field3": "CONSTANT"
+}
+```
+## Spec Configuration
+There are two ways to configure a spec.  One is by providing a `config` element in the Field Spec and the other is by using
+a URL parameter format in the key.  For example the following two specs will produce the same values:
+
+```json
+{
+  "ONE": {
+    "type": "values",
+    "data": [1, 2, 3],
+    "config": {"prefix":  "TEST", "suffix":  "@DEMO"}
+  },
+  "TWO?prefix=TEST&suffix=@DEMO": [1, 2, 3]
+}
+```
+
+## Sample Mode
+To increase the randomness of the data being generated you can configure a FieldSpec that contains a list of values to be
+sampled instead of iterated through incrementally. Normally the spec below would create the repeating sequence: `A1 B2 C3`,
+but since both fields `ONE` and `TWO` are in sample mode, we will get all nine combinations of values after a significant
+number of iterations. This would also be true if only one was set to sample mode. To turn sample mode on either use a URL
+param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only valid with entries that are lists.
+
+```json
+{
+  "combine": {"type": "combine", "refs":  ["ONE", "TWO"]},
+  "refs": {
+    "ONE?sample=true":["A", "B", "C"],
+    "TWO?sample=true":[1, 2, 3]
+  }
 }
 ```
 

@@ -1,3 +1,5 @@
+import json
+from .exceptions import SpecException
 from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
@@ -15,9 +17,18 @@ def values(spec):
     else:
         data = spec['data']
 
+    if isinstance(spec, dict) and 'config' in spec:
+        config = spec['config']
+        sample_mode = config.get('sample', 'false')
+        do_sampling = sample_mode.lower() in ['yes', 'true', 'on']
+    else:
+        do_sampling = False
+
     if isinstance(data, list):
-        return value_list(data)
+        return value_list(data, do_sampling)
     elif isinstance(data, dict):
+        if do_sampling:
+            raise SpecException('Cannot do sampling on weighted values: ' + json.dumps(spec))
         return weighted_values(data)
     else:
         return single_value(data)
@@ -35,13 +46,13 @@ def single_value(data):
     return _SingleValue(data)
 
 
-def value_list(data):
+def value_list(data, do_sampling=False):
     """
     creates a value list supplier
     :param spec: for the supplier
     :return: the supplier
     """
-    return ListValueSupplier(data)
+    return ListValueSupplier(data, do_sampling)
 
 
 def weighted_values(data):
