@@ -1,7 +1,14 @@
+"""
+Loader module is the interface into the dataspec data generation utility.  This class handles loading, parsing and
+delegating the handling of various data types.
+"""
+
 import json
 import dataspec.suppliers as suppliers
 from dataspec.exceptions import SpecException
 import dataspec.types as types
+# need to make sure the default one is registered
+from .preprocessor import *
 
 
 class Refs:
@@ -66,60 +73,9 @@ class Loader:
 
 
 def _preprocess_spec(raw_spec):
-    """
-    Preprocesses the spec into a format that is easier to use.
-    Pushes all url params in keys into config object. Converts shorthand specs into full specs
-    :param raw_spec: to preprocess
-    :return: the reformatted spec
-    """
-    updated_specs = {}
-    for key, spec in raw_spec.items():
-        if '?' not in key:
-            # check for conflicts
-            if key in updated_specs:
-                raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
-            updated_specs[key] = spec
-        else:
-            if ' ' in key:
-                raise SpecException(f'Invalid url key {key}, no spaces allowed')
-            newkey, params = key.replace('?', ' ').split(' ', 2)
-            if newkey in updated_specs:
-                raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
-            # the updated spec to populate
-            updated = {}
-
-            if _is_spec_data(spec):
-                updated['data'] = spec
-            else:
-                # copy all existing values
-                updated.update(spec)
-
-            if 'config' in updated:
-                config = updated['config']
-            else:
-                config = {}
-            for param in params.split('&'):
-                keyvalue = param.split('=')
-                config[keyvalue[0]] = keyvalue[1]
-            updated['config'] = config
-
-            updated_specs[newkey] = updated
-    if 'refs' in raw_spec:
-        updated_specs['refs'] = _preprocess_spec(raw_spec['refs'])
-    return updated_specs
-
-
-def _is_spec_data(spec):
-    """
-    Checks to see if the spec is data only
-    :return: true if only data, false if it is a spec
-    """
-    # if it is not a dictionary, then it is definitely not a spec
-    if not isinstance(spec, dict):
-        return True
-    for core_field in ['type', 'data', 'config']:
-        if core_field in spec:
-            return False
-    # didn't find any core fields, so this must be data
-    return True
-
+    updated = dict(raw_spec)
+    preprocessors = types.registry.preprocessors.get_all()
+    for name in preprocessors:
+        preprocessor = types.registry.preprocessors.get(name)
+        updated = preprocessor(updated)
+    return updated

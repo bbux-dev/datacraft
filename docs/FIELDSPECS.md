@@ -8,6 +8,7 @@ Field Spec Definitions
 |range   | range of values                        |                              |
 |combine | refs or fields                         | join_with                    |
 |uuid    | generates valid uuid                   |                              |
+|ip/ipv4 | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/16 |
 |weightedref | produces values from refs in weighted fashion |                   |
 |select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
 
@@ -69,8 +70,7 @@ C4
 
 
 ## Field Spec Structure
-There are two types of Field Specs, one is the full format that is valid for all types, and the other is the shorthand
-for values types only.
+There are several different ways to define a spec. There is the full spec format and a variety of short hand notations.
 
 ### The full format.
 The only required element is type. Each Type Handler requires different pieces of information. See the Field Type reference
@@ -107,6 +107,22 @@ and the same spec in shorthand notation.
   "field3": "CONSTANT"
 }
 ```
+
+### Inline Key Type Shorthand
+Some specs lend themselves to being easily specified with few parameters. One short hand way to do this is the use a
+colon in the key to specify the type after the field name.  For example `{"id:uuid":{}}`.  This says the field `id` is
+of type `uuid` and has no further configuration.
+
+## Inline Key Config Shorthad
+It is also possible to specify configuration parameters in the key by using URL style prameters. For example.
+
+```json
+{
+  "network:ipv4?cidr=192.168.0.0/14": {}
+}
+```
+The `network` field is of type `ipv4` and the required `cidr` param is specified in the key.
+
 ## Spec Configuration
 There are two ways to configure a spec.  One is by providing a `config` element in the Field Spec and the other is by using
 a URL parameter format in the key.  For example the following two specs will produce the same values:
@@ -255,7 +271,66 @@ The range Field Spec structure is:
 }
 ```
 Example: Range 0 to 10 with a step of 0.5
-{ "zero_to_ten": { "type": "range", "data": [0, 10, 0.5] } }
+```json
+{ 
+  "zero_to_ten": {
+    "type": "range", 
+    "data": [0, 10, 0.5]
+  },
+  "range_shorthand1:range": {"data": [0, 10, 0.5]},
+  "range_shorthand2:range": [0, 10, 0.5]
+}
+```
+
+## Uuid
+A standard uuid.
+
+The uuid Field Spec structure is:
+```json
+{
+  "<field name>": {
+    "type": "uuid"
+  }
+}
+```
+Example Spec
+```json
+{
+  "id": {
+    "type": "uuid"
+  },
+  "id_shorthand:uuid": {}
+}
+```
+
+## IP Addresses
+Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+
+The ipv4 Field Spec structure is:
+```json
+{
+  "<field name>": {
+    "type": "ipv4",
+    "config": {
+      "cidr": "<cidr value>"
+    }
+  }
+}
+```
+
+Example Spec:
+```json
+{
+  "network": {
+    "type": "ipv4",
+    "config": {
+      "cidr": "2.22.222.0/16"
+    }
+  },
+  "network_shorthand:ip?cidr=2.22.222.0/16": {}
+}
+```
+
 ## Weighted Ref
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion. 
 

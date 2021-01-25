@@ -103,50 +103,6 @@ def test_shortcut_notation_config_in_key():
 
     _verify_expected_values(supplier, 5, ['TEST1', 'TEST2', 'TEST3', 'TEST4', 'TEST5'])
 
-
-def test_preprocess_spec_already_defined():
-    config_in_key_spec = {
-        'foo?prefix=TEST': [1, 2, 3, 4, 5],
-        'foo': [5, 6, 7]
-    }
-    with pytest.raises(SpecException):
-        _preprocess_spec(config_in_key_spec)
-
-
-def test_preprocess_spec_simple():
-    config_in_key_spec = {
-        'foo?prefix=TEST': [1, 2, 3, 4, 5],
-    }
-    updated = _preprocess_spec(config_in_key_spec)
-    assert 'foo' in updated
-
-
-def test_preprocess_spec_uuid():
-    config_in_key_spec = {"foo?level=5": {"type": "uuid"}}
-    updated = _preprocess_spec(config_in_key_spec)
-    assert 'foo' in updated
-
-
-def test_preprocess_spec_param_and_config():
-    config_in_key_spec = {
-        'bar?suffix=END': {
-            'type': 'values',
-            'data': [1, 2, 3, 4],
-            'config': {'prefix': 'START'}
-        }
-    }
-    updated = _preprocess_spec(config_in_key_spec)
-    assert 'bar' in updated
-    spec = updated['bar']
-    assert 'config' in spec
-    config = spec['config']
-    assert 'prefix' in config
-    assert config['prefix'] == 'START'
-    assert 'suffix' in config
-    assert config['suffix'] == 'END'
-    assert suppliers.isdecorated(spec)
-
-
 def _verify_expected_values(supplier, iterations, expected_values):
     data = [supplier.next(i) for i in range(iterations)]
     assert data == expected_values

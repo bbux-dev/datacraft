@@ -13,5 +13,9 @@ def test_uuid_spec():
     loader = Loader(spec)
     supplier = loader.get('foo')
 
-    value = supplier.next(0)
-    assert UUID_REGEX.match(value)
+    value1 = supplier.next(0)
+    assert UUID_REGEX.match(value1)
+    value2 = supplier.next(1)
+    assert UUID_REGEX.match(value2)
+
+    assert value1 != value2
