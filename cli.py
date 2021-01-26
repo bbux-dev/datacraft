@@ -11,6 +11,8 @@ from dataspec.type_handlers import range_handler
 from dataspec.type_handlers import select_list_subset
 from dataspec.type_handlers import weighted_ref
 from dataspec.type_handlers import uuid_handler
+from dataspec.type_handlers import ip_handler
+from dataspec.type_handlers import date_handler
 
 def main():
     parser = argparse.ArgumentParser(description='Run dataspec.')

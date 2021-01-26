@@ -119,7 +119,6 @@ class DecoratedSupplier:
         return self.quote + self.prefix + str(value) + self.suffix + self.quote
 
 
-
 def decorated(data_spec, supplier):
     """
     Creates a decorated supplier around the provided on

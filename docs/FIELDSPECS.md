@@ -17,22 +17,26 @@ Field Spec Definitions
         1. [Weighted Values](#Weighted_Values)
         1. [Sample Mode](#Sample_Mode)
     1. [Combine](#Combine)
+    1. [Date](#Date)
     1. [Range](#Range)
     1. [Uuid](#Uuid)
     1. [IP Addresses](#IP_Addresses)
     1. [Weighted Ref](#Weighted_Ref)
-    1. [Select List Subset](#Select_List_Subset)
+    1. [Select List Su  bset](#Select_List_Subset)
 
 # <a name="Quick_Reference"></a>Quick Reference
-| type   | description                            | config                       |
-|--------|----------------------------------------|------------------------------|
-|values  | constant, list, or weighted dictionary |                              |
-|range   | range of values                        |                              |
-|combine | refs or fields                         | join_with                    |
-|uuid    | generates valid uuid                   |                              |
-|ip/ipv4 | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/16 |
-|weightedref | produces values from refs in weighted fashion |                   |
-|select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
+| type                        | description                            | config params                |
+|-----------------------------|----------------------------------------|------------------------------|
+|[values](#Values)            | constant, list, or weighted dictionary |                              |
+|[range](#Range)              | range of values                        |                              |
+|[combine](#Combine)          | refs or fields                         | join_with                    |
+|[date](#Date)                | date strings                           | many see details below       |
+|[date.iso](#Date)            | date strings in ISO8601 format no microseconds| many see details below|
+|[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
+|[uuid](#Uuid)                | generates valid uuid                   |                              |
+|[ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/16 |
+|[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |                      |
+|[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with |
 
 # <a name="Overview"></a>Overview
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
@@ -257,7 +261,7 @@ The combine Field Spec structure is:
     "fields": ["valid field name1", "valid field name2"],
     OR
     "refs": ["valid ref1", "valid ref2"],
-    "config": { "join_with": "<optional string to use to join fields or refs, default is none"}
+    "config": { "join_with": "<optional string to use to join fields or refs, default is none>"}
   }
 }
 ```
@@ -279,6 +283,57 @@ Example below uses the first and last fields to create a full name field.
   }
 }
 ```
+
+## <a name="Date"></a>Date
+A Date Field Spec is used to generate date strings. The default format is day-month-year i.e. Christmas 2050 would be:
+25-12-2050. There is also a `date.iso` type that generates ISO8601 formatted date strings without microseconds and a 
+`date.iso.us` for one that generates them with microseconds.
+We use the [format specification](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
+from the datetime module. The default strategy is to create dates around a center date.  The default is to use today
+with a spread of +-15 days. To make the base or anchor date the start or end of the date range, use the delta_days
+parameter with an array of two elements, where one is zero. If the first is zero then all generated dates will only
+be after the base/anchor date.  If the second element is zero then all generated dates will be before the base/anchor date.
+There are a lot of configuration parameters for the date module.  Each are described below.
+
+### Parameters
+| param | description                                      | examples |
+|-------|--------------------------------------------------|----------|
+|format | datetime compatible format specification         | %Y-%m-%d, %m/%d/%Y, %H:%M:%S,... |
+|delta_days | The number of days +- from the base/anchor date to create date strings for | 1, 12, \[14, 0\] |
+|anchor | date string matching format or default format to use for base date | 22-02-2022 |
+|offset | number of days to shift base date by, positive means shift backwards, negative means forward | 30, -7, ...|
+
+
+The date Field Spec structure is:
+```json
+{
+  "<field name>": {
+    "type": "date",
+    OR,
+    "type": "date.iso",
+    "config": { "...":  "..."}
+  }
+}
+```
+### Examples
+To help with the number of variations of date formats, below is a table of examples.  Assume today is 15 Jan 2050, so the
+default date formatted for today would be 15-01-2050
+
+|format  |delta_days|anchor     |offset|produces                 |spec|
+|--------|----------|-----------|------|-------------------------|----|
+|-       |-         |-          |-     |12-31-2049 ... 30-01-2050|`{"dates:date":{}}`|
+|-       |-         |-          |1     |12-30-2049 ... 29-01-2050|`{"dates:date?offset=1":{}}`|
+|-       |1         |-          |-     |14-01-2050 ... 16-01-2050|`{"dates:date?delta_days=1":{}}`|
+|-       |-1        |-          |-     |same as above            |`{"dates:date?delta_days=-1":{}}`|
+|-       |1         |-          |1     |13-01-2050 ... 15-01-2050|`{"dates:date?delta_days=1&offset=1":{}}`|
+|-       |1         |-          |-1    |15-01-2050 ... 17-01-2050|`{"dates:date?delta_days=1&offset=-1":{}}`|
+|-       |1         |15-12-2050 |1     |13-12-2050 ... 15-12-2050|`{"dates:date?delta_days=1&offset=1&anchor=15-12-2050":{}}`|
+|%d-%b-%Y|1         |15-Dec-2050|-     |14-Dec-2050 ... 16-Dec-2050|`{"dates:date?delta_days=1&anchor=15-Dec-2050&format=%d-%b-%Y":{}}`|
+|-       |\[1,2\]   |-          |-     |15-01-2050 ... 17-01-2050|`{"dates:date":{"config":{"delta_days":\[0,2\]}}}`|
+
+### ISO8601 formatted dates
+The type `date.iso` will produce a ISO8601 formatted date in the bounds configured without milliseconds. Use the `date.iso.us`
+type to generate them with microseconds.
 
 ## <a name="Range"></a>Range
 A range spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and step can be integers or
