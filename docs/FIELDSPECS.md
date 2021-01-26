@@ -22,7 +22,8 @@ Field Spec Definitions
     1. [Uuid](#Uuid)
     1. [IP Addresses](#IP_Addresses)
     1. [Weighted Ref](#Weighted_Ref)
-    1. [Select List Su  bset](#Select_List_Subset)
+    1. [Select List Subset](#Select_List_Subset)
+        1. [Quoting Sublist Elements](#quoting_sublist)
 
 # <a name="Quick_Reference"></a>Quick Reference
 | type                        | description                            | config params                |
@@ -311,6 +312,8 @@ The date Field Spec structure is:
     "type": "date",
     OR,
     "type": "date.iso",
+    OR,
+    "type": "date.iso.us",
     "config": { "...":  "..."}
   }
 }
@@ -494,4 +497,35 @@ potatoes, bell peppers, onions, garlic
 spinach, bell peppers
 spinach, onions, garlic
 carrots, garlic, mushrooms, potatoes
+```
+### <a name='quoting_sublist'></a> Quoting Sublist Elements
+The default `quote` parameter will only quote the whole combined list of elements.  To quote each individual element of the
+sublist you need to use a special form of `join_with` along with the `quote` param.  For example if we wanted all of our
+ingredients surrounded with double quotes. We would update our spec this way.
+```json
+{
+  "ingredients": {
+    "type": "select_list_subset",
+    "config": {
+      "mean": 3, "stddev": 1, "min": 2, "max": 4,
+      "join_with": "\", \"",
+      "quote": "\""
+    },
+    "data": [ "onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
+  }
+}
+```
+Now when we run our datespec we get:
+```shell script
+dist/dataspec -s ~/scratch/quoted_ingredients.json -i 10
+"spinach", "mushrooms", "bell peppers", "onions"
+"spinach", "onions", "mushrooms", "garlic"
+"carrots", "garlic", "mushrooms", "onions"
+"mushrooms", "bell peppers", "carrots"
+"carrots", "potatoes", "bell peppers", "onions"
+"spinach", "mushrooms"
+"mushrooms", "bell peppers", "onions"
+"potatoes", "carrots", "bell peppers", "spinach"
+"garlic", "mushrooms", "potatoes"
+"carrots", "spinach", "bell peppers", "potatoes"
 ```
