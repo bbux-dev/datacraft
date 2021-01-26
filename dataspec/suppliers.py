@@ -103,18 +103,21 @@ def isdecorated(data_spec):
     if 'config' not in data_spec:
         return False
     config = data_spec.get('config')
-    return 'prefix' in config or 'suffix' in config
+    return 'prefix' in config or 'suffix' in config or 'quote' in config
 
 
 class DecoratedSupplier:
     def __init__(self, config, supplier):
         self.prefix = config.get('prefix', '')
         self.suffix = config.get('suffix', '')
+        self.quote = config.get('quote', '')
         self.wrapped = supplier
 
     def next(self, iteration):
         value = self.wrapped.next(iteration)
-        return self.prefix + str(value) + self.suffix
+        # todo: cache mapping for efficiency?
+        return self.quote + self.prefix + str(value) + self.suffix + self.quote
+
 
 
 def decorated(data_spec, supplier):

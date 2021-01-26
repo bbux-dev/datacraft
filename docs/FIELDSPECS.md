@@ -1,7 +1,29 @@
 Field Spec Definitions
 ========================
 
-# Quick Reference
+1. [Quick Reference](#Quick_Reference)
+1. [Overview](#Overview)
+1. [Field Spec Structure](#Field_Spec_Structure)
+    1. [The Full Format](#The_full_format.)
+    1. [Values Shorthand](#Values_Shorthand)
+    1. [Inline Key Type Shorthand](#Inline_Key_Type_Shorthand)
+    1. [Inline Key Config Shorthad](#Inline_Key_Config_Shorthad)
+1. [Spec Configuration](#Spec_Configuration)
+    1. [Common Configurations](#Common_Configurations)
+1. [Field Spec Types](#Field_Spec_Types)
+    1. [Values](#Values)
+        1. [Constant Values](#Constant_Values)
+        1. [List Values](#List_Values)
+        1. [Weighted Values](#Weighted_Values)
+        1. [Sample Mode](#Sample_Mode)
+    1. [Combine](#Combine)
+    1. [Range](#Range)
+    1. [Uuid](#Uuid)
+    1. [IP Addresses](#IP_Addresses)
+    1. [Weighted Ref](#Weighted_Ref)
+    1. [Select List Subset](#Select_List_Subset)
+
+# <a name="Quick_Reference"></a>Quick Reference
 | type   | description                            | config                       |
 |--------|----------------------------------------|------------------------------|
 |values  | constant, list, or weighted dictionary |                              |
@@ -12,7 +34,7 @@ Field Spec Definitions
 |weightedref | produces values from refs in weighted fashion |                   |
 |select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
 
-# Overview
+# <a name="Overview"></a>Overview
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
 refer to this as a Field Spec.  The simplest type of Field Spec is a values spec.  The main format of a values spec is a
 list of values to use.  By default, these values are rotated through incrementally.  If the number of increments is larger than the
@@ -69,10 +91,10 @@ C4
 ```
 
 
-## Field Spec Structure
+# <a name="Field_Spec_Structure"></a>Field Spec Structure
 There are several different ways to define a spec. There is the full spec format and a variety of short hand notations.
 
-### The full format.
+## <a name="The_full_format."></a>The Full Format.
 The only required element is type. Each Type Handler requires different pieces of information. See the Field Type reference
 below for details on each type.
 ```json
@@ -89,7 +111,7 @@ below for details on each type.
 }
 ```
 
-### Values Shorthand
+## <a name="Values_Shorthand"></a>Values Shorthand
 The values type is very common and so has a shorthand notation.  Below is an example full Field Spec for some values types fields
 and the same spec in shorthand notation.
 
@@ -108,12 +130,12 @@ and the same spec in shorthand notation.
 }
 ```
 
-### Inline Key Type Shorthand
+## <a name="Inline_Key_Type_Shorthand"></a>Inline Key Type Shorthand
 Some specs lend themselves to being easily specified with few parameters. One short hand way to do this is the use a
 colon in the key to specify the type after the field name.  For example `{"id:uuid":{}}`.  This says the field `id` is
 of type `uuid` and has no further configuration.
 
-## Inline Key Config Shorthad
+## <a name="Inline_Key_Config_Shorthad"></a>Inline Key Config Shorthad
 It is also possible to specify configuration parameters in the key by using URL style prameters. For example.
 
 ```json
@@ -123,9 +145,9 @@ It is also possible to specify configuration parameters in the key by using URL 
 ```
 The `network` field is of type `ipv4` and the required `cidr` param is specified in the key.
 
-## Spec Configuration
+# <a name="Spec_Configuration"></a>Spec Configuration
 There are two ways to configure a spec.  One is by providing a `config` element in the Field Spec and the other is by using
-a URL parameter format in the key.  For example the following two specs will produce the same values:
+a URL parameter format in the key.  For example, the following two fields will produce the same values:
 
 ```json
 {
@@ -138,30 +160,14 @@ a URL parameter format in the key.  For example the following two specs will pro
 }
 ```
 
-## Sample Mode
-To increase the randomness of the data being generated you can configure a FieldSpec that contains a list of values to be
-sampled instead of iterated through incrementally. Normally the spec below would create the repeating sequence: `A1 B2 C3`,
-but since both fields `ONE` and `TWO` are in sample mode, we will get all nine combinations of values after a significant
-number of iterations. This would also be true if only one was set to sample mode. To turn sample mode on either use a URL
-param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only valid with entries that are lists.
-
-```json
-{
-  "combine": {"type": "combine", "refs":  ["ONE", "TWO"]},
-  "refs": {
-    "ONE?sample=true":["A", "B", "C"],
-    "TWO?sample=true":[1, 2, 3]
-  }
-}
-```
-
-# Common Configurations
+# <a name="Common_Configurations"></a>Common Configurations
 There are some configuration values that can be applied to all types.  These are listed below
 
-| key   | effect |
-|-------|--------|
-|prefix | Prepends the value to all results |
-|suffix | Appends the value to all results  |
+| key   | argument |effect |
+|-------|----------|-------|
+|prefix | string   |Prepends the value to all results |
+|suffix | string   |Appends the value to all results  |
+|quote  | string   |Wraps the resulting value on both sides with the provided string |
 
 Example:
 ```json
@@ -174,14 +180,14 @@ Example:
 }
 ```
 
-# Field Spec Types
+# <a name="Field_Spec_Types"></a>Field Spec Types
 These are the built in types
 
-## Values
+## <a name="Values"></a>Values
 There are three types of values specs: Constants, List, and Weighted. Values specs have a shorthand notation where the
 value of the data element replaces the full spec.  See examples below.
 
-### Constant Values
+### <a name="Constant_Values"></a>Constant Values
 A Constant Value is just a single value that is used in every iteration
 
 ```json
@@ -191,7 +197,7 @@ A Constant Value is just a single value that is used in every iteration
 }
 ```
 
-### List Values
+### <a name="List_Values"></a>List Values
 List values are rotated through in order. If the number of iterations is larger than the size of the list, we start over
 from the beginning of the list.
 
@@ -202,7 +208,7 @@ from the beginning of the list.
 }
 ```
 
-### Weighted Values
+### <a name="Weighted_Values"></a>Weighted Values
 Weighted values are generated according to their weights.
 
 ```json
@@ -223,7 +229,24 @@ Weighted values are generated according to their weights.
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more likely
 the values will match their specified weights.
 
-## Combine
+### <a name="Sample_Mode"></a>Sample Mode
+To increase the randomness of the data being generated you can configure a FieldSpec that contains a list of values to be
+sampled instead of iterated through incrementally. Normally the spec below would create the repeating sequence: `A1 B2 C3`,
+but since both fields `ONE` and `TWO` are in sample mode, we will get all nine combinations of values after a significant
+number of iterations. This would also be true if only one was set to sample mode. To turn sample mode on either use a URL
+param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only valid with entries that are lists.
+
+```json
+{
+  "combine": {"type": "combine", "refs":  ["ONE", "TWO"]},
+  "refs": {
+    "ONE?sample=true":["A", "B", "C"],
+    "TWO?sample=true":[1, 2, 3]
+  }
+}
+```
+
+## <a name="Combine"></a>Combine
 A combine Field Spec is used to concatenate or append two or more fields or reference to one another. 
 
 The combine Field Spec structure is:
@@ -257,7 +280,7 @@ Example below uses the first and last fields to create a full name field.
 }
 ```
 
-## Range
+## <a name="Range"></a>Range
 A range spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and step can be integers or
 floating point numbers.
 
@@ -282,7 +305,7 @@ Example: Range 0 to 10 with a step of 0.5
 }
 ```
 
-## Uuid
+## <a name="Uuid"></a>Uuid
 A standard uuid.
 
 The uuid Field Spec structure is:
@@ -303,7 +326,7 @@ Example Spec
 }
 ```
 
-## IP Addresses
+## <a name="IP_Addresses"></a>IP Addresses
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
 
 The ipv4 Field Spec structure is:
@@ -331,7 +354,7 @@ Example Spec:
 }
 ```
 
-## Weighted Ref
+## <a name="Weighted_Ref"></a>Weighted Ref
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion. 
 
 The weightedref Field Spec structure is:
@@ -362,7 +385,7 @@ the follow spec.
 }
 ```
 
-## Select List Subset
+## <a name="Select_List_Subset"></a>Select List Subset
 A select list subset spec is used to select multiple values from a list to use as the value for a field. 
 
 The select_list_subset Field Spec structure is:
