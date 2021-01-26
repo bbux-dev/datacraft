@@ -1,7 +1,15 @@
 Data Spec Repository
 ========================
+1. [Overview](#Overview)
+1. [Build](#Build)
+1. [Examples](#Examples)
+1. [Core Concepts](#Core_Concepts)
+    1. [Data Spec](#Data_Spec)
+    1. [Field Specs](#Field_Specs)
+    1. [Templating](#Templating)
+    1. [Custom Code Loading](#Custom_Code_Loading)
 
-## Overview
+## <a name="Overview"></a>Overview
 
 This is a tool for making data according to specifications. The goal is to separate the structure of the data from the
 values that populate it. We do this by defining two core concepts the Data Spec and the Field Spec. A Data Spec is used
@@ -11,7 +19,7 @@ Field Spec that defines how the values for it should be created. There are a var
 the data for each field.  Where the built-in types are not sufficient, there is an easy way to create custom types and handlers for
 them. The tool supports templating using the [Jinja2](https://pypi.org/project/Jinja2/) templating engine format.
 
-## Build
+## <a name="Build"></a>Build
 
 To build a command line version of the tool:
 
@@ -21,11 +29,11 @@ pyinstaller cli.py --name dataspec --onefile
 
 The executable will be located in `dist/dataspec`
 
-## Examples
+## <a name="Examples"></a>Examples
 See [examples](docs/EXAMPLES.md) to dive into detailed examples and practical use cases.
 
-## Core Concepts
-### Data Spec
+## <a name="Core_Concepts"></a>Core Concepts
+### <a name="Data_Spec"></a>Data Spec
 
 A Data Spec is a Dictionary where the keys are the names of the fields to generate and each value is a [Field Spec](docs/FIELDSPECS.md)
 that describes how the values for that field are to be generated. There is one reserved key in the root of the Data Spec: refs.
@@ -84,10 +92,10 @@ llama_jump@gmail.com
 flamingo_jump@gmail.com
 ```
 
-### Field Specs
+### <a name="Field_Specs"></a>Field Specs
 See [field specs](docs/FIELDSPECS.md) for details.
 
-### Templating
+### <a name="Templating"></a>Templating
 To populate a template file with the generated values for each iteration, pass the -t /path/to/template arg to the dataspec
 command.  We use the [Jinja2](https://pypi.org/project/Jinja2/) templating engine under the hood.  The basic format is to put
 the field names in {{ field name }} notation wherever they should be substituted.  For example the following is a template
@@ -121,7 +129,7 @@ dist/dataspec -s ~/scratch/es-spec.json -t ~/scratch/template.json -i 10
 ...
 ```
 
-### Custom Code Loading
+### <a name="Custom_Code_Loading"></a>Custom Code Loading
 There are a lot of types of data that are not generated with this tool. Instead of adding them all, there is a mechanism
 to bring your own data suppliers. We make use of the handy [catalogue](https://pypi.org/project/catalogue/) library to
 allow auto discovery of custom functions using decorators.  Use the @dataspec.registry.types('\<type key\>') to register a
@@ -137,9 +145,9 @@ class ReverseStringSupplier:
         self.wrapped = wrapped
 
     def next(self, iteration):
-        # value from the wrapped supplier
+        # the wrapped supplier"></a>value from the wrapped supplier
         value = str(self.wrapped.next(iteration))
-        # python way to reverse a string, hehe
+        # to reverse a string, hehe"></a>python way to reverse a string, hehe
         return value[::-1]
 
 
@@ -149,7 +157,7 @@ def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
     spec = loader.refs.get(key)
     wrapped = loader.get_from_spec(spec)
-    # wrap this with our custom reverse string supplier
+    # with our custom reverse string supplier"></a>wrap this with our custom reverse string supplier
     return ReverseStringSupplier(wrapped)
 ```
 

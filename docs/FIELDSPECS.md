@@ -1,18 +1,45 @@
 Field Spec Definitions
 ========================
 
-# Quick Reference
-| type   | description                            | config                       |
-|--------|----------------------------------------|------------------------------|
-|values  | constant, list, or weighted dictionary |                              |
-|range   | range of values                        |                              |
-|combine | refs or fields                         | join_with                    |
-|uuid    | generates valid uuid                   |                              |
-|ip/ipv4 | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/16 |
-|weightedref | produces values from refs in weighted fashion |                   |
-|select_list_subset | selects subset of fields that are combined to create the value for the field | join_with                    |
+1. [Quick Reference](#Quick_Reference)
+1. [Overview](#Overview)
+1. [Field Spec Structure](#Field_Spec_Structure)
+    1. [The Full Format](#The_full_format.)
+    1. [Values Shorthand](#Values_Shorthand)
+    1. [Inline Key Type Shorthand](#Inline_Key_Type_Shorthand)
+    1. [Inline Key Config Shorthad](#Inline_Key_Config_Shorthad)
+1. [Spec Configuration](#Spec_Configuration)
+    1. [Common Configurations](#Common_Configurations)
+1. [Field Spec Types](#Field_Spec_Types)
+    1. [Values](#Values)
+        1. [Constant Values](#Constant_Values)
+        1. [List Values](#List_Values)
+        1. [Weighted Values](#Weighted_Values)
+        1. [Sample Mode](#Sample_Mode)
+    1. [Combine](#Combine)
+    1. [Date](#Date)
+    1. [Range](#Range)
+    1. [Uuid](#Uuid)
+    1. [IP Addresses](#IP_Addresses)
+    1. [Weighted Ref](#Weighted_Ref)
+    1. [Select List Subset](#Select_List_Subset)
+        1. [Quoting Sublist Elements](#quoting_sublist)
 
-# Overview
+# <a name="Quick_Reference"></a>Quick Reference
+| type                        | description                            | config params                |
+|-----------------------------|----------------------------------------|------------------------------|
+|[values](#Values)            | constant, list, or weighted dictionary |                              |
+|[range](#Range)              | range of values                        |                              |
+|[combine](#Combine)          | refs or fields                         | join_with                    |
+|[date](#Date)                | date strings                           | many see details below       |
+|[date.iso](#Date)            | date strings in ISO8601 format no microseconds| many see details below|
+|[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
+|[uuid](#Uuid)                | generates valid uuid                   |                              |
+|[ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/16 |
+|[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |                      |
+|[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with |
+
+# <a name="Overview"></a>Overview
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
 refer to this as a Field Spec.  The simplest type of Field Spec is a values spec.  The main format of a values spec is a
 list of values to use.  By default, these values are rotated through incrementally.  If the number of increments is larger than the
@@ -69,10 +96,10 @@ C4
 ```
 
 
-## Field Spec Structure
+# <a name="Field_Spec_Structure"></a>Field Spec Structure
 There are several different ways to define a spec. There is the full spec format and a variety of short hand notations.
 
-### The full format.
+## <a name="The_full_format."></a>The Full Format.
 The only required element is type. Each Type Handler requires different pieces of information. See the Field Type reference
 below for details on each type.
 ```json
@@ -89,7 +116,7 @@ below for details on each type.
 }
 ```
 
-### Values Shorthand
+## <a name="Values_Shorthand"></a>Values Shorthand
 The values type is very common and so has a shorthand notation.  Below is an example full Field Spec for some values types fields
 and the same spec in shorthand notation.
 
@@ -108,12 +135,12 @@ and the same spec in shorthand notation.
 }
 ```
 
-### Inline Key Type Shorthand
+## <a name="Inline_Key_Type_Shorthand"></a>Inline Key Type Shorthand
 Some specs lend themselves to being easily specified with few parameters. One short hand way to do this is the use a
 colon in the key to specify the type after the field name.  For example `{"id:uuid":{}}`.  This says the field `id` is
 of type `uuid` and has no further configuration.
 
-## Inline Key Config Shorthad
+## <a name="Inline_Key_Config_Shorthad"></a>Inline Key Config Shorthad
 It is also possible to specify configuration parameters in the key by using URL style prameters. For example.
 
 ```json
@@ -123,9 +150,9 @@ It is also possible to specify configuration parameters in the key by using URL 
 ```
 The `network` field is of type `ipv4` and the required `cidr` param is specified in the key.
 
-## Spec Configuration
+# <a name="Spec_Configuration"></a>Spec Configuration
 There are two ways to configure a spec.  One is by providing a `config` element in the Field Spec and the other is by using
-a URL parameter format in the key.  For example the following two specs will produce the same values:
+a URL parameter format in the key.  For example, the following two fields will produce the same values:
 
 ```json
 {
@@ -138,30 +165,14 @@ a URL parameter format in the key.  For example the following two specs will pro
 }
 ```
 
-## Sample Mode
-To increase the randomness of the data being generated you can configure a FieldSpec that contains a list of values to be
-sampled instead of iterated through incrementally. Normally the spec below would create the repeating sequence: `A1 B2 C3`,
-but since both fields `ONE` and `TWO` are in sample mode, we will get all nine combinations of values after a significant
-number of iterations. This would also be true if only one was set to sample mode. To turn sample mode on either use a URL
-param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only valid with entries that are lists.
-
-```json
-{
-  "combine": {"type": "combine", "refs":  ["ONE", "TWO"]},
-  "refs": {
-    "ONE?sample=true":["A", "B", "C"],
-    "TWO?sample=true":[1, 2, 3]
-  }
-}
-```
-
-# Common Configurations
+# <a name="Common_Configurations"></a>Common Configurations
 There are some configuration values that can be applied to all types.  These are listed below
 
-| key   | effect |
-|-------|--------|
-|prefix | Prepends the value to all results |
-|suffix | Appends the value to all results  |
+| key   | argument |effect |
+|-------|----------|-------|
+|prefix | string   |Prepends the value to all results |
+|suffix | string   |Appends the value to all results  |
+|quote  | string   |Wraps the resulting value on both sides with the provided string |
 
 Example:
 ```json
@@ -174,14 +185,14 @@ Example:
 }
 ```
 
-# Field Spec Types
+# <a name="Field_Spec_Types"></a>Field Spec Types
 These are the built in types
 
-## Values
+## <a name="Values"></a>Values
 There are three types of values specs: Constants, List, and Weighted. Values specs have a shorthand notation where the
 value of the data element replaces the full spec.  See examples below.
 
-### Constant Values
+### <a name="Constant_Values"></a>Constant Values
 A Constant Value is just a single value that is used in every iteration
 
 ```json
@@ -191,7 +202,7 @@ A Constant Value is just a single value that is used in every iteration
 }
 ```
 
-### List Values
+### <a name="List_Values"></a>List Values
 List values are rotated through in order. If the number of iterations is larger than the size of the list, we start over
 from the beginning of the list.
 
@@ -202,7 +213,7 @@ from the beginning of the list.
 }
 ```
 
-### Weighted Values
+### <a name="Weighted_Values"></a>Weighted Values
 Weighted values are generated according to their weights.
 
 ```json
@@ -223,7 +234,24 @@ Weighted values are generated according to their weights.
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more likely
 the values will match their specified weights.
 
-## Combine
+### <a name="Sample_Mode"></a>Sample Mode
+To increase the randomness of the data being generated you can configure a FieldSpec that contains a list of values to be
+sampled instead of iterated through incrementally. Normally the spec below would create the repeating sequence: `A1 B2 C3`,
+but since both fields `ONE` and `TWO` are in sample mode, we will get all nine combinations of values after a significant
+number of iterations. This would also be true if only one was set to sample mode. To turn sample mode on either use a URL
+param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only valid with entries that are lists.
+
+```json
+{
+  "combine": {"type": "combine", "refs":  ["ONE", "TWO"]},
+  "refs": {
+    "ONE?sample=true":["A", "B", "C"],
+    "TWO?sample=true":[1, 2, 3]
+  }
+}
+```
+
+## <a name="Combine"></a>Combine
 A combine Field Spec is used to concatenate or append two or more fields or reference to one another. 
 
 The combine Field Spec structure is:
@@ -234,7 +262,7 @@ The combine Field Spec structure is:
     "fields": ["valid field name1", "valid field name2"],
     OR
     "refs": ["valid ref1", "valid ref2"],
-    "config": { "join_with": "<optional string to use to join fields or refs, default is none"}
+    "config": { "join_with": "<optional string to use to join fields or refs, default is none>"}
   }
 }
 ```
@@ -257,7 +285,60 @@ Example below uses the first and last fields to create a full name field.
 }
 ```
 
-## Range
+## <a name="Date"></a>Date
+A Date Field Spec is used to generate date strings. The default format is day-month-year i.e. Christmas 2050 would be:
+25-12-2050. There is also a `date.iso` type that generates ISO8601 formatted date strings without microseconds and a 
+`date.iso.us` for one that generates them with microseconds.
+We use the [format specification](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
+from the datetime module. The default strategy is to create dates around a center date.  The default is to use today
+with a spread of +-15 days. To make the base or anchor date the start or end of the date range, use the delta_days
+parameter with an array of two elements, where one is zero. If the first is zero then all generated dates will only
+be after the base/anchor date.  If the second element is zero then all generated dates will be before the base/anchor date.
+There are a lot of configuration parameters for the date module.  Each are described below.
+
+### Parameters
+| param | description                                      | examples |
+|-------|--------------------------------------------------|----------|
+|format | datetime compatible format specification         | %Y-%m-%d, %m/%d/%Y, %H:%M:%S,... |
+|delta_days | The number of days +- from the base/anchor date to create date strings for | 1, 12, \[14, 0\] |
+|anchor | date string matching format or default format to use for base date | 22-02-2022 |
+|offset | number of days to shift base date by, positive means shift backwards, negative means forward | 30, -7, ...|
+
+
+The date Field Spec structure is:
+```json
+{
+  "<field name>": {
+    "type": "date",
+    OR,
+    "type": "date.iso",
+    OR,
+    "type": "date.iso.us",
+    "config": { "...":  "..."}
+  }
+}
+```
+### Examples
+To help with the number of variations of date formats, below is a table of examples.  Assume today is 15 Jan 2050, so the
+default date formatted for today would be 15-01-2050
+
+|format  |delta_days|anchor     |offset|produces                 |spec|
+|--------|----------|-----------|------|-------------------------|----|
+|-       |-         |-          |-     |12-31-2049 ... 30-01-2050|`{"dates:date":{}}`|
+|-       |-         |-          |1     |12-30-2049 ... 29-01-2050|`{"dates:date?offset=1":{}}`|
+|-       |1         |-          |-     |14-01-2050 ... 16-01-2050|`{"dates:date?delta_days=1":{}}`|
+|-       |-1        |-          |-     |same as above            |`{"dates:date?delta_days=-1":{}}`|
+|-       |1         |-          |1     |13-01-2050 ... 15-01-2050|`{"dates:date?delta_days=1&offset=1":{}}`|
+|-       |1         |-          |-1    |15-01-2050 ... 17-01-2050|`{"dates:date?delta_days=1&offset=-1":{}}`|
+|-       |1         |15-12-2050 |1     |13-12-2050 ... 15-12-2050|`{"dates:date?delta_days=1&offset=1&anchor=15-12-2050":{}}`|
+|%d-%b-%Y|1         |15-Dec-2050|-     |14-Dec-2050 ... 16-Dec-2050|`{"dates:date?delta_days=1&anchor=15-Dec-2050&format=%d-%b-%Y":{}}`|
+|-       |\[1,2\]   |-          |-     |15-01-2050 ... 17-01-2050|`{"dates:date":{"config":{"delta_days":\[0,2\]}}}`|
+
+### ISO8601 formatted dates
+The type `date.iso` will produce a ISO8601 formatted date in the bounds configured without milliseconds. Use the `date.iso.us`
+type to generate them with microseconds.
+
+## <a name="Range"></a>Range
 A range spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and step can be integers or
 floating point numbers.
 
@@ -282,7 +363,7 @@ Example: Range 0 to 10 with a step of 0.5
 }
 ```
 
-## Uuid
+## <a name="Uuid"></a>Uuid
 A standard uuid.
 
 The uuid Field Spec structure is:
@@ -303,7 +384,7 @@ Example Spec
 }
 ```
 
-## IP Addresses
+## <a name="IP_Addresses"></a>IP Addresses
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
 
 The ipv4 Field Spec structure is:
@@ -331,7 +412,7 @@ Example Spec:
 }
 ```
 
-## Weighted Ref
+## <a name="Weighted_Ref"></a>Weighted Ref
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion. 
 
 The weightedref Field Spec structure is:
@@ -362,7 +443,7 @@ the follow spec.
 }
 ```
 
-## Select List Subset
+## <a name="Select_List_Subset"></a>Select List Subset
 A select list subset spec is used to select multiple values from a list to use as the value for a field. 
 
 The select_list_subset Field Spec structure is:
@@ -416,4 +497,35 @@ potatoes, bell peppers, onions, garlic
 spinach, bell peppers
 spinach, onions, garlic
 carrots, garlic, mushrooms, potatoes
+```
+### <a name='quoting_sublist'></a> Quoting Sublist Elements
+The default `quote` parameter will only quote the whole combined list of elements.  To quote each individual element of the
+sublist you need to use a special form of `join_with` along with the `quote` param.  For example if we wanted all of our
+ingredients surrounded with double quotes. We would update our spec this way.
+```json
+{
+  "ingredients": {
+    "type": "select_list_subset",
+    "config": {
+      "mean": 3, "stddev": 1, "min": 2, "max": 4,
+      "join_with": "\", \"",
+      "quote": "\""
+    },
+    "data": [ "onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
+  }
+}
+```
+Now when we run our datespec we get:
+```shell script
+dist/dataspec -s ~/scratch/quoted_ingredients.json -i 10
+"spinach", "mushrooms", "bell peppers", "onions"
+"spinach", "onions", "mushrooms", "garlic"
+"carrots", "garlic", "mushrooms", "onions"
+"mushrooms", "bell peppers", "carrots"
+"carrots", "potatoes", "bell peppers", "onions"
+"spinach", "mushrooms"
+"mushrooms", "bell peppers", "onions"
+"potatoes", "carrots", "bell peppers", "spinach"
+"garlic", "mushrooms", "potatoes"
+"carrots", "spinach", "bell peppers", "potatoes"
 ```
