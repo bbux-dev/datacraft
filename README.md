@@ -5,6 +5,7 @@ Data Spec Repository
 1. [Examples](#Examples)
 1. [Core Concepts](#Core_Concepts)
    1. [Data Spec](#Data_Spec)
+      1. [YAML Format](#YAML_Format)
    1. [Field Specs](#Field_Specs)
    1. [Templating](#Templating)
       1. [Loops in Templates](#Templating_Loops)
@@ -95,6 +96,38 @@ llama_jump@gmail.com
 flamingo_jump@gmail.com
 ```
 
+#### <a name="YAML_Format"></a>YAML Format
+Dats specs can also be created using YAML.  Below is the same spec above in YAML.
+```yaml
+---
+email:
+  type: combine
+  refs:
+  - HANDLE
+  - DOMAINS
+  config:
+    join_with: "@"
+refs:
+  HANDLE:
+    type: combine
+    refs:
+    - ANIMALS
+    - ACTIONS
+    config:
+      join_with: _
+  ANIMALS:
+    type: values
+    data: [zebra, hedgehog, llama, flamingo]
+  ACTIONS?sample=true:
+    type: values
+    data: [fling, jump, launch, dispatch]
+  DOMAINS:
+    type: values
+    data:
+      gmail.com: 0.6
+      yahoo.com: 0.3
+      hotmail.com: 0.1
+```
 ### <a name="Field_Specs"></a>Field Specs
 See [field specs](docs/FIELDSPECS.md) for details.
 
