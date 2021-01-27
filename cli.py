@@ -1,9 +1,11 @@
 import json
+import yaml
 import argparse
 from dataspec import Loader
 import dataspec.template_engines as engines
 import dataspec.outputs as outputs
 from dataspec import utils
+from dataspec import SpecException
 # this activates the decorators, so they will be discoverable
 # cannot use * import due to pyinstaller not recognizing modules as being used
 from dataspec.type_handlers import combine
@@ -41,8 +43,7 @@ def main():
         for code in args.code:
             utils.load_custom_code(code)
 
-    with open(args.spec, 'r') as handle:
-        spec = json.load(handle)
+    spec = _load_spec(args.spec)
 
     loader = Loader(spec)
 
@@ -69,6 +70,19 @@ def main():
             value = loader.get(key).next(i)
             output.handle(key, value)
         output.finished_record()
+
+
+def _load_spec(spec_path):
+    with open(spec_path, 'r') as handle:
+        try:
+            return json.load(handle)
+        except json.decoder.JSONDecodeError:
+            pass
+    # not JSON, try yaml
+    with open(spec_path, 'r') as handle:
+        spec = yaml.load(handle, Loader=yaml.FullLoader)
+    if not isinstance(spec, dict):
+        raise SpecException(f'Unable to load spec from path: {spec_path}, Please verify it is valid JSON or YAML')
 
 
 if __name__ == '__main__':

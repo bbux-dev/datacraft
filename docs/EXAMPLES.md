@@ -65,6 +65,50 @@ look like:
 }
 ```
 
+<details>
+<summary>Spec as YAML</summary>
+
+```yaml
+---
+insults1:
+  type: combine
+  refs: [PRONOUN_IDENTIFIER, ADVERB_MODIFIER, ADJECTIVE_INSULT]
+  config:
+    join_with: " "
+    prefix: '1,'
+insults2:
+  type: combine
+  refs: [PRONOUN_IDENTIFIER, DETERMINANT, NOUN_INSULT]
+  config:
+    join_with: " "
+    prefix: '1,'
+compliments1:
+  type: combine
+  refs: [PRONOUN_IDENTIFIER, ADVERB_MODIFIER, ADJECTIVE_COMPLIMENT]
+  config:
+    join_with: " "
+    prefix: '0,'
+compliments2:
+  type: combine
+  refs: [PRONOUN_IDENTIFIER, DETERMINANT, NOUN_COMPLIMENT]
+  config:
+    join_with: " "
+    prefix: '0,'
+refs:
+  PRONOUN_IDENTIFIER: [You are, You're]
+  ADVERB_MODIFIER: [so, extremely, utterly, incredibly]
+  DETERMINANT:
+    a: 0.3
+    an: 0.3
+    such a: 0.3
+    a complete and utter: 0.1
+  ADJECTIVE_INSULT: [stupid, dumb, idiotic, imbecilic, useless, ugly]
+  NOUN_INSULT: [idiot, schmuck, moron, imbecile, poop face]
+  ADJECTIVE_COMPLIMENT: [nice, sweet, kind, smart]
+  NOUN_COMPLIMENT: [inspiration, blessing, friend]
+```
+</details>  
+
 Looking at some of the insults produced
 ```shell script
 dist/dataspec -s ~/scratch/insults.json -i 100 | grep '1,' | tail

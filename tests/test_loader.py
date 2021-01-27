@@ -103,6 +103,7 @@ def test_shortcut_notation_config_in_key():
 
     _verify_expected_values(supplier, 5, ['TEST1', 'TEST2', 'TEST3', 'TEST4', 'TEST5'])
 
+
 def _verify_expected_values(supplier, iterations, expected_values):
     data = [supplier.next(i) for i in range(iterations)]
     assert data == expected_values
