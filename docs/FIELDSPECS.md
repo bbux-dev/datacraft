@@ -21,6 +21,7 @@ Field Spec Definitions
     1. [Range](#Range)
     1. [Uuid](#Uuid)
     1. [IP Addresses](#IP_Addresses)
+        1. [Fast IP](#Fast_IP)
     1. [Weighted Ref](#Weighted_Ref)
     1. [Select List Subset](#Select_List_Subset)
         1. [Quoting Sublist Elements](#quoting_sublist)
@@ -36,7 +37,8 @@ Field Spec Definitions
 |[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
 |[uuid](#Uuid)                | generates valid uuid                   |                              |
 |[ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/16 |
-|[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |                      |
+|[ip.fast](#IP_Addresses)     | generates ip v4 addresses              | base                         |
+|[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |                       |
 |[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with |
 
 # <a name="Overview"></a>Overview
@@ -385,7 +387,8 @@ Example Spec
 ```
 
 ## <a name="IP_Addresses"></a>IP Addresses
-Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).
+Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing). Note
+this can be slow for anything smaller than a /16 address space. See [Fast IP](#Fast_IP) below for an alternative.
 
 The ipv4 Field Spec structure is:
 ```json
@@ -411,6 +414,28 @@ Example Spec:
   "network_shorthand:ip?cidr=2.22.222.0/16": {}
 }
 ```
+
+### <a name="Fast_IP"></a> Fast IP Addresses
+For some cidr values the number of generated ips becomes large and the underlying module used becomes preventatively slow.
+Even with a /16 address it can take multiple seconds to generate only 1000 ips. Anything smaller than that may not be worth it.
+The `ip.fast` type is used to get around this limitation. Given a valid ip base i.e. 10.0, it will generate random numbers
+between 0 and 255 for the unspecified octets of the ip. Any valid ip base can be used.  If none is specified, all octets
+will be generated randomly.
+
+#### Examples
+All random IPs
+```json
+{"network:ip.fast":{}}
+```
+Ips in the 10.n.n.n range
+```json
+{"network:ip.fast?base=10.":{}}
+```
+Ips in the 192.168.1.n range
+```json
+{"network:ip.fast?base=192.168.1":{}}
+```
+
 
 ## <a name="Weighted_Ref"></a>Weighted Ref
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion. 
