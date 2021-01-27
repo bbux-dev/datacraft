@@ -22,7 +22,7 @@ def test_date_delta():
 def test_date_anchor_positive_delta():
     config = {"delta_days": 1, "anchor": "02-01-2050"}
     spec = {"foo": {"type": "date", "config": config}}
-    _test_date_spec(spec, 'foo', 10, ['01-01-2050', '02-01-2050', '03-01-2050'])
+    _test_date_spec(spec, 'foo', 100, ['01-01-2050', '02-01-2050', '03-01-2050'])
 
 
 def test_date_anchor_negative_delta_string():

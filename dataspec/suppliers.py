@@ -17,21 +17,29 @@ def values(spec):
     else:
         data = spec['data']
 
+    # Check for sampling mode
     if isinstance(spec, dict) and 'config' in spec:
         config = spec['config']
         sample_mode = config.get('sample', 'false')
         do_sampling = sample_mode.lower() in ['yes', 'true', 'on']
     else:
+        config = {}
         do_sampling = False
 
     if isinstance(data, list):
-        return value_list(data, do_sampling)
+        # this supplier can handle the count param itself, so just return it
+        return value_list(data, do_sampling, config.get('count', 1))
     elif isinstance(data, dict):
         if do_sampling:
             raise SpecException('Cannot do sampling on weighted values: ' + json.dumps(spec))
-        return weighted_values(data)
+        supplier = weighted_values(data)
     else:
-        return single_value(data)
+        supplier = single_value(data)
+
+    # Check for count param
+    if 'count' in config:
+        return _MultipleValueSupplier(supplier, config['count'])
+    return supplier
 
 
 class _SingleValue:
@@ -46,13 +54,24 @@ def single_value(data):
     return _SingleValue(data)
 
 
-def value_list(data, do_sampling=False):
+class _MultipleValueSupplier:
+    def __init__(self, wrapped, count):
+        self.wrapped = wrapped
+        self.count = int(count)
+
+    def next(self, iteration):
+        return [self.wrapped.next(iteration + i) for i in range(self.count)]
+
+
+def value_list(data, do_sampling=False, count=1):
     """
     creates a value list supplier
-    :param spec: for the supplier
+    :param data: for the supplier
+    :param do_sampling: if the data should be sampled instead of iterated through
+    :param count: number of values to return on each iteration
     :return: the supplier
     """
-    return ListValueSupplier(data, do_sampling)
+    return ListValueSupplier(data, do_sampling, count)
 
 
 def weighted_values(data):
@@ -107,6 +126,10 @@ def isdecorated(data_spec):
 
 
 class DecoratedSupplier:
+    """
+    Class used to add additional data to other suppliers output, such as a
+    prefix or suffix or to surround the output with quotes
+    """
     def __init__(self, config, supplier):
         self.prefix = config.get('prefix', '')
         self.suffix = config.get('suffix', '')

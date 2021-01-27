@@ -49,10 +49,8 @@ def _update_with_params(key, spec, updated_specs):
         # copy all existing values
         updated.update(spec)
 
-    if 'config' in updated:
-        config = updated['config']
-    else:
-        config = {}
+    config = updated.get('config', {})
+
     for param in params.split('&'):
         keyvalue = param.split('=')
         config[keyvalue[0]] = keyvalue[1]
