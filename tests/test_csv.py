@@ -24,7 +24,7 @@ def test_csv_valid_with_header_indexed_column():
 
 
 def test_csv_valid_no_header_indexed_column():
-    spec = _build_csv_spec('status', {"datafile": "test_no_headers.csv", "has_headers": False})
+    spec = _build_csv_spec('status', {"datafile": "test_no_headers.csv", "headers": False})
     loader = Loader(spec, datadir=test_dir)
     supplier = loader.get('status')
 
@@ -40,7 +40,7 @@ def test_csv_valid_with_header_field_name_column():
 
 
 def test_csv_valid_with_header_field_name_column_shorthand():
-    spec = {"status_desc:csv?datafile=test.csv&has_headers=true&column=2": {}}
+    spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2": {}}
     loader = Loader(spec, datadir=test_dir)
     supplier = loader.get('status_desc')
 
@@ -61,7 +61,7 @@ def _test_invalid_csv_config(key, spec):
 
 def test_csv_single_column():
     # we don't specify the column number or name, so default is to expect single column of values
-    spec = {"user_agent:csv?datafile=single_column.csv&has_headers=false": {}}
+    spec = {"user_agent:csv?datafile=single_column.csv&headers=false": {}}
     loader = Loader(spec, datadir=test_dir)
     supplier = loader.get('user_agent')
 
@@ -77,7 +77,7 @@ def _build_csv_spec(field_name, config_changes):
             "type": "csv",
             "config": {
                 "datafile": "test.csv",
-                "has_headers": True,
+                "headers": True,
                 "column": 1
             }
         }
