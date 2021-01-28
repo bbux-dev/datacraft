@@ -36,6 +36,8 @@ def main():
                         help='When printing to stdout field name should be printed along with value')
     parser.add_argument('-c', '--code', nargs='+',
                         help='Path to custom defined functions in one or more modules to load')
+    parser.add_argument('-d', '--datadir',
+                        help='Path to external directory to load external data file such as csvs')
 
     args = parser.parse_args()
 
@@ -45,7 +47,7 @@ def main():
 
     spec = _load_spec(args.spec)
 
-    loader = Loader(spec)
+    loader = Loader(spec, args.datadir)
 
     if args.outdir:
         writer = outputs.FileWriter(

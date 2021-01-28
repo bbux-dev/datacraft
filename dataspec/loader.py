@@ -28,8 +28,9 @@ class Loader:
     Parent object for loading value suppliers from specs
     """
 
-    def __init__(self, specs):
+    def __init__(self, specs, datadir='./data'):
         self.specs = _preprocess_spec(specs)
+        self.datadir = datadir
         self.cache = {}
         if 'refs' in specs:
             self.refs = Refs(self.specs.get('refs'))
