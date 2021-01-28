@@ -139,7 +139,7 @@ class DecoratedSupplier:
     def next(self, iteration):
         value = self.wrapped.next(iteration)
         # todo: cache mapping for efficiency?
-        return self.quote + self.prefix + str(value) + self.suffix + self.quote
+        return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
 
 
 def decorated(data_spec, supplier):
