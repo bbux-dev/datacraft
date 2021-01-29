@@ -1,6 +1,10 @@
-jinja2~=2.11.2
-pyyaml~=5.1
-pytest~=6.2.1
+# build
 setuptools~=45.2.0
-dataspec~=0.1.0
+# test
+pytest~=6.2.1
+# config
+pyyaml~=5.1
+# custom code
 catalogue~=2.0.1
+# templating
+jinja2~=2.11.2

@@ -8,16 +8,22 @@ with open('README.md') as f:
 with open('LICENSE') as f:
     project_license = f.read()
 
+with open('requirements.txt') as f:
+    lines = f.readlines()
+    requires = [line.strip() for line in lines]
+
 setup(
     name='dataspec',
     version='0.1.0',
-    description='Data Generation Utility',
+    description='Data Generation Through Specification',
     long_description=readme,
     author='Brian Buxton',
     author_email='bbux.dev@gmail.com',
     url='https://github.com/bbux-dev/dataspec',
     license=project_license,
-    packages=find_packages(exclude=('tests', 'docs')),
+    packages=['dataspec'],
+    keywords=['data', 'synthetic', 'generator', 'specification', 'spec', 'data spec'],
+    install_requires=requires,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
