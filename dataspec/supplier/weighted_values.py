@@ -1,7 +1,15 @@
+"""
+Module for the class that implements supplying weighted values
+"""
 import random
+from .value_supplier import ValueSupplierInterface
 
 
-class WeightedValueSupplier:
+class WeightedValueSupplier(ValueSupplierInterface):
+    """
+    Value supplier implementation for weighted values
+    """
+
     def __init__(self, data):
         # may be passed raw data or a spec
         if isinstance(data, dict) and 'data' in data:

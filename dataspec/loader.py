@@ -4,11 +4,10 @@ delegating the handling of various data types.
 """
 
 import json
-import dataspec.suppliers as suppliers
-from dataspec.exceptions import SpecException
-import dataspec.types as types
+from .types import registry, lookup_type
+from . import suppliers
 # need to make sure the default one is registered
-from .preprocessor import *
+from .exceptions import SpecException
 
 
 class Refs:
@@ -65,7 +64,7 @@ class Loader:
         if spec_type is None or spec_type == 'values':
             supplier = suppliers.values(field_spec, self)
         else:
-            handler = types.lookup_type(spec_type)
+            handler = lookup_type(spec_type)
             if handler is None:
                 raise SpecException('Unable to load handler for: ' + json.dumps(field_spec))
             supplier = handler(field_spec, self)
@@ -76,9 +75,14 @@ class Loader:
 
 
 def _preprocess_spec(raw_spec):
+    """
+    Uses the registered preprocessors to cumulatively update the spec
+    :param raw_spec: to preprocesss
+    :return: updated version of the spec after all preprocessors have run on it
+    """
     updated = dict(raw_spec)
-    preprocessors = types.registry.preprocessors.get_all()
+    preprocessors = registry.preprocessors.get_all()
     for name in preprocessors:
-        preprocessor = types.registry.preprocessors.get(name)
+        preprocessor = registry.preprocessors.get(name)
         updated = preprocessor(updated)
     return updated

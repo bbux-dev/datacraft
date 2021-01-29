@@ -1,12 +1,17 @@
+"""
+Factory like module for core supplier related functions.
+"""
+
 import json
-from .exceptions import SpecException
-from .utils import load_config
-from .utils import is_affirmative
-from .supplier.list_values import ListValueSupplier
-from .supplier.combine import CombineValuesSupplier
-from .supplier.weighted_values import WeightedValueSupplier
-from .supplier.weighted_refs import WeightedRefsSupplier
-from .type_handlers.select_list_subset import SelectListSupplier
+from dataspec.exceptions import SpecException
+from dataspec.utils import load_config
+from dataspec.utils import is_affirmative
+from dataspec.supplier.list_values import ListValueSupplier
+from dataspec.supplier.combine import CombineValuesSupplier
+from dataspec.supplier.weighted_values import WeightedValueSupplier
+from dataspec.supplier.weighted_refs import WeightedRefsSupplier
+from dataspec.type_handlers.select_list_subset import SelectListSupplier
+from dataspec.supplier.value_supplier import ValueSupplierInterface
 
 
 def values(spec, loader=None):
@@ -25,7 +30,7 @@ def values(spec, loader=None):
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it
         return value_list(data, do_sampling, config.get('count', 1))
-    elif isinstance(data, dict):
+    if isinstance(data, dict):
         if do_sampling:
             raise SpecException('Cannot do sampling on weighted values: ' + json.dumps(spec))
         supplier = weighted_values(data)
@@ -38,7 +43,11 @@ def values(spec, loader=None):
     return supplier
 
 
-class _SingleValue:
+class _SingleValue(ValueSupplierInterface):
+    """
+    Encapsulates supplier that only returns a static value
+    """
+
     def __init__(self, data):
         self.data = data
 
@@ -47,10 +56,15 @@ class _SingleValue:
 
 
 def single_value(data):
+    """ Creates value supplier for the single value """
     return _SingleValue(data)
 
 
-class _MultipleValueSupplier:
+class _MultipleValueSupplier(ValueSupplierInterface):
+    """
+    Supplier that generates list of values based on count parameter
+    """
+
     def __init__(self, wrapped, count):
         self.wrapped = wrapped
         self.count = int(count)
@@ -121,7 +135,7 @@ def isdecorated(data_spec):
     return 'prefix' in config or 'suffix' in config or 'quote' in config
 
 
-class DecoratedSupplier:
+class DecoratedSupplier(ValueSupplierInterface):
     """
     Class used to add additional data to other suppliers output, such as a
     prefix or suffix or to surround the output with quotes

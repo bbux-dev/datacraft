@@ -1,14 +1,36 @@
+"""
+Module for handling date related types
+
+The date Field Spec structure is:
+
+{
+  "<field name>": {
+    "type": "date",
+    OR,
+    "type": "date.iso",
+    OR,
+    "type": "date.iso.us",
+    "config": {"...": "..."}
+  }
+}
+
+"""
 import random
 import datetime
 import dataspec
 from dataspec.utils import load_config
+from dataspec.supplier.value_supplier import ValueSupplierInterface
 
 DEFAULT_FORMAT = "%d-%m-%Y"
 ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
 ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 
 
-class DateSupplier:
+class DateSupplier(ValueSupplierInterface):
+    """
+    Value Supplier implementation for dates
+    """
+
     def __init__(self, delta_days, offset, anchor, date_format_string):
         self.date_format = date_format_string
 
@@ -31,6 +53,7 @@ class DateSupplier:
 
 @dataspec.registry.types('date')
 def configure_supplier(field_spec, loader):
+    """ configures the date value supplier """
     config = load_config(field_spec, loader)
     delta_days = config.get('delta_days', 15)
     offset = int(config.get('offset', 0))
@@ -41,15 +64,18 @@ def configure_supplier(field_spec, loader):
 
 @dataspec.registry.types('date.iso')
 def configure_supplier_iso(field_spec, loader):
+    """ configures the date.iso value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_NO_MICRO)
 
 
 @dataspec.registry.types('date.iso.us')
 def configure_supplier_iso_microseconds(field_spec, loader):
+    """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_WITH_MICRO)
 
 
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
+    """ configures an iso based date supplier using the provided date format """
     config = load_config(field_spec, loader)
     delta_days = config.get('delta_days', 15)
     offset = int(config.get('offset', 0))
@@ -95,6 +121,7 @@ def _calculate_upper_lower(delta_days):
 
 
 def _calculate_delta_seconds(start, end):
+    """ calculates the delta in seconds between the two dates """
     delta = end - start
     int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
     return int_delta

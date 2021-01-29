@@ -3,6 +3,8 @@ Module for preprocessing spec before generating values. Exists to handle shortha
 pushing params from URL form of field?param=value in to config object.
 """
 import json
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
 import dataspec
 from .exceptions import SpecException
 
@@ -53,15 +55,13 @@ def _update_with_params(key, spec, updated_specs):
     updated_specs[newkey] = updated
 
 
-def _parse_key(key):
+def _parse_key(field_name):
     """
     Expected key to have URL format. Two main forms:
     1. field:field_type?param1=val&param2=val...
     2. field?param1=val...
     """
-    from urllib.parse import urlparse
-    from urllib.parse import parse_qs
-    parsed_url = urlparse(key)
+    parsed_url = urlparse(field_name)
     parsed_query = parse_qs(parsed_url.query)
     if parsed_url.scheme:
         newkey = parsed_url.scheme

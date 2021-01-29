@@ -3,8 +3,6 @@ from dataspec.loader import Loader
 import dataspec.suppliers as suppliers
 from dataspec import SpecException
 # to trigger registration
-from dataspec.type_handlers import combine
-from dataspec.type_handlers import configref
 
 
 def test_neither_refs_nor_fields_specified():

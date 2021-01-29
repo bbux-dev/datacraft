@@ -1,15 +1,23 @@
+"""
+Module for value list supplier implementation
+"""
 import random
 import dataspec
+from .value_supplier import ValueSupplierInterface
 
 
-class ListValueSupplier:
+class ListValueSupplier(ValueSupplierInterface):
+    """
+    Value Supplier implementation for supplying values from lists
+    """
+
     def __init__(self, data, do_sampling=False, count=1):
         self.values = data
         self.do_sampling = do_sampling
         try:
             self.count = int(count)
-        except ValueError:
-            raise dataspec.SpecException(f'Invalid count param: {count}')
+        except ValueError as value_error:
+            raise dataspec.SpecException(f'Invalid count param: {count}') from value_error
 
     def next(self, iteration):
         if self.do_sampling:

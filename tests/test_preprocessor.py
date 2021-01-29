@@ -1,11 +1,9 @@
-import json
 from dataspec.preprocessor import preprocess_spec
 from dataspec.preprocessor import _parse_key
 from dataspec import SpecException
 import dataspec.suppliers as suppliers
 import pytest
 # hack to load up all types
-from dataspec.type_handlers import *
 
 
 def testpreprocess_spec_already_defined():

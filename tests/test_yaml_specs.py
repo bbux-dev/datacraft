@@ -2,6 +2,8 @@ import yaml
 import json
 
 from dataspec.loader import Loader
+# to trigger registration
+from dataspec.type_handlers import combine
 
 
 yaml_spec = '''

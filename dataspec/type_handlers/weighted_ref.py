@@ -13,8 +13,7 @@ The weightedref Field Spec structure is:
 """
 import json
 import dataspec
-from dataspec import suppliers
-from dataspec import SpecException
+from dataspec import SpecException, suppliers
 
 
 @dataspec.registry.types('weightedref')

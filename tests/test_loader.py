@@ -1,12 +1,9 @@
 from dataspec.loader import Loader
-from dataspec.loader import _preprocess_spec
-import dataspec.suppliers as suppliers
 from dataspec.exceptions import SpecException
 from collections import Counter
 import pytest
-# hack to load up all types
-from dataspec.type_handlers import *
-
+# to trigger registration
+from dataspec.type_handlers import combine, weighted_ref
 
 spec = {
     'foo': {

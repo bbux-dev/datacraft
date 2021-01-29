@@ -1,6 +1,5 @@
 """
 Module for handling csv related data, deals with data typed as 'csv'
-
 """
 import os
 import csv
@@ -10,6 +9,7 @@ import dataspec
 from dataspec import SpecException
 from dataspec.utils import is_affirmative
 from dataspec.utils import load_config
+from dataspec.supplier.value_supplier import ValueSupplierInterface
 
 # 100 MB
 SMALL_ENOUGH_THRESHOLD = 100 * 1024 * 1024
@@ -27,7 +27,7 @@ class CsvData:
     def __init__(self, csv_path, delimiter, quotechar, has_headers):
         with open(csv_path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
-            self.data = [row for row in reader]
+            self.data = list(reader)
         if has_headers:
             has_headers = self.data.pop(0)
             self.mapping = {has_headers[i]: i for i in range(len(has_headers))}
@@ -38,21 +38,33 @@ class CsvData:
             self.valid_keys = [i + 1 for i in range(len(self.data[0]))]
 
     def next(self, field, iteration, sample, count):
+        """
+        Obtains the next value(s) for the field for the given iteration
+        :param field: key or one based index number
+        :param iteration: current iteration
+        :param sample: if sampling should be used
+        :param count: number of values to return
+        :return: array of values if count > 1 else the next value
+        """
         colidx = self._get_column_index(field)
 
         values = []
         for i in range(count):
             if sample:
-                idx = random.randint(0, len(self.data))
+                idx = random.randint(0, len(self.data) - 1)
             else:
                 idx = iteration % len(self.data) + i
             values.append(self.data[idx][colidx])
         if count == 1:
             return values[0]
-        else:
-            return values
+        return values
 
     def _get_column_index(self, field):
+        """
+        Resolve the column index
+        :param field: key or one based index number
+        :return: the column index for the field
+        """
         # if we had headers we can use that name, otherwise field should be one based index
         colidx = self.mapping.get(field)
         if colidx is None and not str(field).isdigit():
@@ -62,7 +74,11 @@ class CsvData:
         return colidx
 
 
-class CsvSupplier:
+class CsvSupplier(ValueSupplierInterface):
+    """
+    Class for supplying data from a specific field in a csv file
+    """
+
     def __init__(self, csv_data, field_name, sample, count):
         self.csv_data = csv_data
         self.field_name = field_name
@@ -75,6 +91,7 @@ class CsvSupplier:
 
 @dataspec.registry.types('csv')
 def configure_csv(field_spec, loader):
+    """ Configures the csv value supplier for this field """
     config = load_config(field_spec, loader)
 
     field_name = config.get('column', 1)
@@ -86,6 +103,13 @@ def configure_csv(field_spec, loader):
 
 
 def _load_csv_data(field_spec, config, datadir):
+    """
+    Creates the CsvData object, caches the object by file path so that we can share this object across fields
+    :param field_spec: that triggered the creation
+    :param config: to use to do the creation
+    :param datadir: where to look for data files
+    :return: the configured CsvData object
+    """
     datafile = config.get('datafile', 'data.csv')
     csv_path = f'{datadir}/{datafile}'
     if csv_path in _csv_data_cache:

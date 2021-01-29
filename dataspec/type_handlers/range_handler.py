@@ -18,6 +18,7 @@ import dataspec.suppliers as suppliers
 
 @dataspec.registry.types('range')
 def configure_supplier(field_spec, _):
+    """ configures the range value supplier """
     if 'data' not in field_spec:
         raise dataspec.SpecException('No data element defined for: %s' % json.dumps(field_spec))
 
@@ -43,6 +44,7 @@ def configure_supplier(field_spec, _):
 
 
 def _any_is_float(data):
+    """ are any of the items floats """
     for item in data:
         if isinstance(item, float):
             return True

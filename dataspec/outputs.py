@@ -4,7 +4,23 @@ Module holds output related classes and functions
 import os
 
 
-class SingleFieldOutput:
+class OutputHandlerInterface:
+    def handle(self, key, value):
+        """
+        This is called each time a new value is generated for a given field
+        :param key: the field name
+        :param value: the new value for the field
+        :return: None
+        """
+
+    def finished_record(self):
+        """
+        This is called whenever all of the fields for a record have been generated for one iteration
+        :return: None
+        """
+
+
+class SingleFieldOutput(OutputHandlerInterface):
     """
     Writes each field as it is created
     """
@@ -23,7 +39,7 @@ class SingleFieldOutput:
         pass
 
 
-class RecordLevelOutput:
+class RecordLevelOutput(OutputHandlerInterface):
     """
     Class to output after all fields have been generated
     """
@@ -46,7 +62,20 @@ class RecordLevelOutput:
         self.current.clear()
 
 
-class StdOutWriter:
+class WriterInterface:
+    """
+    Interface for classes that write the generated values out
+    """
+
+    def write(self, value):
+        """
+        Write the value to the configured output destination
+        :param value: to write
+        :return: None
+        """
+
+
+class StdOutWriter(WriterInterface):
     """
     Writes values to stdout
     """
@@ -55,7 +84,7 @@ class StdOutWriter:
         print(value)
 
 
-class FileWriter:
+class FileWriter(WriterInterface):
     """
     Writes processed output to disk
     """

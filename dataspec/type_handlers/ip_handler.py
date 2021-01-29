@@ -1,31 +1,42 @@
+"""
+Module for handling ip types
+"""
 import json
 import random
 import ipaddress
 import dataspec
-from dataspec import suppliers
 from dataspec.utils import load_config
-from dataspec import SpecException
+from dataspec import SpecException, suppliers
 
 
 class IpV4Supplier:
+    """
+    Default implementation for generating ip values, uses separate suppliers for each octet of the ip
+    """
+
     def __init__(self, octet_supplier_map):
-        self.octet_supplier_map = octet_supplier_map
+        self.first = octet_supplier_map['first']
+        self.second = octet_supplier_map['second']
+        self.third = octet_supplier_map['third']
+        self.fourth = octet_supplier_map['fourth']
 
     def next(self, iteration):
-        first = self.octet_supplier_map['first'].next(iteration)
-        second = self.octet_supplier_map['second'].next(iteration)
-        third = self.octet_supplier_map['third'].next(iteration)
-        fourth = self.octet_supplier_map['fourth'].next(iteration)
+        first = self.first.next(iteration)
+        second = self.second.next(iteration)
+        third = self.third.next(iteration)
+        fourth = self.fourth.next(iteration)
         return f'{first}.{second}.{third}.{fourth}'
 
 
 @dataspec.registry.types('ipv4')
 def configure_ipv4(field_spec, _):
+    """ configures value supplier for ipv4 type """
     return configure_ip(field_spec, _)
 
 
 @dataspec.registry.types('ip')
 def configure_ip(field_spec, loader):
+    """ configures value supplier for ip type """
     config = load_config(field_spec, loader)
     if 'base' in config and 'cidr' in config:
         raise SpecException('Must supply only one of base or cidr param: ' + json.dumps(field_spec))
@@ -79,6 +90,7 @@ def _get_base_parts(config):
 
 
 def _create_octet_supplier(parts, index, sample):
+    """ creates a value supplier for the index'th octet """
     if len(parts) >= index + 1 and parts[index].strip() != '':
         octet = parts[index].strip()
         if not octet.isdigit():
@@ -91,6 +103,10 @@ def _create_octet_supplier(parts, index, sample):
 
 
 class IpV4PreciseSupplier:
+    """
+    Class that supports precise ip address generation by specifying cidr values
+    """
+
     def __init__(self, cidr, sample):
         self.net = ipaddress.ip_network(cidr)
         self.sample = sample
@@ -109,6 +125,7 @@ class IpV4PreciseSupplier:
 
 @dataspec.registry.types('ip.precise')
 def configure_precise_ip(field_spec, _):
+    """ configures value supplier for ip.precise type """
     config = field_spec.get('config')
     if config is None:
         raise SpecException('No config for: ' + json.dumps(field_spec) + ', param cidr required')
