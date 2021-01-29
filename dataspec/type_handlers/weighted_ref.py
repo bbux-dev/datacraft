@@ -18,6 +18,7 @@ from dataspec import SpecException, suppliers
 
 @dataspec.registry.types('weightedref')
 def configure_supplier(parent_field_spec, loader):
+    """ configures suplier for weighted ref specs """
     key_supplier = suppliers.values(parent_field_spec)
     values_map = {}
     for key in parent_field_spec['data'].keys():

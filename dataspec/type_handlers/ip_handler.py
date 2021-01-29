@@ -5,11 +5,12 @@ import json
 import random
 import ipaddress
 import dataspec
+from dataspec.supplier.value_supplier import ValueSupplierInterface
 from dataspec.utils import load_config
 from dataspec import SpecException, suppliers
 
 
-class IpV4Supplier:
+class IpV4Supplier(ValueSupplierInterface):
     """
     Default implementation for generating ip values, uses separate suppliers for each octet of the ip
     """
@@ -91,20 +92,21 @@ def _get_base_parts(config):
 
 def _create_octet_supplier(parts, index, sample):
     """ creates a value supplier for the index'th octet """
+    # this index is for a part that is static, create a single value supplier for that part
     if len(parts) >= index + 1 and parts[index].strip() != '':
         octet = parts[index].strip()
         if not octet.isdigit():
             raise SpecException(f'Octet: {octet} invalid for base' + '.'.join(parts))
         return suppliers.values(octet)
-    else:
-        octet_range = list(range(0, 255))
-        spec = {'config': {'sample': sample}, 'data': octet_range}
-        return suppliers.values(spec)
+    # need octet range at this point
+    octet_range = list(range(0, 255))
+    spec = {'config': {'sample': sample}, 'data': octet_range}
+    return suppliers.values(spec)
 
 
-class IpV4PreciseSupplier:
+class IpV4PreciseSupplier(ValueSupplierInterface):
     """
-    Class that supports precise ip address generation by specifying cidr values
+    Class that supports precise ip address generation by specifying cidr values, much slower for large ip ranges
     """
 
     def __init__(self, cidr, sample):

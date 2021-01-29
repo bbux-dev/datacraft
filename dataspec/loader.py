@@ -6,7 +6,6 @@ delegating the handling of various data types.
 import json
 from .types import registry, lookup_type
 from . import suppliers
-# need to make sure the default one is registered
 from .exceptions import SpecException
 
 
@@ -22,6 +21,7 @@ class Refs:
             self.refspec = {}
 
     def get(self, key):
+        """ get the ref for the key """
         return self.refspec.get(key)
 
 

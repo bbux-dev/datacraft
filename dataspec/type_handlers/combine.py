@@ -20,6 +20,7 @@ from dataspec import SpecException, suppliers
 
 @dataspec.registry.types('combine')
 def configure_supplier(field_spec, loader):
+    """ configures supplier for combine type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
 

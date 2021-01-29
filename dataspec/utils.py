@@ -19,7 +19,7 @@ def load_custom_code(code_path):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
     except Exception as exception:
-        logging.warning("Couldn't load custom Python code: %s: %s" % (code_path, str(exception)))
+        logging.warning("Couldn't load custom Python code: %s: %s",  code_path, str(exception))
 
 
 def is_affirmative(key, config, default=False):

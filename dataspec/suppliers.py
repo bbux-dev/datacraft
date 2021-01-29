@@ -10,7 +10,7 @@ from dataspec.supplier.list_values import ListValueSupplier
 from dataspec.supplier.combine import CombineValuesSupplier
 from dataspec.supplier.weighted_values import WeightedValueSupplier
 from dataspec.supplier.weighted_refs import WeightedRefsSupplier
-from dataspec.type_handlers.select_list_subset import SelectListSupplier
+from dataspec.supplier.select_list_subset import SelectListSupplier
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 
 

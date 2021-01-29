@@ -5,6 +5,8 @@ import os
 
 
 class OutputHandlerInterface:
+    """ Interface four handling generated output values """
+
     def handle(self, key, value):
         """
         This is called each time a new value is generated for a given field

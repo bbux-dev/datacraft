@@ -2,7 +2,7 @@
 Module for value list supplier implementation
 """
 import random
-import dataspec
+from dataspec.exceptions import SpecException
 from .value_supplier import ValueSupplierInterface
 
 
@@ -17,7 +17,7 @@ class ListValueSupplier(ValueSupplierInterface):
         try:
             self.count = int(count)
         except ValueError as value_error:
-            raise dataspec.SpecException(f'Invalid count param: {count}') from value_error
+            raise SpecException(f'Invalid count param: {count}') from value_error
 
     def next(self, iteration):
         if self.do_sampling:
