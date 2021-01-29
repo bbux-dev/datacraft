@@ -63,7 +63,7 @@ class Loader:
         if spec_type == 'configref':
             raise SpecException(f'Cannot use configref as source of data: {json.dumps(field_spec)}')
         if spec_type is None or spec_type == 'values':
-            supplier = suppliers.values(field_spec)
+            supplier = suppliers.values(field_spec, self)
         else:
             handler = types.lookup_type(spec_type)
             if handler is None:

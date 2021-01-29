@@ -47,6 +47,22 @@ def test_csv_valid_with_header_field_name_column_shorthand():
     assert supplier.next(0) == 'Continue'
 
 
+def test_csv_valid_sample_mode():
+    spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true": {}}
+    loader = Loader(spec, datadir=test_dir)
+    supplier = loader.get('status_desc')
+
+    assert supplier.next(0) is not None
+
+
+def test_csv_valid_sample_mode_with_count():
+    spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true&count=2": {}}
+    loader = Loader(spec, datadir=test_dir)
+    supplier = loader.get('status_desc')
+
+    assert len(supplier.next(0)) == 2
+
+
 def test_invalid_csv_config_unknown_key():
     # column name should be status not status_code
     spec = _build_csv_spec('status', {"column": "status_code"})
@@ -68,7 +84,6 @@ def test_csv_single_column():
     expected = 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.2) Gecko/20090803 Firefox/3.5.2 Slackware'
 
     assert supplier.next(4) == expected
-
 
 
 def _build_csv_spec(field_name, config_changes):

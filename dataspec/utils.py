@@ -24,11 +24,12 @@ def is_affirmative(key, config, default=False):
 
 
 def load_config(field_spec, loader):
+    if not isinstance(field_spec, dict):
+        return {}
+
     config = field_spec.get('config', {})
     refkey = config.get('configref')
     if refkey:
         configref = loader.refs.get(refkey)
-        #print(configref)
         config.update(configref.get('config', {}))
-    #print(config)
     return config

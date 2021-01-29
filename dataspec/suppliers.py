@@ -1,5 +1,7 @@
 import json
 from .exceptions import SpecException
+from .utils import load_config
+from .utils import is_affirmative
 from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
@@ -7,7 +9,7 @@ from .supplier.weighted_refs import WeightedRefsSupplier
 from .type_handlers.select_list_subset import SelectListSupplier
 
 
-def values(spec):
+def values(spec, loader=None):
     """
     Based on data, return the appropriate values supplier
     """
@@ -17,14 +19,8 @@ def values(spec):
     else:
         data = spec['data']
 
-    # Check for sampling mode
-    if isinstance(spec, dict) and 'config' in spec:
-        config = spec['config']
-        sample_mode = config.get('sample', 'false')
-        do_sampling = sample_mode.lower() in ['yes', 'true', 'on']
-    else:
-        config = {}
-        do_sampling = False
+    config = load_config(spec, loader)
+    do_sampling = is_affirmative('sample', config)
 
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it
@@ -130,6 +126,7 @@ class DecoratedSupplier:
     Class used to add additional data to other suppliers output, such as a
     prefix or suffix or to surround the output with quotes
     """
+
     def __init__(self, config, supplier):
         self.prefix = config.get('prefix', '')
         self.suffix = config.get('suffix', '')

@@ -625,9 +625,11 @@ dist/dataspec -s ~/scratch/quoted_ingredients.json -i 10
 ## <a name='CSV_Data'></a> CSV Data
 
 If you have an existing large set of data in a tabular format that you want to use, it would be burdensome to copy and
-paste the data into a spec. This would also increase the maintenance burden. To make use of data already in a tabular
-format you can use a `csv` Field Spec. These specs allow you to identify a column from a tabular data file to use to
-provide the values for a field.
+paste the data into a spec. To make use of data already in a tabular format you can use a `csv` Field Spec. These specs
+allow you to identify a column from a tabular data file to use to provide the values for a field. Another advantage of
+using a csv spec is that it is easy to have fields that are correlated be generated together. All rows will be selected
+incrementally, unless any of the fields are configured to use `sample` mode. You can use `sample` mode on individual
+columns, or you can use it across all columns by creating a `configref` spec.
 
 The `csv` Field Spec structure is:
 
@@ -640,7 +642,9 @@ The `csv` Field Spec structure is:
       "headers": "yes, on, true for affirmative",
       "column": "1 based column number or field name if headers are present",
       "delimiter": "how values are separated, default is comma",
-      "quotechar": "how values are quoted, default is double quote"
+      "quotechar": "how values are quoted, default is double quote",
+      "sample": "If the values should be selected at random, default is false",
+      "count": "Number of values in column to use for value"
     }
   }
 }
@@ -655,6 +659,8 @@ The `csv` Field Spec structure is:
 |column     |no       |1       |1 based column number or field name if headers are present|
 |delimiter  |no       |,       |how values are separated|
 |quotechar  |no       |"       |how values are quoted, default is double quote|
+|sample     |no       |False   |If the values should be selected at random|
+|count      |no       |1       |Number of values in column to use for value|
 
 #### Examples
 
@@ -671,7 +677,8 @@ smaller input files.
     "type": "csv",
     "config": {
       "datafile": "cities.csv",
-      "delimiter": "~"
+      "delimiter": "~",
+      "sample": "true"
     }
   }
 }
@@ -686,7 +693,8 @@ Chicage
 London
 ```
 
-Note that if your data might have commas in it, you should specify a delimiter that will not be found in your data.
+Note that if your data might have commas in it (the default delimiter), you should specify a delimiter that will not be
+found in your data.
 
 ##### Multiple Fields Non Comma Separated
 
@@ -716,6 +724,8 @@ description:
   config:
     configref: tabs_config
     column: 2
+# shorthand notation
+status_type:csv?configref=tabs_config&column=3: {}
 refs:
   tabs_config:
     type: configref
@@ -726,13 +736,13 @@ refs:
 ```
 
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
-use the following template `{{ status }},{{ description }}` and run this spec we will get output similar to:
+use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we will get output similar to:
 
 ```shell
 dataspec --spec tabs.yaml --datadir ./data -t template.jinja -i 5
-100,Continue
-101,Switching Protocols
-200,OK
-201,Created
-202,Accepted
+100,Continue,Informational
+101,Switching Protocols,Informational
+200,OK,Successful
+201,Created,Successful
+202,Accepted,Successful
 ```
