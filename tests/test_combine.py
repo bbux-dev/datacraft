@@ -2,6 +2,8 @@ import pytest
 from dataspec.loader import Loader
 import dataspec.suppliers as suppliers
 from dataspec import SpecException
+
+
 # to trigger registration
 
 
@@ -21,6 +23,14 @@ def test_refs_specified_but_not_all_defined():
         "refs": {
             "ONE": ["a", "b", "c"]
         }
+    }
+    _test_invalid_combine_spec(spec)
+
+
+def test_fields_specified_but_not_all_defined():
+    spec = {
+        "field:combine": {"fields": ["ONE", "TWO"]},
+        "ONE": ["a", "b", "c"]
     }
     _test_invalid_combine_spec(spec)
 
@@ -56,3 +66,13 @@ def test_combine_lists():
     assert combo.next(0) == 'a1foo'
     assert combo.next(1) == 'b2bar'
     assert combo.next(2) == 'c3baz'
+
+
+def test_combine_fields():
+    spec = {
+        "full_name:combine?join_with= ": {"fields": ["first", "last"]},
+        "first": ["bob", "rob", "ann", "sue"],
+        "last": ["smith", "jones", "frank", "wee"]
+    }
+    supplier = Loader(spec).get('full_name')
+    assert supplier.next(0) == 'bob smith'

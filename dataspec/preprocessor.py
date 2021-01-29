@@ -108,7 +108,7 @@ def _is_spec_data(spec):
     # if it is not a dictionary, then it is definitely not a spec
     if not isinstance(spec, dict):
         return True
-    for core_field in ['type', 'data', 'config', 'ref', 'refs']:
+    for core_field in ['type', 'data', 'config', 'ref', 'refs', 'fields']:
         if core_field in spec:
             return False
     # if empty, then may be using abbreviated notation i.e. field:type?param=value...
