@@ -4,7 +4,7 @@ from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.weighted_refs import WeightedRefsSupplier
-from .supplier.select_list_subset import SelectListSupplier
+from .type_handlers.select_list_subset import SelectListSupplier
 
 
 def values(spec):

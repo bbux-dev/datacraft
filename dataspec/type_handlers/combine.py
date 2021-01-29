@@ -24,9 +24,6 @@ def configure_supplier(field_spec, loader):
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
 
-    if 'refs' in field_spec and not loader.refs:
-        raise SpecException("No refs element defined in specification! Needed for" + str(field_spec))
-
     if 'refs' in field_spec:
         supplier = _load_from_refs(field_spec, loader)
     else:
@@ -34,16 +31,18 @@ def configure_supplier(field_spec, loader):
     return supplier
 
 
-def _load_from_refs(data_spec, loader):
-    keys = data_spec.get('refs')
+def _load_from_refs(combine_field_spec, loader):
+    keys = combine_field_spec.get('refs')
     to_combine = []
     for key in keys:
         field_spec = loader.refs.get(key)
+        if field_spec is None:
+            raise SpecException("Unable to get field_spec for ref key: %s, spec: %s" % (key, json.dumps(combine_field_spec)))
         supplier = loader.get_from_spec(field_spec)
         if supplier is None:
             raise SpecException("Unable to get supplier for ref key: %s, spec: %s" % (key, json.dumps(field_spec)))
         to_combine.append(supplier)
-    return suppliers.combine(to_combine, data_spec.get('config'))
+    return suppliers.combine(to_combine, combine_field_spec.get('config'))
 
 
 def _load_from_fields(data_spec, loader):

@@ -71,7 +71,7 @@ def test_date_offset():
     # anchored to 7 Feb - 5 day offset gives center of 2 Feb +- 1 day
     config = {"delta_days": 1, "anchor": "07-Feb-2050", "format": "%d-%b-%Y", "offset": 5}
     spec = {"foo": {"type": "date", "config": config}}
-    _test_date_spec(spec, 'foo', 10, ['01-Feb-2050', '02-Feb-2050', '03-Feb-2050'])
+    _test_date_spec(spec, 'foo', 100, ['01-Feb-2050', '02-Feb-2050', '03-Feb-2050'])
 
 
 def _test_date_spec(spec, key, iterations, expected):
