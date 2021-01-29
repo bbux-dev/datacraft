@@ -31,13 +31,8 @@ def _update_with_params(key, spec, updated_specs):
     handles the case that there are ?param=value portions in the key
     These get stripped out and pushed into the config object
     """
-    if ' ' in key:
-        raise SpecException(f'Invalid url key {key}, no spaces allowed')
-    newkey, params = key.replace('?', ' ').split(' ', 2)
-    if ':' in newkey:
-        newkey, spectype = newkey.split(':', 2)
-        if not _is_spec_data(spec):
-            spec['type'] = spectype
+    newkey, spectype, params = _parse_key(key)
+
     if newkey in updated_specs:
         raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
     # the updated spec to populate
@@ -50,13 +45,42 @@ def _update_with_params(key, spec, updated_specs):
         updated.update(spec)
 
     config = updated.get('config', {})
-
-    for param in params.split('&'):
-        keyvalue = param.split('=')
-        config[keyvalue[0]] = keyvalue[1]
+    config.update(params)
     updated['config'] = config
+    if spectype:
+        updated['type'] = spectype
 
     updated_specs[newkey] = updated
+
+
+def _parse_key(key):
+    """
+    Expected key to have URL format. Two main forms:
+    1. field:field_type?param1=val&param2=val...
+    2. field?param1=val...
+    """
+    from urllib.parse import urlparse
+    from urllib.parse import parse_qs
+    parsed_url = urlparse(key)
+    parsed_query = parse_qs(parsed_url.query)
+    if parsed_url.scheme:
+        newkey = parsed_url.scheme
+        spectype = parsed_url.path
+    else:
+        # case that the key portion has non standard chars such as _
+        if ':' in parsed_url.path:
+            newkey, spectype = parsed_url.path.split(':', 2)
+        else:
+            newkey = parsed_url.path
+            spectype = None
+    config = {}
+    for key, value in parsed_query.items():
+        if len(value) == 1:
+            config[key] = value[0]
+        else:
+            config[key] = value
+
+    return newkey, spectype, config
 
 
 def _update_no_params(key, spec, updated_specs):
@@ -84,7 +108,7 @@ def _is_spec_data(spec):
     # if it is not a dictionary, then it is definitely not a spec
     if not isinstance(spec, dict):
         return True
-    for core_field in ['type', 'data', 'config']:
+    for core_field in ['type', 'data', 'config', 'ref', 'refs']:
         if core_field in spec:
             return False
     # if empty, then may be using abbreviated notation i.e. field:type?param=value...

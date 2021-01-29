@@ -1,5 +1,6 @@
 import json
 from dataspec.preprocessor import preprocess_spec
+from dataspec.preprocessor import _parse_key
 from dataspec import SpecException
 import dataspec.suppliers as suppliers
 import pytest
@@ -85,3 +86,19 @@ def test_weird_combos():
 
     # want to make sure params override configs
     assert 'A-' == zero_to_ten['config']['prefix']
+
+
+def test_url_lib_parsing():
+    format1 = "field?param=value"
+    format2 = "user_agent:csv?datafile=single_column.csv&headers=false"
+
+    newkey, spectype, params = _parse_key(format1)
+    assert newkey == 'field'
+    assert type(params) == dict
+    assert spectype is None
+    assert 'param' in params
+
+    newkey, spectype, params = _parse_key(format2)
+    assert newkey == 'user_agent'
+    assert spectype == 'csv'
+    assert params.get('datafile') == 'single_column.csv'

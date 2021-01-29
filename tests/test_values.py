@@ -1,3 +1,4 @@
+from dataspec import Loader
 import dataspec.suppliers as suppliers
 from dataspec.loader import _preprocess_spec
 from dataspec.exceptions import SpecException
@@ -73,3 +74,20 @@ def test_count_param_valid():
     first = supplier.next(0)
     assert type(first) == list
     assert ['A', 'B'] == first
+
+
+def test_configref_for_values():
+    """ verifies that the values ref inherits the config from the configref """
+    spec = {
+        "name?configref=quoteit": ["bob", "joe", "ann", "sue"],
+        "refs": {
+            "quoteit": {
+                "type": "configref",
+                "config": {
+                    "quote": "\""
+                }
+            }
+        }
+    }
+    supplier = Loader(spec).get('name')
+    assert supplier.next(0) == '"bob"'

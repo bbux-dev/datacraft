@@ -1,6 +1,7 @@
 import random
 import datetime
 import dataspec
+from dataspec.utils import load_config
 
 DEFAULT_FORMAT = "%d-%m-%Y"
 ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
@@ -29,8 +30,8 @@ class DateSupplier:
 
 
 @dataspec.registry.types('date')
-def configure_supplier(field_spec, _):
-    config = field_spec.get('config', {})
+def configure_supplier(field_spec, loader):
+    config = load_config(field_spec, loader)
     delta_days = config.get('delta_days', 15)
     offset = int(config.get('offset', 0))
     anchor = config.get('anchor')
@@ -39,17 +40,17 @@ def configure_supplier(field_spec, _):
 
 
 @dataspec.registry.types('date.iso')
-def configure_supplier_iso(field_spec, _):
-    return _configure_supplier_iso_date(field_spec, ISO_FORMAT_NO_MICRO)
+def configure_supplier_iso(field_spec, loader):
+    return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_NO_MICRO)
 
 
 @dataspec.registry.types('date.iso.us')
-def configure_supplier_iso_microseconds(field_spec, _):
-    return _configure_supplier_iso_date(field_spec, ISO_FORMAT_WITH_MICRO)
+def configure_supplier_iso_microseconds(field_spec, loader):
+    return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_WITH_MICRO)
 
 
-def _configure_supplier_iso_date(field_spec, iso_date_format):
-    config = field_spec.get('config', {})
+def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
+    config = load_config(field_spec, loader)
     delta_days = config.get('delta_days', 15)
     offset = int(config.get('offset', 0))
     anchor = config.get('anchor')

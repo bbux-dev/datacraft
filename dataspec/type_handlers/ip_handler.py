@@ -3,6 +3,7 @@ import random
 import ipaddress
 import dataspec
 from dataspec import suppliers
+from dataspec.utils import load_config
 from dataspec import SpecException
 
 
@@ -24,8 +25,8 @@ def configure_ipv4(field_spec, _):
 
 
 @dataspec.registry.types('ip')
-def configure_ip(field_spec, _):
-    config = field_spec.get('config', {})
+def configure_ip(field_spec, loader):
+    config = load_config(field_spec, loader)
     if 'base' in config and 'cidr' in config:
         raise SpecException('Must supply only one of base or cidr param: ' + json.dumps(field_spec))
 

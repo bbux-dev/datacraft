@@ -6,15 +6,6 @@ import dataspec.template_engines as engines
 import dataspec.outputs as outputs
 from dataspec import utils
 from dataspec import SpecException
-# this activates the decorators, so they will be discoverable
-# cannot use * import due to pyinstaller not recognizing modules as being used
-from dataspec.type_handlers import combine
-from dataspec.type_handlers import range_handler
-from dataspec.type_handlers import select_list_subset
-from dataspec.type_handlers import weighted_ref
-from dataspec.type_handlers import uuid_handler
-from dataspec.type_handlers import ip_handler
-from dataspec.type_handlers import date_handler
 
 def main():
     parser = argparse.ArgumentParser(description='Run dataspec.')
@@ -36,6 +27,8 @@ def main():
                         help='When printing to stdout field name should be printed along with value')
     parser.add_argument('-c', '--code', nargs='+',
                         help='Path to custom defined functions in one or more modules to load')
+    parser.add_argument('-d', '--datadir',
+                        help='Path to external directory to load external data file such as csvs')
 
     args = parser.parse_args()
 
@@ -45,7 +38,7 @@ def main():
 
     spec = _load_spec(args.spec)
 
-    loader = Loader(spec)
+    loader = Loader(spec, args.datadir)
 
     if args.outdir:
         writer = outputs.FileWriter(
@@ -83,7 +76,17 @@ def _load_spec(spec_path):
         spec = yaml.load(handle, Loader=yaml.FullLoader)
     if not isinstance(spec, dict):
         raise SpecException(f'Unable to load spec from path: {spec_path}, Please verify it is valid JSON or YAML')
-
+    return spec
 
 if __name__ == '__main__':
+    # this activates the decorators, so they will be discoverable
+    # cannot use * import due to pyinstaller not recognizing modules as being used
+    from dataspec.type_handlers import combine
+    from dataspec.type_handlers import range_handler
+    from dataspec.type_handlers import select_list_subset
+    from dataspec.type_handlers import weighted_ref
+    from dataspec.type_handlers import uuid_handler
+    from dataspec.type_handlers import ip_handler
+    from dataspec.type_handlers import date_handler
+    from dataspec.type_handlers import csv_handler
     main()
