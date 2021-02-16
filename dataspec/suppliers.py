@@ -4,15 +4,15 @@ Factory like module for core supplier related functions.
 
 import json
 import random
-from dataspec.exceptions import SpecException
-from dataspec.utils import load_config
-from dataspec.utils import is_affirmative
-from dataspec.supplier.list_values import ListValueSupplier
-from dataspec.supplier.combine import CombineValuesSupplier
-from dataspec.supplier.weighted_values import WeightedValueSupplier
-from dataspec.supplier.weighted_refs import WeightedRefsSupplier
-from dataspec.supplier.select_list_subset import SelectListSupplier
-from dataspec.supplier.value_supplier import ValueSupplierInterface
+from .exceptions import SpecException
+from .utils import load_config
+from .utils import is_affirmative
+from .supplier.list_values import ListValueSupplier
+from .supplier.combine import CombineValuesSupplier
+from .supplier.weighted_values import WeightedValueSupplier
+from .supplier.weighted_refs import WeightedRefsSupplier
+from .supplier.select_list_subset import SelectListSupplier
+from .supplier.value_supplier import ValueSupplierInterface
 
 
 def values(spec, loader=None):
