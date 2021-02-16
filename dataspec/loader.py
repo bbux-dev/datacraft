@@ -48,7 +48,9 @@ class Loader:
         data_spec = self.specs.get(key)
         if data_spec is None:
             raise SpecException("No key " + key + " found in specs")
-        return self.get_from_spec(data_spec)
+        supplier = self.get_from_spec(data_spec)
+        self.cache[key] = supplier
+        return supplier
 
     def get_from_spec(self, field_spec):
         """

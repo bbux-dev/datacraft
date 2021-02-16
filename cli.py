@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import json
 import yaml
 import argparse
