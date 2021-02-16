@@ -3,6 +3,7 @@ Factory like module for core supplier related functions.
 """
 
 import json
+import random
 from dataspec.exceptions import SpecException
 from dataspec.utils import load_config
 from dataspec.utils import is_affirmative
@@ -71,6 +72,31 @@ class _MultipleValueSupplier(ValueSupplierInterface):
 
     def next(self, iteration):
         return [self.wrapped.next(iteration + i) for i in range(self.count)]
+
+
+def from_list_of_suppliers(suppliers):
+    """
+    Returns a supplier that rotates through the provided suppliers incrementally
+    :param suppliers: to rotate through
+    :return: a supplier for these suppliers
+    """
+    return RotatingSupplierList(suppliers)
+
+
+class RotatingSupplierList(ValueSupplierInterface):
+    """
+    Class that rotates through a list of suppliers incrementally to provide the next value
+    """
+
+    def __init__(self, suppliers):
+        """
+        :param suppliers: list of suppliers to rotate through
+        """
+        self.suppliers = suppliers
+
+    def next(self, iteration):
+        idx = iteration % len(self.suppliers)
+        return self.suppliers[idx].next(iteration)
 
 
 def value_list(data, do_sampling=False, count=1):

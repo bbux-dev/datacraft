@@ -56,8 +56,11 @@ class Loader:
         """
         if isinstance(field_spec, list):
             spec_type = None
-        else:
+        elif isinstance(field_spec, dict):
             spec_type = field_spec.get('type')
+        else:
+            # assume it is data, so values?
+            spec_type = 'values'
 
         if spec_type == 'configref':
             raise SpecException(f'Cannot use configref as source of data: {json.dumps(field_spec)}')

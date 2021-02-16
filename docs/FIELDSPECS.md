@@ -34,6 +34,7 @@ Field Spec Definitions
 |[values](#Values)            | constant, list, or weighted dictionary |                              |
 |[range](#Range)              | range of values                        |                              |
 |[combine](#Combine)          | refs or fields                         | join_with                    |
+|[combine-list](#CombineList) | list of lists of refs to combine       | join_with                    |
 |[date](#Date)                | date strings                           | many see details below       |
 |[date.iso](#Date)            | date strings in ISO8601 format no microseconds| many see details below|
 |[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
@@ -297,22 +298,68 @@ The combine Field Spec structure is:
 }
 ```
 
-Example below uses the first and last fields to create a full name field.
+Example below uses the first and last refs to create a full name field.
 
 ```json
 {
   "full name": {
     "type": "combine",
-    "fields": ["first", "last"],
+    "refs": ["first", "last"],
     "config": {"join_with": " "}
   },
-  "first": {
-    "type": "values",
-    "data": ["zebra", "hedgehog", "llama", "flamingo"]
+  "refs": {
+    "first": {
+      "type": "values",
+      "data": ["zebra", "hedgehog", "llama", "flamingo"]
+    },
+    "last": {
+      "type": "values",
+      "data": ["jones", "smith", "williams"]
+    }
+  }
+}
+```
+
+## <a name="CombineList"></a>Combine
+
+A combine-list Field Spec is used to specify a list of lists of refs to combine. This is useful if there are a lot of
+variations on the values that should be combined. This allows all the variations to be specified in one place. Note:
+This approach requires the same join_with param for each set of refs.
+
+The combine Field Spec structure is:
+
+```json
+{
+  "<field name>": {
+    "type": "combine-list",
+    "refs": [
+      ["valid ref1", "valid ref2"],
+      ["valid ref1", "valid ref2", "valid_ref3", ...], ...
+      ["another_ref", "one_more_ref"]
+    ],
+    "config": {"join_with": "<optional string to use to join fields or refs, default is none>"}
+  }
+}
+```
+
+This is a slight modification to the above combine Example.
+
+```json
+{
+  "full name": {
+    "type": "combine-list",
+    "refs": [
+      ["first", "last"],
+      ["first", "middle", "last"],
+      ["first", "middle_initial", "last"]
+    ],
+    "config": {"join_with": " "}
   },
-  "last": {
-    "type": "values",
-    "data": ["jones", "smith", "williams"]
+  "refs": {
+    "first": ["zebra", "hedgehog", "llama", "flamingo"],
+    "last": ["jones", "smith", "williams"],
+    "middle": ["cloud", "sage", "river"],
+    "middle_initial": {"a": 0.3, "m": 0.3, "j": 0.1, "l":  0.1, "e":  0.1, "w":  0.1}
   }
 }
 ```
@@ -725,7 +772,7 @@ description:
     configref: tabs_config
     column: 2
 # shorthand notation
-status_type:csv?configref=tabs_config&column=3: {}
+status_type:csv?configref=tabs_config&column=3: { }
 refs:
   tabs_config:
     type: configref
@@ -736,7 +783,8 @@ refs:
 ```
 
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
-use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we will get output similar to:
+use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we will get output
+similar to:
 
 ```shell
 dataspec --spec tabs.yaml --datadir ./data -t template.jinja -i 5

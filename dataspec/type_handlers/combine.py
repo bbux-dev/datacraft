@@ -16,10 +16,11 @@ The combine field structure is:
 import json
 import dataspec
 from dataspec import SpecException, suppliers
+from dataspec.suppliers import from_list_of_suppliers
 
 
 @dataspec.registry.types('combine')
-def configure_supplier(field_spec, loader):
+def configure_combine_supplier(field_spec, loader):
     """ configures supplier for combine type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
@@ -29,6 +30,24 @@ def configure_supplier(field_spec, loader):
     else:
         supplier = _load_from_fields(field_spec, loader)
     return supplier
+
+
+@dataspec.registry.types('combine-list')
+def configure_combine_list_supplier(field_spec, loader):
+    """ configures supplier for combine-list type """
+    if 'refs' not in field_spec:
+        raise SpecException('Must define refs for combine-list type. %s' % json.dumps(field_spec))
+
+    refs_list = field_spec['refs']
+    if len(refs_list) < 1 or not isinstance(refs_list[0], list):
+        raise SpecException('refs pointer must be list of lists: i.e [["ONE", "TWO"]]. %s' % json.dumps(field_spec))
+
+    suppliers_list = []
+    for ref in refs_list:
+        spec = dict(field_spec)
+        spec['refs'] = ref
+        suppliers_list.append(_load_from_refs(spec, loader))
+    return from_list_of_suppliers(suppliers_list)
 
 
 def _load_from_refs(combine_field_spec, loader):
