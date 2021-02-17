@@ -24,6 +24,7 @@ setup(
     packages=find_packages(),
     keywords=['data', 'synthetic', 'generator', 'specification', 'spec', 'data spec'],
     install_requires=requires,
+    scripts=['bin/dataspec'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

@@ -24,21 +24,13 @@ them. The tool supports templating using the [Jinja2](https://pypi.org/project/J
 
 ## <a name="Build"></a>Build
 
-To Build and Install:
+To Install:
 
 ```shell script
-it clone https://github.com/bbux-dev/dataspec
-
-cd dataspec
-
-pip install -r requirements.txt
-
-# requires a python command to be present on path
-# recommend virtualenv
-sudo cp cli.py /usr/local/bin/dataspec
+pip install git+https://github.com/bbux-dev/dataspec.git
 ```
 
-The executable will be located in `/usr/local/bin/dataspec`
+The executable will be located in `dataspec` and should now be on your path
 
 ## <a name="Examples"></a>Examples
 See [examples](docs/EXAMPLES.md) to dive into detailed examples and practical use cases.
