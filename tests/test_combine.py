@@ -35,6 +35,21 @@ def test_fields_specified_but_not_all_defined():
     _test_invalid_combine_spec(spec)
 
 
+def test_combine_list_no_refs_invalid():
+    spec = {"field": {"type": "combine-list"}}
+    _test_invalid_combine_spec(spec)
+
+
+def test_combine_list_empty_refs_invalid():
+    spec = {"field": {"type": "combine-list", "refs": []}}
+    _test_invalid_combine_spec(spec)
+
+
+def test_combine_list_single_list_refs_invalid():
+    spec = {"field": {"type": "combine-list", "refs": ["ONE"]}, "refs": {"ONE": "uno"}}
+    _test_invalid_combine_spec(spec)
+
+
 def test_refs_specified_but_invalid_type():
     spec = {
         "field:combine": {"refs": ["ONE", "TWO"]},
@@ -52,8 +67,10 @@ def test_refs_specified_but_invalid_type():
 
 
 def _test_invalid_combine_spec(spec):
-    with pytest.raises(SpecException):
+    with pytest.raises(SpecException) as err:
         Loader(spec).get('field')
+    # for debugging
+    # print(str(err.value))
 
 
 def test_combine_lists():
@@ -76,3 +93,39 @@ def test_combine_fields():
     }
     supplier = Loader(spec).get('full_name')
     assert supplier.next(0) == 'bob smith'
+
+
+def test_combine_list_spec_valid_but_weird1():
+    spec = {"field": {"type": "combine-list", "refs": [["ONE"]]}, "refs": {"ONE": "uno"}}
+    supplier = Loader(spec).get('field')
+    assert supplier.next(0) == 'uno'
+    assert supplier.next(1) == 'uno'
+
+
+def test_combine_list_spec_valid_but_weird2():
+    spec = {"field": {"type": "combine-list", "refs": [["ONE", "TWO"]]}, "refs": {"ONE": "uno", "TWO": "dos"}}
+    supplier = Loader(spec).get('field')
+    assert supplier.next(0) == 'unodos'
+    assert supplier.next(1) == 'unodos'
+
+
+def test_combine_list_spec_valid_normal():
+    spec = {
+        "field": {
+            "type": "combine-list",
+            "refs": [
+                ["ONE", "TWO"],
+                ["TWO", "TRE"],
+                ["TRE", "ONE"]
+            ]
+        },
+        "refs": {
+            "ONE": "uno",
+            "TWO": "dos",
+            "TRE": "tres"
+        }
+    }
+    supplier = Loader(spec).get('field')
+    assert supplier.next(0) == 'unodos'
+    assert supplier.next(1) == 'dostres'
+    assert supplier.next(2) == 'tresuno'

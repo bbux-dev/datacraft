@@ -21,7 +21,7 @@ setup(
     author_email='bbux.dev@gmail.com',
     url='https://github.com/bbux-dev/dataspec',
     license=project_license,
-    packages=['dataspec'],
+    packages=find_packages(),
     keywords=['data', 'synthetic', 'generator', 'specification', 'spec', 'data spec'],
     install_requires=requires,
     classifiers=[

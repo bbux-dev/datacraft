@@ -3,15 +3,16 @@ Factory like module for core supplier related functions.
 """
 
 import json
-from dataspec.exceptions import SpecException
-from dataspec.utils import load_config
-from dataspec.utils import is_affirmative
-from dataspec.supplier.list_values import ListValueSupplier
-from dataspec.supplier.combine import CombineValuesSupplier
-from dataspec.supplier.weighted_values import WeightedValueSupplier
-from dataspec.supplier.weighted_refs import WeightedRefsSupplier
-from dataspec.supplier.select_list_subset import SelectListSupplier
-from dataspec.supplier.value_supplier import ValueSupplierInterface
+import random
+from .exceptions import SpecException
+from .utils import load_config
+from .utils import is_affirmative
+from .supplier.list_values import ListValueSupplier
+from .supplier.combine import CombineValuesSupplier
+from .supplier.weighted_values import WeightedValueSupplier
+from .supplier.weighted_refs import WeightedRefsSupplier
+from .supplier.select_list_subset import SelectListSupplier
+from .supplier.value_supplier import ValueSupplierInterface
 
 
 def values(spec, loader=None):
@@ -71,6 +72,31 @@ class _MultipleValueSupplier(ValueSupplierInterface):
 
     def next(self, iteration):
         return [self.wrapped.next(iteration + i) for i in range(self.count)]
+
+
+def from_list_of_suppliers(suppliers):
+    """
+    Returns a supplier that rotates through the provided suppliers incrementally
+    :param suppliers: to rotate through
+    :return: a supplier for these suppliers
+    """
+    return RotatingSupplierList(suppliers)
+
+
+class RotatingSupplierList(ValueSupplierInterface):
+    """
+    Class that rotates through a list of suppliers incrementally to provide the next value
+    """
+
+    def __init__(self, suppliers):
+        """
+        :param suppliers: list of suppliers to rotate through
+        """
+        self.suppliers = suppliers
+
+    def next(self, iteration):
+        idx = iteration % len(self.suppliers)
+        return self.suppliers[idx].next(iteration)
 
 
 def value_list(data, do_sampling=False, count=1):

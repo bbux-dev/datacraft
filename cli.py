@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import json
 import yaml
 import argparse
@@ -102,7 +104,6 @@ def _load_spec(spec_path):
 
 def _configure_logging(args):
     for name in dataspec.registry.logging.get_all():
-        print(name)
         configure_function = dataspec.registry.logging.get(name)
         configure_function(args.loglevel)
 
