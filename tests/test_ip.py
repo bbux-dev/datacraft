@@ -3,7 +3,6 @@ from dataspec.loader import Loader
 from dataspec import SpecException
 # need this to trigger registration
 from dataspec.type_handlers import ip_handler
-import dataspec.preprocessor
 
 
 def test_ip_v4_spec():

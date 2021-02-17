@@ -187,3 +187,25 @@ def decorated(data_spec, supplier):
     :return: the decorated supplier
     """
     return DecoratedSupplier(data_spec.get('config'), supplier)
+
+
+class RandomRangeSupplier(ValueSupplierInterface):
+    def __init__(self, start, end, precision, cast_to_float):
+        self.start = start
+        self.end = end
+        self.precision = precision
+        self.format_str = '{: .' + str(precision) + 'f}'
+        self.cast_to_float = cast_to_float
+
+    def next(self, iteration):
+        next_num = random.uniform(self.start, self.end)
+        if self.precision is None:
+            return next_num
+        formatted = self.format_str.format(next_num)
+        if self.cast_to_float:
+            return float(formatted)
+        return formatted
+
+
+def random_range(start, end, precision=None, cast_to_float=False):
+    return RandomRangeSupplier(start, end, precision, cast_to_float)

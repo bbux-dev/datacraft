@@ -20,6 +20,7 @@ Field Spec Definitions
     1. [Date](#Date)
     1. [Range](#Range)
     1. [Uuid](#Uuid)
+    1. [Geo](#Geo)
     1. [IP Addresses](#IP_Addresses)
         1. [Precise CIDR Addresses](#Precise_IP)
     1. [Weighted Ref](#Weighted_Ref)
@@ -39,6 +40,9 @@ Field Spec Definitions
 |[date.iso](#Date)            | date strings in ISO8601 format no microseconds| many see details below|
 |[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
 |[uuid](#Uuid)                | generates valid uuid                   |                              |
+|[geo.lat](#Geo)              | generates decimal latitude             | start_lat,end_lat,precision  |
+|[geo.long](#Geo)             | generates decimal longitude            | start_long,end_long,precision|
+|[geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision|
 |[ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | base, cidr /8,/16,/24 only   |
 |[ip.precise](#IP_Addresses)  | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/14 |
 |[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |                       |
@@ -473,6 +477,47 @@ Example Spec
     "type": "uuid"
   },
   "id_shorthand:uuid": {}
+}
+```
+
+
+## <a name="Geo"></a>Geo Related Types
+
+There are three main geo types: `geo.lat`, `geo.long`, and `geo.pair`.  The defaults will create decimal string values
+in the valid ranges: -90 to 90 for latitude and -180 to 180 for longitude. You can bound the ranges in several ways.
+The first is with the `start_lat`, `end_lat`, `start_long`, `end_long` config params.  These will set the individual
+bounds for each of the segments. You can use one or more of them.  The other mechanism is by defining a `bbox` array
+which consists of the lower left geo point and the upper right one. See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
+
+Config Params:
+
+|type    |param     |description                                  |
+|--------|----------|---------------------------------------------|
+|all     |precision |number of decimal places for lat or long, default is 4, max is 5|
+|        |bbox      |array of \[min Longitude, min Latitude, max Longitude, max Latitude\]|
+|geo.lat |start_lat |lower bound for latitude                                        |
+|        |end_lat   |upper bound for latitude                                        |
+|geo.long|start_long|lower bound for longitude                                       |
+|        |end_long  |upper bound for longitude                                       |
+|geo.pair|join_with |delimiter to join long and lat with, default is comma           |
+|        |lat_first |if latitude should be first in the generated pair, default is longitude first|
+|        |start_lat |lower bound for latitude                                        |
+|        |end_lat   |upper bound for latitude                                        |
+|        |start_long|lower bound for longitude                                       |
+|        |end_long  |upper bound for longitude                                       |
+
+Examples:
+
+Generates a `longitude,latitude` pair with in the bounding box defining Egypt with 3 decimal points of precision.
+```json
+{
+  "egypt": {
+    "type": "geo.point",
+    "config": {
+      "bbox": [31.33134, 22.03795, 34.19295, 25.00562],
+      "precision": 3
+    }
+  }
 }
 ```
 
