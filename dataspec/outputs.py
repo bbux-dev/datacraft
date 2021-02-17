@@ -2,6 +2,9 @@
 Module holds output related classes and functions
 """
 import os
+import json
+import dataspec
+from .types import registry
 
 
 class OutputHandlerInterface:
@@ -117,3 +120,29 @@ class FileWriter(WriterInterface):
         if self.record_count == self.records_per_file:
             self.record_count = 0
             self.count += 1
+
+
+class FormatProcessor:
+    """
+    A simple class that creates wraps a record formatting function
+    """
+
+    def __init__(self, key):
+        self.format_func = registry.formats.get(key)
+
+    def process(self, record):
+        """
+        :param record: dictionary of record to format
+        :return: The formatted record
+        """
+        return self.format_func(record)
+
+
+@dataspec.registry.formats('json')
+def format_json(record):
+    return json.dumps(record)
+
+
+@dataspec.registry.formats('json-pretty')
+def format_json(record):
+    return json.dumps(record, indent=4)

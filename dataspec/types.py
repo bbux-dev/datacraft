@@ -11,6 +11,7 @@ class registry:
     types = catalogue.create('dataspec', 'type')
     preprocessors = catalogue.create('dataspec', 'preprocessor')
     logging = catalogue.create('dataspec', 'logging')
+    formats = catalogue.create('dataspec', 'format')
 
 
 def lookup_type(key):
@@ -20,3 +21,7 @@ def lookup_type(key):
     :return: the type if found
     """
     return registry.types.get(key)
+
+
+def valid_formats():
+    return list(registry.formats.get_all().keys())
