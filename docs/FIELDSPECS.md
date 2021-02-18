@@ -71,7 +71,7 @@ two values providers that are lists, they will be combined in incrementing order
 Will produce the values A1, B2, C3 continuously.
 
 ```shell script
-dist/dataspec -s ~/scratch/sample.json -i 7
+dataspec -s ~/scratch/sample.json -i 7
 A1
 B2
 C3
@@ -94,7 +94,7 @@ If an additional number is added to TWO, we now get 12 distinct values:
 ```
 
 ```shell script
-dist/dataspec -s ~/scratch/sample.json -i 12 | sort
+dataspec -s ~/scratch/sample.json -i 12 | sort
 A1
 A2
 A3
@@ -738,7 +738,7 @@ You can also set a min and max. Example:
 ```
 
 ```shell script
-dist/dataspec -s ~/scratch/ingredients.json -i 10
+dataspec -s ~/scratch/ingredients.json -i 10
 garlic, onions
 garlic, spinach
 bell peppers, spinach
@@ -774,7 +774,7 @@ our ingredients surrounded with double quotes. We would update our spec this way
 Now when we run our datespec we get:
 
 ```shell script
-dist/dataspec -s ~/scratch/quoted_ingredients.json -i 10
+dataspec -s ~/scratch/quoted_ingredients.json -i 10
 "spinach", "mushrooms", "bell peppers", "onions"
 "spinach", "onions", "mushrooms", "garlic"
 "carrots", "garlic", "mushrooms", "onions"
