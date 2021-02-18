@@ -4,7 +4,7 @@ import json
 import yaml
 import argparse
 import logging
-from dataspec import Loader
+from dataspec import Loader, preprocess_spec
 import dataspec.template_engines as engines
 import dataspec.outputs as outputs
 import dataspec.types as types
@@ -40,6 +40,8 @@ def main():
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error"')
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
+    parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
+                        help='Debug spec after internal reformatting')
 
     try:
         args = parser.parse_args()
@@ -55,6 +57,9 @@ def main():
 
         log.debug('Attempting to load Data Spec from %s', args.spec)
         spec = _load_spec(args.spec)
+        if args.debug_spec:
+            print(json.dumps(preprocess_spec(spec), indent=4))
+            return
         loader = Loader(spec, args.datadir)
 
         output = _configure_output(args)
@@ -132,6 +137,8 @@ if __name__ == '__main__':
     from dataspec.type_handlers import ip_handler
     from dataspec.type_handlers import date_handler
     from dataspec.type_handlers import csv_handler
+    from dataspec.type_handlers import geo_handler
+    import dataspec.preprocessor
     import dataspec.logging
 
     main()
