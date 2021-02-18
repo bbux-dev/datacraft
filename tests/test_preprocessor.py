@@ -118,3 +118,13 @@ def test_url_lib_parsing():
     assert newkey == 'user_agent'
     assert spectype == 'csv'
     assert params.get('datafile') == 'single_column.csv'
+
+
+def test_url_lib_parsing_ignore_spaces():
+    format1 = "short_name?    param=value"
+    format2 = "aligned:values?prefix=foo& suffix=bar"
+
+    _, _, params = _parse_key(format1)
+    assert 'param' in params
+    _, _, params = _parse_key(format2)
+    assert 'suffix' in params

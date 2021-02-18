@@ -76,9 +76,9 @@ def _parse_key(field_name):
     config = {}
     for key, value in parsed_query.items():
         if len(value) == 1:
-            config[key] = value[0]
+            config[key.strip()] = value[0]
         else:
-            config[key] = value
+            config[key.strip()] = value
 
     return newkey, spectype, config
 
