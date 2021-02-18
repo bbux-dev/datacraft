@@ -118,7 +118,7 @@ There are several different ways to define a spec. There is the full spec format
 The only required element is type. Each Type Handler requires different pieces of information. See the Field Type
 reference below for details on each type.
 
-```json
+```
 {
   "type": "<the type>",
   "config": {
@@ -294,7 +294,7 @@ A combine Field Spec is used to concatenate or append two or more fields or refe
 
 The combine Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "combine",
@@ -336,7 +336,7 @@ This approach requires the same join_with param for each set of refs.
 
 The combine Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "combine-list",
@@ -395,7 +395,7 @@ a lot of configuration parameters for the date module. Each are described below.
 
 The date Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "date",
@@ -437,7 +437,7 @@ step can be integers or floating point numbers.
 
 The range Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "range",
@@ -489,7 +489,7 @@ one of int, float, or string. The default is to return value as a string.
 
 The range Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "rand_range",
@@ -601,7 +601,7 @@ specifying a base.
 
 The ipv4 Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "ipv4",
@@ -664,7 +664,7 @@ A weighted ref spec is used to select the values from a set of refs in a weighte
 
 The weightedref Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "weightedref",
@@ -698,7 +698,7 @@ A select list subset spec is used to select multiple values from a list to use a
 
 The select_list_subset Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "select_list_subset",
