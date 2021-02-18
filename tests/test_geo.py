@@ -1,14 +1,7 @@
-import pytest
 import decimal
-from dataspec import Loader, SpecException
+from dataspec import Loader
 # need this to trigger registration
 from dataspec.type_handlers import geo_handler
-
-
-def test_geo_invalid_precision():
-    spec = {"lat:geo.lat?precision=6": {}}
-    with pytest.raises(SpecException):
-        Loader(spec).get('lat').next(0)
 
 
 def test_geo_lat_default_precision():
