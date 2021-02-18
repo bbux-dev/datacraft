@@ -3,6 +3,8 @@ from dataspec.preprocessor import _parse_key
 from dataspec import SpecException
 import dataspec.suppliers as suppliers
 import pytest
+
+
 # hack to load up all types
 
 
@@ -46,7 +48,7 @@ def testpreprocess_spec_param_and_config():
     assert config['prefix'] == 'START'
     assert 'suffix' in config
     assert config['suffix'] == 'END'
-    assert suppliers.isdecorated(spec)
+    assert suppliers.is_decorated(spec)
 
 
 def test_fully_inline_key_no_params():
@@ -59,6 +61,22 @@ def test_fully_inline_key_with_params():
     config_in_key_spec = {"network:ip?cidr=2.3.4.0/14": {}}
     updated = preprocess_spec(config_in_key_spec)
     assert 'network' in updated
+    spec = updated.get('network')
+    assert 'type' in spec
+    assert spec['type'] == 'ip'
+    config = spec.get('config')
+    assert config is not None
+
+
+def test_fully_inline_key_no_params():
+    config_in_key_spec = {"geo:geo.pair": {}}
+    updated = preprocess_spec(config_in_key_spec)
+    assert 'geo' in updated
+    spec = updated.get('geo')
+    assert 'type' in spec
+    assert spec['type'] == 'geo.pair'
+    config = spec.get('config')
+    assert config is None
 
 
 def test_weird_combos():
