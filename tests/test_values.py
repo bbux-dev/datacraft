@@ -1,6 +1,6 @@
 from dataspec import Loader
 import dataspec.suppliers as suppliers
-from dataspec.loader import _preprocess_spec
+from dataspec.loader import preprocess_spec
 from dataspec.exceptions import SpecException
 from collections import Counter
 import pytest
@@ -60,7 +60,7 @@ def test_count_param_invalid():
 
 
 def _test_invalid_spec(spec, key):
-    updated = _preprocess_spec(spec)
+    updated = preprocess_spec(spec)
     with pytest.raises(SpecException):
         suppliers.values(updated[key])
 
@@ -69,7 +69,7 @@ def test_count_param_valid():
     spec = {
         'foo?count=2': ['A', 'B', 'C', 'D']
     }
-    updated = _preprocess_spec(spec)
+    updated = preprocess_spec(spec)
     supplier = suppliers.values(updated['foo'])
     first = supplier.next(0)
     assert type(first) == list

@@ -15,7 +15,6 @@ def test_date_delta():
     spec = {"foo": {"type": "date", "config": config}}
     values = _get_unique_values(spec, 'foo')
     # this should create three unique dates
-    print(values)
     assert len(values) == 3
 
 

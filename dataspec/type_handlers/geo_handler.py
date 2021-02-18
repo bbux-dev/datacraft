@@ -2,10 +2,11 @@
 Module for handling geo types
 """
 import json
+
 import dataspec
+from dataspec import SpecException, suppliers
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 from dataspec.utils import load_config, is_affirmative
-from dataspec import SpecException, suppliers
 
 
 class GeoSupplier(ValueSupplierInterface):
@@ -60,8 +61,7 @@ def _configure_geo_type(spec, loader, default_start, default_end, suffix):
     if not str(precision).isnumeric() or int(precision) > 5:
         raise SpecException(f'precision for geo should be 5 or less and an integer: {json.dumps(spec)}')
     start, end = _get_start_end(config, default_start, default_end, suffix)
-    cast_to_float = is_affirmative('cast_to_float', config)
-    return GeoSupplier(suppliers.random_range(start, end, precision, cast_to_float))
+    return GeoSupplier(suppliers.random_range(start, end, precision))
 
 
 def _get_start_end(config, default_start, default_end, suffix):

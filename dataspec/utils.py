@@ -4,6 +4,7 @@ Module for storing package wide common functions
 import os
 import importlib
 import logging
+import dataspec.casters as casters
 
 
 def load_custom_code(code_path):
@@ -19,7 +20,7 @@ def load_custom_code(code_path):
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
     except Exception as exception:
-        logging.warning("Couldn't load custom Python code: %s: %s",  code_path, str(exception))
+        logging.warning("Couldn't load custom Python code: %s: %s", code_path, str(exception))
 
 
 def is_affirmative(key, config, default=False):
@@ -50,3 +51,13 @@ def load_config(field_spec, loader):
         configref = loader.refs.get(refkey)
         config.update(configref.get('config', {}))
     return config
+
+
+def get_caster(config):
+    cast_key = ''
+    for key in ['cast', 'cast_to', 'cast_as']:
+        if key in config:
+            cast_key = key
+            break
+
+    return casters.get(config.get(cast_key))

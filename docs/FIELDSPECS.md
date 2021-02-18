@@ -34,6 +34,7 @@ Field Spec Definitions
 |-----------------------------|----------------------------------------|------------------------------|
 |[values](#Values)            | constant, list, or weighted dictionary |                              |
 |[range](#Range)              | range of values                        |                              |
+|[rand_range](#RandRange)     | random value in a range                |                              |
 |[combine](#Combine)          | refs or fields                         | join_with                    |
 |[combine-list](#CombineList) | list of lists of refs to combine       | join_with                    |
 |[date](#Date)                | date strings                           | many see details below       |
@@ -188,13 +189,16 @@ using a URL parameter format in the key. For example, the following two fields w
 
 # <a name="Common_Configurations"></a>Common Configurations
 
-There are some configuration values that can be applied to all types. These are listed below
+There are some configuration values that can be applied to all or a subset of types. These are listed below
 
 | key   | argument |effect |
 |-------|----------|-------|
 |prefix | string   |Prepends the value to all results |
 |suffix | string   |Appends the value to all results  |
 |quote  | string   |Wraps the resulting value on both sides with the provided string |
+|cast   | i,int,f,float,s,str,string|For numeric types, will cast results the provided type|
+|cast_as|          |Same as cast                                                           |
+|cast_to|          |Same as cast                                                           |
 
 Example:
 
@@ -363,7 +367,7 @@ This is a slight modification to the above combine Example.
     "first": ["zebra", "hedgehog", "llama", "flamingo"],
     "last": ["jones", "smith", "williams"],
     "middle": ["cloud", "sage", "river"],
-    "middle_initial": {"a": 0.3, "m": 0.3, "j": 0.1, "l":  0.1, "e":  0.1, "w":  0.1}
+    "middle_initial": {"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1}
   }
 }
 ```
@@ -428,7 +432,7 @@ the `date.iso.us` type to generate them with microseconds.
 
 ## <a name="Range"></a>Range
 
-A range spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
+A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
 step can be integers or floating point numbers.
 
 The range Field Spec structure is:
@@ -452,6 +456,51 @@ Example: Range 0 to 10 with a step of 0.5
   },
   "range_shorthand1:range": {"data": [0, 10, 0.5]},
   "range_shorthand2:range": [0, 10, 0.5]
+}
+```
+
+## <a name="RandRange"></a>Random Range
+
+A `rand_range` spec is used to generate a number with in a range. Use the `cast` param to explicitly cast the value to
+one of int, float, or string. The default is to return value as a string.
+
+The range Field Spec structure is:
+
+```json
+{
+  "<field name>": {
+    "type": "rand_range",
+    "data": [<upper>],
+    or
+    "data": [<lower>, <upper>],
+    or
+    "data": [<lower>, <upper>, <precision> (optional)]
+  }
+}
+```
+
+If a single element is provided in the `data` array, it will be used as the upper bound and 0 will be the lower.
+
+### Config Params
+
+|param    |description|
+|---------|-----------|
+|precision|How many digits after decimal point to include|
+|cast     |Type to cast result to, default is to return as string|
+
+Example:
+
+Two different population fields. The first generates an integer uniformly between 100 and 1000. The second generates a
+float between 200.2 and 1222.7 with two values after the decimal place. Note the abbreviation for cast.
+
+```json
+{
+  "population": {
+    "type": "rand_range",
+    "data": [100, 1000],
+    "config": {"cast_to": "int"}
+  },
+  "pop:rand_range?cast=f": [200.2, 1222.7, 2]
 }
 ```
 
@@ -480,14 +529,14 @@ Example Spec
 }
 ```
 
-
 ## <a name="Geo"></a>Geo Related Types
 
-There are three main geo types: `geo.lat`, `geo.long`, and `geo.pair`.  The defaults will create decimal string values
-in the valid ranges: -90 to 90 for latitude and -180 to 180 for longitude. You can bound the ranges in several ways.
-The first is with the `start_lat`, `end_lat`, `start_long`, `end_long` config params.  These will set the individual
-bounds for each of the segments. You can use one or more of them.  The other mechanism is by defining a `bbox` array
-which consists of the lower left geo point and the upper right one. See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
+There are three main geo types: `geo.lat`, `geo.long`, and `geo.pair`. The defaults will create decimal string values in
+the valid ranges: -90 to 90 for latitude and -180 to 180 for longitude. You can bound the ranges in several ways. The
+first is with the `start_lat`, `end_lat`, `start_long`, `end_long` config params. These will set the individual bounds
+for each of the segments. You can use one or more of them. The other mechanism is by defining a `bbox` array which
+consists of the lower left geo point and the upper right one.
+See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
 
 Config Params:
 
@@ -509,6 +558,7 @@ Config Params:
 Examples:
 
 Generates a `longitude,latitude` pair with in the bounding box defining Egypt with 3 decimal points of precision.
+
 ```json
 {
   "egypt": {
