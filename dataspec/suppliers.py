@@ -5,8 +5,7 @@ Factory like module for core supplier related functions.
 import json
 import random
 from .exceptions import SpecException
-from .utils import load_config
-from .utils import is_affirmative
+from .utils import load_config, is_affirmative, get_caster
 from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
@@ -74,13 +73,14 @@ class _MultipleValueSupplier(ValueSupplierInterface):
         return [self.wrapped.next(iteration + i) for i in range(self.count)]
 
 
-def from_list_of_suppliers(suppliers):
+def from_list_of_suppliers(supplier_list, modulate_iteration):
     """
     Returns a supplier that rotates through the provided suppliers incrementally
-    :param suppliers: to rotate through
+    :param supplier_list: to rotate through
+    :param modulate_iteration: if the iteration number should be moded by the index of the supplier
     :return: a supplier for these suppliers
     """
-    return RotatingSupplierList(suppliers)
+    return RotatingSupplierList(supplier_list, modulate_iteration)
 
 
 class RotatingSupplierList(ValueSupplierInterface):
@@ -88,14 +88,19 @@ class RotatingSupplierList(ValueSupplierInterface):
     Class that rotates through a list of suppliers incrementally to provide the next value
     """
 
-    def __init__(self, suppliers):
+    def __init__(self, suppliers, modulate_iteration):
         """
         :param suppliers: list of suppliers to rotate through
+        :param modulate_iteration: if the iteration should be split evenly across all suppliers 
         """
         self.suppliers = suppliers
+        self.modulate_iteration = modulate_iteration
 
     def next(self, iteration):
         idx = iteration % len(self.suppliers)
+        if self.modulate_iteration:
+            modulated_iteration = int(iteration / len(self.suppliers))
+            return self.suppliers[idx].next(modulated_iteration)
         return self.suppliers[idx].next(iteration)
 
 
@@ -149,15 +154,15 @@ def select_list_subset(data, config):
     return SelectListSupplier(data, config)
 
 
-def isdecorated(data_spec):
+def is_decorated(field_spec):
     """
     is this spec a decorated one
-    :param data_spec: to check
+    :param field_spec: to check
     :return: true or false
     """
-    if 'config' not in data_spec:
+    if 'config' not in field_spec:
         return False
-    config = data_spec.get('config')
+    config = field_spec.get('config')
     return 'prefix' in config or 'suffix' in config or 'quote' in config
 
 
@@ -179,11 +184,62 @@ class DecoratedSupplier(ValueSupplierInterface):
         return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
 
 
-def decorated(data_spec, supplier):
+def decorated(field_spec, supplier):
     """
     Creates a decorated supplier around the provided on
-    :param data_spec: the spec
+    :param field_spec: the spec
     :param supplier: the supplier to decorate
     :return: the decorated supplier
     """
-    return DecoratedSupplier(data_spec.get('config'), supplier)
+    return DecoratedSupplier(field_spec.get('config'), supplier)
+
+
+class CastingSupplier(ValueSupplierInterface):
+    """
+    Class that just casts the results of other suppliers
+    """
+
+    def __init__(self, wrapped, caster):
+        self.wrapped = wrapped
+        self.caster = caster
+
+    def next(self, iteration):
+        return self.caster.cast(self.wrapped.next(iteration))
+
+
+def is_cast(field_spec):
+    """
+    is this spec requires casting
+    :param field_spec: to check
+    :return: true or false
+    """
+    if not isinstance(field_spec, dict):
+        return False
+    config = field_spec.get('config', {})
+    return any(key in config for key in ['cast', 'cast_as', 'cast_to'])
+
+
+def cast_supplier(field_spec, supplier):
+    return CastingSupplier(supplier, get_caster(field_spec.get('config')))
+
+
+class RandomRangeSupplier(ValueSupplierInterface):
+    """
+    Class that supplies random ranges between specified bounds
+    """
+
+    def __init__(self, start, end, precision):
+        self.start = float(start)
+        self.end = float(end)
+        self.precision = precision
+        self.format_str = '{: .' + str(precision) + 'f}'
+
+    def next(self, iteration):
+        next_num = random.uniform(self.start, self.end)
+        if self.precision is not None:
+            next_num = self.format_str.format(next_num)
+        return next_num
+
+
+def random_range(start, end, precision=None):
+    return RandomRangeSupplier(start, end, precision)

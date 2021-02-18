@@ -4,9 +4,10 @@ import json
 import yaml
 import argparse
 import logging
-from dataspec import Loader
+from dataspec import Loader, preprocess_spec
 import dataspec.template_engines as engines
 import dataspec.outputs as outputs
+import dataspec.types as types
 from dataspec import utils
 from dataspec import SpecException
 
@@ -37,6 +38,10 @@ def main():
                         help='Path to external directory to load external data file such as csvs')
     parser.add_argument('-l', '--loglevel', default=logging.INFO,
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error"')
+    parser.add_argument('-f', '--format', default=None,
+                        help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
+    parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
+                        help='Debug spec after internal reformatting')
 
     try:
         args = parser.parse_args()
@@ -46,31 +51,18 @@ def main():
         log.debug("Parsing Args")
 
         if args.code:
-            log.debug(f'Loading custom code from {args.code}')
+            log.debug('Loading custom code from %s', args.code)
             for code in args.code:
                 utils.load_custom_code(code)
 
-        log.debug(f'Attempting to load Data Spec from {args.spec}')
+        log.debug('Attempting to load Data Spec from %s', args.spec)
         spec = _load_spec(args.spec)
+        if args.debug_spec:
+            print(json.dumps(preprocess_spec(spec), indent=4))
+            return
         loader = Loader(spec, args.datadir)
 
-        if args.outdir:
-            log.debug(f'Creating output file writer for dir: {args.outdir}')
-            writer = outputs.FileWriter(
-                outdir=args.outdir,
-                outname=args.outfileprefix,
-                extension=args.extension,
-                records_per_file=args.recordsperfile
-            )
-        else:
-            log.debug(f'Writing output to stdout')
-            writer = outputs.StdOutWriter()
-
-        if args.template:
-            log.debug(f'Using template from specified file: {args.template}')
-            output = outputs.RecordLevelOutput(engines.load(args.template), writer)
-        else:
-            output = outputs.SingleFieldOutput(writer, args.printkey)
+        output = _configure_output(args)
 
         keys = [key for key in loader.specs.keys() if key != 'refs']
 
@@ -83,6 +75,32 @@ def main():
         log.info('Finished Processing')
     except SpecException as e:
         log.error(str(e))
+
+
+def _configure_output(args):
+    if args.outdir:
+        log.debug('Creating output file writer for dir: %s', args.outdir)
+        writer = outputs.FileWriter(
+            outdir=args.outdir,
+            outname=args.outfileprefix,
+            extension=args.extension,
+            records_per_file=args.recordsperfile
+        )
+    else:
+        log.debug('Writing output to stdout')
+        writer = outputs.StdOutWriter()
+
+    if args.template:
+        log.debug('Using template from specified file: %s', args.template)
+        return outputs.RecordLevelOutput(engines.load(args.template), writer)
+
+    if args.format:
+        log.debug('Using %s formatter for output', args.format)
+        formatter = outputs.FormatProcessor(args.format)
+        return outputs.RecordLevelOutput(formatter, writer)
+
+    # default
+    return outputs.SingleFieldOutput(writer, args.printkey)
 
 
 def _load_spec(spec_path):
@@ -98,7 +116,7 @@ def _load_spec(spec_path):
         log.debug('Attempting to load spec as YAML')
         spec = yaml.load(handle, Loader=yaml.FullLoader)
     if not isinstance(spec, dict):
-        raise SpecException(f'Unable to load spec from path: {spec_path}, Please verify it is valid JSON or YAML')
+        raise SpecException('Unable to load spec from path: %s, Please verify it is valid JSON or YAML', spec_path)
     return spec
 
 
@@ -119,6 +137,8 @@ if __name__ == '__main__':
     from dataspec.type_handlers import ip_handler
     from dataspec.type_handlers import date_handler
     from dataspec.type_handlers import csv_handler
+    from dataspec.type_handlers import geo_handler
+    import dataspec.preprocessor
     import dataspec.logging
 
     main()

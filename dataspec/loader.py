@@ -4,7 +4,7 @@ delegating the handling of various data types.
 """
 
 import json
-from .types import registry, lookup_type
+from .types import lookup_type, registry
 from . import suppliers
 from .exceptions import SpecException
 
@@ -30,8 +30,8 @@ class Loader:
     Parent object for loading value suppliers from specs
     """
 
-    def __init__(self, specs, datadir='./data'):
-        self.specs = _preprocess_spec(specs)
+    def __init__(self, data_spec, datadir='./data'):
+        self.specs = preprocess_spec(data_spec)
         self.datadir = datadir
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
@@ -73,13 +73,14 @@ class Loader:
             if handler is None:
                 raise SpecException('Unable to load handler for: ' + json.dumps(field_spec))
             supplier = handler(field_spec, self)
-
-        if suppliers.isdecorated(field_spec):
-            return suppliers.decorated(field_spec, supplier)
+        if suppliers.is_cast(field_spec):
+            supplier = suppliers.cast_supplier(field_spec, supplier)
+        if suppliers.is_decorated(field_spec):
+            supplier = suppliers.decorated(field_spec, supplier)
         return supplier
 
 
-def _preprocess_spec(raw_spec):
+def preprocess_spec(raw_spec):
     """
     Uses the registered preprocessors to cumulatively update the spec
     :param raw_spec: to preprocesss

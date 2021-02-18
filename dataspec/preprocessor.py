@@ -92,6 +92,11 @@ def _update_no_params(key, spec, updated_specs):
         newkey, spectype = key.split(':', 2)
         if not _is_spec_data(spec):
             spec['type'] = spectype
+        else:
+            spec = {
+                'type': spectype,
+                'data': spec
+            }
     else:
         newkey = key
     # check for conflicts

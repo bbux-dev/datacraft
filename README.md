@@ -81,7 +81,7 @@ on each of the Field Specs used in this example.
 Running dataspec from the command line against this spec:
 
 ```shell script
-dist/dataspec -s ~/example.json -i 12
+dataspec -s ~/example.json -i 12
 zebra_jump@gmail.com
 hedgehog_launch@yahoo.com
 llama_launch@yahoo.com
@@ -154,7 +154,7 @@ We could then create a spec to populate the id, name, age, and gender fields. Su
 
 When we run the tool we get the data populated for the template:
 ```shell script
-dist/dataspec -s ~/scratch/es-spec.json -t ~/scratch/template.json -i 10
+dataspec -s ~/scratch/es-spec.json -t ~/scratch/template.json -i 10
 { "index" : { "_index" : "test", "_id" : "1" } }
 { "doc" : {"name" : "bob", "age": "22", "gender": "F" } }
 { "index" : { "_index" : "test", "_id" : "2" } }
@@ -278,7 +278,7 @@ next value for the given iteration.
 
 To supply custom code to the tool use the -c or --code arguments. One or more module files can be imported.
 ```shell script
-.dist/dataspec -s reverse-spec.json -i 4 -c custom.py another.py
+.dataspec -s reverse-spec.json -i 4 -c custom.py another.py
 arbez
 gohegdeh
 amall
