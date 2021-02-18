@@ -91,3 +91,12 @@ def test_configref_for_values():
     }
     supplier = Loader(spec).get('name')
     assert supplier.next(0) == '"bob"'
+
+
+def test_values_list_order():
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    spec = {'field': data}
+    supplier = Loader(spec).get('field')
+
+    values = [supplier.next(i) for i in range(10)]
+    assert values == data

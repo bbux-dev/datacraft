@@ -10,12 +10,13 @@ Range Spec format:
   }
 }
 """
-import json
 import decimal
+import json
+import math
+
 import dataspec
 import dataspec.suppliers as suppliers
-import dataspec.casters as casters
-from dataspec.utils import load_config, get_caster
+from dataspec.utils import load_config
 
 
 @dataspec.registry.types('range')
@@ -28,6 +29,14 @@ def configure_range_supplier(field_spec, _):
     if not isinstance(data, list) or len(data) < 2:
         raise dataspec.SpecException(
             'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
+    # we have the nested case
+    if isinstance(data[0], list):
+        suppliers_list = [_configure_supplier_for_range_data(field_spec, subdata) for subdata in data]
+        return suppliers.from_list_of_suppliers(suppliers_list, True)
+    return _configure_supplier_for_range_data(field_spec, data)
+
+
+def _configure_supplier_for_range_data(field_spec, data):
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
     # more intuitive behavior
@@ -39,7 +48,11 @@ def configure_range_supplier(field_spec, _):
     else:
         step = data[2]
     if _any_is_float(data):
-        range_values = list(float_range(float(start), float(end), float(step)))
+        config = field_spec.get('config', {})
+        precision = config.get('precision', None)
+        if precision and not str(precision).isnumeric():
+            raise dataspec.SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
+        range_values = list(float_range(float(start), float(end), float(step), precision))
     else:
         range_values = list(range(start, end, step))
     return suppliers.values(range_values)
@@ -53,7 +66,8 @@ def configure_rand_range_supplier(field_spec, loader):
     data = field_spec.get('data')
     config = load_config(field_spec, loader)
     if not isinstance(data, list) or len(data) == 0:
-        raise dataspec.SpecException('rand_range specs require data as array with at least one element: %s' % json.dumps(field_spec))
+        raise dataspec.SpecException(
+            'rand_range specs require data as array with at least one element: %s' % json.dumps(field_spec))
     start = 0
     if len(data) == 1:
         end = data[0]
@@ -76,15 +90,22 @@ def _any_is_float(data):
     return False
 
 
-def float_range(start, stop, step):
+def float_range(start, stop, step, precision=None):
     """
     Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are stored
     """
     # attempt to defeat some rounding errors prevalent in python
+    if precision:
+        quantize = decimal.Decimal(str(1/math.pow(10, int(precision))))
     current = decimal.Decimal(str(start))
+    if precision:
+        current = current.quantize(quantize)
+
     dstop = decimal.Decimal(str(stop))
     dstep = decimal.Decimal(str(step))
     while current < dstop:
         # inefficient?
         yield float(str(current))
         current = current + dstep
+        if precision:
+            current = current.quantize(quantize)

@@ -441,7 +441,14 @@ The range Field Spec structure is:
 {
   "<field name>": {
     "type": "range",
-    "data": [<start>, <end>, <step> (optional)]
+    "data": [<start>, <end>, <step> (optional)],
+    or
+    "data": [
+      [<start>, <end>, <step> (optional)],
+      [<start>, <end>, <step> (optional)],
+      ...
+      [<start>, <end>, <step> (optional)],
+    ],
   }
 }
 ```
@@ -458,6 +465,22 @@ Example: Range 0 to 10 with a step of 0.5
   "range_shorthand2:range": [0, 10, 0.5]
 }
 ```
+
+Example: Multiple Ranges One Field
+
+```json
+{
+  "salaries": {
+    "type": "range",
+    "data": [
+      [1000, 10000, 1000],
+      [10000, 55000, 5000],
+      [55000, 155000, 10000]
+    ]
+  }
+}
+```
+This spec produces integer values for three different ranges each with different step sizes.
 
 ## <a name="RandRange"></a>Random Range
 

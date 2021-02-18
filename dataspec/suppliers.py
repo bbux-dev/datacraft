@@ -73,13 +73,14 @@ class _MultipleValueSupplier(ValueSupplierInterface):
         return [self.wrapped.next(iteration + i) for i in range(self.count)]
 
 
-def from_list_of_suppliers(suppliers):
+def from_list_of_suppliers(supplier_list, modulate_iteration):
     """
     Returns a supplier that rotates through the provided suppliers incrementally
-    :param suppliers: to rotate through
+    :param supplier_list: to rotate through
+    :param modulate_iteration: if the iteration number should be moded by the index of the supplier
     :return: a supplier for these suppliers
     """
-    return RotatingSupplierList(suppliers)
+    return RotatingSupplierList(supplier_list, modulate_iteration)
 
 
 class RotatingSupplierList(ValueSupplierInterface):
@@ -87,14 +88,18 @@ class RotatingSupplierList(ValueSupplierInterface):
     Class that rotates through a list of suppliers incrementally to provide the next value
     """
 
-    def __init__(self, suppliers):
+    def __init__(self, suppliers, modulate_iteration):
         """
         :param suppliers: list of suppliers to rotate through
         """
         self.suppliers = suppliers
+        self.modulate_iteration = modulate_iteration
 
     def next(self, iteration):
         idx = iteration % len(self.suppliers)
+        if self.modulate_iteration:
+            modulated_iteration = int(iteration / len(self.suppliers))
+            return self.suppliers[idx].next(modulated_iteration)
         return self.suppliers[idx].next(iteration)
 
 

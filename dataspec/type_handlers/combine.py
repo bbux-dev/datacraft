@@ -47,7 +47,7 @@ def configure_combine_list_supplier(field_spec, loader):
         spec = dict(field_spec)
         spec['refs'] = ref
         suppliers_list.append(_load_from_refs(spec, loader))
-    return from_list_of_suppliers(suppliers_list)
+    return from_list_of_suppliers(suppliers_list, True)
 
 
 def _load_from_refs(combine_field_spec, loader):
