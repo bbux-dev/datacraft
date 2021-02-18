@@ -124,7 +124,7 @@ class FileWriter(WriterInterface):
 
 class FormatProcessor:
     """
-    A simple class that creates wraps a record formatting function
+    A simple class that wraps a record formatting function
     """
 
     def __init__(self, key):

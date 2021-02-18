@@ -58,8 +58,8 @@ def _configure_lat_type(spec, loader):
 def _configure_geo_type(spec, loader, default_start, default_end, suffix):
     config = load_config(spec, loader)
     precision = config.get('precision', 4)
-    if not str(precision).isnumeric() or int(precision) > 5:
-        raise SpecException(f'precision for geo should be 5 or less and an integer: {json.dumps(spec)}')
+    if not str(precision).isnumeric():
+        raise SpecException(f'precision for geo should be valid integer: {json.dumps(spec)}')
     start, end = _get_start_end(config, default_start, default_end, suffix)
     return GeoSupplier(suppliers.random_range(start, end, precision))
 

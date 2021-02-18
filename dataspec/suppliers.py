@@ -91,6 +91,7 @@ class RotatingSupplierList(ValueSupplierInterface):
     def __init__(self, suppliers, modulate_iteration):
         """
         :param suppliers: list of suppliers to rotate through
+        :param modulate_iteration: if the iteration should be split evenly across all suppliers 
         """
         self.suppliers = suppliers
         self.modulate_iteration = modulate_iteration
@@ -208,7 +209,7 @@ class CastingSupplier(ValueSupplierInterface):
 
 def is_cast(field_spec):
     """
-    is this spec a decorated one
+    is this spec requires casting
     :param field_spec: to check
     :return: true or false
     """
@@ -223,6 +224,10 @@ def cast_supplier(field_spec, supplier):
 
 
 class RandomRangeSupplier(ValueSupplierInterface):
+    """
+    Class that supplies random ranges between specified bounds
+    """
+
     def __init__(self, start, end, precision):
         self.start = float(start)
         self.end = float(end)
