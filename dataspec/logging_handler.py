@@ -19,7 +19,7 @@ def configure_logging(loglevel):
     :param loglevel: loglevel as specified from the command line
     :return: None
     """
-    if loglevel.lower() in ['off', 'stop', 'disable']:
+    if str(loglevel).lower() in ['off', 'stop', 'disable']:
         logging.disable(logging.CRITICAL)
     else:
         level = _MAPPING.get(loglevel, logging.INFO)
