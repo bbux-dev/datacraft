@@ -13,21 +13,19 @@ from dataspec.supplier.value_supplier import ValueSupplierInterface
 
 # 100 MB
 SMALL_ENOUGH_THRESHOLD = 100 * 1024 * 1024
+_DEFAULT_BUFFER_SIZE = 1000000
 
 # to keep from reloading the same CsvData
 _csv_data_cache = {}
 
 
-class CsvData:
+class CsvDataBase:
     """
     Class for encapsulating the data for a single CSV file so that multiple suppliers
     only need one copy of the underlying data
     """
 
-    def __init__(self, csv_path, delimiter, quotechar, has_headers):
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
-            self.data = list(reader)
+    def __init__(self, has_headers):
         if has_headers:
             has_headers = self.data.pop(0)
             self.mapping = {has_headers[i]: i for i in range(len(has_headers))}
@@ -46,18 +44,6 @@ class CsvData:
         :param count: number of values to return
         :return: array of values if count > 1 else the next value
         """
-        colidx = self._get_column_index(field)
-
-        values = []
-        for i in range(count):
-            if sample:
-                idx = random.randint(0, len(self.data) - 1)
-            else:
-                idx = iteration % len(self.data) + i
-            values.append(self.data[idx][colidx])
-        if count == 1:
-            return values[0]
-        return values
 
     def _get_column_index(self, field):
         """
@@ -74,7 +60,30 @@ class CsvData:
         return colidx
 
 
-class BufferedCsvData:
+class SampleEnabledCsv(CsvDataBase):
+    def __init__(self, csv_path, delimiter, quotechar, has_headers):
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+            self.data = list(reader)
+        # need to populate data before super constructor call
+        super().__init__(has_headers)
+
+    def next(self, field, iteration, sample, count):
+        colidx = self._get_column_index(field)
+
+        values = []
+        for i in range(count):
+            if sample:
+                idx = random.randint(0, len(self.data) - 1)
+            else:
+                idx = iteration % len(self.data) + i
+            values.append(self.data[idx][colidx])
+        if count == 1:
+            return values[0]
+        return values
+
+
+class BufferedCsvData(CsvDataBase):
     def __init__(self, csv_path, delimiter, quotechar, has_headers, buffer_size):
         self.csv_path = csv_path
         self.delimiter = delimiter
@@ -83,14 +92,8 @@ class BufferedCsvData:
         self.increment = -1
         self.data = None
         self.fill_buffer(0)
-        if has_headers:
-            has_headers = self.data.pop(0)
-            self.mapping = {has_headers[i]: i for i in range(len(has_headers))}
-        else:
-            self.mapping = {}
-        self.valid_keys = list(self.mapping.keys())
-        if len(self.valid_keys) == 0:
-            self.valid_keys = [i + 1 for i in range(len(self.data[0]))]
+        # need to populate data before super constructor call
+        super().__init__(has_headers)
 
     def fill_buffer(self, iteration):
         if int(iteration / self.size) == self.increment:
@@ -199,8 +202,8 @@ def _load_csv_data(field_spec, config, datadir):
 
     size_in_bytes = os.stat(csv_path).st_size
     if size_in_bytes <= SMALL_ENOUGH_THRESHOLD:
-        csv_data = CsvData(csv_path, delimiter, quotechar, has_headers)
+        csv_data = SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
     else:
-        csv_data = BufferedCsvData(csv_path, delimiter, quotechar, has_headers, 10)
+        csv_data = BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)
     _csv_data_cache[csv_path] = csv_data
     return csv_data
