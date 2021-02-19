@@ -61,13 +61,7 @@ than the number of values in the list, the values start over from the beginning 
 two values providers that are lists, they will be combined in incrementing order. i.e:
 
 ```json
-{
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
-  "refs": {
-    "ONE": ["A", "B", "C"],
-    "TWO": [1, 2, 3]
-  }
-}
+{{ json_spec_overview_example_one }}
 ```
 
 Will produce the values A1, B2, C3 continuously.
@@ -86,13 +80,7 @@ A1
 If an additional number is added to TWO, we now get 12 distinct values:
 
 ```json
-{
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
-  "refs": {
-    "ONE": ["A", "B", "C"],
-    "TWO": [1, 2, 3, 4]
-  }
-}
+{{ json_spec_overview_example_two }}
 ```
 
 ```shell script
@@ -114,13 +102,7 @@ C4
 If we want our values to be generated randomly from the provided lists, we set the config param `sample` to true:
 
 ```json
-{
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
-  "refs": {
-    "ONE?sample=true": ["A", "B", "C"],
-    "TWO?sample=true": [1, 2, 3, 4]
-  }
-}
+{{ json_spec_overview_example_three }}
 ```
 
 # <a name="Field_Spec_Structure"></a>Field Spec Structure
@@ -152,19 +134,11 @@ The values type is very common and so has a shorthand notation. Below is an exam
 types fields and the same spec in shorthand notation.
 
 ```json
-{
-  "field1": {"type": "vaules", "data": [1, 2, 3, 4, 5]},
-  "field2": {"type": "values", "data": {"A": 0.5, "B": 0.3, "C": 0.2}},
-  "field3": {"type": "values", "data": "CONSTANT"}
-}
+{{ json_spec_values_shorthand_one }}
 ```
 
 ```json
-{
-  "field1": [1, 2, 3, 4, 5],
-  "field2": {"A": 0.5, "B": 0.3, "C": 0.2},
-  "field3": "CONSTANT"
-}
+{{ json_spec_values_shorthand_two }}
 ```
 
 The value after the field name is just the value of the data element from the full Field Spec. Config params can be
@@ -181,9 +155,7 @@ type `uuid` and has no further configuration. If no type is specified, the field
 It is also possible to specify configuration parameters in the key by using URL style parameters. For example.
 
 ```json
-{
-  "network:ipv4?cidr=192.168.0.0/16": {}
-}
+{{ json_spec_inline_key_example }}
 ```
 
 The `network` field is of type `ipv4` and the required `cidr` param is specified in the key.
@@ -194,14 +166,7 @@ There are two ways to configure a spec. One is by providing a `config` element i
 using a URL parameter format in the key. For example, the following two fields will produce the same values:
 
 ```json
-{
-  "ONE": {
-    "type": "values",
-    "data": [1, 2, 3],
-    "config": {"prefix": "TEST", "suffix": "@DEMO"}
-  },
-  "TWO?prefix=TEST&suffix=@DEMO": [1, 2, 3]
-}
+{{ json_spec_config_example_one }}
 ```
 
 # <a name="Common_Configurations"></a>Common Configurations
@@ -220,13 +185,7 @@ There are some configuration values that can be applied to all or a subset of ty
 Example:
 
 ```json
-{
-  "type": "values",
-  "config": {
-    "prefix": "Hello "
-  },
-  "data": ["world", "beautiful", "destiny"]
-}
+{{ json_spec_common_config_example_one }}
 ```
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
@@ -243,10 +202,7 @@ value of the data element replaces the full spec. See examples below.
 A Constant Value is just a single value that is used in every iteration
 
 ```json
-{
-  "constant1": {"type": "values", "data": 42},
-  "shorthand_constant": "This is simulated data and should not be used for nefarious purposes"
-}
+{{ json_spec_constants_example_one }}
 ```
 
 ### <a name="List_Values"></a>List Values
@@ -256,11 +212,7 @@ from the beginning of the list. Use the `sample` config param to specify that th
 from the provided list.
 
 ```json
-{
-  "list1": {"type": "values", "data": ["200", "202", "303", "400", "404", "500"]},
-  "shorthand_list": ["200", "202", "303", "400", "404", "500"],
-  "random_pet?sample=true": ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"]
-}
+{{ json_spec_list_values_example_one }}
 ```
 
 ### <a name="Weighted_Values"></a>Weighted Values
@@ -268,19 +220,7 @@ from the provided list.
 Weighted values are generated according to their weights.
 
 ```json
-{
-  "weighted1": {
-    "type": "values",
-    "data": {
-      "200": 0.4, "202": 0.3, "303": 0.1,
-      "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
-    }
-  },
-  "shorthand_weighted": {
-    "200": 0.4, "202": 0.3, "303": 0.1,
-    "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
-  }
-}
+{{ json_spec_weighted_values_example_one }}
 ```
 
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more
@@ -296,13 +236,7 @@ sample mode on either use a URL param or config entry with one of `on`,  `yes`, 
 valid with entries that are lists.
 
 ```json
-{
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
-  "refs": {
-    "ONE?sample=true": ["A", "B", "C"],
-    "TWO?sample=true": [1, 2, 3]
-  }
-}
+{{ json_spec_sample_mode_example_one }}
 ```
 
 ## <a name="Combine"></a>Combine
@@ -326,23 +260,7 @@ The combine Field Spec structure is:
 Example below uses the first and last refs to create a full name field.
 
 ```json
-{
-  "full name": {
-    "type": "combine",
-    "refs": ["first", "last"],
-    "config": {"join_with": " "}
-  },
-  "refs": {
-    "first": {
-      "type": "values",
-      "data": ["zebra", "hedgehog", "llama", "flamingo"]
-    },
-    "last": {
-      "type": "values",
-      "data": ["jones", "smith", "williams"]
-    }
-  }
-}
+{{ json_spec_combine_spec_example_one }}
 ```
 
 ## <a name="CombineList"></a>Combine List
@@ -370,23 +288,7 @@ The combine Field Spec structure is:
 This is a slight modification to the above combine Example.
 
 ```json
-{
-  "full name": {
-    "type": "combine-list",
-    "refs": [
-      ["first", "last"],
-      ["first", "middle", "last"],
-      ["first", "middle_initial", "last"]
-    ],
-    "config": {"join_with": " "}
-  },
-  "refs": {
-    "first": ["zebra", "hedgehog", "llama", "flamingo"],
-    "last": ["jones", "smith", "williams"],
-    "middle": ["cloud", "sage", "river"],
-    "middle_initial": {"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1}
-  }
-}
+{{ json_spec_combine_list_spec_example_one }}
 ```
 
 ## <a name="Date"></a>Date
@@ -473,29 +375,13 @@ The range Field Spec structure is:
 Example: Range 0 to 10 with a step of 0.5
 
 ```json
-{
-  "zero_to_ten": {
-    "type": "range",
-    "data": [0, 10, 0.5]
-  },
-  "range_shorthand1:range": {"data": [0, 10, 0.5]},
-  "range_shorthand2:range": [0, 10, 0.5]
-}
+{{ json_spec_range_spec_example_one }}
 ```
 
 Example: Multiple Ranges One Field
 
 ```json
-{
-  "salaries": {
-    "type": "range",
-    "data": [
-      [1000, 10000, 1000],
-      [10000, 55000, 5000],
-      [55000, 155000, 10000]
-    ]
-  }
-}
+{{ json_spec_range_spec_example_two }}
 ```
 This spec produces integer values for three different ranges each with different step sizes.
 
@@ -534,14 +420,7 @@ Two different population fields. The first generates an integer uniformly betwee
 float between 200.2 and 1222.7 with two values after the decimal place. Note the abbreviation for cast.
 
 ```json
-{
-  "population": {
-    "type": "rand_range",
-    "data": [100, 1000],
-    "config": {"cast_to": "int"}
-  },
-  "pop:rand_range?cast=f": [200.2, 1222.7, 2]
-}
+{{ json_spec_rand_range_spec_example_one }}
 ```
 
 ## <a name="Uuid"></a>Uuid
@@ -561,12 +440,7 @@ The uuid Field Spec structure is:
 Example Spec
 
 ```json
-{
-  "id": {
-    "type": "uuid"
-  },
-  "id_shorthand:uuid": {}
-}
+{{ json_spec_uuid_spec_example_one }}
 ```
 
 ## <a name="Geo"></a>Geo Related Types
@@ -600,15 +474,7 @@ Examples:
 Generates a `longitude,latitude` pair with in the bounding box defining Egypt with 3 decimal points of precision.
 
 ```json
-{
-  "egypt": {
-    "type": "geo.point",
-    "config": {
-      "bbox": [31.33134, 22.03795, 34.19295, 25.00562],
-      "precision": 3
-    }
-  }
-}
+{{ json_spec_geo_point_spec_example_one }}
 ```
 
 ## <a name="IP_Addresses"></a>IP Addresses
@@ -634,16 +500,7 @@ The ipv4 Field Spec structure is:
 Example Spec:
 
 ```json
-{
-  "network": {
-    "type": "ipv4",
-    "config": {
-      "cidr": "2.22.222.0/16"
-    }
-  },
-  "network_shorthand:ip?cidr=2.22.222.0/16": {},
-  "network_with_base:ip?base=192.168.0": {}
-}
+{{ json_spec_ip_spec_example_one }}
 ```
 
 ### <a name="Precise_IP"></a> Precise CIDR Addresses
@@ -660,19 +517,19 @@ random ip addresses selected from the generated ranges.
 Ips in the 10.n.n.n range, extremely slow, this is around 16 Million unique ip addresses
 
 ```json
-{"network:ip.precise?cidr=10.0.0.0/8":{}}
+{{ json_spec_ip_precise_example_one }}
 ```
 
 Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around 250K addresses
 
 ```json
-{"network:ip.precise?cidr=192.168.0.0/14&sample=true": {}}
+{{ json_spec_ip_precise_example_two }}
 ```
 
 Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 
 ```json
-{"network:ip.precise?cidr=2.22.222.0/22": {}}
+{{ json_spec_ip_precise_example_three }}
 ```
 
 ## <a name="Weighted_Ref"></a>Weighted Ref
@@ -694,19 +551,7 @@ For example if we want to generate a set of HTTP response codes, but we want mos
 the follow spec.
 
 ```json
-{
-  "http_code": {
-    "type": "weightedref",
-    "data": {
-      "GOOD_CODES": 0.7,
-      "BAD_CODES": 0.3
-    }
-  },
-  "refs": {
-    "GOOD_CODES": {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1},
-    "BAD_CODES": {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1}
-  }
-}
+{{ json_spec_weighted_ref_example_one }}
 ```
 
 ## <a name="Select_List_Subset"></a>Select List Subset
@@ -739,19 +584,7 @@ sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items 
 You can also set a min and max. Example:
 
 ```json
-{
-  "ingredients": {
-    "type": "select_list_subset",
-    "config": {
-      "mean": 3,
-      "stddev": 1,
-      "min": 2,
-      "max": 4,
-      "join_with": ", "
-    },
-    "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
-  }
-}
+{{ json_spec_select_list_example_one }}
 ```
 
 ```shell script
@@ -775,17 +608,7 @@ the sublist you need to use a special form of `join_with` along with the `quote`
 our ingredients surrounded with double quotes. We would update our spec this way.
 
 ```json
-{
-  "ingredients": {
-    "type": "select_list_subset",
-    "config": {
-      "mean": 3, "stddev": 1, "min": 2, "max": 4,
-      "join_with": "\", \"",
-      "quote": "\""
-    },
-    "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
-  }
-} 
+{{ json_spec_select_list_example_two }}
 ```
 
 Now when we run our datespec we get:
@@ -855,16 +678,7 @@ that it is easy to add new data points and to use small sets of data for testing
 smaller input files.
 
 ```json
-{
-  "cities": {
-    "type": "csv",
-    "config": {
-      "datafile": "cities.csv",
-      "delimiter": "~",
-      "sample": "true"
-    }
-  }
-}
+{{ json_spec_csv_spec_example_one }}
 ```
 
 ```shell
@@ -896,30 +710,11 @@ status	status_description	status_type
 Our Data Spec looks like:
 
 ```yaml
----
-status:
-  type: csv
-  config:
-    configref: tabs_config
-    column: 1
-description:
-  type: csv
-  config:
-    configref: tabs_config
-    column: 2
-# shorthand notation
-status_type:csv?configref=tabs_config&column=3: { }
-refs:
-  tabs_config:
-    type: configref
-    config:
-      datafile: tabs.csv
-      delimiter: '\t'
-      headers: true
+{{ yaml_spec_csv_spec_example_two }}
 ```
 
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
-use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we will get output
+use the following template {% raw %}`{{ status }},{{ description }},{{ status_type }}`{% endraw %} and run this spec we will get output
 similar to:
 
 ```shell
@@ -941,18 +736,5 @@ for the field. The value can either be the 1 indexed column number or the name o
 Our example doesn't have headers, so we are using the 1 based indexes.
 
 ```yaml
----
-placeholder:
-  type: csv_select
-  data:
-    geonameid: 1
-    name: 2
-    latitude: 5
-    longitude: 6
-    country_code: 9
-    population: 15
-  config:
-    datafile: allCountries.txt
-    headers: no
-    delimiter: "\t"
+{{ yaml_spec_csv_select_example_one }}
 ```

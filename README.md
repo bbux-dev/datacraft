@@ -8,6 +8,7 @@ Data Spec Repository
     1. [Data Spec](#Data_Spec)
         1. [YAML Format](#YAML_Format)
     1. [Field Specs](#Field_Specs)
+    1. [Notes on CSV Inputs](#CSV_Inputs)
     1. [Templating](#Templating)
         1. [Loops in Templates](#Templating_Loops)
         1. [Dynamic Loop Counters](#Dynamic_Loop_Counters)
@@ -140,12 +141,22 @@ refs:
 
 See [field specs](docs/FIELDSPECS.md) for details.
 
-### <a name="CSV_Inputs"></a>CSV Input
+### <a name="CSV_Inputs"></a>Notes on CSV Inputs
+
+#### Processing Large CSVs
 
 There are [Field Specs](https://github.com/bbux-dev/dataspec/blob/main/docs/FIELDSPECS.md#CSV_Data) that support using
-csv data to feed the data generation process. A common process is to select subsets of the columns from a csv file to
-use. The `csv_select` type makes this more efficient than using the standard `csv` type. Below is an example that will
-Convert data from
+csv data to feed the data generation process. If the input CSV file is very large, not all features will be supported.
+You will not be able to set sampling to true or use a field count > 1. You maximum number of iterations will be equal to
+the size of the smallest number of lines for all the large input CSV file. The current size threshold is set to 250
+MB. So, if you are using two different csv files as inputs and one is 300 MB with 5 million entries and another is 500
+MB with 2 million entries, you will be limited to 2 million iterations before an exception will be raised and
+processing will cease.
+
+#### More efficient processing using csv_select
+
+A common process is to select subsets of the columns from a csv file to use. The `csv_select` type makes this more
+efficient than using the standard `csv` type. Below is an example that will Convert data from
 the [Geonames](http://www.geonames.org/) [allCountries.zip](http://download.geonames.org/export/dump/allCountries.zip)
 dataset by selecting a subset of the columns from the tab delimited file.
 

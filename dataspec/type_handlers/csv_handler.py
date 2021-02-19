@@ -11,8 +11,9 @@ from dataspec.utils import is_affirmative
 from dataspec.utils import load_config
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 
-# 100 MB
-SMALL_ENOUGH_THRESHOLD = 100 * 1024 * 1024
+# 250 MB
+ONE_MB = 1024 * 1024
+SMALL_ENOUGH_THRESHOLD = 250 * ONE_MB
 _DEFAULT_BUFFER_SIZE = 1000000
 
 # to keep from reloading the same CsvData
