@@ -101,7 +101,7 @@ class BufferedCsvData(CsvDataBase):
         else:
             self.increment = int(iteration / self.size)
         start = self.size * self.increment + 1
-        end = start + self.size
+        end = start + self.size + 1
         buff = []
         with open(self.csv_path) as f:
             rows = csv.reader(f, delimiter=self.delimiter, quotechar=self.quotechar)
@@ -123,16 +123,15 @@ class BufferedCsvData(CsvDataBase):
         """
         if sample:
             raise SpecException('Large CSV files do not support sample mode')
+        if count > 1:
+            raise SpecException('Large CSV files only support count of 1')
         self.fill_buffer(iteration)
         colidx = self._get_column_index(field)
 
-        values = []
-        for i in range(count):
-            idx = iteration % len(self.data) + i
-            values.append(self.data[idx][colidx])
-        if count == 1:
-            return values[0]
-        return values
+        idx = iteration % self.size
+        if idx >= len(self.data):
+            raise SpecException("Exceeded end of CSV data, unable to proceed with large CSV files")
+        return self.data[idx][colidx]
 
     def _get_column_index(self, field):
         """

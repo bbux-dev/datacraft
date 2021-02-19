@@ -146,8 +146,9 @@ def test_preprocess_csv_select():
         },
         "another:range": [1, 10]
     }
-
-    updated = preprocess_csv_select(spec)
+    # need first layer of preprocessing done
+    updated = preprocess_spec(spec)
+    updated = preprocess_csv_select(updated)
     for key in ['one', 'two', 'six', 'another']:
         assert key in updated
     assert 'placeholder' not in updated
