@@ -1,4 +1,4 @@
-from dataspec.preprocessor import preprocess_spec
+from dataspec.preprocessor import preprocess_spec, preprocess_csv_select
 from dataspec.preprocessor import _parse_key
 from dataspec import SpecException
 import dataspec.suppliers as suppliers
@@ -128,3 +128,28 @@ def test_url_lib_parsing_ignore_spaces():
     assert 'param' in params
     _, _, params = _parse_key(format2)
     assert 'suffix' in params
+
+
+def test_preprocess_csv_select():
+    spec = {
+        "placeholder": {
+            "type": "csv_select",
+            "data": {
+                "one": 1,
+                "two": 2,
+                "six": 6
+            },
+            "config": {
+                "datafile": "not_real.csv",
+                "headers": "no"
+            }
+        },
+        "another:range": [1, 10]
+    }
+
+    updated = preprocess_csv_select(spec)
+    for key in ['one', 'two', 'six', 'another']:
+        assert key in updated
+    assert 'placeholder' not in updated
+    assert 'refs' in updated
+    assert 'config' in updated['one'] and 'configref' in updated['one']['config']
