@@ -1,5 +1,11 @@
 #!/bin/env python
+"""
+Utiltity to validate json and yaml example specs and apply them to templates for the READMEs
+"""
+
+
 import json
+import yaml
 import argparse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -10,7 +16,9 @@ def main():
                         required=True, help='where to get the input')
     parser.add_argument('-t', '--template', default="FIELDSPECS.jinja.md",
                         help='where to get the input')
-    parser.add_argument('-m', '--mode', default="verify", choices=['verify', 'test', 'apply', 'all'],
+    parser.add_argument('-k', '--key-filter', dest='key_filter',
+                        help='where to get the input')
+    parser.add_argument('-m', '--mode', default="verify", choices=['verify', 'test', 'apply', 'dump', 'all'],
                         help='what mode to run in')
 
     args = parser.parse_args()
@@ -19,29 +27,81 @@ def main():
         data = json.load(f)
 
     if args.mode == 'verify' or args.mode == 'all':
-        verify_data(data)
+        verify_data(data.get('examples', {}), args.key_filter)
     if args.mode == 'apply' or args.mode == 'all':
         apply_template(data, args.template)
+    if args.mode == 'dump':
+        dump_data(data.get('examples', {}), args.key_filter)
 
+def dump_data(data, specific_keys):
+    """
+    Dumps the data for inspection
+    :param data: with json and yaml example specs
+    :param specific_keys: to dump
+    :return: Nonee
+    """
+    for key, value in data.items():
+        if specific_keys and key not in specific_keys:
+            continue
+        print(f'## {key}')
+        if 'json' in value:
+            print('```')
+            print(value['json'])
+            print('```')
+            print()
+        if 'yaml' in value:
+            print('```')
+            print(value['yaml'])
+            print('```')
+            print()
+        print()
 
-def verify_data(data):
+def verify_data(data, specific_keys):
+    """
+    Performs validation to make sure the json and yaml specs can be parsed and are identical when evaluated
+    :param data: with json and yaml specs
+    :param specific_keys: to filter on
+    :return: None
+    """
     any_errors = False
     for key, value in data.items():
-        if not key.startswith('json_spec'):
-            # skip yaml for now
+        if specific_keys and key not in specific_keys:
             continue
-        # try to load as json
-        try:
-            json.loads(value)
-        except json.decoder.JSONDecodeError as err:
-            any_errors = True
-            print(f'{key}: error: {str(err)}')
-            print(value)
+        jdata = None
+        ydata = None
+        if 'json' in value:
+            try:
+                jdata = json.loads(value['json'])
+            except json.decoder.JSONDecodeError as err:
+                any_errors = True
+                print(f'{key}: error: {str(err)}')
+                print(value)
+        if 'yaml' in value:
+            try:
+                ydata = yaml.safe_load(value['yaml'])
+            except Exception as err:
+                any_errors = True
+                print(f'{key}: error: {str(err)}')
+                print(value)
+        if jdata is None:
+            print(f"Unable to parse: {value.get('json')}")
+        if ydata is None:
+            print(f"Unable to parse: {value.get('yaml')}")
+        if jdata != ydata:
+            print(f'json and yaml data for key: {key} differ')
+            print(json.dumps(jdata))
+            print(json.dumps(ydata))
     if any_errors:
-        raise Exception('Not all specs parsed successfully!')
+        print('Not all specs parsed successfully!')
 
 
 def apply_template(data, template_name):
+    """
+    Apply the data to the template and print
+    :param data: to apply
+    :param template_name: name of template file to apply to, should be in current directory
+    :return: None
+    """
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])

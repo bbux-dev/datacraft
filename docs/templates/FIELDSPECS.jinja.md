@@ -81,7 +81,7 @@ list of values to use. By default, these values are rotated through incrementall
 than the number of values in the list, the values start over from the beginning of the list. When combining values from
 two values providers that are lists, they will be combined in incrementing order. i.e:
 
-{{ show_example(overview_example_one) }}
+{{ show_example(examples.overview_example_one) }}
 Will produce the values A1, B2, C3 continuously.
 
 ```shell script
@@ -97,7 +97,7 @@ A1
 
 If an additional number is added to TWO, we now get 12 distinct values:
 
-{{ show_example(overview_example_two) }}
+{{ show_example(examples.overview_example_two) }}
 
 ```shell script
 dataspec -s ~/scratch/sample.json -i 12 | sort
@@ -117,7 +117,7 @@ C4
 
 If we want our values to be generated randomly from the provided lists, we set the config param `sample` to true:
 
-{{ show_example(overview_example_three) }}
+{{ show_example(examples.overview_example_three) }}
 
 # <a name="Field_Spec_Structure"></a>Field Spec Structure
 
@@ -147,9 +147,9 @@ reference below for details on each type.
 The values type is very common and so has a shorthand notation. Below is an example full Field Spec for some values
 types fields and the same spec in shorthand notation.
 
-{{ show_example(values_shorthand_one) }}
+{{ show_example(examples.values_shorthand_one) }}
 
-{{ show_example(values_shorthand_two) }}
+{{ show_example(examples.values_shorthand_two) }}
 
 The value after the field name is just the value of the data element from the full Field Spec. Config params can be
 added to the key using the URL syntax described below.
@@ -164,7 +164,7 @@ type `uuid` and has no further configuration. If no type is specified, the field
 
 It is also possible to specify configuration parameters in the key by using URL style parameters. For example.
 
-{{ show_example(inline_key_example) }}
+{{ show_example(examples.inline_key_example) }}
 
 The `network` field is of type `ipv4` and the required `cidr` param is specified in the key.
 
@@ -173,7 +173,7 @@ The `network` field is of type `ipv4` and the required `cidr` param is specified
 There are two ways to configure a spec. One is by providing a `config` element in the Field Spec and the other is by
 using a URL parameter format in the key. For example, the following two fields will produce the same values:
 
-{{ show_example(config_example_one) }}
+{{ show_example(examples.config_example_one) }}
 
 # <a name="Common_Configurations"></a>Common Configurations
 
@@ -190,7 +190,7 @@ There are some configuration values that can be applied to all or a subset of ty
 
 Example:
 
-{{ show_example(common_config_example_one) }}
+{{ show_example(examples.common_config_example_one) }}
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
@@ -205,7 +205,7 @@ value of the data element replaces the full spec. See examples below.
 
 A Constant Value is just a single value that is used in every iteration
 
-{{ show_example(constants_example_one) }}
+{{ show_example(examples.constants_example_one) }}
 
 ### <a name="List_Values"></a>List Values
 
@@ -213,13 +213,13 @@ List values are rotated through in order. If the number of iterations is larger 
 from the beginning of the list. Use the `sample` config param to specify that the values should be selected at random
 from the provided list.
 
-{{ show_example(list_values_example_one) }}
+{{ show_example(examples.list_values_example_one) }}
 
 ### <a name="Weighted_Values"></a>Weighted Values
 
 Weighted values are generated according to their weights.
 
-{{ show_example(weighted_values_example_one) }}
+{{ show_example(examples.weighted_values_example_one) }}
 
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more
 likely the values will match their specified weights.
@@ -233,7 +233,7 @@ values after a significant number of iterations. This would also be true if only
 sample mode on either use a URL param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only
 valid with entries that are lists.
 
-{{ show_example(sample_mode_example_one) }}
+{{ show_example(examples.sample_mode_example_one) }}
 
 ## <a name="Combine"></a>Combine
 
@@ -255,7 +255,7 @@ The combine Field Spec structure is:
 
 Example below uses the first and last refs to create a full name field.
 
-{{ show_example(combine_spec_example_one) }}
+{{ show_example(examples.combine_spec_example_one) }}
 
 ## <a name="CombineList"></a>Combine List
 
@@ -281,7 +281,7 @@ The combine Field Spec structure is:
 
 This is a slight modification to the above combine Example.
 
-{{ show_example(combine_list_spec_example_one) }}
+{{ show_example(examples.combine_list_spec_example_one) }}
 
 ## <a name="Date"></a>Date
 
@@ -366,11 +366,11 @@ The range Field Spec structure is:
 
 Example: Range 0 to 10 with a step of 0.5
 
-{{ show_example(range_spec_example_one) }}
+{{ show_example(examples.range_spec_example_one) }}
 
 Example: Multiple Ranges One Field
 
-{{ show_example(range_spec_example_two) }}
+{{ show_example(examples.range_spec_example_two) }}
 
 This spec produces integer values for three different ranges each with different step sizes.
 
@@ -408,7 +408,7 @@ Example:
 Two different population fields. The first generates an integer uniformly between 100 and 1000. The second generates a
 float between 200.2 and 1222.7 with two values after the decimal place. Note the abbreviation for cast.
 
-{{ show_example(rand_range_spec_example_one) }}
+{{ show_example(examples.rand_range_spec_example_one) }}
 
 ## <a name="Uuid"></a>Uuid
 
@@ -426,7 +426,7 @@ The uuid Field Spec structure is:
 
 Example Spec
 
-{{ show_example(uuid_spec_example_one) }}
+{{ show_example(examples.uuid_spec_example_one) }}
 
 ## <a name="Geo"></a>Geo Related Types
 
@@ -458,7 +458,7 @@ Examples:
 
 Generates a `longitude,latitude` pair with in the bounding box defining Egypt with 3 decimal points of precision.
 
-{{ show_example(geo_point_spec_example_one) }}
+{{ show_example(examples.geo_point_spec_example_one) }}
 
 ## <a name="IP_Addresses"></a>IP Addresses
 
@@ -482,7 +482,7 @@ The ipv4 Field Spec structure is:
 
 Example Spec:
 
-{{ show_example(ip_spec_example_one) }}
+{{ show_example(examples.ip_spec_example_one) }}
 
 ### <a name="Precise_IP"></a> Precise CIDR Addresses
 
@@ -497,15 +497,15 @@ random ip addresses selected from the generated ranges.
 
 Ips in the 10.n.n.n range, extremely slow, this is around 16 Million unique ip addresses
 
-{{ show_example(ip_precise_example_one) }}
+{{ show_example(examples.ip_precise_example_one) }}
 
 Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around 250K addresses
 
-{{ show_example(ip_precise_example_two) }}
+{{ show_example(examples.ip_precise_example_two) }}
 
 Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 
-{{ show_example(ip_precise_example_three) }}
+{{ show_example(examples.ip_precise_example_three) }}
 
 ## <a name="Weighted_Ref"></a>Weighted Ref
 
@@ -525,7 +525,7 @@ The weightedref Field Spec structure is:
 For example if we want to generate a set of HTTP response codes, but we want mostly success related codes we could use
 the follow spec.
 
-{{ show_example(weighted_ref_example_one) }}
+{{ show_example(examples.weighted_ref_example_one) }}
 
 ## <a name="Select_List_Subset"></a>Select List Subset
 
@@ -556,7 +556,7 @@ options tell how many items should be chosen. For example a mean of 2 and stddev
 sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen (which is the default).
 You can also set a min and max. Example:
 
-{{ show_example(select_list_example_one) }}
+{{ show_example(examples.select_list_example_one) }}
 
 ```shell script
 dataspec -s ~/scratch/ingredients.json -i 10
@@ -578,7 +578,7 @@ The default `quote` parameter will only quote the whole combined list of element
 the sublist you need to use a special form of `join_with` along with the `quote` param. For example if we wanted all of
 our ingredients surrounded with double quotes. We would update our spec this way.
 
-{{ show_example(select_list_example_two) }}
+{{ show_example(examples.select_list_example_two) }}
 
 Now when we run our datespec we get:
 
@@ -646,7 +646,7 @@ have a known list of cities, we can put this in a file and reference it from our
 that it is easy to add new data points and to use small sets of data for testing by creating directories that have
 smaller input files.
 
-{{ show_example(csv_spec_example_one) }}
+{{ show_example(examples.csv_spec_example_one) }}
 
 ```shell
 dataspec --spec cities.json --datadir ./data -i 5
@@ -676,7 +676,7 @@ status	status_description	status_type
 
 Our Data Spec looks like:
 
-{{ show_example(csv_spec_example_two) }}
+{{ show_example(examples.csv_spec_example_two) }}
 
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
 use the following template {% raw %}`{{ status }},{{ description }},{{ status_type }}`{% endraw %} and run this spec we will get output
@@ -700,4 +700,4 @@ dataset by selecting a subset of the columns from the tab delimited file. The ke
 for the field. The value can either be the 1 indexed column number or the name of the field if the data has `headers`.
 Our example doesn't have headers, so we are using the 1 based indexes.
 
-{{ show_example(csv_select_example_one) }}
+{{ show_example(examples.csv_select_example_one) }}

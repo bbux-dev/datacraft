@@ -79,21 +79,13 @@ two values providers that are lists, they will be combined in incrementing order
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 combine:
-  refs:
-  - ONE
-  - TWO
   type: combine
+  refs: [ONE, TWO]
 refs:
-  ONE:
-  - A
-  - B
-  - C
-  TWO:
-  - 1
-  - 2
-  - 3
-
+  ONE: [A, B, C]
+  TWO: [1, 2, 3]
 ```
 </details>
 Will produce the values A1, B2, C3 continuously.
@@ -129,22 +121,13 @@ If an additional number is added to TWO, we now get 12 distinct values:
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 combine:
-  refs:
-  - ONE
-  - TWO
   type: combine
+  refs: [ONE, TWO]
 refs:
-  ONE:
-  - A
-  - B
-  - C
-  TWO:
-  - 1
-  - 2
-  - 3
-  - 4
-
+  ONE: [A, B, C]
+  TWO: [1, 2, 3 ,4]
 ```
 </details>
 
@@ -184,22 +167,13 @@ If we want our values to be generated randomly from the provided lists, we set t
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 combine:
-  refs:
-  - ONE
-  - TWO
   type: combine
+  refs: [ONE, TWO]
 refs:
-  ONE?sample=true:
-  - A
-  - B
-  - C
-  TWO?sample=true:
-  - 1
-  - 2
-  - 3
-  - 4
-
+  ONE?sample=true: [A, B, C]
+  TWO?sample=true: [1, 2, 3 ,4]
 ```
 </details>
 
@@ -247,24 +221,19 @@ types fields and the same spec in shorthand notation.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 field1:
-  data:
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
   type: vaules
+  data: [1, 2, 3, 4, 5]
 field2:
+  type: values
   data:
     A: 0.5
     B: 0.3
     C: 0.2
-  type: values
 field3:
-  data: CONSTANT
   type: values
-
+  data: CONSTANT
 ```
 </details>
 
@@ -284,18 +253,13 @@ field3:
   <summary>YAML Spec</summary>
 
 ```yaml
-field1:
-- 1
-- 2
-- 3
-- 4
-- 5
+---
+field1: [1, 2, 3, 4, 5]
 field2:
   A: 0.5
   B: 0.3
   C: 0.2
 field3: CONSTANT
-
 ```
 </details>
 
@@ -326,8 +290,8 @@ It is also possible to specify configuration parameters in the key by using URL 
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 network:ipv4?cidr=192.168.0.0/16: {}
-
 ```
 </details>
 
@@ -357,20 +321,14 @@ using a URL parameter format in the key. For example, the following two fields w
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 ONE:
+  type: values
   config:
     prefix: TEST
     suffix: '@DEMO'
-  data:
-  - 1
-  - 2
-  - 3
-  type: values
-TWO?prefix=TEST&suffix=@DEMO:
-- 1
-- 2
-- 3
-
+  data: [1, 2, 3]
+TWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]
 ```
 </details>
 
@@ -394,11 +352,13 @@ Example:
 
 ```json
 {
-  "type": "values",
-  "config": {
-    "prefix": "Hello "
-  },
-  "data": ["world", "beautiful", "destiny"]
+  "field": {
+      "type": "values",
+      "config": {
+        "prefix": "Hello "
+      },
+      "data": ["world", "beautiful", "destiny"]
+    }
 }
 ```
 </details>
@@ -407,14 +367,12 @@ Example:
   <summary>YAML Spec</summary>
 
 ```yaml
-config:
-  prefix: 'Hello '
-data:
-- world
-- beautiful
-- destiny
-type: values
-
+---
+field:
+  type: values
+  config:
+    prefix: 'Hello '
+  data: [world, beautiful, destiny]
 ```
 </details>
 
@@ -447,10 +405,9 @@ A Constant Value is just a single value that is used in every iteration
 
 ```yaml
 constant1:
-  data: 42
   type: values
+  data: 42
 shorthand_constant: This is simulated data and should not be used for nefarious purposes
-
 ```
 </details>
 
@@ -465,8 +422,8 @@ from the provided list.
 
 ```json
 {
-  "list1": {"type": "values", "data": ["200", "202", "303", "400", "404", "500"]},
-  "shorthand_list": ["200", "202", "303", "400", "404", "500"],
+  "list1": {"type": "values", "data": [200, 202, 303, 400, 404, 500]},
+  "shorthand_list":  [200, 202, 303, 400, 404, 500],
   "random_pet?sample=true": ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"]
 }
 ```
@@ -476,30 +433,12 @@ from the provided list.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 list1:
-  data:
-  - '200'
-  - '202'
-  - '303'
-  - '400'
-  - '404'
-  - '500'
   type: values
-random_pet?sample=true:
-- dog
-- cat
-- bunny
-- pig
-- rhino
-- hedgehog
-shorthand_list:
-- '200'
-- '202'
-- '303'
-- '400'
-- '404'
-- '500'
-
+  data: [200, 202, 303, 400, 404, 500]
+shorthand_list: [200, 202, 303, 400, 404, 500]
+random_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]
 ```
 </details>
 
@@ -531,15 +470,9 @@ Weighted values are generated according to their weights.
   <summary>YAML Spec</summary>
 
 ```yaml
-shorthand_weighted:
-  '200': 0.4
-  '202': 0.3
-  '303': 0.1
-  '400': 0.05
-  '403': 0.05
-  '404': 0.05
-  '500': 0.05
+---
 weighted1:
+  type: values
   data:
     '200': 0.4
     '202': 0.3
@@ -548,8 +481,14 @@ weighted1:
     '403': 0.05
     '404': 0.05
     '500': 0.05
-  type: values
-
+shorthand_weighted:
+  '200': 0.4
+  '202': 0.3
+  '303': 0.1
+  '400': 0.05
+  '403': 0.05
+  '404': 0.05
+  '500': 0.05
 ```
 </details>
 
@@ -583,21 +522,15 @@ valid with entries that are lists.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 combine:
+  type: combine
   refs:
   - ONE
   - TWO
-  type: combine
 refs:
-  ONE?sample=true:
-  - A
-  - B
-  - C
-  TWO?sample=true:
-  - 1
-  - 2
-  - 3
-
+  ONE?sample=true: [A, B, C]
+  TWO?sample=true: [1, 2, 3]
 ```
 </details>
 
@@ -649,28 +582,21 @@ Example below uses the first and last refs to create a full name field.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 full name:
-  config:
-    join_with: ' '
+  type: combine
   refs:
   - first
   - last
-  type: combine
+  config:
+    join_with: ' '
 refs:
   first:
-    data:
-    - zebra
-    - hedgehog
-    - llama
-    - flamingo
     type: values
+    data: [zebra, hedgehog, llama, flamingo]
   last:
-    data:
-    - jones
-    - smith
-    - williams
     type: values
-
+    data: [jones, smith, williams]
 ```
 </details>
 
@@ -726,41 +652,27 @@ This is a slight modification to the above combine Example.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 full name:
+  type: combine-list
+  refs: [
+    [first, last],
+    [first, middle, last],
+    [first, middle_initial, last]
+  ]
   config:
     join_with: ' '
-  refs:
-  - - first
-    - last
-  - - first
-    - middle
-    - last
-  - - first
-    - middle_initial
-    - last
-  type: combine-list
 refs:
-  first:
-  - zebra
-  - hedgehog
-  - llama
-  - flamingo
-  last:
-  - jones
-  - smith
-  - williams
-  middle:
-  - cloud
-  - sage
-  - river
+  first: [zebra, hedgehog, llama, flamingo]
+  last: [jones, smith, williams]
+  middle: [cloud, sage, river]
   middle_initial:
     a: 0.3
-    e: 0.1
+    m: 0.3
     j: 0.1
     l: 0.1
-    m: 0.3
+    e: 0.1
     w: 0.1
-
 ```
 </details>
 
@@ -866,6 +778,7 @@ Example: Range 0 to 10 with a step of 0.5
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 range_shorthand1:range:
   data:
   - 0
@@ -881,7 +794,6 @@ zero_to_ten:
   - 10
   - 0.5
   type: range
-
 ```
 </details>
 
@@ -908,19 +820,14 @@ Example: Multiple Ranges One Field
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 salaries:
-  data:
-  - - 1000
-    - 10000
-    - 1000
-  - - 10000
-    - 55000
-    - 5000
-  - - 55000
-    - 155000
-    - 10000
   type: range
-
+  data: [
+    [1000, 10000, 1000],
+    [10000, 55000, 5000],
+    [55000, 155000, 10000]
+  ]
 ```
 </details>
 
@@ -979,18 +886,13 @@ float between 200.2 and 1222.7 with two values after the decimal place. Note the
   <summary>YAML Spec</summary>
 
 ```yaml
-pop:rand_range?cast=f:
-- 200.2
-- 1222.7
-- 2
+---
 population:
+  type: rand_range
+  data: [100, 1000]
   config:
     cast_to: int
-  data:
-  - 100
-  - 1000
-  type: rand_range
-
+pop:rand_range?cast=f: [200.2, 1222.7, 2]
 ```
 </details>
 
@@ -1027,10 +929,10 @@ Example Spec
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 id:
   type: uuid
 id_shorthand:uuid: {}
-
 ```
 </details>
 
@@ -1084,7 +986,9 @@ Generates a `longitude,latitude` pair with in the bounding box defining Egypt wi
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 egypt:
+  type: geo.point
   config:
     bbox:
     - 31.33134
@@ -1092,8 +996,6 @@ egypt:
     - 34.19295
     - 25.00562
     precision: 3
-  type: geo.point
-
 ```
 </details>
 
@@ -1140,13 +1042,13 @@ Example Spec:
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 network:
+  type: ipv4
   config:
     cidr: 2.22.222.0/16
-  type: ipv4
 network_shorthand:ip?cidr=2.22.222.0/16: {}
 network_with_base:ip?base=192.168.0: {}
-
 ```
 </details>
 
@@ -1175,8 +1077,8 @@ Ips in the 10.n.n.n range, extremely slow, this is around 16 Million unique ip a
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 network:ip.precise?cidr=10.0.0.0/8: {}
-
 ```
 </details>
 
@@ -1194,8 +1096,8 @@ Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 network:ip.precise?cidr=192.168.0.0/14&sample=true: {}
-
 ```
 </details>
 
@@ -1213,8 +1115,8 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 network:ip.precise?cidr=2.22.222.0/22: {}
-
 ```
 </details>
 
@@ -1260,11 +1162,12 @@ the follow spec.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 http_code:
-  data:
-    BAD_CODES: 0.3
-    GOOD_CODES: 0.7
   type: weightedref
+  data:
+    GOOD_CODES: 0.7
+    BAD_CODES: 0.3
 refs:
   BAD_CODES:
     '400': 0.5
@@ -1276,7 +1179,6 @@ refs:
     '202': 0.3
     '203': 0.1
     '300': 0.1
-
 ```
 </details>
 
@@ -1333,6 +1235,7 @@ You can also set a min and max. Example:
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 ingredients:
   config:
     join_with: ', '
@@ -1349,7 +1252,6 @@ ingredients:
   - potatoes
   - carrots
   type: select_list_subset
-
 ```
 </details>
 
@@ -1387,7 +1289,7 @@ our ingredients surrounded with double quotes. We would update our spec this way
     },
     "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
   }
-} 
+}
 ```
 </details>
 
@@ -1395,14 +1297,16 @@ our ingredients surrounded with double quotes. We would update our spec this way
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 ingredients:
+  type: select_list_subset
   config:
     join_with: '", "'
-    max: 4
     mean: 3
-    min: 2
-    quote: '"'
     stddev: 1
+    min: 2
+    max: 4
+    quote: '"'
   data:
   - onions
   - mushrooms
@@ -1411,8 +1315,6 @@ ingredients:
   - spinach
   - potatoes
   - carrots
-  type: select_list_subset
-
 ```
 </details>
 
@@ -1492,7 +1394,7 @@ smaller input files.
     "config": {
       "datafile": "cities.csv",
       "delimiter": "~",
-      "sample": "true"
+      "sample": true
     }
   }
 }
@@ -1503,13 +1405,13 @@ smaller input files.
   <summary>YAML Spec</summary>
 
 ```yaml
+---
 cities:
+  type: csv
   config:
     datafile: cities.csv
     delimiter: '~'
-    sample: 'true'
-  type: csv
-
+    sample: true
 ```
 </details>
 
