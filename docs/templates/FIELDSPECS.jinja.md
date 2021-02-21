@@ -1,6 +1,6 @@
 {% macro show_example(example) -%}
 {% if example.json is defined  -%}
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json

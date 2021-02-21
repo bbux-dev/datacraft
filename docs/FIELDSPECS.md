@@ -61,7 +61,7 @@ list of values to use. By default, these values are rotated through incrementall
 than the number of values in the list, the values start over from the beginning of the list. When combining values from
 two values providers that are lists, they will be combined in incrementing order. i.e:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -103,7 +103,7 @@ A1
 
 If an additional number is added to TWO, we now get 12 distinct values:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -149,7 +149,7 @@ C4
 
 If we want our values to be generated randomly from the provided lists, we set the config param `sample` to true:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -205,7 +205,7 @@ reference below for details on each type.
 The values type is very common and so has a shorthand notation. Below is an example full Field Spec for some values
 types fields and the same spec in shorthand notation.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -237,7 +237,7 @@ field3:
 ```
 </details>
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -276,7 +276,7 @@ type `uuid` and has no further configuration. If no type is specified, the field
 
 It is also possible to specify configuration parameters in the key by using URL style parameters. For example.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -302,7 +302,7 @@ The `network` field is of type `ipv4` and the required `cidr` param is specified
 There are two ways to configure a spec. One is by providing a `config` element in the Field Spec and the other is by
 using a URL parameter format in the key. For example, the following two fields will produce the same values:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -347,7 +347,7 @@ There are some configuration values that can be applied to all or a subset of ty
 
 Example:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -389,7 +389,7 @@ value of the data element replaces the full spec. See examples below.
 
 A Constant Value is just a single value that is used in every iteration
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -417,7 +417,7 @@ List values are rotated through in order. If the number of iterations is larger 
 from the beginning of the list. Use the `sample` config param to specify that the values should be selected at random
 from the provided list.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -446,7 +446,7 @@ random_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]
 
 Weighted values are generated according to their weights.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -504,7 +504,7 @@ values after a significant number of iterations. This would also be true if only
 sample mode on either use a URL param or config entry with one of `on`,  `yes`, or `true`. NOTE: Sample mode is only
 valid with entries that are lists.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -554,7 +554,7 @@ The combine Field Spec structure is:
 
 Example below uses the first and last refs to create a full name field.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -624,7 +624,7 @@ The combine Field Spec structure is:
 
 This is a slight modification to the above combine Example.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -759,7 +759,7 @@ The range Field Spec structure is:
 
 Example: Range 0 to 10 with a step of 0.5
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -799,7 +799,7 @@ zero_to_ten:
 
 Example: Multiple Ranges One Field
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -867,7 +867,7 @@ Example:
 Two different population fields. The first generates an integer uniformly between 100 and 1000. The second generates a
 float between 200.2 and 1222.7 with two values after the decimal place. Note the abbreviation for cast.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -912,7 +912,7 @@ The uuid Field Spec structure is:
 
 Example Spec
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -966,7 +966,7 @@ Examples:
 
 Generates a `longitude,latitude` pair with in the bounding box defining Egypt with 3 decimal points of precision.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1021,7 +1021,7 @@ The ipv4 Field Spec structure is:
 
 Example Spec:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1065,7 +1065,7 @@ random ip addresses selected from the generated ranges.
 
 Ips in the 10.n.n.n range, extremely slow, this is around 16 Million unique ip addresses
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1084,7 +1084,7 @@ network:ip.precise?cidr=10.0.0.0/8: {}
 
 Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around 250K addresses
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1103,7 +1103,7 @@ network:ip.precise?cidr=192.168.0.0/14&sample=true: {}
 
 Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1138,7 +1138,7 @@ The weightedref Field Spec structure is:
 For example if we want to generate a set of HTTP response codes, but we want mostly success related codes we could use
 the follow spec.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1211,7 +1211,7 @@ options tell how many items should be chosen. For example a mean of 2 and stddev
 sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen (which is the default).
 You can also set a min and max. Example:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1275,7 +1275,7 @@ The default `quote` parameter will only quote the whole combined list of element
 the sublist you need to use a special form of `join_with` along with the `quote` param. For example if we wanted all of
 our ingredients surrounded with double quotes. We would update our spec this way.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1384,7 +1384,7 @@ have a known list of cities, we can put this in a file and reference it from our
 that it is easy to add new data points and to use small sets of data for testing by creating directories that have
 smaller input files.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1443,7 +1443,7 @@ status	status_description	status_type
 
 Our Data Spec looks like:
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1526,7 +1526,7 @@ dataset by selecting a subset of the columns from the tab delimited file. The ke
 for the field. The value can either be the 1 indexed column number or the name of the field if the data has `headers`.
 Our example doesn't have headers, so we are using the 1 based indexes.
 
-<details>
+<details open>
   <summary>JSON Spec</summary>
 
 ```json
