@@ -1,0 +1,118 @@
+{
+  "overview_example_one": {
+    "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE\": [\"A\", \"B\", \"C\"],\n    \"TWO\": [1, 2, 3]\n  }\n}",
+    "yaml": "combine:\n  refs:\n  - ONE\n  - TWO\n  type: combine\nrefs:\n  ONE:\n  - A\n  - B\n  - C\n  TWO:\n  - 1\n  - 2\n  - 3\n"
+  },
+  "overview_example_two": {
+    "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE\": [\"A\", \"B\", \"C\"],\n    \"TWO\": [1, 2, 3, 4]\n  }\n}",
+    "yaml": "combine:\n  refs:\n  - ONE\n  - TWO\n  type: combine\nrefs:\n  ONE:\n  - A\n  - B\n  - C\n  TWO:\n  - 1\n  - 2\n  - 3\n  - 4\n"
+  },
+  "overview_example_three": {
+    "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE?sample=true\": [\"A\", \"B\", \"C\"],\n    \"TWO?sample=true\": [1, 2, 3, 4]\n  }\n}",
+    "yaml": "combine:\n  refs:\n  - ONE\n  - TWO\n  type: combine\nrefs:\n  ONE?sample=true:\n  - A\n  - B\n  - C\n  TWO?sample=true:\n  - 1\n  - 2\n  - 3\n  - 4\n"
+  },
+  "values_shorthand_one": {
+    "json": "{\n  \"field1\": {\"type\": \"vaules\", \"data\": [1, 2, 3, 4, 5]},\n  \"field2\": {\"type\": \"values\", \"data\": {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}},\n  \"field3\": {\"type\": \"values\", \"data\": \"CONSTANT\"}\n}",
+    "yaml": "field1:\n  data:\n  - 1\n  - 2\n  - 3\n  - 4\n  - 5\n  type: vaules\nfield2:\n  data:\n    A: 0.5\n    B: 0.3\n    C: 0.2\n  type: values\nfield3:\n  data: CONSTANT\n  type: values\n"
+  },
+  "values_shorthand_two": {
+    "json": "{\n  \"field1\": [1, 2, 3, 4, 5],\n  \"field2\": {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2},\n  \"field3\": \"CONSTANT\"\n}",
+    "yaml": "field1:\n- 1\n- 2\n- 3\n- 4\n- 5\nfield2:\n  A: 0.5\n  B: 0.3\n  C: 0.2\nfield3: CONSTANT\n"
+  },
+  "inline_key_example": {
+    "json": "{\n  \"network:ipv4?cidr=192.168.0.0/16\": {}\n}",
+    "yaml": "network:ipv4?cidr=192.168.0.0/16: {}\n"
+  },
+  "config_example_one": {
+    "json": "{\n  \"ONE\": {\n    \"type\": \"values\",\n    \"data\": [1, 2, 3],\n    \"config\": {\"prefix\": \"TEST\", \"suffix\": \"@DEMO\"}\n  },\n  \"TWO?prefix=TEST&suffix=@DEMO\": [1, 2, 3]\n}",
+    "yaml": "ONE:\n  config:\n    prefix: TEST\n    suffix: '@DEMO'\n  data:\n  - 1\n  - 2\n  - 3\n  type: values\nTWO?prefix=TEST&suffix=@DEMO:\n- 1\n- 2\n- 3\n"
+  },
+  "common_config_example_one": {
+    "json": "{\n  \"type\": \"values\",\n  \"config\": {\n    \"prefix\": \"Hello \"\n  },\n  \"data\": [\"world\", \"beautiful\", \"destiny\"]\n}",
+    "yaml": "config:\n  prefix: 'Hello '\ndata:\n- world\n- beautiful\n- destiny\ntype: values\n"
+  },
+  "constants_example_one": {
+    "json": "{\n  \"constant1\": {\"type\": \"values\", \"data\": 42},\n  \"shorthand_constant\": \"This is simulated data and should not be used for nefarious purposes\"\n}",
+    "yaml": "constant1:\n  data: 42\n  type: values\nshorthand_constant: This is simulated data and should not be used for nefarious purposes\n"
+  },
+  "list_values_example_one": {
+    "json": "{\n  \"list1\": {\"type\": \"values\", \"data\": [\"200\", \"202\", \"303\", \"400\", \"404\", \"500\"]},\n  \"shorthand_list\": [\"200\", \"202\", \"303\", \"400\", \"404\", \"500\"],\n  \"random_pet?sample=true\": [\"dog\", \"cat\", \"bunny\", \"pig\", \"rhino\", \"hedgehog\"]\n}",
+    "yaml": "list1:\n  data:\n  - '200'\n  - '202'\n  - '303'\n  - '400'\n  - '404'\n  - '500'\n  type: values\nrandom_pet?sample=true:\n- dog\n- cat\n- bunny\n- pig\n- rhino\n- hedgehog\nshorthand_list:\n- '200'\n- '202'\n- '303'\n- '400'\n- '404'\n- '500'\n"
+  },
+  "weighted_values_example_one": {
+    "json": "{\n  \"weighted1\": {\n    \"type\": \"values\",\n    \"data\": {\n      \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n      \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n    }\n  },\n  \"shorthand_weighted\": {\n    \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n    \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n  }\n}",
+    "yaml": "shorthand_weighted:\n  '200': 0.4\n  '202': 0.3\n  '303': 0.1\n  '400': 0.05\n  '403': 0.05\n  '404': 0.05\n  '500': 0.05\nweighted1:\n  data:\n    '200': 0.4\n    '202': 0.3\n    '303': 0.1\n    '400': 0.05\n    '403': 0.05\n    '404': 0.05\n    '500': 0.05\n  type: values\n"
+  },
+  "sample_mode_example_one": {
+    "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE?sample=true\": [\"A\", \"B\", \"C\"],\n    \"TWO?sample=true\": [1, 2, 3]\n  }\n}",
+    "yaml": "combine:\n  refs:\n  - ONE\n  - TWO\n  type: combine\nrefs:\n  ONE?sample=true:\n  - A\n  - B\n  - C\n  TWO?sample=true:\n  - 1\n  - 2\n  - 3\n"
+  },
+  "combine_spec_example_one": {
+    "json": "{\n  \"full name\": {\n    \"type\": \"combine\",\n    \"refs\": [\"first\", \"last\"],\n    \"config\": {\"join_with\": \" \"}\n  },\n  \"refs\": {\n    \"first\": {\n      \"type\": \"values\",\n      \"data\": [\"zebra\", \"hedgehog\", \"llama\", \"flamingo\"]\n    },\n    \"last\": {\n      \"type\": \"values\",\n      \"data\": [\"jones\", \"smith\", \"williams\"]\n    }\n  }\n}",
+    "yaml": "full name:\n  config:\n    join_with: ' '\n  refs:\n  - first\n  - last\n  type: combine\nrefs:\n  first:\n    data:\n    - zebra\n    - hedgehog\n    - llama\n    - flamingo\n    type: values\n  last:\n    data:\n    - jones\n    - smith\n    - williams\n    type: values\n"
+  },
+  "combine_list_spec_example_one": {
+    "json": "{\n  \"full name\": {\n    \"type\": \"combine-list\",\n    \"refs\": [\n      [\"first\", \"last\"],\n      [\"first\", \"middle\", \"last\"],\n      [\"first\", \"middle_initial\", \"last\"]\n    ],\n    \"config\": {\"join_with\": \" \"}\n  },\n  \"refs\": {\n    \"first\": [\"zebra\", \"hedgehog\", \"llama\", \"flamingo\"],\n    \"last\": [\"jones\", \"smith\", \"williams\"],\n    \"middle\": [\"cloud\", \"sage\", \"river\"],\n    \"middle_initial\": {\"a\": 0.3, \"m\": 0.3, \"j\": 0.1, \"l\": 0.1, \"e\": 0.1, \"w\": 0.1}\n  }\n}",
+    "yaml": "full name:\n  config:\n    join_with: ' '\n  refs:\n  - - first\n    - last\n  - - first\n    - middle\n    - last\n  - - first\n    - middle_initial\n    - last\n  type: combine-list\nrefs:\n  first:\n  - zebra\n  - hedgehog\n  - llama\n  - flamingo\n  last:\n  - jones\n  - smith\n  - williams\n  middle:\n  - cloud\n  - sage\n  - river\n  middle_initial:\n    a: 0.3\n    e: 0.1\n    j: 0.1\n    l: 0.1\n    m: 0.3\n    w: 0.1\n"
+  },
+  "range_spec_example_one": {
+    "json": "{\n  \"zero_to_ten\": {\n    \"type\": \"range\",\n    \"data\": [0, 10, 0.5]\n  },\n  \"range_shorthand1:range\": {\"data\": [0, 10, 0.5]},\n  \"range_shorthand2:range\": [0, 10, 0.5]\n}",
+    "yaml": "range_shorthand1:range:\n  data:\n  - 0\n  - 10\n  - 0.5\nrange_shorthand2:range:\n- 0\n- 10\n- 0.5\nzero_to_ten:\n  data:\n  - 0\n  - 10\n  - 0.5\n  type: range\n"
+  },
+  "range_spec_example_two": {
+    "json": "{\n  \"salaries\": {\n    \"type\": \"range\",\n    \"data\": [\n      [1000, 10000, 1000],\n      [10000, 55000, 5000],\n      [55000, 155000, 10000]\n    ]\n  }\n}",
+    "yaml": "salaries:\n  data:\n  - - 1000\n    - 10000\n    - 1000\n  - - 10000\n    - 55000\n    - 5000\n  - - 55000\n    - 155000\n    - 10000\n  type: range\n"
+  },
+  "rand_range_spec_example_one": {
+    "json": "{\n  \"population\": {\n    \"type\": \"rand_range\",\n    \"data\": [100, 1000],\n    \"config\": {\"cast_to\": \"int\"}\n  },\n  \"pop:rand_range?cast=f\": [200.2, 1222.7, 2]\n}",
+    "yaml": "pop:rand_range?cast=f:\n- 200.2\n- 1222.7\n- 2\npopulation:\n  config:\n    cast_to: int\n  data:\n  - 100\n  - 1000\n  type: rand_range\n"
+  },
+  "uuid_spec_example_one": {
+    "json": "{\n  \"id\": {\n    \"type\": \"uuid\"\n  },\n  \"id_shorthand:uuid\": {}\n}",
+    "yaml": "id:\n  type: uuid\nid_shorthand:uuid: {}\n"
+  },
+  "geo_point_spec_example_one": {
+    "json": "{\n  \"egypt\": {\n    \"type\": \"geo.point\",\n    \"config\": {\n      \"bbox\": [31.33134, 22.03795, 34.19295, 25.00562],\n      \"precision\": 3\n    }\n  }\n}",
+    "yaml": "egypt:\n  config:\n    bbox:\n    - 31.33134\n    - 22.03795\n    - 34.19295\n    - 25.00562\n    precision: 3\n  type: geo.point\n"
+  },
+  "ip_spec_example_one": {
+    "json": "{\n  \"network\": {\n    \"type\": \"ipv4\",\n    \"config\": {\n      \"cidr\": \"2.22.222.0/16\"\n    }\n  },\n  \"network_shorthand:ip?cidr=2.22.222.0/16\": {},\n  \"network_with_base:ip?base=192.168.0\": {}\n}",
+    "yaml": "network:\n  config:\n    cidr: 2.22.222.0/16\n  type: ipv4\nnetwork_shorthand:ip?cidr=2.22.222.0/16: {}\nnetwork_with_base:ip?base=192.168.0: {}\n"
+  },
+  "ip_precise_example_one": {
+    "json": "{\"network:ip.precise?cidr=10.0.0.0/8\":{}}",
+    "yaml": "network:ip.precise?cidr=10.0.0.0/8: {}\n"
+  },
+  "ip_precise_example_two": {
+    "json": "{\"network:ip.precise?cidr=192.168.0.0/14&sample=true\": {}}",
+    "yaml": "network:ip.precise?cidr=192.168.0.0/14&sample=true: {}\n"
+  },
+  "ip_precise_example_three": {
+    "json": "{\"network:ip.precise?cidr=2.22.222.0/22\": {}}",
+    "yaml": "network:ip.precise?cidr=2.22.222.0/22: {}\n"
+  },
+  "weighted_ref_example_one": {
+    "json": "{\n  \"http_code\": {\n    \"type\": \"weightedref\",\n    \"data\": {\n      \"GOOD_CODES\": 0.7,\n      \"BAD_CODES\": 0.3\n    }\n  },\n  \"refs\": {\n    \"GOOD_CODES\": {\"200\": 0.5, \"202\": 0.3, \"203\": 0.1, \"300\": 0.1},\n    \"BAD_CODES\": {\"400\": 0.5, \"403\": 0.3, \"404\": 0.1, \"500\": 0.1}\n  }\n}",
+    "yaml": "http_code:\n  data:\n    BAD_CODES: 0.3\n    GOOD_CODES: 0.7\n  type: weightedref\nrefs:\n  BAD_CODES:\n    '400': 0.5\n    '403': 0.3\n    '404': 0.1\n    '500': 0.1\n  GOOD_CODES:\n    '200': 0.5\n    '202': 0.3\n    '203': 0.1\n    '300': 0.1\n"
+  },
+  "select_list_example_one": {
+    "json": "{\n  \"ingredients\": {\n    \"type\": \"select_list_subset\",\n    \"config\": {\n      \"mean\": 3,\n      \"stddev\": 1,\n      \"min\": 2,\n      \"max\": 4,\n      \"join_with\": \", \"\n    },\n    \"data\": [\"onions\", \"mushrooms\", \"garlic\", \"bell peppers\", \"spinach\", \"potatoes\", \"carrots\"]\n  }\n}",
+    "yaml": "ingredients:\n  config:\n    join_with: ', '\n    max: 4\n    mean: 3\n    min: 2\n    stddev: 1\n  data:\n  - onions\n  - mushrooms\n  - garlic\n  - bell peppers\n  - spinach\n  - potatoes\n  - carrots\n  type: select_list_subset\n"
+  },
+  "select_list_example_two": {
+    "json": "{\n  \"ingredients\": {\n    \"type\": \"select_list_subset\",\n    \"config\": {\n      \"mean\": 3, \"stddev\": 1, \"min\": 2, \"max\": 4,\n      \"join_with\": \"\\\", \\\"\",\n      \"quote\": \"\\\"\"\n    },\n    \"data\": [\"onions\", \"mushrooms\", \"garlic\", \"bell peppers\", \"spinach\", \"potatoes\", \"carrots\"]\n  }\n} ",
+    "yaml": "ingredients:\n  config:\n    join_with: '\", \"'\n    max: 4\n    mean: 3\n    min: 2\n    quote: '\"'\n    stddev: 1\n  data:\n  - onions\n  - mushrooms\n  - garlic\n  - bell peppers\n  - spinach\n  - potatoes\n  - carrots\n  type: select_list_subset\n"
+  },
+  "csv_spec_example_one": {
+    "json": "{\n  \"cities\": {\n    \"type\": \"csv\",\n    \"config\": {\n      \"datafile\": \"cities.csv\",\n      \"delimiter\": \"~\",\n      \"sample\": \"true\"\n    }\n  }\n}",
+    "yaml": "cities:\n  config:\n    datafile: cities.csv\n    delimiter: '~'\n    sample: 'true'\n  type: csv\n"
+  },
+  "csv_spec_example_two": {
+    "json": "{\n    \"status\": {\n        \"type\": \"csv\",\n        \"config\": {\n            \"configref\": \"tabs_config\",\n            \"column\": 1\n        }\n    },\n    \"description\": {\n        \"type\": \"csv\",\n        \"config\": {\n            \"configref\": \"tabs_config\",\n            \"column\": 2\n        }\n    },\n    \"status_type:csv?configref=tabs_config&column=3\": {},\n    \"refs\": {\n        \"tabs_config\": {\n            \"type\": \"configref\",\n            \"config\": {\n                \"datafile\": \"tabs.csv\",\n                \"delimiter\": \"\\\\t\",\n                \"headers\": true\n            }\n        }\n    }\n}",
+    "yaml": "---\nstatus:\n  type: csv\n  config:\n    configref: tabs_config\n    column: 1\ndescription:\n  type: csv\n  config:\n    configref: tabs_config\n    column: 2\n# shorthand notation\nstatus_type:csv?configref=tabs_config&column=3: { }\nrefs:\n  tabs_config:\n    type: configref\n    config:\n      datafile: tabs.csv\n      delimiter: '\\t'\n      headers: true"
+  },
+  "csv_select_example_one": {
+    "json": "{\n    \"placeholder\": {\n        \"type\": \"csv_select\",\n        \"data\": {\n            \"geonameid\": 1,\n            \"name\": 2,\n            \"latitude\": 5,\n            \"longitude\": 6,\n            \"country_code\": 9,\n            \"population\": 15\n        },\n        \"config\": {\n            \"datafile\": \"allCountries.txt\",\n            \"headers\": false,\n            \"delimiter\": \"\\t\"\n        }\n    }\n}",
+    "yaml": "---\nplaceholder:\n  type: csv_select\n  data:\n    geonameid: 1\n    name: 2\n    latitude: 5\n    longitude: 6\n    country_code: 9\n    population: 15\n  config:\n    datafile: allCountries.txt\n    headers: no\n    delimiter: \"\\t\""
+  }
+}
