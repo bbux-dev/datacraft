@@ -3,10 +3,13 @@ Module for preprocessing spec before generating values. Exists to handle shortha
 pushing params from URL form of field?param=value in to config object.
 """
 import json
+import logging
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 import dataspec
 from .exceptions import SpecException
+
+log = logging.getLogger(__name__)
 
 
 @dataspec.registry.preprocessors('default')
@@ -25,6 +28,43 @@ def preprocess_spec(raw_spec):
             _update_with_params(key, spec, updated_specs)
     if 'refs' in raw_spec:
         updated_specs['refs'] = preprocess_spec(raw_spec['refs'])
+    return updated_specs
+
+
+@dataspec.registry.preprocessors('csv-select')
+def preprocess_csv_select(raw_spec):
+    """
+    Converts and csv-select elements into standard csv ones
+    :param raw_spec: to process
+    :return: converted spec
+    """
+    updated_specs = {}
+    for key, spec in raw_spec.items():
+        if 'type' in spec and 'csv_select' == spec['type']:
+            configref_name = f'{key}_configref'
+            configref = {
+                'type': 'configref',
+                'config': spec.get('config', {})
+            }
+            if 'refs' not in raw_spec:
+                updated_specs['refs'] = {configref_name: configref}
+            else:
+                updated_specs['refs'][configref_name] = configref
+            for name, column in spec.get('data', {}).items():
+                spec_for_column = {
+                    'type': 'csv',
+                    'config': {
+                        'column': column,
+                        'configref': configref_name
+                    }
+                }
+                if name not in raw_spec:
+                    updated_specs[name] = spec_for_column
+                else:
+                    alt_name = f'{name}-{column}'
+                    updated_specs[alt_name] = spec_for_column
+        else:
+            updated_specs[key] = spec
     return updated_specs
 
 
@@ -76,9 +116,9 @@ def _parse_key(field_name):
     config = {}
     for key, value in parsed_query.items():
         if len(value) == 1:
-            config[key] = value[0]
+            config[key.strip()] = value[0]
         else:
-            config[key] = value
+            config[key.strip()] = value
 
     return newkey, spectype, config
 

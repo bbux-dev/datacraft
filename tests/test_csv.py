@@ -99,3 +99,27 @@ def _build_csv_spec(field_name, config_changes):
     }
     base[field_name]['config'].update(config_changes)
     return base
+
+
+def test_buffred_csv_end_of_data_raises_spec_exception():
+    csv_path = f'{test_dir}/test.csv'
+    csv_data = csv_handler.BufferedCsvData(csv_path, ',', '"', True, 5)
+    with pytest.raises(SpecException):
+        csv_data.next('status', 100, False, 1)
+
+
+def test_buffred_csv_does_not_support_sample_mode():
+    csv_path = f'{test_dir}/test.csv'
+    do_sampling = True
+    csv_data = csv_handler.BufferedCsvData(csv_path, ',', '"', True, 5)
+    with pytest.raises(SpecException):
+        csv_data.next('status', 0, do_sampling, 1)
+
+
+def test_buffred_csv_does_not_support_count_greater_than_one():
+    csv_path = f'{test_dir}/test.csv'
+    invalid_count = 2
+    csv_data = csv_handler.BufferedCsvData(csv_path, ',', '"', True, 5)
+    with pytest.raises(SpecException):
+        csv_data.next('status', 0, False, invalid_count)
+

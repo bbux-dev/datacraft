@@ -37,7 +37,7 @@ def main():
     parser.add_argument('-d', '--datadir',
                         help='Path to external directory to load external data file such as csvs')
     parser.add_argument('-l', '--loglevel', default=logging.INFO,
-                        help='Logging level verbosity, default is info, valid are "debug","info","warn","error"')
+                        help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
     parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
@@ -139,6 +139,6 @@ if __name__ == '__main__':
     from dataspec.type_handlers import csv_handler
     from dataspec.type_handlers import geo_handler
     import dataspec.preprocessor
-    import dataspec.logging
+    import dataspec.logging_handler
 
     main()

@@ -11,23 +11,22 @@ from dataspec.utils import is_affirmative
 from dataspec.utils import load_config
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 
-# 100 MB
-SMALL_ENOUGH_THRESHOLD = 100 * 1024 * 1024
+# 250 MB
+ONE_MB = 1024 * 1024
+SMALL_ENOUGH_THRESHOLD = 250 * ONE_MB
+_DEFAULT_BUFFER_SIZE = 1000000
 
 # to keep from reloading the same CsvData
 _csv_data_cache = {}
 
 
-class CsvData:
+class CsvDataBase:
     """
     Class for encapsulating the data for a single CSV file so that multiple suppliers
     only need one copy of the underlying data
     """
 
-    def __init__(self, csv_path, delimiter, quotechar, has_headers):
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
-            self.data = list(reader)
+    def __init__(self, has_headers):
         if has_headers:
             has_headers = self.data.pop(0)
             self.mapping = {has_headers[i]: i for i in range(len(has_headers))}
@@ -46,6 +45,31 @@ class CsvData:
         :param count: number of values to return
         :return: array of values if count > 1 else the next value
         """
+
+    def _get_column_index(self, field):
+        """
+        Resolve the column index
+        :param field: key or one based index number
+        :return: the column index for the field
+        """
+        # if we had headers we can use that name, otherwise field should be one based index
+        colidx = self.mapping.get(field)
+        if colidx is None and not str(field).isdigit():
+            raise SpecException(f'Invalid field name: {field} for csv, known keys: {self.valid_keys}')
+        if colidx is None:
+            colidx = int(field) - 1
+        return colidx
+
+
+class SampleEnabledCsv(CsvDataBase):
+    def __init__(self, csv_path, delimiter, quotechar, has_headers):
+        with open(csv_path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+            self.data = list(reader)
+        # need to populate data before super constructor call
+        super().__init__(has_headers)
+
+    def next(self, field, iteration, sample, count):
         colidx = self._get_column_index(field)
 
         values = []
@@ -58,6 +82,57 @@ class CsvData:
         if count == 1:
             return values[0]
         return values
+
+
+class BufferedCsvData(CsvDataBase):
+    def __init__(self, csv_path, delimiter, quotechar, has_headers, buffer_size):
+        self.csv_path = csv_path
+        self.delimiter = delimiter
+        self.quotechar = quotechar
+        self.size = buffer_size
+        self.increment = -1
+        self.data = None
+        self.fill_buffer(0)
+        # need to populate data before super constructor call
+        super().__init__(has_headers)
+
+    def fill_buffer(self, iteration):
+        if int(iteration / self.size) == self.increment:
+            return
+        else:
+            self.increment = int(iteration / self.size)
+        start = self.size * self.increment + 1
+        end = start + self.size + 1
+        buff = []
+        with open(self.csv_path) as f:
+            rows = csv.reader(f, delimiter=self.delimiter, quotechar=self.quotechar)
+            for line in rows:
+                if rows.line_num == end:
+                    break
+                if rows.line_num >= start:
+                    buff.append(line)
+        self.data = buff
+
+    def next(self, field, iteration, sample, count):
+        """
+        Obtains the next value(s) for the field for the given iteration
+        :param field: key or one based index number
+        :param iteration: current iteration
+        :param sample: if sampling should be used
+        :param count: number of values to return
+        :return: array of values if count > 1 else the next value
+        """
+        if sample:
+            raise SpecException('Large CSV files do not support sample mode')
+        if count > 1:
+            raise SpecException('Large CSV files only support count of 1')
+        self.fill_buffer(iteration)
+        colidx = self._get_column_index(field)
+
+        idx = iteration % self.size
+        if idx >= len(self.data):
+            raise SpecException("Exceeded end of CSV data, unable to proceed with large CSV files")
+        return self.data[idx][colidx]
 
     def _get_column_index(self, field):
         """
@@ -118,16 +193,17 @@ def _load_csv_data(field_spec, config, datadir):
     if not os.path.exists(csv_path):
         raise SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
                             + json.dumps(field_spec))
+    delimiter = config.get('delimiter', ',')
+    # in case tab came in as string
+    if delimiter == '\\t':
+        delimiter = '\t'
+    quotechar = config.get('quotechar', '"')
+    has_headers = is_affirmative('headers', config)
+
     size_in_bytes = os.stat(csv_path).st_size
     if size_in_bytes <= SMALL_ENOUGH_THRESHOLD:
-        delimiter = config.get('delimiter', ',')
-        # in case tab came in as string
-        if delimiter == '\\t':
-            delimiter = '\t'
-        quotechar = config.get('quotechar', '"')
-        has_headers = is_affirmative('headers', config)
-        csv_data = CsvData(csv_path, delimiter, quotechar, has_headers)
+        csv_data = SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
     else:
-        raise SpecException(f'Input CSV at {csv_path} too large to use as input!')
+        csv_data = BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)
     _csv_data_cache[csv_path] = csv_data
     return csv_data
