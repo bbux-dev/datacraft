@@ -10,6 +10,7 @@
 {%- endif %}
 
 {% if example.yaml is defined  -%}
+
 <details>
   <summary>YAML Spec</summary>
 
@@ -17,6 +18,15 @@
 {{ example.yaml }}
 ```
 </details>
+
+{%- endif %}
+{%- endmacro %}
+{% macro show_command_and_output(example) -%}
+{% if example.command is defined  -%}
+```shell
+{{ example.command }}
+{{ example.output }}
+```
 {%- endif %}
 {%- endmacro %}
 Field Spec Definitions
@@ -49,6 +59,7 @@ Field Spec Definitions
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
+    1. [nested](#Nested)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -72,6 +83,7 @@ Field Spec Definitions
 |[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with |
 |[csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below       |
 |[csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below |
+|[nested](#Nested)            | For nested fields                      |                              |
 
 # <a name="Overview"></a>Overview
 
@@ -701,3 +713,30 @@ for the field. The value can either be the 1 indexed column number or the name o
 Our example doesn't have headers, so we are using the 1 based indexes.
 
 {{ show_example(examples.csv_select_example_one) }}
+
+## <a name="nested"></a>Nested fields
+
+Many documents or objects are not flat, but contain nested inner objects or child documents. To generate nested fields
+use the `nested` type. 
+
+### Example:
+
+In this example a pseudo schema for our data might look like this:
+
+```
+ - id:str
+ - user
+   - user_id:str
+   - geo
+     - place_id:str
+     - coordinates: List[float]
+```
+
+The user is a nested object, which has a geo, which is also a nested object. Below are the specs that will generate data
+that matches this schema.
+
+{{ show_example(examples.nested_example_one) }}
+
+If we run this example:
+
+{{ show_command_and_output(examples.nested_example_one) }}

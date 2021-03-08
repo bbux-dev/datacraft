@@ -1,4 +1,5 @@
 
+
 Field Spec Definitions
 ========================
 
@@ -29,6 +30,7 @@ Field Spec Definitions
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
+    1. [nested](#Nested)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -52,6 +54,7 @@ Field Spec Definitions
 |[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with |
 |[csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below       |
 |[csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below |
+|[nested](#Nested)            | For nested fields                      |                              |
 
 # <a name="Overview"></a>Overview
 
@@ -1571,3 +1574,74 @@ placeholder:
     delimiter: "\t"
 ```
 </details>
+
+## <a name="nested"></a>Nested fields
+
+Many documents or objects are not flat, but contain nested inner objects or child documents. To generate nested fields
+use the `nested` type. 
+
+### Example:
+
+In this example a pseudo schema for our data might look like this:
+
+```
+ - id:str
+ - user
+   - user_id:str
+   - geo
+     - place_id:str
+     - coordinates: List[float]
+```
+
+The user is a nested object, which has a geo, which is also a nested object. Below are the specs that will generate data
+that matches this schema.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "id:uuid": {},
+  "user:nested": {
+    "user_id:uuid": {},
+    "geo:nested": {
+      "place_id:uuid": {},
+      "coordinates:geo.pair?as_list=true": {}
+    }
+  }
+}
+```
+</details>
+
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+---
+id:uuid: {}
+user:nested:
+  user_id:uuid: {}
+  geo:nested:
+    place_id:uuid: {}
+    coordinates:geo.pair?as_list=true: {}
+```
+</details>
+
+If we run this example:
+
+```shell
+dataspec -s double-nested.json -i 1 --format json-pretty
+{
+    "id": "4278b060-442d-4558-bf2c-5f1df68cb265",
+    "user": {
+        "geo": {
+            "coordinates": [
+                "-167.4324",
+                " 84.6883"
+            ],
+            "place_id": "510e5740-6a13-4c0b-8c53-2e3c1f88ca24"
+        },
+        "user_id": "13d5c2a6-80c8-4bdb-89b2-7da9699cd0fb"
+    }
+} 
+```

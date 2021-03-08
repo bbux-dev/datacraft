@@ -3,11 +3,11 @@
 Utiltity to validate json and yaml example specs and apply them to templates for the READMEs
 """
 
-
 import json
 import yaml
 import argparse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 
 def main():
     parser = argparse.ArgumentParser(description='')
@@ -18,7 +18,8 @@ def main():
                         help='where to get the input')
     parser.add_argument('-k', '--key-filter', dest='key_filter',
                         help='where to get the input')
-    parser.add_argument('-m', '--mode', default="verify", choices=['verify', 'test', 'apply', 'dump', 'all'],
+    parser.add_argument('-m', '--mode', default="verify",
+                        choices=['verify', 'test', 'apply', 'dump', 'dump-yaml', 'all'],
                         help='what mode to run in')
 
     args = parser.parse_args()
@@ -32,13 +33,33 @@ def main():
         apply_template(data, args.template)
     if args.mode == 'dump':
         dump_data(data.get('examples', {}), args.key_filter)
+    if args.mode == 'dump-yaml':
+        dump_yaml(data.get('examples', {}), args.key_filter)
+
+
+def dump_yaml(data, specific_keys):
+    """
+    Dumps the data for as yaml for inspection
+    :param data: with json and yaml example specs
+    :param specific_keys: to dump
+    :return: None
+    """
+    for key, value in data.items():
+        if specific_keys and key not in specific_keys:
+            continue
+        print(f'## {key}')
+        if 'json' in value:
+            data = json.loads(value['json'])
+            print(yaml.dump(data))
+        print()
+
 
 def dump_data(data, specific_keys):
     """
     Dumps the data for inspection
     :param data: with json and yaml example specs
     :param specific_keys: to dump
-    :return: Nonee
+    :return: None
     """
     for key, value in data.items():
         if specific_keys and key not in specific_keys:
@@ -55,6 +76,7 @@ def dump_data(data, specific_keys):
             print('```')
             print()
         print()
+
 
 def verify_data(data, specific_keys):
     """
@@ -78,7 +100,7 @@ def verify_data(data, specific_keys):
                 print(value)
         if 'yaml' in value:
             try:
-                ydata = yaml.safe_load(value['yaml'])
+                ydata = yaml.load(value['yaml'], Loader=yaml.FullLoader)
             except Exception as err:
                 any_errors = True
                 print(f'{key}: error: {str(err)}')
@@ -108,6 +130,7 @@ def apply_template(data, template_name):
     )
     template = env.get_template(template_name)
     print(template.render(data))
+
 
 if __name__ == '__main__':
     main()
