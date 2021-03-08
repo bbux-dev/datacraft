@@ -29,6 +29,7 @@ class Loader:
     """
     Parent object for loading value suppliers from specs
     """
+    RESERVED = ['type', 'data', 'ref', 'refs', 'config']
 
     def __init__(self, data_spec, datadir='./data'):
         self.specs = preprocess_spec(data_spec)
@@ -46,6 +47,8 @@ class Loader:
             return self.cache[key]
 
         data_spec = self.specs.get(key)
+        if data_spec is None:
+            data_spec = self.refs.get(key)
         if data_spec is None:
             raise SpecException("No key " + key + " found in specs")
         supplier = self.get_from_spec(data_spec)

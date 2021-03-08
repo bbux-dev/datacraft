@@ -11,6 +11,7 @@ class CombineValuesSupplier(ValueSupplierInterface):
 
     def __init__(self, suppliers, config=None):
         self.suppliers = suppliers
+        self.as_list = config.get('as_list', False) if config else False
         if config and 'join_with' in config:
             self.joiner = config.get('join_with')
         else:
@@ -18,5 +19,6 @@ class CombineValuesSupplier(ValueSupplierInterface):
 
     def next(self, iteration):
         values = [str(supplier.next(iteration)) for supplier in self.suppliers]
-
+        if self.as_list:
+            return values
         return self.joiner.join(values)
