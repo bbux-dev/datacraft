@@ -4,32 +4,23 @@ Module for handling character class types
 import json
 import string
 import dataspec
-from dataspec.supplier.string_sampler import StringSamplerSupplier
 from dataspec.utils import any_key_exists
-from dataspec.supplier.list_sampler import ListSampler
+from dataspec.suppliers import string_sampler, list_sampler
 
-
-def _create_chars_for_ranges(ranges):
-    chars_as_str = ''
-    for ascii_range in ranges:
-        if len(ascii_range) == 1:
-            chars_as_str = chars_as_str + chr(ascii_range[0])
-        else:
-            chars_as_str = chars_as_str + ''.join(chr(x) for x in range(ascii_range[0], ascii_range[1] + 1))
-    return chars_as_str
-
-
-_ZERO_TO_NINE = [48, 57]
-_LOWER_CASE = [97, 122]
-_UPPER_CASE = [65, 90]
-_UNDER_SCORE = [95]
+_UNDER_SCORE = '_'
 
 _CLASS_MAPPING = {
     "ascii": ''.join(chr(x) for x in range(128)),
-    "word": _create_chars_for_ranges([_ZERO_TO_NINE, _LOWER_CASE, _UPPER_CASE, _UNDER_SCORE]),
+    "lower": string.ascii_lowercase,
+    "upper": string.ascii_uppercase,
+    "letters": string.ascii_letters,
+    "word": f'{string.ascii_letters}{string.digits}{_UNDER_SCORE}',
     "printable": string.printable,
-    "special": "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-    "digits": ''.join(chr(x) for x in range(9))
+    "visible": ''.join(string.printable.split()),
+    "punctuation": string.punctuation,
+    "special": string.punctuation,
+    "digits": string.digits,
+    "hex": string.hexdigits,
 }
 
 
@@ -42,11 +33,91 @@ def configure_supplier(spec, _):
     data = spec['data']
     if isinstance(data, str) and data in _CLASS_MAPPING:
         data = _CLASS_MAPPING[data]
+    if isinstance(data, list):
+        new_data = [_CLASS_MAPPING[datum] if datum in _CLASS_MAPPING else datum for datum in data]
+        data = ''.join(new_data)
     if 'exclude' in config:
         for char_to_exclude in config.get('exclude'):
             data = data.replace(char_to_exclude, '')
     if any_key_exists(config, ['mean', 'stddev']):
         if 'join_with' not in config:
             config['join_with'] = ''
-        return ListSampler(data, config)
-    return StringSamplerSupplier(data, config)
+        return list_sampler(data, config)
+    return string_sampler(data, config)
+
+
+@dataspec.registry.types('cc-ascii')
+def configure_ascii_supplier(spec, loader):
+    """ configure the supplier for char_class types """
+    spec['data'] = 'ascii'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-lower')
+def configure_lower_supplier(spec, loader):
+    """ configure the supplier for lower char_class types """
+    spec['data'] = 'lower'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-upper')
+def configure_upper_supplier(spec, loader):
+    """ configure the supplier for upper char_class types """
+    spec['data'] = 'upper'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-letters')
+def configure_letters_supplier(spec, loader):
+    """ configure the supplier for letters char_class types """
+    spec['data'] = 'letters'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-word')
+def configure_word_supplier(spec, loader):
+    """ configure the supplier for char_class types """
+    spec['data'] = 'word'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-printable')
+def configure_printable_supplier(spec, loader):
+    """ configure the supplier for char_class types """
+    spec['data'] = 'printable'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-visible')
+def configure_visible_supplier(spec, loader):
+    """ configure the supplier for visible char_class types """
+    spec['data'] = 'visible'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-punctuation')
+def configure_punctuation_supplier(spec, loader):
+    """ configure the supplier for char_class types """
+    spec['data'] = 'punctuation'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-special')
+def configure_special_supplier(spec, loader):
+    """ configure the supplier for special char_class types """
+    spec['data'] = 'special'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-digits')
+def configure_digits_supplier(spec, loader):
+    """ configure the supplier for digits char_class types """
+    spec['data'] = 'digits'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-hex')
+def configure_hex_supplier(spec, loader):
+    """ configure the supplier for hex char_class types """
+    spec['data'] = 'hex'
+    return configure_supplier(spec, loader)

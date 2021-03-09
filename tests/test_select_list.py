@@ -42,7 +42,7 @@ def test_select_list_basic():
         'mean': 2,
         'join_with': '-'
     }
-    supplier = suppliers.select_list_subset(['a', 'b', 'c'], config)
+    supplier = suppliers.list_sampler(['a', 'b', 'c'], config)
 
     possible = ['a-b', 'a-c', 'b-a', 'b-c', 'c-a', 'c-b']
 
@@ -57,7 +57,7 @@ def test_select_list_mean_and_variance():
         'stddev': 1,
         'join_with': '-'
     }
-    supplier = suppliers.select_list_subset(['a', 'b', 'c'], config)
+    supplier = suppliers.list_sampler(['a', 'b', 'c'], config)
 
     # possible values are single element, all combos of two, and all combos of three
     possible = ['a', 'b', 'c',
