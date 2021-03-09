@@ -532,6 +532,44 @@ If we run this example:
 The `stddev` config parameters is not required, but without it the sizes will tend to stack on the edges of the allowed
 size range.
 
+<details>
+  <summary>Detailed Example</summary>
+
+```shell
+# no stddev specified
+for p in $(dataspec -l off --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
+do
+  echo $p | tr -d '\n' | wc -m
+done | sort | uniq -c | sort -n -k2,2
+# count num chars
+    163 1
+     59 2
+     91 3
+     92 4
+    100 5
+    110 6
+     94 7
+     71 8
+    220 9
+# with stddev of 3 specified
+for p in $(dataspec -l off --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
+do
+  echo $p | tr -d '\n' | wc -m
+done | sort | uniq -c | sort -n -k2,2
+# count num chars
+     98 1
+     72 2
+     96 3
+    126 4
+    133 5
+    128 6
+    113 7
+     90 8
+    144 9
+```
+
+</details>
+
 ## <a name="Geo"></a>Geo Related Types
 
 There are three main geo types: `geo.lat`, `geo.long`, and `geo.pair`. The defaults will create decimal string values in
