@@ -40,6 +40,7 @@ def _test_invalid_select_list_spec(spec):
 def test_select_list_basic():
     config = {
         'mean': 2,
+        'stddev': 0,
         'join_with': '-'
     }
     supplier = suppliers.list_sampler(['a', 'b', 'c'], config)
@@ -70,7 +71,7 @@ def test_select_list_mean_and_variance():
 
 
 def test_select_list_using_loader():
-    spec = {"pets:select_list_subset?mean=2&join_with= ": ['dog', 'cat', 'pig', 'hog', 'bun']}
+    spec = {"pets:select_list_subset?mean=2&stddev=0&join_with= ": ['dog', 'cat', 'pig', 'hog', 'bun']}
     loader = Loader(spec)
     supplier = loader.get('pets')
     value = supplier.next(0)

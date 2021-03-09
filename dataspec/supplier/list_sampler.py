@@ -17,9 +17,14 @@ class ListSamplerSupplier(ValueSupplierInterface):
     def __init__(self, data, config):
         self.values = data
         self.mean = float(config.get('mean'))
-        self.stddev = config.get('stddev', 0)
         self.min = int(config.get('min', 1))
         self.max = int(config.get('max', len(self.values)))
+        # attempt to create a reasonable standard deviation
+        if abs(int(self.mean - self.min)) < abs(int(self.mean - self.max)):
+            lower_delta = abs(int(self.mean - self.min))
+        else:
+            lower_delta = abs(int(self.mean - self.max))
+        self.stddev = float(config.get('stddev', lower_delta))
         self.join_with = config.get('join_with', ' ')
         self.as_list = is_affirmative('as_list', config, False)
 

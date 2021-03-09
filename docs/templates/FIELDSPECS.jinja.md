@@ -1,3 +1,5 @@
+Field Spec Definitions
+========================
 {% macro show_example(example) -%}
 {% if example.json is defined  -%}
 <details open>
@@ -29,9 +31,6 @@
 ```
 {%- endif %}
 {%- endmacro %}
-Field Spec Definitions
-========================
-
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
 1. [Field Spec Structure](#Field_Spec_Structure)
@@ -51,6 +50,8 @@ Field Spec Definitions
     1. [Date](#Date)
     1. [Range](#Range)
     1. [Uuid](#Uuid)
+    1. [Character Class](#CharClass)
+       1. [Built In Classes](#SupportedClasses)
     1. [Geo](#Geo)
     1. [IP Addresses](#IP_Addresses)
         1. [Precise CIDR Addresses](#Precise_IP)
@@ -74,6 +75,7 @@ Field Spec Definitions
 |[date.iso](#Date)            | date strings in ISO8601 format no microseconds| many see details below|
 |[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
 |[uuid](#Uuid)                | generates valid uuid                   |                              |
+|[char_class](#CharClass)     | generates strings from character classes| many see details below      |
 |[geo.lat](#Geo)              | generates decimal latitude             | start_lat,end_lat,precision  |
 |[geo.long](#Geo)             | generates decimal longitude            | start_long,end_long,precision|
 |[geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision|
@@ -84,7 +86,6 @@ Field Spec Definitions
 |[csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below       |
 |[csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below |
 |[nested](#Nested)            | For nested fields                      |                              |
-
 # <a name="Overview"></a>Overview
 
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
@@ -442,6 +443,82 @@ Example Spec
 
 {{ show_example(examples.uuid_spec_example_one) }}
 
+## <a name="CharClass"></a>Character Classes
+
+A `char_class` type is used to create strings that are made up of characters from specific character classes. The strings
+can be of fixed or variable length. There are several built in character classes. You can also provide your own set of
+characters to sample from. Below is the list of supported character classes:
+
+### <a name="SupportedClasses"></a>Built In Classes
+
+|class      |description|
+|-----------|--------------------------------------------|
+|ascii      |All valid ascii characters including control|
+|lower      |ascii lowercase|
+|upper      |ascii uppercase|
+|digits     |Numbers 0 through 9|
+|letters    |lowercase and uppercase|
+|word       |letters + digits + '_'|
+|printable  |All printable ascii chars including whitespace|
+|visible    |All printable ascii chars excluding whitespace|
+|punctuation|local specific punctuation|
+|special    |local specific punctuation|
+|hex        |Hexidecimal digits including upper and lower case a-f|
+|hex-lower  |Hexidecimal digits only including lower case a-f|
+|hex-upper  |Hexidecimal digits only including upper case A-F|
+
+Helpful Links:
+
+  * https://en.wikipedia.org/wiki/ASCII#Character_groups
+  * https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
+  * https://docs.python.org/3/library/string.html
+
+### Usage
+
+A `char_class` Field Spec takes the form
+
+```
+{
+  "<field>": {
+    "type": "char_class":
+    "data": <char_class_name>,
+    or
+    "data": <string with custom set of characters to sample from>
+    or
+    "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>, ...]
+    "config":{
+      # General Parameters
+      "exclude": <string of characters to exclude from output>,
+      # String Size Based Config Parameters
+      "min": <min number of characters in string>,
+      "max": <max number of characters in string>,
+      or
+      "count": <exact number of characters in string>
+      or
+      "mean": <mean number of characters in string>
+      "stddev": <standard deviation from mean for number of characters in string>
+      "min": <optional min>
+      "max": <optional max>
+    }    
+  }
+}
+```
+
+### Example
+
+Below is an example selecting several character classes along with a set of custom ones to use to generate passwords.
+The generated passwords are between 10 and 18 characters in length with a mean size of 14 characters and a standard
+deviation of 2.
+
+{{ show_example(examples.char_class_spec_example_one) }}
+
+If we run this example:
+
+{{ show_command_and_output(examples.char_class_spec_example_one) }}
+
+The `stddev` config parameters is not required, but without it the sizes will tend to stack on the edges of the allowed
+size range.
+
 ## <a name="Geo"></a>Geo Related Types
 
 There are three main geo types: `geo.lat`, `geo.long`, and `geo.pair`. The defaults will create decimal string values in
@@ -567,7 +644,7 @@ The select_list_subset Field Spec structure is:
 
 The join_with config option is used to specify how the selected values should be combined. The mean and stddev config
 options tell how many items should be chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items then
-sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen (which is the default).
+sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen.
 You can also set a min and max. Example:
 
 {{ show_example(examples.select_list_example_one) }}
