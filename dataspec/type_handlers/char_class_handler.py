@@ -21,6 +21,8 @@ _CLASS_MAPPING = {
     "special": string.punctuation,
     "digits": string.digits,
     "hex": string.hexdigits,
+    "hex-lower": string.digits + 'abcdef',
+    "hex-upper": string.digits + 'ABCDEF',
 }
 
 
@@ -120,4 +122,18 @@ def configure_digits_supplier(spec, loader):
 def configure_hex_supplier(spec, loader):
     """ configure the supplier for hex char_class types """
     spec['data'] = 'hex'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-hex-lower')
+def configure_hex_lower_supplier(spec, loader):
+    """ configure the supplier for hex-lower char_class types """
+    spec['data'] = 'hex-lower'
+    return configure_supplier(spec, loader)
+
+
+@dataspec.registry.types('cc-hex-upper')
+def configure_hex_upper_supplier(spec, loader):
+    """ configure the supplier for hex-upper char_class types """
+    spec['data'] = 'hex-upper'
     return configure_supplier(spec, loader)
