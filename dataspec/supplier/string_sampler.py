@@ -17,7 +17,7 @@ class StringSamplerSupplier(ValueSupplierInterface):
             self.count_range = [int(count)]
         else:
             min_cnt = int(config.get('min', 1))
-            max_cnt = int(config.get('max', len(self.values) + 1))
+            max_cnt = int(config.get('max', len(self.values))) + 1
             self.count_range = list(range(min_cnt, max_cnt))
         self.join_with = config.get('join_with', '')
 
