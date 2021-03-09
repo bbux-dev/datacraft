@@ -26,7 +26,7 @@ import json
 
 import dataspec
 from dataspec.exceptions import SpecException
-from dataspec.supplier.select_list_subset import SelectListSupplier
+from dataspec.supplier.list_sampler import ListSampler
 from dataspec.utils import load_config
 
 
@@ -53,4 +53,4 @@ def configure_supplier(field_spec, loader):
     if 'data' in field_spec:
         data = field_spec.get('data')
 
-    return SelectListSupplier(data, config)
+    return ListSampler(data, config)

@@ -10,7 +10,7 @@ from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.weighted_refs import WeightedRefsSupplier
-from .supplier.select_list_subset import SelectListSupplier
+from .supplier.list_sampler import ListSampler
 from .supplier.value_supplier import ValueSupplierInterface
 
 
@@ -151,7 +151,7 @@ def select_list_subset(data, config):
     :param config: with minimal of mean specified
     :return: the supplier
     """
-    return SelectListSupplier(data, config)
+    return ListSampler(data, config)
 
 
 def is_decorated(field_spec):
