@@ -1,3 +1,5 @@
+Field Spec Definitions
+========================
 {% macro show_example(example) -%}
 {% if example.json is defined  -%}
 <details open>
@@ -10,6 +12,7 @@
 {%- endif %}
 
 {% if example.yaml is defined  -%}
+
 <details>
   <summary>YAML Spec</summary>
 
@@ -17,11 +20,17 @@
 {{ example.yaml }}
 ```
 </details>
+
 {%- endif %}
 {%- endmacro %}
-Field Spec Definitions
-========================
-
+{% macro show_command_and_output(example) -%}
+{% if example.command is defined  -%}
+```shell
+{{ example.command }}
+{{ example.output }}
+```
+{%- endif %}
+{%- endmacro %}
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
 1. [Field Spec Structure](#Field_Spec_Structure)
@@ -41,6 +50,8 @@ Field Spec Definitions
     1. [Date](#Date)
     1. [Range](#Range)
     1. [Uuid](#Uuid)
+    1. [Character Class](#CharClass)
+       1. [Built In Classes](#SupportedClasses)
     1. [Geo](#Geo)
     1. [IP Addresses](#IP_Addresses)
         1. [Precise CIDR Addresses](#Precise_IP)
@@ -49,6 +60,7 @@ Field Spec Definitions
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
+    1. [nested](#Nested)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -63,6 +75,7 @@ Field Spec Definitions
 |[date.iso](#Date)            | date strings in ISO8601 format no microseconds| many see details below|
 |[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
 |[uuid](#Uuid)                | generates valid uuid                   |                              |
+|[char_class](#CharClass)     | generates strings from character classes| many see details below      |
 |[geo.lat](#Geo)              | generates decimal latitude             | start_lat,end_lat,precision  |
 |[geo.long](#Geo)             | generates decimal longitude            | start_long,end_long,precision|
 |[geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision|
@@ -72,7 +85,7 @@ Field Spec Definitions
 |[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with |
 |[csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below       |
 |[csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below |
-
+|[nested](#Nested)            | For nested fields                      |                              |
 # <a name="Overview"></a>Overview
 
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
@@ -179,14 +192,16 @@ using a URL parameter format in the key. For example, the following two fields w
 
 There are some configuration values that can be applied to all or a subset of types. These are listed below
 
-| key   | argument |effect |
-|-------|----------|-------|
-|prefix | string   |Prepends the value to all results |
-|suffix | string   |Appends the value to all results  |
-|quote  | string   |Wraps the resulting value on both sides with the provided string |
+| key   | argument  |effect |
+|-------|-----------|-------|
+|prefix | string    |Prepends the value to all results |
+|suffix | string    |Appends the value to all results  |
+|quote  | string    |Wraps the resulting value on both sides with the provided string |
 |cast   | i,int,f,float,s,str,string|For numeric types, will cast results the provided type|
-|cast_as|          |Same as cast                                                           |
-|cast_to|          |Same as cast                                                           |
+|cast_as|           |Same as cast                                                           |
+|cast_to|           |Same as cast                                                           |
+|join_with|string   |For types that produce multiple values, use this string to join them   |
+|as_list|yes,true,on|For types that produce multiple values, return as list without joining |
 
 Example:
 
@@ -428,6 +443,133 @@ Example Spec
 
 {{ show_example(examples.uuid_spec_example_one) }}
 
+## <a name="CharClass"></a>Character Classes
+
+A `char_class` type is used to create strings that are made up of characters from specific character classes. The strings
+can be of fixed or variable length. There are several built in character classes. You can also provide your own set of
+characters to sample from. Below is the list of supported character classes:
+
+### <a name="SupportedClasses"></a>Built In Classes
+
+|class      |description|
+|-----------|--------------------------------------------|
+|ascii      |All valid ascii characters including control|
+|lower      |ascii lowercase|
+|upper      |ascii uppercase|
+|digits     |Numbers 0 through 9|
+|letters    |lowercase and uppercase|
+|word       |letters + digits + '_'|
+|printable  |All printable ascii chars including whitespace|
+|visible    |All printable ascii chars excluding whitespace|
+|punctuation|local specific punctuation|
+|special    |local specific punctuation|
+|hex        |Hexidecimal digits including upper and lower case a-f|
+|hex-lower  |Hexidecimal digits only including lower case a-f|
+|hex-upper  |Hexidecimal digits only including upper case A-F|
+
+Helpful Links:
+
+  * https://en.wikipedia.org/wiki/ASCII#Character_groups
+  * https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
+  * https://docs.python.org/3/library/string.html
+
+### Usage
+
+A `char_class` Field Spec takes the form
+
+```
+{
+  "<field>": {
+    # type definition
+    "type": "char_class":
+    or
+    "type": "cc-<char_class_name>",
+    # data definition
+    "data": <char_class_name>,
+    or
+    "data": <string with custom set of characters to sample from>
+    or
+    "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>, ...]
+    # configuration
+    "config":{
+      # General Parameters
+      "exclude": <string of characters to exclude from output>,
+      # String Size Based Config Parameters
+      "min": <min number of characters in string>,
+      "max": <max number of characters in string>,
+      or
+      "count": <exact number of characters in string>
+      or
+      "mean": <mean number of characters in string>
+      "stddev": <standard deviation from mean for number of characters in string>
+      "min": <optional min>
+      "max": <optional max>
+    }    
+  }
+}
+```
+
+### Shorthand Notation for Single Character Classes
+
+If a single character class is needed, the type can be specified with a `cc-` prefix: `cc-<char_class_name>`
+e.g. `"type": "cc-visible"` would only use characters from the `visible` class. If this format is used, the `data`
+element is ignored and only characters from the single character class are sampled from.
+
+{{ show_example(examples.char_class_spec_example_one) }}
+
+### Examples
+
+Below is an example selecting several character classes along with a set of custom ones to use to generate passwords.
+The generated passwords are between 10 and 18 characters in length with a mean size of 14 characters and a standard
+deviation of 2.
+
+{{ show_example(examples.char_class_spec_example_two) }}
+
+If we run this example:
+
+{{ show_command_and_output(examples.char_class_spec_example_two) }}
+
+The `stddev` config parameters is not required, but without it the sizes will tend to stack on the edges of the allowed
+size range.
+
+<details>
+  <summary>Detailed Example</summary>
+
+```shell
+# no stddev specified
+for p in $(dataspec -l off --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
+do
+  echo $p | tr -d '\n' | wc -m
+done | sort | uniq -c | sort -n -k2,2
+# count num chars
+    163 1
+     59 2
+     91 3
+     92 4
+    100 5
+    110 6
+     94 7
+     71 8
+    220 9
+# with stddev of 3 specified
+for p in $(dataspec -l off --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
+do
+  echo $p | tr -d '\n' | wc -m
+done | sort | uniq -c | sort -n -k2,2
+# count num chars
+     98 1
+     72 2
+     96 3
+    126 4
+    133 5
+    128 6
+    113 7
+     90 8
+    144 9
+```
+
+</details>
+
 ## <a name="Geo"></a>Geo Related Types
 
 There are three main geo types: `geo.lat`, `geo.long`, and `geo.pair`. The defaults will create decimal string values in
@@ -441,13 +583,14 @@ Config Params:
 
 |type    |param     |description                                  |
 |--------|----------|---------------------------------------------|
-|all     |precision |number of decimal places for lat or long, default is 4, max is 5|
+|all     |precision |number of decimal places for lat or long, default is 4          |
 |        |bbox      |array of \[min Longitude, min Latitude, max Longitude, max Latitude\]|
 |geo.lat |start_lat |lower bound for latitude                                        |
 |        |end_lat   |upper bound for latitude                                        |
 |geo.long|start_long|lower bound for longitude                                       |
 |        |end_long  |upper bound for longitude                                       |
 |geo.pair|join_with |delimiter to join long and lat with, default is comma           |
+|        |as_list   |One of yes, true, or on if the pair should be returned as a list instead of as a joined string|
 |        |lat_first |if latitude should be first in the generated pair, default is longitude first|
 |        |start_lat |lower bound for latitude                                        |
 |        |end_lat   |upper bound for latitude                                        |
@@ -553,7 +696,7 @@ The select_list_subset Field Spec structure is:
 
 The join_with config option is used to specify how the selected values should be combined. The mean and stddev config
 options tell how many items should be chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items then
-sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen (which is the default).
+sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen.
 You can also set a min and max. Example:
 
 {{ show_example(examples.select_list_example_one) }}
@@ -701,3 +844,30 @@ for the field. The value can either be the 1 indexed column number or the name o
 Our example doesn't have headers, so we are using the 1 based indexes.
 
 {{ show_example(examples.csv_select_example_one) }}
+
+## <a name="nested"></a>Nested fields
+
+Many documents or objects are not flat, but contain nested inner objects or child documents. To generate nested fields
+use the `nested` type. 
+
+### Example:
+
+In this example a pseudo schema for our data might look like this:
+
+```
+ - id:str
+ - user
+   - user_id:str
+   - geo
+     - place_id:str
+     - coordinates: List[float]
+```
+
+The user is a nested object, which has a geo, which is also a nested object. Below are the specs that will generate data
+that matches this schema.
+
+{{ show_example(examples.nested_example_one) }}
+
+If we run this example:
+
+{{ show_command_and_output(examples.nested_example_one) }}

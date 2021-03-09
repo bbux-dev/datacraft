@@ -41,10 +41,15 @@ def configure_geo_long(field_spec, loader):
     long_supplier = _configure_long_type(field_spec, loader)
     lat_supplier = _configure_lat_type(field_spec, loader)
     join_with = config.get('join_with', ',')
+    as_list = is_affirmative('as_list', config, False)
     lat_first = is_affirmative('lat_first', config)
+    combine_config = {
+        'join_with': join_with,
+        'as_list': as_list
+    }
     if lat_first:
-        return suppliers.combine([lat_supplier, long_supplier], {'join_with': join_with})
-    return suppliers.combine([long_supplier, lat_supplier], {'join_with': join_with})
+        return suppliers.combine([lat_supplier, long_supplier], combine_config)
+    return suppliers.combine([long_supplier, lat_supplier], combine_config)
 
 
 def _configure_long_type(spec, loader):

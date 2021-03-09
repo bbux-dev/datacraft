@@ -4,7 +4,6 @@ from dataspec.loader import Loader
 from dataspec import SpecException
 # need this to trigger registration
 from dataspec.type_handlers import csv_handler
-import dataspec.preprocessor
 
 test_dir = f'{os.path.dirname(os.path.realpath(__file__))}/data'
 

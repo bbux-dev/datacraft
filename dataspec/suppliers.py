@@ -10,7 +10,8 @@ from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.weighted_refs import WeightedRefsSupplier
-from .supplier.select_list_subset import SelectListSupplier
+from .supplier.string_sampler import StringSamplerSupplier
+from .supplier.list_sampler import ListSamplerSupplier
 from .supplier.value_supplier import ValueSupplierInterface
 
 
@@ -144,14 +145,14 @@ def weighted_ref(key_supplier, values_map):
     return WeightedRefsSupplier(key_supplier, values_map)
 
 
-def select_list_subset(data, config):
+def list_sampler(data, config):
     """
     select list subset supplier
     :param data: list to select subset from
     :param config: with minimal of mean specified
     :return: the supplier
     """
-    return SelectListSupplier(data, config)
+    return ListSamplerSupplier(data, config)
 
 
 def is_decorated(field_spec):
@@ -243,3 +244,7 @@ class RandomRangeSupplier(ValueSupplierInterface):
 
 def random_range(start, end, precision=None):
     return RandomRangeSupplier(start, end, precision)
+
+
+def string_sampler(data, config):
+    return StringSamplerSupplier(data, config)

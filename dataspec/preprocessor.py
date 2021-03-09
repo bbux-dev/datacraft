@@ -40,7 +40,7 @@ def preprocess_csv_select(raw_spec):
     """
     updated_specs = {}
     for key, spec in raw_spec.items():
-        if 'type' in spec and 'csv_select' == spec['type']:
+        if 'type' in spec and spec['type'] == 'csv_select':
             configref_name = f'{key}_configref'
             configref = {
                 'type': 'configref',
@@ -68,6 +68,46 @@ def preprocess_csv_select(raw_spec):
     return updated_specs
 
 
+@dataspec.registry.preprocessors('nested')
+def preprocess_nested(raw_spec):
+    """
+    Converts and nested elements
+    :param raw_spec: to process
+    :return: converted spec
+    """
+    updated_specs = {}
+    for key, spec in raw_spec.items():
+        if key == 'refs' and 'refs' in updated_specs:
+            updated_specs.get('refs').update(spec)
+        if 'type' in spec and spec['type'] == 'nested':
+            updated = preprocess_spec(spec)
+            updated = preprocess_csv_select(updated)
+            # in case we have nested nested elements
+            updated = preprocess_nested(updated)
+            # this may have created a refs element, need to move this to the root
+            _update_root_refs(updated_specs, updated)
+            updated_specs[key] = updated
+        else:
+            updated_specs[key] = spec
+    return updated_specs
+
+
+def _update_root_refs(updated_specs, updated):
+    """
+    Updates to root refs if needed by popping the refs from the updated and merging with existing refs or creating
+    a new refs element
+    :param updated_specs: specs being updated
+    :param updated: current updated spec that may have refs injected into it
+    :return: None
+    """
+    if 'refs' in updated:
+        refs = updated.pop('refs')
+        if 'refs' in updated_specs:
+            updated_specs.get('refs').update(refs)
+        else:
+            updated_specs['refs'] = refs
+
+
 def _update_with_params(key, spec, updated_specs):
     """
     handles the case that there are ?param=value portions in the key
@@ -80,7 +120,7 @@ def _update_with_params(key, spec, updated_specs):
     # the updated spec to populate
     updated = {}
 
-    if _is_spec_data(spec):
+    if _is_spec_data(spec, spectype):
         updated['data'] = spec
     else:
         # copy all existing values
@@ -130,7 +170,7 @@ def _update_no_params(key, spec, updated_specs):
     """
     if ':' in key:
         newkey, spectype = key.split(':', 2)
-        if not _is_spec_data(spec):
+        if not _is_spec_data(spec, spectype):
             spec['type'] = spectype
         else:
             spec = {
@@ -145,11 +185,13 @@ def _update_no_params(key, spec, updated_specs):
     updated_specs[newkey] = spec
 
 
-def _is_spec_data(spec):
+def _is_spec_data(spec, spectype):
     """
     Checks to see if the spec is data only
     :return: true if only data, false if it is a spec
     """
+    if spectype == 'nested':
+        return False
     # if it is not a dictionary, then it is definitely not a spec
     if not isinstance(spec, dict):
         return True

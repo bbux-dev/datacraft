@@ -124,6 +124,27 @@ def test_geo_spec_pair_reduced_ranges_bbox():
     _verify_in_range_and_has_precision(parts[1], start_lat, end_lat, -4)
 
 
+def test_geo_pair_as_list():
+    start_lat = -45.0
+    end_lat = 45.0
+    start_long = 50.0
+    end_long = 60.0
+    spec = {
+        "pair": {
+            "type": "geo.pair",
+            "config": {
+                "bbox": [start_long, start_lat, end_long, end_lat],
+                "as_list": True
+            }
+        }
+    }
+    supplier = Loader(spec).get('pair')
+    value = supplier.next(0)
+    assert isinstance(value, list)
+    _verify_in_range_and_has_precision(value[0], start_long, end_long, -4)
+    _verify_in_range_and_has_precision(value[1], start_lat, end_lat, -4)
+
+
 def _verify_lat(value, exponent):
     _verify_in_range_and_has_precision(value, -90.0, 90.0, exponent)
 

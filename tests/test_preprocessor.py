@@ -1,4 +1,4 @@
-from dataspec.preprocessor import preprocess_spec, preprocess_csv_select
+from dataspec.preprocessor import preprocess_spec, preprocess_csv_select, preprocess_nested
 from dataspec.preprocessor import _parse_key
 from dataspec import SpecException
 import dataspec.suppliers as suppliers
@@ -154,3 +154,41 @@ def test_preprocess_csv_select():
     assert 'placeholder' not in updated
     assert 'refs' in updated
     assert 'config' in updated['one'] and 'configref' in updated['one']['config']
+
+
+def test_preprocess_nested():
+    spec = {
+        "outer": {
+            "type": "nested",
+            "one:values": ["grey", "blue", "yellow"],
+            "two:range": [1, 10]
+        }
+    }
+    # need first layer of preprocessing done
+    updated = preprocess_spec(spec)
+    updated = preprocess_nested(updated)
+    outer = updated.get('outer')
+    assert outer is not None
+    for key in ['one', 'two']:
+        assert key in outer
+
+
+def test_preprocess_nested_with_csv_select():
+    spec = {
+        "outer:nested": {
+            "placeholder": {
+                "type": "csv_select",
+                "data": {"one": 1, "two": 2, "six": 6},
+                "config": {
+                    "datafile": "not_real.csv",
+                    "headers": "no"
+                }
+            }
+        },
+        "another:range": [1, 10]
+    }
+
+    updated = preprocess_spec(spec)
+    updated = preprocess_nested(updated)
+    for key in ['outer', 'another']:
+        assert key in updated

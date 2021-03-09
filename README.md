@@ -306,7 +306,7 @@ indexed. If it is less, then there will be empty line items whenever the num_use
 ### <a name="Custom_Code_Loading"></a>Custom Code Loading
 
 There are a lot of types of data that are not generated with this tool. Instead of adding them all, there is a mechanism
-to bring your own data suppliers. We make use of the handy [catalogue](https://pypi.org/project/catalogue/) library to
+to bring your own data suppliers. We make use of the handy [catalogue](https://pypi.org/project/catalogue/) package to
 allow auto discovery of custom functions using decorators. Use the @dataspec.registry.types('\<type key\>') to register
 a function that will create a Value Supplier for the supplied Field Spec. Below is an example of a custom class which
 reverses the output of another supplier. Types that are amazing and useful should be nominated for core inclusion.
@@ -331,8 +331,7 @@ class ReverseStringSupplier:
 def configure_supplier(field_spec, loader):
     # load the supplier for the given ref
     key = field_spec.get('ref')
-    spec = loader.refs.get(key)
-    wrapped = loader.get_from_spec(spec)
+    wrapped = loader.get(key)
     # wrap this with our custom reverse string supplier
     return ReverseStringSupplier(wrapped)
 ```
