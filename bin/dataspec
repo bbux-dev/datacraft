@@ -16,8 +16,9 @@ log = logging.getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser(description='Run dataspec.')
-    parser.add_argument('-s', '--spec', required=True,
-                        help='Spec to Use')
+    group = parser.add_argument_group('input')
+    group.add_argument('-s', '--spec', help='Spec to Use')
+    group.add_argument('--inline', help='Spec as string')
     parser.add_argument('-i', '--iterations', default=100, type=int,
                         help='Number of Iterations to Execute')
     parser.add_argument('-o', '--outdir',
@@ -56,7 +57,7 @@ def main():
                 utils.load_custom_code(code)
 
         log.debug('Attempting to load Data Spec from %s', args.spec)
-        spec = _load_spec(args.spec)
+        spec = _load_spec(args)
         if args.debug_spec:
             print(json.dumps(preprocess_spec(spec), indent=4))
             return
@@ -103,7 +104,15 @@ def _configure_output(args):
     return outputs.SingleFieldOutput(writer, args.printkey)
 
 
-def _load_spec(spec_path):
+def _load_spec(args):
+    spec_path = args.spec
+    inline = args.inline
+    if spec_path is None and inline is None:
+        raise SpecException('One of --spec <spec path> or --inline "<spec string>" must be specified')
+    if spec_path and inline:
+        raise SpecException('Only one of --spec <spec path> or --inline "<spec string>" must be specified')
+    if inline:
+        return _parse_spec_string(inline)
     with open(spec_path, 'r') as handle:
         log.debug('Attempting to load spec as JSON')
         try:
@@ -117,6 +126,19 @@ def _load_spec(spec_path):
         spec = yaml.load(handle, Loader=yaml.FullLoader)
     if not isinstance(spec, dict):
         raise SpecException('Unable to load spec from path: %s, Please verify it is valid JSON or YAML', spec_path)
+    return spec
+
+
+def _parse_spec_string(inline):
+    try:
+        return json.loads(inline)
+    except json.decoder.JSONDecodeError:
+        log.debug('Spec is not Valid JSON')
+        pass
+    # not JSON, try yaml
+    spec = yaml.load(inline, Loader=yaml.FullLoader)
+    if not isinstance(spec, dict):
+        raise SpecException('Unable to load spec from string: %s, Please verify it is valid JSON or YAML', inline)
     return spec
 
 
