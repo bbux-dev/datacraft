@@ -123,6 +123,10 @@
       "output": "{\n    \"id\": \"4278b060-442d-4558-bf2c-5f1df68cb265\",\n    \"user\": {\n        \"geo\": {\n            \"coordinates\": [\n                \"-167.4324\",\n                \" 84.6883\"\n            ],\n            \"place_id\": \"510e5740-6a13-4c0b-8c53-2e3c1f88ca24\"\n        },\n        \"user_id\": \"13d5c2a6-80c8-4bdb-89b2-7da9699cd0fb\"\n    }\n} "
     },
     "char_class_spec_example_one": {
+      "json": "{\n  \"one_to_five_digits:cc-digits?min=1&max=5\": {}\n}",
+      "yaml": "one_to_five_digits:cc-digits?min=1&max=5: {}"
+    },
+    "char_class_spec_example_two": {
       "json": "{\n  \"password\": {\n    \"type\": \"char_class\",\n    \"data\": [\n      \"word\",\n      \"special\",\n      \"hex-lower\",\n      \"M4$p3c!@l$@uc3\"\n    ],\n    \"config\": {\n      \"mean\": 14,\n      \"stddev\": 2,\n      \"min\": 10,\n      \"max\": 18,\n      \"exclude\": [\"'\", \"\\\"\"]\n    }\n  }\n}",
       "yaml": "---\npassword:\n  type: char_class\n  data:\n  - word\n  - special\n  - hex-lower\n  - M4$p3c!@l$@uc3\n  config:\n    mean: 14\n    stddev: 2\n    min: 10\n    max: 18\n    exclude: ['''', '\"']",
       "command": "dataspec -s password.json -i 10",

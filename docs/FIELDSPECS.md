@@ -979,12 +979,17 @@ A `char_class` Field Spec takes the form
 ```
 {
   "<field>": {
+    # type definition
     "type": "char_class":
+    or
+    "type": "cc-<char_class_name>",
+    # data definition
     "data": <char_class_name>,
     or
     "data": <string with custom set of characters to sample from>
     or
     "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>, ...]
+    # configuration
     "config":{
       # General Parameters
       "exclude": <string of characters to exclude from output>,
@@ -1003,7 +1008,31 @@ A `char_class` Field Spec takes the form
 }
 ```
 
-### Example
+### Shorthand Notation for Single Character Classes
+
+If a single character class is needed, the type can be specified with a `cc-` prefix: `cc-<char_class_name>`
+e.g. `"type": "cc-visible"` would only use characters from the `visible` class. If this format is used, the `data`
+element is ignored and only characters from the single character class are sampled from.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "one_to_five_digits:cc-digits?min=1&max=5": {}
+}
+```
+</details>
+
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+one_to_five_digits:cc-digits?min=1&max=5: {}
+```
+</details>
+
+### Examples
 
 Below is an example selecting several character classes along with a set of custom ones to use to generate passwords.
 The generated passwords are between 10 and 18 characters in length with a mean size of 14 characters and a standard
@@ -1059,16 +1088,16 @@ If we run this example:
 
 ```shell
 dataspec -s password.json -i 10
-[MGE!>Ft{q/lJe_
-Tlhk]>x@MQ0M
-c/wnY!EU$:h@4)8
-svy@2xcf3pg]#
-7FpjZ>@uKq|^}sH
-3&eUP@eI:j$!wpiQ
-!yi4fVCvgD>}3-
-}Oc8!cat]$.24,
-j$ql;oZ3@p23z
-T8Qabk_lhwcSM9I3@
+61Nl=U35LVY^*
+pe576Z*P198&f4t
+1p}=HA9b?iJDc
+7$C])[o<BDh&W9kz
+F%iGot-j~eUfpT3qR
+(TM9b$o$A4KG*{&
+{WPm1;]O:w@y27l\
+JeTmpZ@zYN2Ms3,
+96i@FPA$^Q#%(|7Cba
+Q=+6D*8I36R%<n`$8
 ```
 
 The `stddev` config parameters is not required, but without it the sizes will tend to stack on the edges of the allowed
@@ -1087,13 +1116,14 @@ Config Params:
 
 |type    |param     |description                                  |
 |--------|----------|---------------------------------------------|
-|all     |precision |number of decimal places for lat or long, default is 4, max is 5|
+|all     |precision |number of decimal places for lat or long, default is 4          |
 |        |bbox      |array of \[min Longitude, min Latitude, max Longitude, max Latitude\]|
 |geo.lat |start_lat |lower bound for latitude                                        |
 |        |end_lat   |upper bound for latitude                                        |
 |geo.long|start_long|lower bound for longitude                                       |
 |        |end_long  |upper bound for longitude                                       |
 |geo.pair|join_with |delimiter to join long and lat with, default is comma           |
+|        |as_list   |One of yes, true, or on if the pair should be returned as a list instead of as a joined string|
 |        |lat_first |if latitude should be first in the generated pair, default is longitude first|
 |        |start_lat |lower bound for latitude                                        |
 |        |end_lat   |upper bound for latitude                                        |

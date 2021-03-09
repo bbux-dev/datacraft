@@ -480,12 +480,17 @@ A `char_class` Field Spec takes the form
 ```
 {
   "<field>": {
+    # type definition
     "type": "char_class":
+    or
+    "type": "cc-<char_class_name>",
+    # data definition
     "data": <char_class_name>,
     or
     "data": <string with custom set of characters to sample from>
     or
     "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>, ...]
+    # configuration
     "config":{
       # General Parameters
       "exclude": <string of characters to exclude from output>,
@@ -504,17 +509,25 @@ A `char_class` Field Spec takes the form
 }
 ```
 
-### Example
+### Shorthand Notation for Single Character Classes
+
+If a single character class is needed, the type can be specified with a `cc-` prefix: `cc-<char_class_name>`
+e.g. `"type": "cc-visible"` would only use characters from the `visible` class. If this format is used, the `data`
+element is ignored and only characters from the single character class are sampled from.
+
+{{ show_example(examples.char_class_spec_example_one) }}
+
+### Examples
 
 Below is an example selecting several character classes along with a set of custom ones to use to generate passwords.
 The generated passwords are between 10 and 18 characters in length with a mean size of 14 characters and a standard
 deviation of 2.
 
-{{ show_example(examples.char_class_spec_example_one) }}
+{{ show_example(examples.char_class_spec_example_two) }}
 
 If we run this example:
 
-{{ show_command_and_output(examples.char_class_spec_example_one) }}
+{{ show_command_and_output(examples.char_class_spec_example_two) }}
 
 The `stddev` config parameters is not required, but without it the sizes will tend to stack on the edges of the allowed
 size range.
@@ -532,13 +545,14 @@ Config Params:
 
 |type    |param     |description                                  |
 |--------|----------|---------------------------------------------|
-|all     |precision |number of decimal places for lat or long, default is 4, max is 5|
+|all     |precision |number of decimal places for lat or long, default is 4          |
 |        |bbox      |array of \[min Longitude, min Latitude, max Longitude, max Latitude\]|
 |geo.lat |start_lat |lower bound for latitude                                        |
 |        |end_lat   |upper bound for latitude                                        |
 |geo.long|start_long|lower bound for longitude                                       |
 |        |end_long  |upper bound for longitude                                       |
 |geo.pair|join_with |delimiter to join long and lat with, default is comma           |
+|        |as_list   |One of yes, true, or on if the pair should be returned as a list instead of as a joined string|
 |        |lat_first |if latitude should be first in the generated pair, default is longitude first|
 |        |start_lat |lower bound for latitude                                        |
 |        |end_lat   |upper bound for latitude                                        |
