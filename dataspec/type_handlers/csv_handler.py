@@ -5,8 +5,10 @@ import os
 import csv
 import json
 import random
+from typing import Union
 import dataspec
 from dataspec import SpecException
+from dataspec.suppliers import count_supplier_from_data
 from dataspec.utils import is_affirmative
 from dataspec.utils import load_config
 from dataspec.supplier.value_supplier import ValueSupplierInterface
@@ -26,7 +28,7 @@ class CsvDataBase:
     only need one copy of the underlying data
     """
 
-    def __init__(self, has_headers):
+    def __init__(self, has_headers: bool):
         if has_headers:
             has_headers = self.data.pop(0)
             self.mapping = {has_headers[i]: i for i in range(len(has_headers))}
@@ -36,7 +38,7 @@ class CsvDataBase:
         if len(self.valid_keys) == 0:
             self.valid_keys = [i + 1 for i in range(len(self.data[0]))]
 
-    def next(self, field, iteration, sample, count):
+    def next(self, field: Union[int, str], iteration: int, sample: bool, count: int):
         """
         Obtains the next value(s) for the field for the given iteration
         :param field: key or one based index number
@@ -46,7 +48,7 @@ class CsvDataBase:
         :return: array of values if count > 1 else the next value
         """
 
-    def _get_column_index(self, field):
+    def _get_column_index(self, field: Union[int, str]):
         """
         Resolve the column index
         :param field: key or one based index number
@@ -154,14 +156,15 @@ class CsvSupplier(ValueSupplierInterface):
     Class for supplying data from a specific field in a csv file
     """
 
-    def __init__(self, csv_data, field_name, sample, count):
+    def __init__(self, csv_data, field_name, sample, count_supplier: ValueSupplierInterface):
         self.csv_data = csv_data
         self.field_name = field_name
         self.sample = sample
-        self.count = count
+        self.count_supplier = count_supplier
 
     def next(self, iteration):
-        return self.csv_data.next(self.field_name, iteration, self.sample, self.count)
+        count = self.count_supplier.next(iteration)
+        return self.csv_data.next(self.field_name, iteration, self.sample, count)
 
 
 @dataspec.registry.types('csv')
@@ -171,10 +174,10 @@ def configure_csv(field_spec, loader):
 
     field_name = config.get('column', 1)
     sample = is_affirmative('sample', config)
-    count = int(config.get('count', 1))
+    count_supplier = count_supplier_from_data(config.get('count', 1))
 
     csv_data = _load_csv_data(field_spec, config, loader.datadir)
-    return CsvSupplier(csv_data, field_name, sample, count)
+    return CsvSupplier(csv_data, field_name, sample, count_supplier)
 
 
 def _load_csv_data(field_spec, config, datadir):

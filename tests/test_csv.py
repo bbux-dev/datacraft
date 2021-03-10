@@ -62,6 +62,16 @@ def test_csv_valid_sample_mode_with_count():
     assert len(supplier.next(0)) == 2
 
 
+def test_csv_valid_sample_mode_with_count_as_array():
+    spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true": {"config": {"count": [4, 3, 2]}}}
+    loader = Loader(spec, datadir=test_dir)
+    supplier = loader.get('status_desc')
+
+    assert len(supplier.next(0)) == 4
+    assert len(supplier.next(1)) == 3
+    assert len(supplier.next(2)) == 2
+
+
 def test_invalid_csv_config_unknown_key():
     # column name should be status not status_code
     spec = _build_csv_spec('status', {"column": "status_code"})
@@ -121,4 +131,3 @@ def test_buffred_csv_does_not_support_count_greater_than_one():
     csv_data = csv_handler.BufferedCsvData(csv_path, ',', '"', True, 5)
     with pytest.raises(SpecException):
         csv_data.next('status', 0, False, invalid_count)
-

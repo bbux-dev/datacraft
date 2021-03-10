@@ -171,14 +171,22 @@ def list_stat_sampler(data, config):
     return ListStatSamplerSupplier(data, config)
 
 
-def list_count_sampler(data, config):
+def list_count_sampler(data: list, config: dict):
     """
     sample from list with counts
     :param data: list to select subset from
     :param config: with minimal of count or min and max supplied
     :return: the supplier
     """
-    return ListCountSamplerSupplier(data, config)
+    count = config.get('count')
+    if count is not None:
+        count_supplier = count_supplier_from_data(count)
+    else:
+        min_cnt = int(config.get('min', 1))
+        max_cnt = int(config.get('max', len(data))) + 1
+        count_range = list(range(min_cnt, max_cnt))
+        count_supplier = value_list(count_range, 1, True)
+    return ListCountSamplerSupplier(data, count_supplier, config.get('join_with', None))
 
 
 def is_decorated(field_spec):
