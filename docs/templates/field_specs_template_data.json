@@ -131,6 +131,12 @@
       "yaml": "---\npassword:\n  type: char_class\n  data:\n  - word\n  - special\n  - hex-lower\n  - M4$p3c!@l$@uc3\n  config:\n    mean: 14\n    stddev: 2\n    min: 10\n    max: 18\n    exclude: ['''', '\"']",
       "command": "dataspec -s password.json -i 10",
       "output": "61Nl=U35LVY^*\npe576Z*P198&f4t\n1p}=HA9b?iJDc\n7$C])[o<BDh&W9kz\nF%iGot-j~eUfpT3qR\n(TM9b$o$A4KG*{&\n{WPm1;]O:w@y27l\\\nJeTmpZ@zYN2Ms3,\n96i@FPA$^Q#%(|7Cba\nQ=+6D*8I36R%<n`$8"
+    },
+    "unicode_range_example_one": {
+      "json": "{\n  \"text\": {\n    \"type\": \"unicode_range\",\n    \"data\": [\"3040\", \"309f\"],\n    \"config\": {\n      \"mean\": 5\n    }\n  }\n}",
+      "yaml": "text:\n  type: unicode_range\n  data: ['3040', '309f']\n  config:\n    mean: 5\n",
+      "command": "dataspec -s unicode.yaml -i 10 -l off",
+      "output": "そぬをく\nが\nとしぶ\nぉけべ゙\nゃれげえ\nっぴ\nつざめよがぽ\nえろぱづゖごそ\u3040べかっ\nい\u3098\nぱまる"
     }
   }
 }

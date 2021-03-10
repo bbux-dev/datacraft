@@ -52,6 +52,7 @@ Field Spec Definitions
     1. [Uuid](#Uuid)
     1. [Character Class](#CharClass)
        1. [Built In Classes](#SupportedClasses)
+    1. [Unicode Ranges](#UnicodeRange)
     1. [Geo](#Geo)
     1. [IP Addresses](#IP_Addresses)
         1. [Precise CIDR Addresses](#Precise_IP)
@@ -76,6 +77,7 @@ Field Spec Definitions
 |[date.iso.us](#Date)         | date strings in ISO8601 format w/ microseconds| many see details below|
 |[uuid](#Uuid)                | generates valid uuid                   |                              |
 |[char_class](#CharClass)     | generates strings from character classes| many see details below      |
+|[unicode_range](#UnicodeRange)| generates strings from unicode ranges | many see details below       |
 |[geo.lat](#Geo)              | generates decimal latitude             | start_lat,end_lat,precision  |
 |[geo.long](#Geo)             | generates decimal longitude            | start_long,end_long,precision|
 |[geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision|
@@ -569,6 +571,55 @@ done | sort | uniq -c | sort -n -k2,2
 ```
 
 </details>
+
+## <a name="UnicodeRange"></a>Unicode Ranges
+
+The `unicode_range` type is similar to the `char_class` type, but it is used to generate characters from valid unicode
+ranges. See [UnicodeRanges](https://www.ling.upenn.edu/courses/Spring_2003/ling538/UnicodeRanges.html) for a list of the
+different valid ranges. One or more ranges can be specified in the `data` element by providing a list or list of lists
+with two elements each specifying the start and end hex code points. If we wanted to generate Japanese Hiragana (Code
+points 0x3040 to 0x30FF) characters as one of our fields we could use the following spec:
+
+{{ show_example(examples.unicode_range_example_one) }}
+
+If we run this example:
+
+{{ show_command_and_output(examples.unicode_range_example_one) }}
+
+### Usage
+
+A `unicode_range` Field Spec takes the form
+
+```
+{
+  "<field>": {
+    # type definition
+    "type": "unicode_range":
+    # data definition
+    "data": [<start_code_point_in_hex>, <end_code_point_in_hex>],
+    or
+    "data": [
+        [<start_code_point_in_hex>, <end_code_point_in_hex>],
+        [<start_code_point_in_hex>, <end_code_point_in_hex>],
+        ...
+        [<start_code_point_in_hex>, <end_code_point_in_hex>],
+    ],
+    # configuration
+    "config":{
+      # String Size Based Config Parameters
+      "min": <min number of characters in string>,
+      "max": <max number of characters in string>,
+      or
+      "count": <exact number of characters in string>
+      or
+      "mean": <mean number of characters in string>
+      "stddev": <standard deviation from mean for number of characters in string>
+      "min": <optional min>
+      "max": <optional max>
+    }    
+  }
+}
+```
 
 ## <a name="Geo"></a>Geo Related Types
 
