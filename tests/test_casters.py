@@ -58,6 +58,20 @@ def test_valid_type_cast_int_weirdness():
     _test_valid_type_cast_forms(input_value, type_map)
 
 
+def test_castors_handle_lists():
+    input_value = [1.1, 2.2, 3.3]
+    type_map = {
+        'i': [1, 2, 3],
+        'int': [1, 2, 3],
+        'f': [1.1, 2.2, 3.3],
+        'float': [1.1, 2.2, 3.3],
+        's': ['1.1', '2.2', '3.3'],
+        'str': ['1.1', '2.2', '3.3'],
+        'string': ['1.1', '2.2', '3.3'],
+    }
+    _test_valid_type_cast_forms(input_value, type_map)
+
+
 def _test_valid_type_cast_forms(input_value, type_to_expected):
     for cast_type, expected_value in type_to_expected.items():
         caster = get_caster({'cast': cast_type})

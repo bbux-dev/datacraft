@@ -77,7 +77,7 @@ class Loader:
                 raise SpecException('Unable to load handler for: ' + json.dumps(field_spec))
             supplier = handler(field_spec, self)
         if suppliers.is_cast(field_spec):
-            supplier = suppliers.cast_supplier(field_spec, supplier)
+            supplier = suppliers.cast_supplier(supplier, field_spec)
         if suppliers.is_decorated(field_spec):
             supplier = suppliers.decorated(field_spec, supplier)
         return supplier
