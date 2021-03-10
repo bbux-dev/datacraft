@@ -8,6 +8,7 @@ from dataspec import Loader, preprocess_spec
 import dataspec.template_engines as engines
 import dataspec.outputs as outputs
 import dataspec.types as types
+import dataspec.key_providers as key_providers
 from dataspec import utils
 from dataspec import SpecException
 
@@ -65,11 +66,11 @@ def main():
 
         output = _configure_output(args)
 
-        keys = [key for key in loader.specs.keys() if key != 'refs']
+        keys = key_providers.from_spec(loader.specs)
 
         log.info('Starting Processing...')
         for i in range(0, args.iterations):
-            for key in keys:
+            for key in keys.get():
                 value = loader.get(key).next(i)
                 output.handle(key, value)
             output.finished_record()
