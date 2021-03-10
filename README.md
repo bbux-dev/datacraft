@@ -8,6 +8,7 @@ Data Spec Repository
     1. [Data Spec](#Data_Spec)
         1. [YAML Format](#YAML_Format)
     1. [Field Specs](#Field_Specs)
+    1. [Field Groups](#FieldGroups)
     1. [Notes on CSV Inputs](#CSV_Inputs)
     1. [Templating](#Templating)
         1. [Loops in Templates](#Templating_Loops)
@@ -140,6 +141,86 @@ refs:
 ### <a name="Field_Specs"></a>Field Specs
 
 See [field specs](docs/FIELDSPECS.md) for details.
+
+### <a name="FieldGroups"></a>Field Groups
+
+There are many times when a record or document will not contain all the available or defined fields for it. When
+generating data with `dataspec` you must define a `field_groups` element in order to select subsets of the defined
+fields to be output together. Without `field_groups` defined, all the fields in the spec will be generated each
+iteration. For example if we are generating data with the following spec:
+
+```json
+{
+  "id": {"type": "range", "data": [1, 100]},
+  "name": ["Fido", "Fluffy", "Bandit", "Bingo", "Champ", "Chief", "Buster", "Lucky"],
+  "tag": {
+    "Affectionate": 0.3, "Agreeable": 0.1, "Charming": 0.1,
+    "Energetic": 0.2, "Friendly": 0.4, "Loyal": 0.3,
+    "Aloof": 0.1
+  }
+}
+```
+
+If the tag field was only present in 50% of the data, we would want to be able to adjust our output to match this. Here
+is an updated version of the spec with the `field_groups` specified to give us our 50/50 output.
+
+```json
+{
+  "id": { "type": "range", "data": [1, 100]},
+  "name": ["Fido", "Fluffy", "Bandit", "Bingo", "Champ", "Chief", "Buster", "Lucky"],
+  "tag": {
+    "Affectionate": 0.3, "Agreeable": 0.1, "Charming": 0.1,
+    "Energetic": 0.2, "Friendly": 0.4, "Loyal": 0.3,
+    "Aloof": 0.1
+  },
+  "field_groups": [
+    ["id", "name"],
+    ["id", "name", "tag"]
+  ]
+}
+```
+
+If we need more precise weightings we can use this format:
+
+```json
+{
+  "id": { "type": "range", "data": [1, 100]},
+  "name": ["Fido", "Fluffy", "Bandit", "Bingo", "Champ", "Chief", "Buster", "Lucky"],
+  "tag": {
+    "Affectionate": 0.3, "Agreeable": 0.1, "Charming": 0.1,
+    "Energetic": 0.2, "Friendly": 0.4, "Loyal": 0.3,
+    "Aloof": 0.1
+  },
+  "field_groups": {
+    "thirty_percent": {
+      "weight": 0.3,
+      "fields": ["id", "name"]
+    },
+    "two": {
+      "weight": 0.7,
+      "fields": ["id", "name", "tag"]
+    }
+  }
+}
+```
+
+The keys of the `field_groups` dictionary are arbitrary. The `weight` and `fields` element underneath are required.
+
+Running our final example:
+
+```shell
+dataspec -s pets.json -i 10 -l off --format json
+{"id": 1, "name": "Fido"}
+{"id": 2, "name": "Fluffy", "tag": "Agreeable"}
+{"id": 3, "name": "Bandit", "tag": "Affectionate"}
+{"id": 4, "name": "Bingo"}
+{"id": 5, "name": "Champ", "tag": "Loyal"}
+{"id": 6, "name": "Chief"}
+{"id": 7, "name": "Buster", "tag": "Friendly"}
+{"id": 8, "name": "Lucky", "tag": "Loyal"}
+{"id": 9, "name": "Fido", "tag": "Aloof"}
+{"id": 10, "name": "Fluffy", "tag": "Affectionate"}
+```
 
 ### <a name="CSV_Inputs"></a>Notes on CSV Inputs
 
