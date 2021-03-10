@@ -2,7 +2,6 @@
 Module for value list supplier implementation
 """
 import random
-from dataspec.exceptions import SpecException
 from .value_supplier import ValueSupplierInterface
 
 
@@ -11,20 +10,18 @@ class ListValueSupplier(ValueSupplierInterface):
     Value Supplier implementation for supplying values from lists
     """
 
-    def __init__(self, data, do_sampling=False, count=1):
+    def __init__(self, data: list, count: ValueSupplierInterface, do_sampling: bool=False):
         self.values = data
         self.do_sampling = do_sampling
-        try:
-            self.count = int(count)
-        except ValueError as value_error:
-            raise SpecException(f'Invalid count param: {count}') from value_error
+        self.count = count
 
     def next(self, iteration):
+        cnt = self.count.next(iteration)
         if self.do_sampling:
-            values = random.sample(self.values, self.count)
+            values = random.sample(self.values, cnt)
         else:
-            values = [self._value(iteration, i) for i in range(self.count)]
-        if self.count == 1:
+            values = [self._value(iteration, i) for i in range(cnt)]
+        if cnt == 1:
             return values[0]
         return values
 

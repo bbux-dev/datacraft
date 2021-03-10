@@ -100,3 +100,20 @@ def test_values_list_order():
 
     values = [supplier.next(i) for i in range(10)]
     assert values == data
+
+
+def test_values_count_as_list():
+    spec = {
+        'field': {
+            'data': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            'config': {
+                'count': [2, 3]
+            }
+        }
+    }
+    supplier = Loader(spec).get('field')
+
+    first = supplier.next(0)
+    assert isinstance(first, list) and len(first) == 2
+    second = supplier.next(1)
+    assert isinstance(second, list) and len(second) == 3

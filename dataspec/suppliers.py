@@ -1,7 +1,7 @@
 """
 Factory like module for core supplier related functions.
 """
-
+from typing import Union
 import json
 import random
 from .exceptions import SpecException
@@ -31,7 +31,7 @@ def values(spec, loader=None):
 
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it
-        return value_list(data, do_sampling, config.get('count', 1))
+        return value_list(data, config.get('count', 1), do_sampling)
     if isinstance(data, dict):
         if do_sampling:
             raise SpecException('Cannot do sampling on weighted values: ' + json.dumps(spec))
@@ -42,6 +42,21 @@ def values(spec, loader=None):
     # Check for count param
     if 'count' in config:
         return _MultipleValueSupplier(supplier, config['count'])
+    return supplier
+
+
+def count_supplier_from_data(data):
+    """ generates a supplier for the count parameter based on the type of the data """
+    if isinstance(data, list):
+        supplier = value_list(data, 1, False)
+    elif isinstance(data, dict):
+        supplier = weighted_values(data)
+    else:
+        try:
+            supplier = single_value(int(data))
+        except ValueError as value_error:
+            raise SpecException(f'Invalid count param: {data}') from value_error
+
     return supplier
 
 
@@ -106,15 +121,15 @@ class RotatingSupplierList(ValueSupplierInterface):
         return self.suppliers[idx].next(iteration)
 
 
-def value_list(data, do_sampling=False, count=1):
+def value_list(data, count: Union[int, list, dict], do_sampling=False):
     """
     creates a value list supplier
     :param data: for the supplier
     :param do_sampling: if the data should be sampled instead of iterated through
-    :param count: number of values to return on each iteration
+    :param count: number of values to return on each iteration, or list, or weighted mapping
     :return: the supplier
     """
-    return ListValueSupplier(data, do_sampling, count)
+    return ListValueSupplier(data, count_supplier_from_data(count), do_sampling)
 
 
 def weighted_values(data):
