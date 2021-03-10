@@ -5,7 +5,7 @@ import json
 import string
 import dataspec
 from dataspec.utils import any_key_exists
-from dataspec.suppliers import string_sampler, list_sampler
+from dataspec.suppliers import list_count_sampler, list_stat_sampler
 
 _UNDER_SCORE = '_'
 
@@ -41,11 +41,11 @@ def configure_supplier(spec, _):
     if 'exclude' in config:
         for char_to_exclude in config.get('exclude'):
             data = data.replace(char_to_exclude, '')
+    if 'join_with' not in config:
+        config['join_with'] = ''
     if any_key_exists(config, ['mean', 'stddev']):
-        if 'join_with' not in config:
-            config['join_with'] = ''
-        return list_sampler(data, config)
-    return string_sampler(data, config)
+        return list_stat_sampler(data, config)
+    return list_count_sampler(data, config)
 
 
 @dataspec.registry.types('cc-ascii')

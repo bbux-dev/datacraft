@@ -162,6 +162,7 @@ if __name__ == '__main__':
     from dataspec.type_handlers import geo_handler
     from dataspec.type_handlers import nested_handler
     from dataspec.type_handlers import char_class_handler
+    from dataspec.type_handlers import unicode_range
     import dataspec.preprocessor
     import dataspec.logging_handler
 

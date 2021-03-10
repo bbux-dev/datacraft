@@ -12,6 +12,8 @@ class CasterInterface:
 class FloatCaster(CasterInterface):
     def cast(self, value):
         try:
+            if isinstance(value, list):
+                return [float(val) for val in value]
             return float(value)
         except ValueError as err:
             raise SpecException(str(err))
@@ -20,6 +22,8 @@ class FloatCaster(CasterInterface):
 class IntCaster(CasterInterface):
     def cast(self, value):
         try:
+            if isinstance(value, list):
+                return [int(float(val)) for val in value]
             return int(float(value))
         except ValueError as err:
             raise SpecException(str(err))
@@ -27,7 +31,16 @@ class IntCaster(CasterInterface):
 
 class StringCaster(CasterInterface):
     def cast(self, value):
+        if isinstance(value, list):
+            return [str(val) for val in value]
         return str(value)
+
+
+class HexCaster(CasterInterface):
+    def cast(self, value):
+        if isinstance(value, list):
+            return [hex(val) for val in value]
+        return hex(value)
 
 
 _CASTOR_MAP = {
@@ -37,7 +50,9 @@ _CASTOR_MAP = {
     "float": FloatCaster(),
     "s": StringCaster(),
     "str": StringCaster(),
-    "string": StringCaster()
+    "string": StringCaster(),
+    "h": HexCaster(),
+    "hex": HexCaster()
 }
 
 

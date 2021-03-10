@@ -8,7 +8,7 @@ from dataspec.utils import is_affirmative
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 
 
-class ListSamplerSupplier(ValueSupplierInterface):
+class ListStatSamplerSupplier(ValueSupplierInterface):
     """
     Implementation for supplying values from a list by select a portion of them
     and optionally joining them by some delimiter

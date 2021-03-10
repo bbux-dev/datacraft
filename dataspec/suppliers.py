@@ -10,9 +10,10 @@ from .supplier.list_values import ListValueSupplier
 from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.weighted_refs import WeightedRefsSupplier
-from .supplier.string_sampler import StringSamplerSupplier
-from .supplier.list_sampler import ListSamplerSupplier
+from .supplier.list_stat_sampler import ListStatSamplerSupplier
+from .supplier.list_count_sampler import ListCountSamplerSupplier
 from .supplier.value_supplier import ValueSupplierInterface
+from . import casters
 
 
 def values(spec, loader=None):
@@ -145,14 +146,24 @@ def weighted_ref(key_supplier, values_map):
     return WeightedRefsSupplier(key_supplier, values_map)
 
 
-def list_sampler(data, config):
+def list_stat_sampler(data, config):
     """
-    select list subset supplier
+    sample from list with stats based params
     :param data: list to select subset from
     :param config: with minimal of mean specified
     :return: the supplier
     """
-    return ListSamplerSupplier(data, config)
+    return ListStatSamplerSupplier(data, config)
+
+
+def list_count_sampler(data, config):
+    """
+    sample from list with counts
+    :param data: list to select subset from
+    :param config: with minimal of count or min and max supplied
+    :return: the supplier
+    """
+    return ListCountSamplerSupplier(data, config)
 
 
 def is_decorated(field_spec):
@@ -220,8 +231,19 @@ def is_cast(field_spec):
     return any(key in config for key in ['cast', 'cast_as', 'cast_to'])
 
 
-def cast_supplier(field_spec, supplier):
-    return CastingSupplier(supplier, get_caster(field_spec.get('config')))
+def cast_supplier(supplier, field_spec, cast_to=None):
+    """
+    Provides a cast_supplier either from config or from explicit cast_to
+    :param supplier: to cast results of
+    :param field_spec: to look up cast config from
+    :param cast_to: explicit cast type to use
+    :return: the casting supplier
+    """
+    if cast_to:
+        caster = casters.get(cast_to)
+    else:
+        caster = get_caster(field_spec.get('config'))
+    return CastingSupplier(supplier, caster)
 
 
 class RandomRangeSupplier(ValueSupplierInterface):
@@ -229,22 +251,21 @@ class RandomRangeSupplier(ValueSupplierInterface):
     Class that supplies random ranges between specified bounds
     """
 
-    def __init__(self, start, end, precision):
+    def __init__(self, start, end, precision, count=1):
         self.start = float(start)
         self.end = float(end)
         self.precision = precision
         self.format_str = '{: .' + str(precision) + 'f}'
+        self.count = count
 
     def next(self, iteration):
-        next_num = random.uniform(self.start, self.end)
+        next_nums = [random.uniform(self.start, self.end) for _ in range(self.count)]
         if self.precision is not None:
-            next_num = self.format_str.format(next_num)
-        return next_num
+            next_nums = [self.format_str.format(next_num) for next_num in next_nums]
+        if self.count == 1:
+            return next_nums[0]
+        return next_nums
 
 
-def random_range(start, end, precision=None):
-    return RandomRangeSupplier(start, end, precision)
-
-
-def string_sampler(data, config):
-    return StringSamplerSupplier(data, config)
+def random_range(start, end, precision=None, count=1):
+    return RandomRangeSupplier(start, end, precision, count)

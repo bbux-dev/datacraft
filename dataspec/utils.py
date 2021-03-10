@@ -67,3 +67,11 @@ def get_caster(config):
 def any_key_exists(config, keys):
     """ checks if any of the keys exist in the config object """
     return any(key in config for key in keys)
+
+
+def update_config(spec, key, value):
+    """ add the key and value to the spec config """
+    config = spec.get('config', {})
+    config[key] = value
+    spec['config'] = config
+    return spec
