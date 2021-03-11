@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/definitions.json",
+  "definitions": {
+    "prefix": {"type":  "string"},
+    "suffix": {"type":  "string"},
+    "quote": {"type":  "string"},
+    "join_with": {"type":  "string"},
+    "as_list": {
+      "oneOf": [
+        {"type": "boolean"},
+        {"type": "string", "pattern": "[t|T][r|R][u|U][e|E]|[f|F][a|A][l|L][s|S][e|E]|[y|Y][e|E][s|S]|[n|N][o|O]|[o|O][n|N]|[o|O][f|F][f|F]"}
+      ]
+    },
+    "cast": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
+    "cast_to": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
+    "cast_as": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]}
+  }
+}
