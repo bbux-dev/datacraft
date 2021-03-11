@@ -55,13 +55,7 @@ def load_config(field_spec, loader):
 
 def get_caster(config):
     """ returns the caster object from the config """
-    cast_key = ''
-    for key in ['cast', 'cast_to', 'cast_as']:
-        if key in config:
-            cast_key = key
-            break
-
-    return casters.get(config.get(cast_key))
+    return casters.get(config.get('cast'))
 
 
 def any_key_exists(config, keys):

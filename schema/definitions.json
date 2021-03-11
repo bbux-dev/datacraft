@@ -13,8 +13,6 @@
       ]
     },
     "cast": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
-    "cast_to": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
-    "cast_as": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
     "count": {
       "oneOf": [
         { "type":  "integer"},

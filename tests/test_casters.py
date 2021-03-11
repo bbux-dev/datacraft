@@ -4,7 +4,7 @@ from dataspec.utils import get_caster
 
 
 def test_valid_key_forms():
-    valid_names = ['cast', 'cast_to', 'cast_as']
+    valid_names = ['cast']
 
     for name in valid_names:
         caster = get_caster({name: 'float'})

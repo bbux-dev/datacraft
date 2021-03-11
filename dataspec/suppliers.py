@@ -251,7 +251,7 @@ def is_cast(field_spec):
     if not isinstance(field_spec, dict):
         return False
     config = field_spec.get('config', {})
-    return any(key in config for key in ['cast', 'cast_as', 'cast_to'])
+    return 'cast' in config
 
 
 def cast_supplier(supplier, field_spec, cast_to=None):

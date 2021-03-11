@@ -4,14 +4,15 @@
   "type": "object",
   "required": ["data"],
   "properties": {
-    "type": {  "type": "string", "pattern": "range"},
+    "type": {  "type": "string", "pattern": "(rand_)?range"},
     "config": {
       "type": "object",
       "properties": {
         "prefix": {"$ref": "#/definitions/prefix"},
         "suffix": {"$ref": "#/definitions/suffix"},
         "quote": {"$ref": "#/definitions/quote"},
-        "count": {"$ref": "#/definitions/count"}
+        "count": {"$ref": "#/definitions/count"},
+        "cast": {"$ref": "#/definitions/cast"}
       }
     },
     "data": {

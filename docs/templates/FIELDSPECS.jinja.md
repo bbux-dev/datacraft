@@ -200,8 +200,6 @@ There are some configuration values that can be applied to all or a subset of ty
 |suffix | string    |Appends the value to all results  |
 |quote  | string    |Wraps the resulting value on both sides with the provided string |
 |cast   | i,int,f,float,s,str,string|For numeric types, will cast results the provided type|
-|cast_as|           |Same as cast                                                           |
-|cast_to|           |Same as cast                                                           |
 |join_with|string   |For types that produce multiple values, use this string to join them   |
 |as_list|yes,true,on|For types that produce multiple values, return as list without joining |
 
