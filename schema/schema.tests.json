@@ -129,5 +129,62 @@
       {"instance": {}, "note": "empty"},
       {"instance": {"type": "uuids"}, "note": "misspelled"}
     ]
+  },
+  "char_class.schema.json": {
+    "valid": [
+      {"instance": {"type": "char_class", "data": "sequence0fV@l!dCharact3rs"}},
+      {"instance": {"type": "char_class", "data": "ascii"}},
+      {"instance": {"type": "char_class", "data": "lower"}},
+      {"instance": {"type": "char_class", "data": "upper"}},
+      {"instance": {"type": "char_class", "data": "digits"}},
+      {"instance": {"type": "char_class", "data": "letters"}},
+      {"instance": {"type": "char_class", "data": "word"}},
+      {"instance": {"type": "char_class", "data": "printable"}},
+      {"instance": {"type": "char_class", "data": "visible"}},
+      {"instance": {"type": "char_class", "data": "punctuation"}},
+      {"instance": {"type": "char_class", "data": "special"}},
+      {"instance": {"type": "char_class", "data": "hex"}},
+      {"instance": {"type": "char_class", "data": "hex-lower"}},
+      {"instance": {"type": "char_class", "data": "hex-upper"}},
+      {"instance": {"type": "char_class", "data": ["visible"]}},
+      {"instance": {"type": "char_class", "data": ["digit", "word"]}},
+      {"instance": {"type": "char_class", "data": ["digit", "word", "CUSTOM12358"]}, "note": "two built in one custom"},
+      {"instance": {"type": "char_class", "data": ["CUSTOM12358", "!@#$%^&*()", ":):(:p;)"]}, "note":  "all custom"},
+      {
+        "note": "count by itself is valid",
+        "instance": {"type": "char_class", "data": "word", "config": {"count": 5}}
+      },
+      {
+        "note": "min and max alone are valid",
+        "instance": {"type": "char_class", "data": "word", "config": {"min": 3, "max": 5}}
+      },
+      {
+        "note": "mean by itself is valid",
+        "instance": {"type": "char_class", "data": "word", "config": {"mean": 5}}
+      },
+      {
+        "note": "mean with stddev is valid",
+        "instance": {"type": "char_class", "data": "word", "config": {"mean": 5, "stddev":  1}}
+      }
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "char_classes"}, "note": "misspelled"},
+      {"instance": {"type": "char_class"}, "note": "no data element defined"},
+      {"instance": {"type": "char_class", "data": 42}, "note": "data not a string"},
+      {"instance": {"type": "char_class", "data": [42]}, "note": "data not a string"},
+      {
+        "note": "count and min together is invalid",
+        "instance": {"type": "char_class", "data": "word", "config": {"count": 5, "min": 3}}
+      },
+      {
+        "note": "count and max together is invalid",
+        "instance": {"type": "char_class", "data": "word", "config": {"count": 5, "max": 5}}
+      },
+      {
+        "note": "count and min together is invalid",
+        "instance": {"type": "char_class", "data": "word", "config": {"count": 5, "min": 3}}
+      }
+    ]
   }
 }

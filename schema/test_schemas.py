@@ -6,7 +6,8 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
 log = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(levelname)s %(message)s',
+                    level=logging.INFO)
 
 ASSUMED_VALID = "valid"
 ASSUMED_INVALID = "invalid"
@@ -49,8 +50,8 @@ def log_should_have_failed(should_have_failed):
         log.warning(f'Should have failed but did not for %s', file)
         for should_not_be_valid in failed_for_file:
             if MESSAGE in should_not_be_valid:
-                log.info(should_not_be_valid[MESSAGE])
-            log.info(should_not_be_valid[INSTANCE])
+                log.warning(should_not_be_valid[MESSAGE])
+            log.warning(should_not_be_valid[INSTANCE])
 
 
 def test_validate_count_formats():
