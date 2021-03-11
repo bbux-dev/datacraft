@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["type"],
   "properties": {
-    "type": {  "type": "string", "pattern": "^combine$"},
+    "type": {  "type": "string", "pattern": "^combine-list$"},
     "config": {
       "type": "object",
       "properties": {
@@ -20,18 +20,24 @@
     },
     "refs": {
       "type": "array",
-      "minItems": 2,
-      "uniqueItems": true,
+      "uniqueItems": false,
       "items": {
-        "type": "string"
+        "type": "array",
+        "minItems": 2,
+        "items": {
+          "type": "string"
+        }
       }
     },
     "fields": {
       "type": "array",
-      "minItems": 2,
       "uniqueItems": true,
       "items": {
-        "type": "string"
+        "type": "array",
+        "minItems": 2,
+        "items": {
+          "type": "string"
+        }
       }
     }
   },

@@ -18,24 +18,28 @@ schema_dir = os.path.dirname(os.path.realpath(__file__))
 tests_dir = f'{schema_dir}/tests'
 
 
-def test_char_class_schema():
-    _test_run_validation("char_class.tests.json")
-
-
-def test_combine_schema():
-    _test_run_validation("combine.tests.json")
+def test_values_schema():
+    _test_run_validation("values.tests.json")
 
 
 def test_range_schema():
     _test_run_validation("range.tests.json")
 
 
+def test_combine_schema():
+    _test_run_validation("combine.tests.json")
+
+
+def test_combine_list_schema():
+    _test_run_validation("combine_list.tests.json")
+
+
 def test_uuid_schema():
     _test_run_validation("uuid.tests.json")
 
 
-def test_values_schema():
-    _test_run_validation("values.tests.json")
+def test_char_class_schema():
+    _test_run_validation("char_class.tests.json")
 
 
 def _test_run_validation(test_file_name):

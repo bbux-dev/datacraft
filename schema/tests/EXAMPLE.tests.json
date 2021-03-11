@@ -1,12 +1,12 @@
 {
   "EXAMPLE.schema.json": {
     "valid": [
-      {"instance": {"type": "FILLMEIN", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
+      {"instance": {"type": "EXAMPLE", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
     ],
     "invalid": [
       {"instance": {}, "note": "empty"},
-      {"instance": {"type": "NaughtWrite"}, "note": "misspelled"},
-      {"instance": {"type": "MightWorkForSome"}, "note": "no fields or refs or data or stuff?"}
+      {"instance": {"type": "EXAMPLEs"}, "note": "misspelled"},
+      {"instance": {"type": "EXAMPLE"}, "note": "no fields or refs or data or stuff?"}
     ]
   }
 }

@@ -22,6 +22,10 @@
       {
         "note": "invalid as_list param",
         "instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "tru"}}
+      },
+      {
+        "note": "invalid to have both join_with and as_list",
+        "instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "true", "join_with": ":"}}
       }
     ]
   }
