@@ -46,6 +46,14 @@ def test_date_schema():
     _test_run_validation("date.tests.json")
 
 
+def test_geo_lat_schema():
+    _test_run_validation("geo.lat.tests.json")
+
+
+def test_geo_long_schema():
+    _test_run_validation("geo.long.tests.json")
+
+
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)
