@@ -42,6 +42,10 @@ def test_char_class_schema():
     _test_run_validation("char_class.tests.json")
 
 
+def test_date_schema():
+    _test_run_validation("date.tests.json")
+
+
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)

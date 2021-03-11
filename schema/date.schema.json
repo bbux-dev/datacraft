@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/date.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^date(\\.iso|\\.iso\\.us)?$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"},
+        "format": {
+          "description": "Valid date format string",
+          "type": "string"
+        },
+        "delta_days": {
+          "oneOf": [
+            {"type": "integer"},
+            {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": { "type": "integer" }
+            }
+          ]
+        },
+        "anchor": {"type": "string"},
+        "offset": {"type": "integer"}
+      }
+    },
+    "additionalProperties": false
+  }
+}
