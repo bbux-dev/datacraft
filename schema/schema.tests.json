@@ -1,4 +1,14 @@
 {
+  "EXAMPLE.schema.json": {
+    "valid": [
+      {"instance": {"type": "FILLMEIN", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "NaughtWrite"}, "note": "misspelled"},
+      {"instance": {"type": "MightWorkForSome"}, "note": "no fields or refs or data or stuff?"}
+    ]
+  },
   "combine.schema.json": {
     "valid": [
       {"instance": {"type": "combine", "refs": ["one", "two"]}},
@@ -109,6 +119,15 @@
         "note": "invalid count type,",
         "instance": {"type": "rand_range", "data": [0, 10], "config": {"count": "blue"}}
       }
+    ]
+  },
+  "uuid.schema.json": {
+    "valid": [
+      {"instance": {"type": "uuid"}, "note": "thats it"}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "uuids"}, "note": "misspelled"}
     ]
   }
 }

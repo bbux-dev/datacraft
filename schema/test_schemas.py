@@ -21,6 +21,8 @@ def test_run_validation():
     tests = load_json('schema.tests.json')
     should_have_failed = {}
     for file, type_tests in tests.items():
+        if 'EXAMPLE' in file:
+            continue
         schema = load_json(file)
         # hack for now
         schema['definitions'] = definitions['definitions']

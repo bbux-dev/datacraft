@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["data"],
   "properties": {
-    "type": {  "type": "string", "pattern": "values"},
+    "type": {  "type": "string", "pattern": "^values$"},
     "config": {
       "type": "object",
       "properties": {
