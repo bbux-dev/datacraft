@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/combine.schema",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/combine.schema.json",
   "type": "object",
   "properties": {
     "type": {  "type": "string", "pattern": "combine"},

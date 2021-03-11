@@ -1,0 +1,97 @@
+{
+  "combine.schema.json": {
+    "valid": [
+      {"test": {"type": "combine", "refs": ["one", "two"]}},
+      {"test": {"type": "combine", "fields": ["one", "two"]}},
+      {"test": {"type": "combine", "refs": ["one", "two"], "config": {"join_with": " "}}},
+      {"test": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": true}}},
+      {"test": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "true"}}},
+      {"test": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "yes"}}},
+      {"test": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "on"}}}
+    ],
+    "invalid": [
+      {"test": {}, "msg": "empty"},
+      {"test": {"type": "cobine"}, "msg": "misspelled"},
+      {"test": {"type": "combine"}, "msg": "no fields or refs"},
+      {"test": {"type": "combine", "refs": ["one"]}, "msg": "only one ref"},
+      {"test": {"type": "combine", "fields": ["one"]}, "msg": "only one field"},
+      {
+        "test": {"type": "combine", "refs": ["one", "two"], "config": {"join_with": true}},
+        "msg": "invalid join_with param"
+      },
+      {
+        "test": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "tru"}},
+        "msg": "invalid as_list param"
+      }
+    ]
+  },
+  "values.schema.json": {
+    "valid": [
+      {"test": {"type": "values", "data": "constant"}},
+      {
+        "test": {"type": "values", "data": ""},
+        "msg": "blank string still a constant"
+      },
+      {"test": {"type": "values", "data": 1}},
+      {"test": {"type": "values", "data": 1.5}},
+      {"test": {"type": "values", "data": true}},
+      {"test": {"type": "values", "data": ["one", "two"]}},
+      {"test": {"type": "values", "data": {"one": 0.4, "two": 0.5}}},
+      {"test": {"type": "values", "data": ["one", "two"], "config": {"count": 2}}},
+      {"test": {"type": "values", "data": ["one", "two"], "config": {"count": [1, 2]}}},
+      {"test": {"type": "values", "data": ["one", "two"], "config": {"count": {"1": 0.7, "2": 0.3}}}}
+    ],
+    "invalid": [
+      {"test": {}, "msg": "empty"},
+      {"test": {"type": "value"}, "msg": "misspelled"},
+      {"test": {"type": "values"}, "msg": "no fields or refs"},
+      {"test": {"type": "values", "data": []}, "msg": "empty data"},
+      {"test": {"type": "values", "data": {}}, "msg": "empty data,"},
+      {
+        "test": {"type": "values", "data": ["one", "two"], "config": {"count": true}},
+        "msg": "invalid count type,"
+      },
+      {
+        "test": {"type": "values", "data": ["one", "two"], "config": {"count": []}},
+        "msg": "empty count type,"
+      },
+      {
+        "test": {"type": "values", "data": ["one", "two"], "config": {"count": [1.1, 1.7]}},
+        "msg": "counts not integers"
+      },
+      {
+        "test": {"type": "values", "data": ["one", "two"], "config": {"count": {}}},
+        "msg": "empty count type"
+      },
+      {
+        "test": {"type": "values", "data": ["one", "two"], "config": {"count": {"one": 0.7, "two": 0.3}}},
+        "msg": "bad count keys"
+      }
+    ]
+  },
+  "range.schema.json": {
+    "valid": [
+      {"test": {"type": "range", "data": [10]}, "msg": "upper bound only"},
+      {"test": {"type": "range", "data": [0, 10]}},
+      {"test": {"type": "range", "data": [0, 10, 2]}, "msg": "start stop step"},
+      {"test": {"type": "range", "data": [[0, 10]]}, "msg": "single nested"},
+      {"test": {"type": "range", "data": [[0, 10, 2]]}, "msg":  "single nested start stop step"},
+      {
+        "test": {"type": "range", "data": [[10], [10, 100, 2], [100, 1000, 100]]},
+        "msg": "multi sized nested"
+      }
+    ],
+    "invalid": [
+      {"test": {}, "msg": "empty"},
+      {"test": {"type": "ranges"}, "msg": "misspelled"},
+      {"test": {"type": "range"}, "msg": "no data"},
+      {"test": {"type": "range", "data": []}, "msg": "empty data"},
+      {"test": {"type": "range", "data": [1, 10, 2, 4]}, "msg": "too many entries"},
+      {"test": {"type": "range", "data": {}}, "msg": "wrong data type"},
+      {
+        "test": {"type": "range", "data": [0, 10], "config": {"count": true}},
+        "msg": "invalid count type,"
+      }
+    ]
+  }
+}
