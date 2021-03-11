@@ -14,17 +14,38 @@ ASSUMED_INVALID = "invalid"
 INSTANCE = "instance"
 MESSAGE = "note"
 
-test_dir = os.path.dirname(os.path.realpath(__file__))
+schema_dir = os.path.dirname(os.path.realpath(__file__))
+tests_dir = f'{schema_dir}/tests'
 
 
-def test_run_validation():
-    definitions = load_json('definitions.json')
-    tests = load_json('schema.tests.json')
+def test_char_class_schema():
+    _test_run_validation("char_class.tests.json")
+
+
+def test_combine_schema():
+    _test_run_validation("combine.tests.json")
+
+
+def test_range_schema():
+    _test_run_validation("range.tests.json")
+
+
+def test_uuid_schema():
+    _test_run_validation("uuid.tests.json")
+
+
+def test_values_schema():
+    _test_run_validation("values.tests.json")
+
+
+def _test_run_validation(test_file_name):
+    definitions = load_schema_file('definitions.json')
+    tests = load_test_file(test_file_name)
     should_have_failed = {}
     for file, type_tests in tests.items():
         if 'EXAMPLE' in file:
             continue
-        schema = load_json(file)
+        schema = load_schema_file(file)
         # hack for now
         schema['definitions'] = definitions['definitions']
         for should_be_valid in type_tests[ASSUMED_VALID]:
@@ -47,7 +68,7 @@ def test_run_validation():
 
 def log_should_have_failed(should_have_failed):
     for file, failed_for_file in should_have_failed.items():
-        log.warning(f'Should have failed but did not for %s', file)
+        log.warning('Should have failed but did not for %s', file)
         for should_not_be_valid in failed_for_file:
             if MESSAGE in should_not_be_valid:
                 log.warning(should_not_be_valid[MESSAGE])
@@ -55,7 +76,7 @@ def log_should_have_failed(should_have_failed):
 
 
 def test_validate_count_formats():
-    definitions = load_json('definitions.json')
+    definitions = load_schema_file('definitions.json')
     schema = definitions['definitions']['count']
 
     bad_counts = [
@@ -72,6 +93,14 @@ def test_validate_count_formats():
             validate(bad_count, schema=schema)
 
 
-def load_json(file_path):
-    with open(f'{test_dir}/{file_path}', 'r') as handle:
+def load_test_file(file_name):
+    return _load_file(tests_dir, file_name)
+
+
+def load_schema_file(file_name):
+    return _load_file(schema_dir, file_name)
+
+
+def _load_file(root_dir, file_name):
+    with open(f'{root_dir}/{file_name}', 'r') as handle:
         return json.load(handle)

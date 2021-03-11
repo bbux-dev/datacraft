@@ -1,0 +1,11 @@
+{
+  "uuid.schema.json": {
+    "valid": [
+      {"instance": {"type": "uuid"}, "note": "thats it"}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "uuids"}, "note": "misspelled"}
+    ]
+  }
+}
