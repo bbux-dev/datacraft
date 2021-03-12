@@ -166,6 +166,20 @@ There are a bunch of shorthand formats for creating specifications.  These ultim
 It may be useful to see what the full spec looks like after all the transformations have taken place.  Use the
 `--debug-spec` to dump the internal form of the specification for inspection.
 
+```shell
+dataspec --inline 'geo:geo.pair?start_lat=-99.0: {}' \
+  --log-level off \
+  --debug-spec
+{
+    "geo": {
+        "config": {
+            "start_lat": "-99.0"
+        },
+        "type": "geo.pair"
+    }
+}
+```
+
 #### Schema Level Validation
 
 Most of the default supported field spec types have JSON based schemas defined for them. Schema based validation is
