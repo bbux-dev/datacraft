@@ -183,7 +183,7 @@ dataspec --inline 'geo:geo.pair?start_lat=-99.0: {}' \
 #### Schema Level Validation
 
 Most of the default supported field spec types have JSON based schemas defined for them. Schema based validation is
-turned off by default.  Use the `--strict` command line flag to turn on thr strict schema based checks for types that
+turned off by default.  Use the `--strict` command line flag to turn on the strict schema based checks for types that
 have schemas defined.  Example:
 
 ```shell
@@ -580,7 +580,7 @@ def configure_supplier(field_spec, loader):
 
 
 @dataspec.registry.schemas('reverse_string')
-def get_combine_list_schema():
+def get_reverse_string_schema():
     return {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "reverse_string.schema.json",
