@@ -7,7 +7,11 @@
       {"instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": true}}},
       {"instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "true"}}},
       {"instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "yes"}}},
-      {"instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "on"}}}
+      {"instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "on"}}},
+      {
+        "note": "valid, if confusing, to have both join_with and as_list",
+        "instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "true", "join_with": ":"}}
+      }
     ],
     "invalid": [
       {"instance": {}, "note": "empty"},
@@ -22,10 +26,6 @@
       {
         "note": "invalid as_list param",
         "instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "tru"}}
-      },
-      {
-        "note": "invalid to have both join_with and as_list",
-        "instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "true", "join_with": ":"}}
       }
     ]
   }

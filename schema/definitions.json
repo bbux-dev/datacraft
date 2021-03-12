@@ -6,12 +6,14 @@
     "suffix": {"type": "string"},
     "quote": {"type": "string"},
     "join_with": {"type": "string"},
-    "as_list": {
+    "affirmative_check": {
+      "description": "Either true, false, 'on', 'off', 'yes', 'no', 'true', 'false', case insensitive",
       "oneOf": [
         {"type": "boolean"},
         {"type": "string", "pattern": "[t|T][r|R][u|U][e|E]|[f|F][a|A][l|L][s|S][e|E]|[y|Y][e|E][s|S]|[n|N][o|O]|[o|O][n|N]|[o|O][f|F][f|F]"}
       ]
     },
+    "as_list": {"$ref": "#/definitions/affirmative_check"},
     "cast": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
     "count": {
       "oneOf": [

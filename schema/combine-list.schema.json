@@ -10,12 +10,6 @@
       "properties": {
         "join_with": {"$ref": "#/definitions/join_with"},
         "as_list": {"$ref": "#/definitions/as_list"}
-      },
-      "not": {
-        "description": "Cannot have both of these together",
-        "anyOf": [
-          {"required": ["join_with", "as_list"]}
-        ]
       }
     },
     "refs": {

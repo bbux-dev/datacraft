@@ -1,0 +1,12 @@
+{
+  "unicode_range.schema.json": {
+    "valid": [
+      {"instance": {"type": "unicode_range", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "unicode_ranges"}, "note": "misspelled"},
+      {"instance": {"type": "unicode_range"}, "note": "no fields or refs or data or stuff?"}
+    ]
+  }
+}

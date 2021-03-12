@@ -1,0 +1,59 @@
+{
+  "geo.pair.schema.json": {
+    "valid": [
+      {"instance": {"type": "geo.pair"}},
+      {"instance": {"type": "geo.pair", "config": {"start_lat": -89.0}}},
+      {"instance": {"type": "geo.pair", "config": {"end_lat": 89.9}}},
+      {"instance": {"type": "geo.pair", "config": {"start_lat": -90.0, "end_lat": 90.0}}},
+      {"instance": {"type": "geo.pair", "config": {"start_long": -179.0}}},
+      {"instance": {"type": "geo.pair", "config": {"end_long": 179.9}}},
+      {"instance": {"type": "geo.pair", "config": {"start_long": -180.0, "end_long": 180.0}}},
+      {"instance": {"type": "geo.pair", "config": {"bbox": [31.33134, 22.03795, 34.19295, 25.00562]}}},
+      {"instance": {"type": "geo.pair", "config": {"lat_first": true}}},
+      {"instance": {"type": "geo.pair", "config": {"as_list": "true"}}},
+      {"instance": {"type": "geo.pair", "config": {"join_with": ":"}}},
+      {
+        "note": "valid, if confusing, to have both join_with and as_list",
+        "instance": {"type": "geo.pair", "config": {"as_list": "true", "join_with": ":"}}
+      }
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "geo.pairs"}, "note": "misspelled"},
+      {"instance": {"type": "geo-pair"}, "note": "misspelled"},
+      {"instance": {"type": "geo.pair", "config": {"lat_first": "tru"}}, "note": "invalid lat_first param"},
+      {
+        "note": " ",
+        "instance": {"type": "geo.pair", "config": {"join_with": -99.0}}
+      },
+      {
+        "note": "out of range of valid latitude",
+        "instance": {"type": "geo.pair", "config": {"start_lat": -99.0}}
+      },
+      {
+        "note": "out of range of valid latitude",
+        "instance": {"type": "geo.pair", "config": {"end_lat": 99.9}}
+      },
+      {
+        "note": "out of range of valid latitude",
+        "instance": {"type": "geo.pair", "config": {"start_lat": -90.1, "end_lat": 90.1  }}
+      },
+      {
+        "note": "out of range of valid longitude",
+        "instance": {"type": "geo.pair", "config": {"start_long": -189.0}}
+      },
+      {
+        "note": "out of range of valid longitude",
+        "instance": {"type": "geo.pair", "config": {"end_long": 189.9}}
+      },
+      {
+        "note": "out of range of valid longitude",
+        "instance": {"type": "geo.pair", "config": {"start_long": -180.1, "end_long": 180.1}}
+      },
+      {
+        "note": "bounding box has out of range coordinates",
+        "instance": {"type": "geo.pair", "config": {"bbox": [31.33134, 99.03795, 34.19295, 25.00562]}}
+      }
+    ]
+  }
+}
