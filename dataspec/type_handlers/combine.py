@@ -17,9 +17,23 @@ import json
 import dataspec
 from dataspec import SpecException, suppliers
 from dataspec.suppliers import from_list_of_suppliers
+import dataspec.schemas as schemas
+
+COMBINE_KEY = 'combine'
+COMBINE_LIST_KEY = 'combine-list'
 
 
-@dataspec.registry.types('combine')
+@dataspec.registry.schemas(COMBINE_KEY)
+def get_combine_schema():
+    return schemas.load(COMBINE_KEY)
+
+
+@dataspec.registry.schemas(COMBINE_LIST_KEY)
+def get_combine_list_schema():
+    return schemas.load(COMBINE_LIST_KEY)
+
+
+@dataspec.registry.types(COMBINE_KEY)
 def configure_combine_supplier(field_spec, loader):
     """ configures supplier for combine type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
@@ -32,7 +46,7 @@ def configure_combine_supplier(field_spec, loader):
     return supplier
 
 
-@dataspec.registry.types('combine-list')
+@dataspec.registry.types(COMBINE_LIST_KEY)
 def configure_combine_list_supplier(field_spec, loader):
     """ configures supplier for combine-list type """
     if 'refs' not in field_spec:

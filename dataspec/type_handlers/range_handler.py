@@ -20,10 +20,17 @@ import dataspec.schemas as schemas
 from dataspec.utils import load_config
 
 RANGE_KEY = 'range'
+RAND_RANGE_KEY = 'rand_range'
 
 
 @dataspec.registry.schemas(RANGE_KEY)
-def get_schema():
+def get_range_schema():
+    return schemas.load(RANGE_KEY)
+
+
+@dataspec.registry.schemas(RAND_RANGE_KEY)
+def get_rand_range_schema():
+    # This shares a schema with range
     return schemas.load(RANGE_KEY)
 
 
@@ -66,7 +73,7 @@ def _configure_supplier_for_range_data(field_spec, data):
     return suppliers.values(range_values)
 
 
-@dataspec.registry.types('rand_range')
+@dataspec.registry.types(RAND_RANGE_KEY)
 def configure_rand_range_supplier(field_spec, loader):
     """ configures the random range value supplier """
     if 'data' not in field_spec:
@@ -104,7 +111,7 @@ def float_range(start, stop, step, precision=None):
     """
     # attempt to defeat some rounding errors prevalent in python
     if precision:
-        quantize = decimal.Decimal(str(1/math.pow(10, int(precision))))
+        quantize = decimal.Decimal(str(1 / math.pow(10, int(precision))))
     current = decimal.Decimal(str(start))
     if precision:
         current = current.quantize(quantize)

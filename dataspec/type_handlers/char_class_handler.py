@@ -6,7 +6,9 @@ import string
 import dataspec
 from dataspec.utils import any_key_exists
 from dataspec.suppliers import list_count_sampler, list_stat_sampler
+import dataspec.schemas as schemas
 
+CHAR_CLASS_KEY = 'char_class'
 _UNDER_SCORE = '_'
 
 _CLASS_MAPPING = {
@@ -26,7 +28,12 @@ _CLASS_MAPPING = {
 }
 
 
-@dataspec.registry.types('char_class')
+@dataspec.registry.schemas(CHAR_CLASS_KEY)
+def get_char_class_schema():
+    return schemas.load(CHAR_CLASS_KEY)
+
+
+@dataspec.registry.types(CHAR_CLASS_KEY)
 def configure_supplier(spec, _):
     """ configure the supplier for char_class types """
     if 'data' not in spec:
