@@ -51,8 +51,8 @@
         "instance": {"type": "char_class", "data": "word", "config": {"count": 5, "max": 5}}
       },
       {
-        "note": "count and min together is invalid",
-        "instance": {"type": "char_class", "data": "word", "config": {"count": 5, "min": 3}}
+        "note": "count and mean together is invalid",
+        "instance": {"type": "char_class", "data": "word", "config": {"count": 5, "mean": 5}}
       }
     ]
   }
