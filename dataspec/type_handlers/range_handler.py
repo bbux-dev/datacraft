@@ -16,10 +16,18 @@ import math
 
 import dataspec
 import dataspec.suppliers as suppliers
+import dataspec.schemas as schemas
 from dataspec.utils import load_config
 
+RANGE_KEY = 'range'
 
-@dataspec.registry.types('range')
+
+@dataspec.registry.schemas(RANGE_KEY)
+def get_schema():
+    return schemas.load(RANGE_KEY)
+
+
+@dataspec.registry.types(RANGE_KEY)
 def configure_range_supplier(field_spec, _):
     """ configures the range value supplier """
     if 'data' not in field_spec:

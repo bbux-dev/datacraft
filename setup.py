@@ -26,7 +26,7 @@ setup(
     install_requires=requires,
     scripts=['bin/dataspec'],
     package_data={
-        "dataspec": ["schema/*.schema.json"]
+        "dataspec": ["schema/*.schema.json", "schema/definitions.json"]
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

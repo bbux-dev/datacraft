@@ -42,6 +42,8 @@ def main():
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
+    parser.add_argument('--strict', action='store_true', default=False,
+                        help='Enforce schema validation for all registered field specs')
     parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
                         help='Debug spec after internal reformatting')
 
@@ -62,7 +64,7 @@ def main():
         if args.debug_spec:
             print(json.dumps(preprocess_spec(spec), indent=4))
             return
-        loader = Loader(spec, args.datadir)
+        loader = Loader(spec, args.datadir, enforce_schema=args.strict)
 
         output = _configure_output(args)
 
