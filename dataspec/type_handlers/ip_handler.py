@@ -96,7 +96,9 @@ def _create_octet_supplier(parts, index, sample):
     if len(parts) >= index + 1 and parts[index].strip() != '':
         octet = parts[index].strip()
         if not octet.isdigit():
-            raise SpecException(f'Octet: {octet} invalid for base' + '.'.join(parts))
+            raise SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
+        if not 0 <= int(octet) <= 255:
+            raise SpecException(f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
         return suppliers.values(octet)
     # need octet range at this point
     octet_range = list(range(0, 255))
