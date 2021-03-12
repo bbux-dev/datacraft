@@ -23,10 +23,6 @@
       {"instance": {"type": "geo-pair"}, "note": "misspelled"},
       {"instance": {"type": "geo.pair", "config": {"lat_first": "tru"}}, "note": "invalid lat_first param"},
       {
-        "note": " ",
-        "instance": {"type": "geo.pair", "config": {"join_with": -99.0}}
-      },
-      {
         "note": "out of range of valid latitude",
         "instance": {"type": "geo.pair", "config": {"start_lat": -99.0}}
       },

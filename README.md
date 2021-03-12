@@ -3,6 +3,7 @@ Data Spec Repository
 
 1. [Overview](#Overview)
 1. [Build](#Build)
+1. [Usage](#Usage)
 1. [Examples](#Examples)
 1. [Core Concepts](#Core_Concepts)
     1. [Data Spec](#Data_Spec)
@@ -35,6 +36,153 @@ pip install git+https://github.com/bbux-dev/dataspec.git
 ```
 
 The executable will be located in `dataspec` and should now be on your path
+
+## <a name="Usage"></a>Usage
+
+```
+usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR]
+                [-l LOG_LEVEL] [-f FORMAT] [--strict] [--debug-spec]
+
+Run dataspec.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i ITERATIONS, --iterations ITERATIONS
+                        Number of Iterations to Execute
+  -o OUTDIR, --outdir OUTDIR
+                        Output directory
+  -p OUTFILEPREFIX, --outfile-prefix OUTFILEPREFIX
+                        Prefix for output files, default is generated
+  -e EXTENSION, --extension EXTENSION
+                        Extension to add to generated files
+  -t TEMPLATE, --template TEMPLATE
+                        Path to template to populate
+  -r RECORDSPERFILE, --records-per-file RECORDSPERFILE
+                        Number of records to place in each file, default is 1, requires -o to be specified
+  -k, --printkey        When printing to stdout field name should be printed along with value
+  -c CODE [CODE ...], --code CODE [CODE ...]
+                        Path to custom defined functions in one or more modules to load
+  -d DATADIR, --datadir DATADIR
+                        Path to external directory to load external data file such as csvs
+  -l LOG_LEVEL, --log-level LOG_LEVEL
+                        Logging level verbosity, default is info, valid are "debug","info","warn","error","off"
+  -f FORMAT, --format FORMAT
+                        Formatter for output records, default is none, valid are: ['json', 'json-pretty']
+  --strict              Enforce schema validation for all registered field specs
+  --debug-spec          Debug spec after internal reformatting
+
+input:
+  -s SPEC, --spec SPEC  Spec to Use
+  --inline INLINE       Spec as string
+```
+
+### Example Usage
+
+The most common way to use dataspec is to define the field specifications in a JSON or YAML file and to use this with
+the --spec command line argument:
+
+```shell
+dataspec --spec /path/to/dataspec.json \
+  --template /path/to/template.jinja
+  --iterations 1000 \
+  --output /path/to/output
+```
+
+The command above will generate 1000 records and apply the generated values to the supplied template which will be
+output to the specified directory. The default is to write all outputs to a single file.  Use the `-r` or
+`--records-per-file` command line argument to modify this if desired.
+
+Another alternative way to specify the data for a spec is by using the `--inline` argument:
+
+```shell
+dataspec \
+  --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
+  --iterations 5
+INFO [12-Mar-2050 06:24:58 PM] Starting Loading Configurations...
+INFO [12-Mar-2050 06:24:58 PM] Starting Processing...
+@QEWXL_
+@0zTDhp
+@5hK
+@bwUAy6
+@ufqd
+INFO [12-Mar-2050 06:24:58 PM] Finished Processing
+```
+
+This can be useful for troubleshooting or experimenting
+
+### Useful Flags
+
+#### Inline JSON/YAML
+The default is to output the generated values to the console. Use the `-k` or `--printkey` arg to print out the key
+along with the value:
+
+```shell
+dataspec --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
+  --iterations 5 \
+  --printkey \
+  --log-level off
+handle -> @r3Wl
+handle -> @cCyfSeU
+handle -> @l8n
+handle -> @aUb
+handle -> @jf7Ax
+```
+#### Log Levels
+
+You can change the logging levels to one of `debug, info, warn, error, or off` by using the `-l` or `--log-level` flag.
+See example above.
+
+#### Formatting Output
+
+Sometimes it may be useful to dump the generated data into a format that is easier to consume or view the relationships
+of. Use the `-f` or `--format` flag to specify one of `json` or `json-pretty`. The `json` format will print a flat
+version of each record that takes up a single line for each iteration. The `json-pretty` format will print an indented
+version of each record that will span multiple lines. Example:
+
+```shell
+# NOTE: This inline spec is in YAML
+dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
+    --iterations 2 \
+    --log-level off \
+    --format json
+{"handle": "@a2oNt"}
+{"handle": "@lLN3i"}
+
+dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
+    --iterations 2 \
+    --log-level off \
+    --format json-pretty
+{
+    "handle": "@ZJeE_f"
+}
+{
+    "handle": "@XmJ"
+}
+```
+
+#### Debugging Specifications
+
+There are a bunch of shorthand formats for creating specifications.  These ultimately get turned into a full spec format.
+It may be useful to see what the full spec looks like after all the transformations have taken place.  Use the
+`--debug-spec` to dump the internal form of the specification for inspection.
+
+#### Schema Level Validation
+
+Most of the default supported field spec types have JSON based schemas defined for them. Schema based validation is
+turned off by default.  Use the `--strict` command line flag to turn on thr strict schema based checks for types that
+have schemas defined.  Example:
+
+```shell
+dataspec --inline 'geo: {type: geo.pair, config: {start_lat: -99.0}}' \
+    --iterations 2 \
+    --log-level info \
+    --format json \
+    --strict
+INFO [12-Mar-2050 07:24:11 PM] Starting Loading Configurations...
+INFO [12-Mar-2050 07:24:11 PM] Starting Processing...
+WARNING [12-Mar-2050 07:24:11 PM] -99.0 is less than the minimum of -90
+ERROR [12-Mar-2050 07:24:11 PM] Failed to validate spec type: geo.pair with spec: {'type': 'geo.pair', 'config': {'start_lat': -99.0}}
+```
 
 ## <a name="Examples"></a>Examples
 
@@ -166,7 +314,7 @@ is an updated version of the spec with the `field_groups` specified to give us o
 
 ```json
 {
-  "id": { "type": "range", "data": [1, 100]},
+  "id": {"type": "range", "data": [1, 100]},
   "name": ["Fido", "Fluffy", "Bandit", "Bingo", "Champ", "Chief", "Buster", "Lucky"],
   "tag": {
     "Affectionate": 0.3, "Agreeable": 0.1, "Charming": 0.1,
@@ -184,7 +332,7 @@ If we need more precise weightings we can use this format:
 
 ```json
 {
-  "id": { "type": "range", "data": [1, 100]},
+  "id": {"type": "range", "data": [1, 100]},
   "name": ["Fido", "Fluffy", "Bandit", "Bingo", "Champ", "Chief", "Buster", "Lucky"],
   "tag": {
     "Affectionate": 0.3, "Agreeable": 0.1, "Charming": 0.1,
@@ -228,11 +376,11 @@ dataspec -s pets.json -i 10 -l off --format json
 
 There are [Field Specs](https://github.com/bbux-dev/dataspec/blob/main/docs/FIELDSPECS.md#CSV_Data) that support using
 csv data to feed the data generation process. If the input CSV file is very large, not all features will be supported.
-You will not be able to set sampling to true or use a field count > 1. You maximum number of iterations will be equal to
-the size of the smallest number of lines for all the large input CSV file. The current size threshold is set to 250
-MB. So, if you are using two different csv files as inputs and one is 300 MB with 5 million entries and another is 500
-MB with 2 million entries, you will be limited to 2 million iterations before an exception will be raised and
-processing will cease.
+You will not be able to set sampling to true or use a field count > 1. The maximum number of iterations will be equal to
+the size of the smallest number of lines for all the large input CSV file. The current size threshold is set to 250 MB.
+So, if you are using two different csv files as inputs and one is 300 MB with 5 million entries and another is 500 MB
+with 2 million entries, you will be limited to 2 million iterations before an exception will be raised and processing
+will cease.
 
 #### More efficient processing using csv_select
 
@@ -265,7 +413,7 @@ dataspec --spec csv-select.yaml \
          --iterations 5  \
          --datadir ./data \
          --format json \
-         --loglevel off
+         --log-level off
 {"geonameid": "2986043", "name": "Pic de Font Blanca", "latitude": "42.64991", "longitude": "1.53335", "country_code": "AD", "population": "0"}
 {"geonameid": "2994701", "name": "Roc M\u00e9l\u00e9", "latitude": "42.58765", "longitude": "1.74028", "country_code": "AD", "population": "0"}
 {"geonameid": "3007683", "name": "Pic des Langounelles", "latitude": "42.61203", "longitude": "1.47364", "country_code": "AD", "population": "0"}
@@ -384,7 +532,7 @@ In this spec the number of users created will be weighted so that half the time 
 are three or four. NOTE: It is important to make sure that the `count` param is equal to the maximum number that will be
 indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
-### <a name="Custom_Code_Loading"></a>Custom Code Loading
+### <a name="Custom_Code_Loading"></a>Custom Code Loading and Schemas
 
 There are a lot of types of data that are not generated with this tool. Instead of adding them all, there is a mechanism
 to bring your own data suppliers. We make use of the handy [catalogue](https://pypi.org/project/catalogue/) package to
@@ -415,12 +563,28 @@ def configure_supplier(field_spec, loader):
     wrapped = loader.get(key)
     # wrap this with our custom reverse string supplier
     return ReverseStringSupplier(wrapped)
+
+
+@dataspec.registry.schemas('reverse_string')
+def get_combine_list_schema():
+    return {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$id": "reverse_string.schema.json",
+        "type": "object",
+        "required": ["type", "ref"],
+        "properties": {
+            "type": {"type": "string", "pattern": "^reverse_string"},
+            "ref": {"type": "string"}
+        }
+    }
 ```
 
 Now when we see a type of "reverse_string" like in the example below, we will use the given function to configure the
 supplier for it. The function name for the decorated function is arbitrary, but the signature must match. The signature
 for the Value Supplier is required to match the interface and have a single `next(iteration)` method that returns the
-next value for the given iteration.
+next value for the given iteration. You can also optionally register a schema for the type. The schema will be applied
+to the spec if the `--strict` command line flag is specified, otherwise you will have to perform your own validation in
+your code.
 
 ```
 {

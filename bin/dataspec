@@ -1,5 +1,6 @@
 #!/bin/env python
 
+import sys
 import json
 import yaml
 import argparse
@@ -24,21 +25,21 @@ def main():
                         help='Number of Iterations to Execute')
     parser.add_argument('-o', '--outdir',
                         help='Output directory')
-    parser.add_argument('-p', '--outfileprefix', default='generated',
-                        help='Prefix fore output files, default is generated')
+    parser.add_argument('-p', '--outfile-prefix', dest='outfileprefix', default='generated',
+                        help='Prefix for output files, default is generated')
     parser.add_argument('-e', '--extension', default='',
                         help='Extension to add to generated files')
     parser.add_argument('-t', '--template',
                         help='Path to template to populate')
-    parser.add_argument('-r', '--recordsperfile', default=1, type=int,
+    parser.add_argument('-r', '--records-per-file', dest='recordsperfile', default=sys.maxsize, type=int,
                         help='Number of records to place in each file, default is 1, requires -o to be specified')
-    parser.add_argument('-k', '--printkey', default=False,
+    parser.add_argument('-k', '--printkey', action='store_true', default=False,
                         help='When printing to stdout field name should be printed along with value')
     parser.add_argument('-c', '--code', nargs='+',
                         help='Path to custom defined functions in one or more modules to load')
     parser.add_argument('-d', '--datadir',
                         help='Path to external directory to load external data file such as csvs')
-    parser.add_argument('-l', '--loglevel', default=logging.INFO,
+    parser.add_argument('-l', '--log-level', dest='log_level', default=logging.INFO,
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
@@ -59,7 +60,7 @@ def main():
             for code in args.code:
                 utils.load_custom_code(code)
 
-        log.debug('Attempting to load Data Spec from %s', args.spec)
+        log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
         spec = _load_spec(args)
         if args.debug_spec:
             print(json.dumps(preprocess_spec(spec), indent=4))
@@ -139,6 +140,7 @@ def _parse_spec_string(inline):
         log.debug('Spec is not Valid JSON')
         pass
     # not JSON, try yaml
+    log.debug('Attempting to load spec as YAML')
     spec = yaml.load(inline, Loader=yaml.FullLoader)
     if not isinstance(spec, dict):
         raise SpecException('Unable to load spec from string: %s, Please verify it is valid JSON or YAML', inline)
@@ -148,7 +150,7 @@ def _parse_spec_string(inline):
 def _configure_logging(args):
     for name in dataspec.registry.logging.get_all():
         configure_function = dataspec.registry.logging.get(name)
-        configure_function(args.loglevel)
+        configure_function(args.log_level)
 
 
 if __name__ == '__main__':
