@@ -1,0 +1,32 @@
+{
+  "combine-list.schema.json": {
+    "valid": [
+      {"instance": {"type": "combine-list", "refs": [["one", "two"]]}, "note":  "single list is still a list"},
+      {"instance": {"type": "combine-list", "fields": [["one", "two"],["one", "two", "tre"]]}},
+      {"instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"join_with": " "}}},
+      {"instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"as_list": true}}},
+      {"instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"as_list": "true"}}},
+      {"instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"as_list": "yes"}}},
+      {"instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"as_list": "on"}}}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "combine-lists"}, "note": "misspelled"},
+      {"instance": {"type": "combine-list"}, "note": "no fields or refs"},
+      {"instance": {"type": "combine-list", "refs": [["one"]]}, "note": "only one ref"},
+      {"instance": {"type": "combine-list", "fields": [["one"]]}, "note": "only one field"},
+      {
+        "note": "invalid join_with param",
+        "instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"join_with": true}}
+      },
+      {
+        "note": "invalid as_list param",
+        "instance": {"type": "combine-list", "refs": [["one", "two"]], "config": {"as_list": "tru"}}
+      },
+      {
+        "note": "invalid to have both join_with and as_list",
+        "instance": {"type": "combine", "refs": ["one", "two"], "config": {"as_list": "true", "join_with": ":"}}
+      }
+    ]
+  }
+}

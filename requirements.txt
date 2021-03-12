@@ -8,3 +8,5 @@ pyyaml~=5.1
 catalogue~=2.0.1
 # templating
 jinja2~=2.11.2
+# json schema
+jsonschema~=3.2.0

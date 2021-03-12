@@ -20,10 +20,32 @@ import datetime
 import dataspec
 from dataspec.utils import load_config
 from dataspec.supplier.value_supplier import ValueSupplierInterface
+import dataspec.schemas as schemas
+
+DATE_KEY = 'date'
+DATE_ISO_KEY = 'date.iso'
+DATE_ISO_US_KEY = 'date.iso.us'
 
 DEFAULT_FORMAT = "%d-%m-%Y"
 ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
 ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
+
+
+@dataspec.registry.schemas(DATE_KEY)
+def get_date_schema():
+    return schemas.load(DATE_KEY)
+
+
+@dataspec.registry.schemas(DATE_ISO_KEY)
+def get_date_iso_schema():
+    # NOTE: These all share a schema
+    return schemas.load(DATE_KEY)
+
+
+@dataspec.registry.schemas(DATE_ISO_US_KEY)
+def get_date_iso_us_schema():
+    # NOTE: These all share a schema
+    return schemas.load(DATE_KEY)
 
 
 class DateSupplier(ValueSupplierInterface):
@@ -51,7 +73,7 @@ class DateSupplier(ValueSupplierInterface):
         return next_date.replace(microsecond=0).isoformat()
 
 
-@dataspec.registry.types('date')
+@dataspec.registry.types(DATE_KEY)
 def configure_supplier(field_spec, loader):
     """ configures the date value supplier """
     config = load_config(field_spec, loader)
@@ -62,13 +84,13 @@ def configure_supplier(field_spec, loader):
     return DateSupplier(delta_days, offset, anchor, date_format)
 
 
-@dataspec.registry.types('date.iso')
+@dataspec.registry.types(DATE_ISO_KEY)
 def configure_supplier_iso(field_spec, loader):
     """ configures the date.iso value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_NO_MICRO)
 
 
-@dataspec.registry.types('date.iso.us')
+@dataspec.registry.types(DATE_ISO_US_KEY)
 def configure_supplier_iso_microseconds(field_spec, loader):
     """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_WITH_MICRO)

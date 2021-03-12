@@ -29,7 +29,10 @@ class ListStatSamplerSupplier(ValueSupplierInterface):
         self.as_list = is_affirmative('as_list', config, False)
 
     def next(self, _):
-        count = math.ceil(gauss(self.mean, self.stddev))
+        if self.stddev == 0:
+            count = int(self.mean)
+        else:
+            count = math.floor(gauss(self.mean, self.stddev))
         if count <= 0:
             count = 1
         if count > self.max:

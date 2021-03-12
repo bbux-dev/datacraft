@@ -8,6 +8,10 @@ import dataspec
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 from dataspec.utils import load_config
 from dataspec import SpecException, suppliers
+import dataspec.schemas as schemas
+
+IP_KEY = 'ip'
+IPV4_KEY = 'ipv4'
 
 
 class IpV4Supplier(ValueSupplierInterface):
@@ -29,13 +33,23 @@ class IpV4Supplier(ValueSupplierInterface):
         return f'{first}.{second}.{third}.{fourth}'
 
 
-@dataspec.registry.types('ipv4')
+@dataspec.registry.schemas(IP_KEY)
+def get_ip_schema():
+    return schemas.load(IP_KEY)
+
+
+@dataspec.registry.schemas(IPV4_KEY)
+def get_ipv4_schema():
+    return schemas.load(IPV4_KEY)
+
+
+@dataspec.registry.types(IPV4_KEY)
 def configure_ipv4(field_spec, _):
     """ configures value supplier for ipv4 type """
     return configure_ip(field_spec, _)
 
 
-@dataspec.registry.types('ip')
+@dataspec.registry.types(IP_KEY)
 def configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = load_config(field_spec, loader)
@@ -96,7 +110,9 @@ def _create_octet_supplier(parts, index, sample):
     if len(parts) >= index + 1 and parts[index].strip() != '':
         octet = parts[index].strip()
         if not octet.isdigit():
-            raise SpecException(f'Octet: {octet} invalid for base' + '.'.join(parts))
+            raise SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
+        if not 0 <= int(octet) <= 255:
+            raise SpecException(f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
         return suppliers.values(octet)
     # need octet range at this point
     octet_range = list(range(0, 255))

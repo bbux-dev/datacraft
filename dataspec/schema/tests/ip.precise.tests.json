@@ -1,0 +1,12 @@
+{
+  "ip.precise.schema.json": {
+    "valid": [
+      {"instance": {"type": "ip.precise", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "ip.precises"}, "note": "misspelled"},
+      {"instance": {"type": "ip.precise"}, "note": "no fields or refs or data or stuff?"}
+    ]
+  }
+}

@@ -6,6 +6,9 @@ import dataspec
 from dataspec.utils import any_key_exists
 from dataspec.suppliers import list_stat_sampler, list_count_sampler, from_list_of_suppliers
 from dataspec.supplier.value_supplier import ValueSupplierInterface
+import dataspec.schemas as schemas
+
+UNICODE_RANGE_KEY = 'unicode_range'
 
 
 class UnicodeRangeSupplier(ValueSupplierInterface):
@@ -20,7 +23,12 @@ class UnicodeRangeSupplier(ValueSupplierInterface):
         return ''.join(as_str)
 
 
-@dataspec.registry.types('unicode_range')
+@dataspec.registry.schemas(UNICODE_RANGE_KEY)
+def get_unicode_range_schema():
+    return schemas.load(UNICODE_RANGE_KEY)
+
+
+@dataspec.registry.types(UNICODE_RANGE_KEY)
 def configure_supplier(spec, _):
     """ configure the supplier for unicode_range types """
     if 'data' not in spec:

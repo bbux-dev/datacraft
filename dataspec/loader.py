@@ -4,7 +4,8 @@ delegating the handling of various data types.
 """
 
 import json
-from .types import lookup_type, registry
+from .types import lookup_type, lookup_schema, registry
+from .schemas import validate_schema_for_spec
 from . import suppliers
 from .exceptions import SpecException
 
@@ -31,9 +32,10 @@ class Loader:
     """
     RESERVED = ['type', 'data', 'ref', 'refs', 'config']
 
-    def __init__(self, data_spec, datadir='./data'):
+    def __init__(self, data_spec, datadir='./data', enforce_schema=False):
         self.specs = preprocess_spec(data_spec)
         self.datadir = datadir
+        self.enforce_schema = enforce_schema
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
 
@@ -75,12 +77,21 @@ class Loader:
             handler = lookup_type(spec_type)
             if handler is None:
                 raise SpecException('Unable to load handler for: ' + json.dumps(field_spec))
+            if self.enforce_schema:
+                _validate_schema_for_spec(spec_type, field_spec)
             supplier = handler(field_spec, self)
         if suppliers.is_cast(field_spec):
             supplier = suppliers.cast_supplier(supplier, field_spec)
         if suppliers.is_decorated(field_spec):
             supplier = suppliers.decorated(field_spec, supplier)
         return supplier
+
+
+def _validate_schema_for_spec(spec_type, field_spec):
+    type_schema = lookup_schema(spec_type)
+    if type_schema is None:
+        return
+    return validate_schema_for_spec(spec_type, field_spec, type_schema)
 
 
 def preprocess_spec(raw_spec):

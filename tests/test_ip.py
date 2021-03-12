@@ -134,8 +134,16 @@ def test_ip_spec_three_octets_dot_in_base():
     assert not value.startswith('11..')
 
 
-def test_ip_spec_invalid_base():
-    loader = Loader(_create_ip_spec_with_base('INVALID.'))
+def test_ip_spec_invalid_base1():
+    _test_ip_spec_invalid_base('INVALID.')
+
+
+def test_ip_spec_invalid_base2():
+    _test_ip_spec_invalid_base('1000.')
+
+
+def _test_ip_spec_invalid_base(base):
+    loader = Loader(_create_ip_spec_with_base(base))
     with pytest.raises(SpecException):
         loader.get('network')
 

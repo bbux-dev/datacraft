@@ -25,6 +25,9 @@ setup(
     keywords=['data', 'synthetic', 'generator', 'specification', 'spec', 'data spec'],
     install_requires=requires,
     scripts=['bin/dataspec'],
+    package_data={
+        "dataspec": ["schema/*.schema.json", "schema/definitions.json"]
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

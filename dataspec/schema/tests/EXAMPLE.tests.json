@@ -1,0 +1,12 @@
+{
+  "EXAMPLE.schema.json": {
+    "valid": [
+      {"instance": {"type": "EXAMPLE", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "EXAMPLEs"}, "note": "misspelled"},
+      {"instance": {"type": "EXAMPLE"}, "note": "no fields or refs or data or stuff?"}
+    ]
+  }
+}

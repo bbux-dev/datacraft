@@ -1,5 +1,5 @@
 from dataspec.preprocessor import preprocess_spec, preprocess_csv_select, preprocess_nested
-from dataspec.preprocessor import _parse_key
+from dataspec.preprocessor import _parse_key, _is_spec_data, _update_no_params
 from dataspec import SpecException
 import dataspec.suppliers as suppliers
 import pytest
@@ -8,7 +8,7 @@ import pytest
 # hack to load up all types
 
 
-def testpreprocess_spec_already_defined():
+def test_preprocess_spec_already_defined():
     config_in_key_spec = {
         'foo?prefix=TEST': [1, 2, 3, 4, 5],
         'foo': [5, 6, 7]
@@ -17,7 +17,7 @@ def testpreprocess_spec_already_defined():
         preprocess_spec(config_in_key_spec)
 
 
-def testpreprocess_spec_simple():
+def test_preprocess_spec_simple():
     config_in_key_spec = {
         'foo?prefix=TEST': [1, 2, 3, 4, 5],
     }
@@ -25,13 +25,21 @@ def testpreprocess_spec_simple():
     assert 'foo' in updated
 
 
-def testpreprocess_spec_uuid():
+def test_preprocess_spec_simple2():
+    spec = {
+        'name': [1, 2, 3, 4, 5],
+    }
+    updated = preprocess_spec(spec)
+    assert 'name' in updated
+
+
+def test_preprocess_spec_uuid():
     config_in_key_spec = {"foo?level=5": {"type": "uuid"}}
     updated = preprocess_spec(config_in_key_spec)
     assert 'foo' in updated
 
 
-def testpreprocess_spec_param_and_config():
+def test_preprocess_spec_param_and_config():
     config_in_key_spec = {
         'bar?suffix=END': {
             'type': 'values',
@@ -192,3 +200,38 @@ def test_preprocess_nested_with_csv_select():
     updated = preprocess_nested(updated)
     for key in ['outer', 'another']:
         assert key in updated
+
+
+def test__is_spec_data_positive_examples():
+    examples = [
+        1,
+        'constant',
+        25.5,
+        ['a', 'b', 'c'],
+        {'foo': 0.5, 'bar': 0.4, 'baz': 0.1}
+    ]
+
+    for example in examples:
+        assert _is_spec_data(example, None)
+
+
+def test_update_no_params():
+    key = "field:nested"
+    spec = {"id": {"type": "values", "data": [1, 2, 3]}}
+    updated_specs = {}
+    _update_no_params(key, spec, updated_specs)
+    assert 'field' in updated_specs
+    assert 'id' in updated_specs['field']
+    assert 'nested' == updated_specs['field']['type']
+
+
+def test_field_defined_multiple_times():
+    spec = {
+        "one": {
+            "type": "range",
+            "data": [0, 9]
+        },
+        "one?prefix=withparams": [1, 2, 3]
+    }
+    with pytest.raises(SpecException):
+        preprocess_spec(spec)
