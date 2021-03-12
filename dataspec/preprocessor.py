@@ -118,13 +118,7 @@ def _update_with_params(key, spec, updated_specs):
     if newkey in updated_specs:
         raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
     # the updated spec to populate
-    updated = {}
-
-    if _is_spec_data(spec, spectype):
-        updated['data'] = spec
-    else:
-        # copy all existing values
-        updated.update(spec)
+    updated = _convert_to_values_if_needed(spec, spectype)
 
     config = updated.get('config', {})
     config.update(params)
@@ -133,6 +127,43 @@ def _update_with_params(key, spec, updated_specs):
         updated['type'] = spectype
 
     updated_specs[newkey] = updated
+
+
+def _update_no_params(key, spec, updated_specs):
+    """
+    handles the case when there are no ?param=value portions in the key
+    key may have name:type notation that still needs to be handled
+    """
+    if ':' in key:
+        newkey, spectype = key.split(':', 2)
+        if not _is_spec_data(spec, spectype):
+            spec['type'] = spectype
+        else:
+            spec = {
+                'type': spectype,
+                'data': spec
+            }
+    else:
+        newkey = key
+    # check for conflicts
+    if key in updated_specs:
+        raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
+
+    spectype = spec.get('type') if isinstance(spec, dict) else None
+    updated = _convert_to_values_if_needed(spec, spectype)
+
+    updated_specs[newkey] = updated
+
+
+def _convert_to_values_if_needed(spec, spectype):
+    """ converts to a values spec if this is data only """
+    if _is_spec_data(spec, spectype):
+        return {
+            'type': 'values',
+            'data': spec
+        }
+    else:
+        return spec
 
 
 def _parse_key(field_name):
@@ -163,34 +194,12 @@ def _parse_key(field_name):
     return newkey, spectype, config
 
 
-def _update_no_params(key, spec, updated_specs):
-    """
-    handles the case when there are no ?param=value portions in the key
-    key may have name:type notation that still needs to be handled
-    """
-    if ':' in key:
-        newkey, spectype = key.split(':', 2)
-        if not _is_spec_data(spec, spectype):
-            spec['type'] = spectype
-        else:
-            spec = {
-                'type': spectype,
-                'data': spec
-            }
-    else:
-        newkey = key
-    # check for conflicts
-    if key in updated_specs:
-        raise SpecException(f'Field {key} defined multiple times: ' + json.dumps(spec))
-    updated_specs[newkey] = spec
-
-
 def _is_spec_data(spec, spectype):
     """
     Checks to see if the spec is data only
     :return: true if only data, false if it is a spec
     """
-    if spectype == 'nested':
+    if spec == 'nested' or spectype == 'nested':
         return False
     # if it is not a dictionary, then it is definitely not a spec
     if not isinstance(spec, dict):
