@@ -35,13 +35,13 @@ To Install:
 pip install git+https://github.com/bbux-dev/dataspec.git
 ```
 
-The executable will be located in `dataspec` and should now be on your path
+This will install the `dataspec` command line utility which should now be on your path
 
 ## <a name="Usage"></a>Usage
 
 ```
-usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR]
-                [-l LOG_LEVEL] [-f FORMAT] [--strict] [--debug-spec]
+usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] 
+                [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT] [--strict] [--debug-spec]
 
 Run dataspec.
 
@@ -58,16 +58,16 @@ optional arguments:
   -t TEMPLATE, --template TEMPLATE
                         Path to template to populate
   -r RECORDSPERFILE, --records-per-file RECORDSPERFILE
-                        Number of records to place in each file, default is 1, requires -o to be specified
+                        Number of records to place in each file, default is all, requires -o to be specified
   -k, --printkey        When printing to stdout field name should be printed along with value
   -c CODE [CODE ...], --code CODE [CODE ...]
                         Path to custom defined functions in one or more modules to load
   -d DATADIR, --datadir DATADIR
-                        Path to external directory to load external data file such as csvs
+                        Path to external directory to load external data files such as csvs
   -l LOG_LEVEL, --log-level LOG_LEVEL
                         Logging level verbosity, default is info, valid are "debug","info","warn","error","off"
   -f FORMAT, --format FORMAT
-                        Formatter for output records, default is none, valid are: ['json', 'json-pretty']
+                        Formatter for output records, default is none, valid are: ['json', 'json-pretty', 'csv']
   --strict              Enforce schema validation for all registered field specs
   --debug-spec          Debug spec after internal reformatting
 

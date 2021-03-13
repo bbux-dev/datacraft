@@ -7,6 +7,21 @@ import dataspec
 from .types import registry
 
 
+@dataspec.registry.formats('json')
+def format_json(record):
+    return json.dumps(record)
+
+
+@dataspec.registry.formats('json-pretty')
+def format_json(record):
+    return json.dumps(record, indent=4)
+
+
+@dataspec.registry.formats('csv')
+def format_csv(record):
+    return ','.join([str(val) for val in record.values()])
+
+
 class OutputHandlerInterface:
     """ Interface four handling generated output values """
 
@@ -136,13 +151,3 @@ class FormatProcessor:
         :return: The formatted record
         """
         return self.format_func(record)
-
-
-@dataspec.registry.formats('json')
-def format_json(record):
-    return json.dumps(record)
-
-
-@dataspec.registry.formats('json-pretty')
-def format_json(record):
-    return json.dumps(record, indent=4)
