@@ -1,5 +1,8 @@
 Data Spec Repository
 ========================
+[![Build Status](https://travis-ci.com/bbux-dev/dataspec.svg?branch=main)](https://travis-ci.com/bbux-dev/dataspec)
+[![codecov](https://codecov.io/gh/bbux-dev/dataspec/branch/main/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/dataspec)
+
 
 1. [Overview](#Overview)
 1. [Build](#Build)
