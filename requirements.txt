@@ -6,6 +6,8 @@ pytest~=6.2.1
 pyyaml~=5.1
 # custom code
 catalogue~=2.0.1
+# to make sure works with python 3.6 in build environment
+importlib-metadata>=0.20
 # templating
 jinja2~=2.11.2
 # json schema
