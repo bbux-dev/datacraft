@@ -81,7 +81,7 @@ input:
 
 ### Example Usage
 
-The most common way to use dataspec is to define the field specifications in a JSON or YAML file and to use this with
+The most common way to use `dataspec` is to define the field specifications in a JSON or YAML file and to specify this file with
 the --spec command line argument:
 
 ```shell
@@ -106,7 +106,6 @@ INFO [12-Mar-2050 06:24:58 PM] Starting Processing...
 @QEWXL_
 @0zTDhp
 @5hK
-@bwUAy6
 @ufqd
 INFO [12-Mar-2050 06:24:58 PM] Finished Processing
 ```
@@ -137,10 +136,10 @@ See example above.
 
 #### Formatting Output
 
-Sometimes it may be useful to dump the generated data into a format that is easier to consume or view the relationships
-of. Use the `-f` or `--format` flag to specify one of `json` or `json-pretty`. The `json` format will print a flat
-version of each record that takes up a single line for each iteration. The `json-pretty` format will print an indented
-version of each record that will span multiple lines. Example:
+Sometimes it may be useful to dump the generated data into a format that is easier to consume or view. Use the `-f` or `--format` flag to specify one
+of `json` or `json-pretty` or `csv`. The `json` format will print a flat version of each record that takes up a single line for each iteration. The
+`json-pretty` format will print an indented version of each record that will span multiple lines. The `csv` format will output each record as a comma
+separated value line.  Examples:
 
 ```shell
 # NOTE: This inline spec is in YAML
@@ -161,6 +160,9 @@ dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@
 {
     "handle": "@XmJ"
 }
+dataspec --inline '{"id:uuid": {}, "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } }' \
+41adb77f-d7b3-4a31-a75b-5faff33d5eb8,@U0gI
+d97e8dad-8dfd-49f1-b25e-eaaf2d6953fd,@IYn
 ```
 
 #### Debugging Specifications
@@ -560,9 +562,10 @@ Please put up a PR if you create or use one that solves many of your data genera
 
 ```python
 import dataspec
+from dataspec import ValueSupplierInterface
 
 
-class ReverseStringSupplier:
+class ReverseStringSupplier(ValueSupplierInterface):
     def __init__(self, wrapped):
         self.wrapped = wrapped
 
