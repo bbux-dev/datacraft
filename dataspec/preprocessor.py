@@ -30,7 +30,10 @@ def preprocess_spec(raw_spec):
         else:
             _update_with_params(key, spec, updated_specs)
     if 'refs' in raw_spec:
-        updated_specs['refs'] = preprocess_spec(raw_spec['refs'])
+        if 'refs' in updated_specs:
+            updated_specs['refs'].update(preprocess_spec(raw_spec['refs']))
+        else:
+            updated_specs['refs'] = preprocess_spec(raw_spec['refs'])
     return updated_specs
 
 
