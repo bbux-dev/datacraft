@@ -307,7 +307,7 @@ refs:
 
 ### <a name="Field_Specs"></a>Field Specs
 
-See [field specs](docs/FIELDSPECS.md) for details.
+See [field specs](docs/FIELDSPECS.md) and [schemas](docs/SCHEMAS.md) for details.
 
 ### <a name="FieldGroups"></a>Field Groups
 

@@ -19,6 +19,9 @@ Built in Field Spec Type Schemas
 
 # <a name="definitions"></a>Definitions
 
+<details>
+  <summary>JSON Schema</summary>
+  
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -76,11 +79,14 @@ Built in Field Spec Type Schemas
   }
 }
 ```
+</details>
 
 # <a name="char_class"></a>char_class
 
 Types covered by schema: `char_class`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -127,11 +133,14 @@ Types covered by schema: `char_class`
   }
 }
 ```
+</details>
 
 # <a name="combine-list"></a>combine-list
 
 Types covered by schema: `combine-list`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -176,11 +185,14 @@ Types covered by schema: `combine-list`
   ]
 }
 ```
+</details>
 
 # <a name="combine"></a>combine
 
 Types covered by schema: `combine`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -219,11 +231,14 @@ Types covered by schema: `combine`
   ]
 }
 ```
+</details>
 
 # <a name="date"></a>Date types (data, date.iso, date.iso.us)
 
 Types covered by schema: `date, date.iso, date.iso.us`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -262,11 +277,14 @@ Types covered by schema: `date, date.iso, date.iso.us`
   }
 }
 ```
+</details>
 
 # <a name="geo.lat"></a>geo.lat
 
 Types covered by schema: `geo.lat`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -293,11 +311,14 @@ Types covered by schema: `geo.lat`
   }
 }
 ```
+</details>
 
 # <a name="geo.long"></a>geo.long
 
 Types covered by schema: `geo.long`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -324,11 +345,14 @@ Types covered by schema: `geo.long`
   }
 }
 ```
+</details>
 
 # <a name="geo.pair"></a>geo.pair
 
 Types covered by schema: `geo.pair`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -360,11 +384,14 @@ Types covered by schema: `geo.pair`
   }
 }
 ```
+</details>
 
 # <a name="ip"></a>IP types (ip, ipv4)
 
 Types covered by schema: `ip, ipv4`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -404,11 +431,14 @@ Types covered by schema: `ip, ipv4`
   }
 }
 ```
+</details>
 
 # <a name="range"></a>Range types (range, rand_range)
 
 Types covered by schema: `range, rand_range`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -452,11 +482,14 @@ Types covered by schema: `range, rand_range`
   }
 }
 ```
+</details>
 
 # <a name="unicode_range"></a>unicode_range
 
 Types covered by schema: `unicode_range`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -521,11 +554,14 @@ Types covered by schema: `unicode_range`
   }
 }
 ```
+</details>
 
 # <a name="uuid"></a>uuid
 
 Types covered by schema: `uuid`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -547,11 +583,14 @@ Types covered by schema: `uuid`
   }
 }
 ```
+</details>
 
 # <a name="values"></a>values
 
 Types covered by schema: `values`
 
+<details>
+  <summary>JSON Schema</summary>
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -589,4 +628,5 @@ Types covered by schema: `values`
   }
 }
 ```
+</details>
 
