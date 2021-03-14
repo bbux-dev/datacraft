@@ -21,7 +21,7 @@ Built in Field Spec Type Schemas
 
 <details>
   <summary>JSON Schema</summary>
-  
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -87,6 +87,7 @@ Types covered by schema: `char_class`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -141,6 +142,7 @@ Types covered by schema: `combine-list`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -193,6 +195,7 @@ Types covered by schema: `combine`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -239,6 +242,7 @@ Types covered by schema: `date, date.iso, date.iso.us`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -285,6 +289,7 @@ Types covered by schema: `geo.lat`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -319,6 +324,7 @@ Types covered by schema: `geo.long`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -353,6 +359,7 @@ Types covered by schema: `geo.pair`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -392,6 +399,7 @@ Types covered by schema: `ip, ipv4`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -439,6 +447,7 @@ Types covered by schema: `range, rand_range`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -490,6 +499,7 @@ Types covered by schema: `unicode_range`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -562,6 +572,7 @@ Types covered by schema: `uuid`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -591,6 +602,7 @@ Types covered by schema: `values`
 
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",

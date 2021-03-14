@@ -7,6 +7,7 @@ Types covered by schema: `{{ schema_info.type_names }}`
 {% endif %}
 <details>
   <summary>JSON Schema</summary>
+
 ```json
 {{ schema_info.schema }}
 ```
