@@ -1,5 +1,8 @@
 Data Spec Repository
 ========================
+[![Build Status](https://travis-ci.com/bbux-dev/dataspec.svg?branch=main)](https://travis-ci.com/bbux-dev/dataspec)
+[![codecov](https://codecov.io/gh/bbux-dev/dataspec/branch/main/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/dataspec)
+
 
 1. [Overview](#Overview)
 1. [Build](#Build)
@@ -78,7 +81,7 @@ input:
 
 ### Example Usage
 
-The most common way to use dataspec is to define the field specifications in a JSON or YAML file and to use this with
+The most common way to use `dataspec` is to define the field specifications in a JSON or YAML file and to specify this file with
 the --spec command line argument:
 
 ```shell
@@ -92,7 +95,7 @@ The command above will generate 1000 records and apply the generated values to t
 output to the specified directory. The default is to write all outputs to a single file.  Use the `-r` or
 `--records-per-file` command line argument to modify this if desired.
 
-Another alternative way to specify the data for a spec is by using the `--inline` argument:
+An alternative way to specify the data for a spec is by using the `--inline` argument:
 
 ```shell
 dataspec \
@@ -103,7 +106,6 @@ INFO [12-Mar-2050 06:24:58 PM] Starting Processing...
 @QEWXL_
 @0zTDhp
 @5hK
-@bwUAy6
 @ufqd
 INFO [12-Mar-2050 06:24:58 PM] Finished Processing
 ```
@@ -134,10 +136,10 @@ See example above.
 
 #### Formatting Output
 
-Sometimes it may be useful to dump the generated data into a format that is easier to consume or view the relationships
-of. Use the `-f` or `--format` flag to specify one of `json` or `json-pretty`. The `json` format will print a flat
-version of each record that takes up a single line for each iteration. The `json-pretty` format will print an indented
-version of each record that will span multiple lines. Example:
+Sometimes it may be useful to dump the generated data into a format that is easier to consume or view. Use the `-f` or `--format` flag to specify one
+of `json` or `json-pretty` or `csv`. The `json` format will print a flat version of each record that takes up a single line for each iteration. The
+`json-pretty` format will print an indented version of each record that will span multiple lines. The `csv` format will output each record as a comma
+separated value line.  Examples:
 
 ```shell
 # NOTE: This inline spec is in YAML
@@ -158,6 +160,9 @@ dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@
 {
     "handle": "@XmJ"
 }
+dataspec --inline '{"id:uuid": {}, "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } }' \
+41adb77f-d7b3-4a31-a75b-5faff33d5eb8,@U0gI
+d97e8dad-8dfd-49f1-b25e-eaaf2d6953fd,@IYn
 ```
 
 #### Debugging Specifications
@@ -302,7 +307,7 @@ refs:
 
 ### <a name="Field_Specs"></a>Field Specs
 
-See [field specs](docs/FIELDSPECS.md) for details.
+See [field specs](docs/FIELDSPECS.md) and [schemas](docs/SCHEMAS.md) for details.
 
 ### <a name="FieldGroups"></a>Field Groups
 
@@ -557,9 +562,10 @@ Please put up a PR if you create or use one that solves many of your data genera
 
 ```python
 import dataspec
+from dataspec import ValueSupplierInterface
 
 
-class ReverseStringSupplier:
+class ReverseStringSupplier(ValueSupplierInterface):
     def __init__(self, wrapped):
         self.wrapped = wrapped
 
