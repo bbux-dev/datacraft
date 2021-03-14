@@ -41,9 +41,9 @@ class Loader:
 
     def get(self, key):
         """
-        Retrieve the value supplier for the given field key
+        Retrieve the value supplier for the given field or ref key
 
-        :param key: key to use, may have url format i.e. field_name?param=value...
+        :param key: key to for field or ref name
         """
         if key in self.cache:
             return self.cache[key]
@@ -86,12 +86,16 @@ class Loader:
             supplier = suppliers.decorated(field_spec, supplier)
         return supplier
 
+    def get_ref_spec(self, key):
+        """ returns the spec for the ref with the provided key """
+        return self.refs.get(key)
+
 
 def _validate_schema_for_spec(spec_type, field_spec):
     type_schema = lookup_schema(spec_type)
     if type_schema is None:
         return
-    return validate_schema_for_spec(spec_type, field_spec, type_schema)
+    validate_schema_for_spec(spec_type, field_spec, type_schema)
 
 
 def preprocess_spec(raw_spec):

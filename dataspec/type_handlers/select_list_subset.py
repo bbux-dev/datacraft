@@ -41,7 +41,7 @@ def configure_supplier(field_spec, loader):
 
     if 'ref' in field_spec:
         ref_name = field_spec.get('ref')
-        field_spec = loader.refs.get(ref_name)
+        field_spec = loader.get_ref_spec(ref_name)
         if field_spec is None:
             raise SpecException('No ref with name %s found: %s' % (ref_name, json.dumps(field_spec)))
 

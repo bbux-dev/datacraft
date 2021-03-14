@@ -30,8 +30,7 @@ class ReverseStringSupplier:
 @dataspec.registry.types('reverse_string')
 def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
-    myspec = loader.refs.get(key)
-    wrapped = suppliers.values(myspec)
+    wrapped = loader.get(key)
     return ReverseStringSupplier(wrapped)
 
 

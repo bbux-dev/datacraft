@@ -13,6 +13,5 @@ class StringReverserSupplier:
 @dataspec.registry.types('string_reverser')
 def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
-    myspec = loader.refs.get(key)
-    wrapped = loader.get_from_spec(myspec)
+    wrapped = loader.get(key)
     return StringReverserSupplier(wrapped)
