@@ -3,7 +3,6 @@ Module for implementation of select list subset value supplier
 """
 import math
 import random
-from random import gauss
 from dataspec.utils import is_affirmative
 from dataspec.supplier.value_supplier import ValueSupplierInterface
 
@@ -32,7 +31,7 @@ class ListStatSamplerSupplier(ValueSupplierInterface):
         if self.stddev == 0:
             count = int(self.mean)
         else:
-            count = math.floor(gauss(self.mean, self.stddev))
+            count = math.floor(random.gauss(self.mean, self.stddev))
         if count <= 0:
             count = 1
         if count > self.max:

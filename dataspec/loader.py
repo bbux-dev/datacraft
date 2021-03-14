@@ -91,7 +91,7 @@ def _validate_schema_for_spec(spec_type, field_spec):
     type_schema = lookup_schema(spec_type)
     if type_schema is None:
         return
-    return validate_schema_for_spec(spec_type, field_spec, type_schema)
+    validate_schema_for_spec(spec_type, field_spec, type_schema)
 
 
 def preprocess_spec(raw_spec):

@@ -123,7 +123,6 @@ def _load_spec(args):
             return json.load(handle)
         except json.decoder.JSONDecodeError:
             log.debug('Spec is not Valid JSON')
-            pass
     # not JSON, try yaml
     with open(spec_path, 'r') as handle:
         log.debug('Attempting to load spec as YAML')
@@ -138,7 +137,6 @@ def _parse_spec_string(inline):
         return json.loads(inline)
     except json.decoder.JSONDecodeError:
         log.debug('Spec is not Valid JSON')
-        pass
     # not JSON, try yaml
     log.debug('Attempting to load spec as YAML')
     spec = yaml.load(inline, Loader=yaml.FullLoader)
@@ -155,19 +153,7 @@ def _configure_logging(args):
 
 if __name__ == '__main__':
     # this activates the decorators, so they will be discoverable
-    # cannot use * import due to pyinstaller not recognizing modules as being used
-    from dataspec.type_handlers import combine
-    from dataspec.type_handlers import range_handler
-    from dataspec.type_handlers import select_list_subset
-    from dataspec.type_handlers import weighted_ref
-    from dataspec.type_handlers import uuid_handler
-    from dataspec.type_handlers import ip_handler
-    from dataspec.type_handlers import date_handler
-    from dataspec.type_handlers import csv_handler
-    from dataspec.type_handlers import geo_handler
-    from dataspec.type_handlers import nested_handler
-    from dataspec.type_handlers import char_class_handler
-    from dataspec.type_handlers import unicode_range
+    from dataspec.type_handlers import *
     import dataspec.preprocessor
     import dataspec.logging_handler
 
