@@ -95,7 +95,7 @@ The command above will generate 1000 records and apply the generated values to t
 output to the specified directory. The default is to write all outputs to a single file.  Use the `-r` or
 `--records-per-file` command line argument to modify this if desired.
 
-Another alternative way to specify the data for a spec is by using the `--inline` argument:
+An alternative way to specify the data for a spec is by using the `--inline` argument:
 
 ```shell
 dataspec \
