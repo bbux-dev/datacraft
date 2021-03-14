@@ -22,9 +22,6 @@ def configure_supplier(parent_field_spec, loader):
     key_supplier = suppliers.values(parent_field_spec)
     values_map = {}
     for key in parent_field_spec['data'].keys():
-        field_spec = loader.refs.get(key)
-        supplier = loader.get_from_spec(field_spec)
-        if supplier is None:
-            raise SpecException("Unable to get supplier for ref key: %s, spec: %s" % (key, json.dumps(field_spec)))
+        supplier = loader.get(key)
         values_map[key] = supplier
     return suppliers.weighted_ref(key_supplier, values_map)

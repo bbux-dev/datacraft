@@ -48,7 +48,7 @@ def load_config(field_spec, loader):
     config = field_spec.get('config', {})
     refkey = config.get('configref')
     if refkey:
-        configref = loader.refs.get(refkey)
+        configref = loader.get_ref_spec(refkey)
         config.update(configref.get('config', {}))
     return config
 

@@ -68,12 +68,7 @@ def _load_from_refs(combine_field_spec, loader):
     keys = combine_field_spec.get('refs')
     to_combine = []
     for key in keys:
-        field_spec = loader.refs.get(key)
-        if field_spec is None:
-            raise SpecException("Unable to get field_spec for ref key: %s, spec: %s" % (key, json.dumps(combine_field_spec)))
-        supplier = loader.get_from_spec(field_spec)
-        if supplier is None:
-            raise SpecException("Unable to get supplier for ref key: %s, spec: %s" % (key, json.dumps(field_spec)))
+        supplier = loader.get(key)
         to_combine.append(supplier)
     return suppliers.combine(to_combine, combine_field_spec.get('config'))
 
