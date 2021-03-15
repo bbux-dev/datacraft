@@ -1,8 +1,7 @@
 """
 Module for handling nested types
 """
-import dataspec
-from dataspec.supplier.value_supplier import ValueSupplierInterface
+from dataspec import registry, ValueSupplierInterface
 
 
 class NestedSupplier(ValueSupplierInterface):
@@ -16,7 +15,7 @@ class NestedSupplier(ValueSupplierInterface):
         return {key: supplier.next(iteration) for key, supplier in self.field_supplier_map.items()}
 
 
-@dataspec.registry.types('nested')
+@registry.types('nested')
 def configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     keys = [key for key in spec.keys() if key not in loader.RESERVED]

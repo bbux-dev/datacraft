@@ -4,11 +4,9 @@ Module for handling ip types
 import json
 import random
 import ipaddress
-import dataspec
-from dataspec.supplier.value_supplier import ValueSupplierInterface
-from dataspec.utils import load_config
-from dataspec import SpecException, suppliers
+from dataspec import registry, suppliers, ValueSupplierInterface, SpecException
 import dataspec.schemas as schemas
+from dataspec.utils import load_config
 
 IP_KEY = 'ip'
 IPV4_KEY = 'ipv4'
@@ -33,23 +31,23 @@ class IpV4Supplier(ValueSupplierInterface):
         return f'{first}.{second}.{third}.{fourth}'
 
 
-@dataspec.registry.schemas(IP_KEY)
+@registry.schemas(IP_KEY)
 def get_ip_schema():
     return schemas.load(IP_KEY)
 
 
-@dataspec.registry.schemas(IPV4_KEY)
+@registry.schemas(IPV4_KEY)
 def get_ipv4_schema():
     return schemas.load(IPV4_KEY)
 
 
-@dataspec.registry.types(IPV4_KEY)
+@registry.types(IPV4_KEY)
 def configure_ipv4(field_spec, _):
     """ configures value supplier for ipv4 type """
     return configure_ip(field_spec, _)
 
 
-@dataspec.registry.types(IP_KEY)
+@registry.types(IP_KEY)
 def configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = load_config(field_spec, loader)
@@ -141,7 +139,7 @@ class IpV4PreciseSupplier(ValueSupplierInterface):
         return str(self.net[idx])
 
 
-@dataspec.registry.types('ip.precise')
+@registry.types('ip.precise')
 def configure_precise_ip(field_spec, _):
     """ configures value supplier for ip.precise type """
     config = field_spec.get('config')

@@ -13,36 +13,33 @@ Range Spec format:
 import decimal
 import json
 import math
-
-import dataspec
-import dataspec.suppliers as suppliers
-import dataspec.schemas as schemas
+from dataspec import registry, suppliers, schemas, SpecException
 from dataspec.utils import load_config
 
 RANGE_KEY = 'range'
 RAND_RANGE_KEY = 'rand_range'
 
 
-@dataspec.registry.schemas(RANGE_KEY)
+@registry.schemas(RANGE_KEY)
 def get_range_schema():
     return schemas.load(RANGE_KEY)
 
 
-@dataspec.registry.schemas(RAND_RANGE_KEY)
+@registry.schemas(RAND_RANGE_KEY)
 def get_rand_range_schema():
     # This shares a schema with range
     return schemas.load(RANGE_KEY)
 
 
-@dataspec.registry.types(RANGE_KEY)
+@registry.types(RANGE_KEY)
 def configure_range_supplier(field_spec, _):
     """ configures the range value supplier """
     if 'data' not in field_spec:
-        raise dataspec.SpecException('No data element defined for: %s' % json.dumps(field_spec))
+        raise SpecException('No data element defined for: %s' % json.dumps(field_spec))
 
     data = field_spec.get('data')
     if not isinstance(data, list) or len(data) < 2:
-        raise dataspec.SpecException(
+        raise SpecException(
             'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
     # we have the nested case
     if isinstance(data[0], list):
@@ -57,7 +54,7 @@ def _configure_supplier_for_range_data(field_spec, data):
     # more intuitive behavior
     end = data[1] + 1
     if not end > start:
-        raise dataspec.SpecException('end element must be larger than start: %s' % json.dumps(field_spec))
+        raise SpecException('end element must be larger than start: %s' % json.dumps(field_spec))
     if len(data) == 2:
         step = 1
     else:
@@ -66,22 +63,22 @@ def _configure_supplier_for_range_data(field_spec, data):
         config = field_spec.get('config', {})
         precision = config.get('precision', None)
         if precision and not str(precision).isnumeric():
-            raise dataspec.SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
+            raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
         range_values = list(float_range(float(start), float(end), float(step), precision))
     else:
         range_values = list(range(start, end, step))
     return suppliers.values(range_values)
 
 
-@dataspec.registry.types(RAND_RANGE_KEY)
+@registry.types(RAND_RANGE_KEY)
 def configure_rand_range_supplier(field_spec, loader):
     """ configures the random range value supplier """
     if 'data' not in field_spec:
-        raise dataspec.SpecException('No data element defined for: %s' % json.dumps(field_spec))
+        raise SpecException('No data element defined for: %s' % json.dumps(field_spec))
     data = field_spec.get('data')
     config = load_config(field_spec, loader)
     if not isinstance(data, list) or len(data) == 0:
-        raise dataspec.SpecException(
+        raise SpecException(
             'rand_range specs require data as array with at least one element: %s' % json.dumps(field_spec))
     start = 0
     if len(data) == 1:

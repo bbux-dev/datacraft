@@ -11,14 +11,12 @@ The weightedref Field Spec structure is:
   }
 }
 """
-import json
-import dataspec
-from dataspec import SpecException, suppliers
+from dataspec import registry, suppliers
 
 
-@dataspec.registry.types('weightedref')
+@registry.types('weightedref')
 def configure_supplier(parent_field_spec, loader):
-    """ configures suplier for weighted ref specs """
+    """ configures supplier for weighted ref specs """
     key_supplier = suppliers.values(parent_field_spec)
     values_map = {}
     for key in parent_field_spec['data'].keys():

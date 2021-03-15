@@ -24,13 +24,12 @@ The select_list_subset Field Spec structure is:
 """
 import json
 
-import dataspec
-from dataspec.exceptions import SpecException
+from dataspec import registry, SpecException
 from dataspec.suppliers import list_stat_sampler
 from dataspec.utils import load_config
 
 
-@dataspec.registry.types('select_list_subset')
+@registry.types('select_list_subset')
 def configure_supplier(field_spec, loader):
     """ configures supplier for select_list_subset type """
     config = load_config(field_spec, loader)

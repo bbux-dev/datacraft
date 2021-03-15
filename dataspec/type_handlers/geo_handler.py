@@ -3,11 +3,9 @@ Module for handling geo types
 """
 import json
 
-import dataspec
-from dataspec import SpecException, suppliers
-from dataspec.supplier.value_supplier import ValueSupplierInterface
-from dataspec.utils import load_config, is_affirmative
+from dataspec import registry, suppliers, ValueSupplierInterface, SpecException
 import dataspec.schemas as schemas
+from dataspec.utils import load_config, is_affirmative
 
 GEO_LAT_KEY = 'geo.lat'
 GEO_LONG_KEY = 'geo.long'
@@ -27,35 +25,35 @@ class GeoSupplier(ValueSupplierInterface):
         return value
 
 
-@dataspec.registry.schemas(GEO_LAT_KEY)
+@registry.schemas(GEO_LAT_KEY)
 def get_geo_lat_schema():
     return schemas.load(GEO_LAT_KEY)
 
 
-@dataspec.registry.schemas(GEO_LONG_KEY)
+@registry.schemas(GEO_LONG_KEY)
 def get_geo_long_schema():
     return schemas.load(GEO_LONG_KEY)
 
 
-@dataspec.registry.schemas(GEO_PAIR_KEY)
+@registry.schemas(GEO_PAIR_KEY)
 def get_geo_pair_schema():
     return schemas.load(GEO_PAIR_KEY)
 
 
-@dataspec.registry.types(GEO_LAT_KEY)
+@registry.types(GEO_LAT_KEY)
 def configure_geo_lat(field_spec, loader):
     """ configures value supplier for geo.lat type """
     return _configure_lat_type(field_spec, loader)
 
 
-@dataspec.registry.types(GEO_LONG_KEY)
+@registry.types(GEO_LONG_KEY)
 def configure_geo_long(field_spec, loader):
     """ configures value supplier for geo.long type """
     return _configure_long_type(field_spec, loader)
 
 
-@dataspec.registry.types(GEO_PAIR_KEY)
-def configure_geo_long(field_spec, loader):
+@registry.types(GEO_PAIR_KEY)
+def configure_geo_pair(field_spec, loader):
     """ configures value supplier for geo.pair type """
     config = load_config(field_spec, loader)
     long_supplier = _configure_long_type(field_spec, loader)

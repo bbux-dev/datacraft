@@ -6,12 +6,9 @@ import csv
 import json
 import random
 from typing import Union
-import dataspec
-from dataspec import SpecException
+from dataspec import registry, ValueSupplierInterface, SpecException
 from dataspec.suppliers import count_supplier_from_data
-from dataspec.utils import is_affirmative
-from dataspec.utils import load_config
-from dataspec.supplier.value_supplier import ValueSupplierInterface
+from dataspec.utils import load_config, is_affirmative
 
 # 250 MB
 ONE_MB = 1024 * 1024
@@ -167,7 +164,7 @@ class CsvSupplier(ValueSupplierInterface):
         return self.csv_data.next(self.field_name, iteration, self.sample, count)
 
 
-@dataspec.registry.types('csv')
+@registry.types('csv')
 def configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
     config = load_config(field_spec, loader)

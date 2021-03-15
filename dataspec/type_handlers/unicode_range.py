@@ -2,10 +2,9 @@
 Module for handling unicode ranges
 """
 import json
-import dataspec
+from dataspec import registry, ValueSupplierInterface, SpecException
 from dataspec.utils import any_key_exists
 from dataspec.suppliers import list_stat_sampler, list_count_sampler, from_list_of_suppliers
-from dataspec.supplier.value_supplier import ValueSupplierInterface
 import dataspec.schemas as schemas
 
 UNICODE_RANGE_KEY = 'unicode_range'
@@ -23,20 +22,20 @@ class UnicodeRangeSupplier(ValueSupplierInterface):
         return ''.join(as_str)
 
 
-@dataspec.registry.schemas(UNICODE_RANGE_KEY)
+@registry.schemas(UNICODE_RANGE_KEY)
 def get_unicode_range_schema():
     return schemas.load(UNICODE_RANGE_KEY)
 
 
-@dataspec.registry.types(UNICODE_RANGE_KEY)
+@registry.types(UNICODE_RANGE_KEY)
 def configure_supplier(spec, _):
     """ configure the supplier for unicode_range types """
     if 'data' not in spec:
-        raise dataspec.SpecException('data is Required Element for unicode_range specs' + json.dumps(spec))
+        raise SpecException('data is Required Element for unicode_range specs: ' + json.dumps(spec))
     data = spec['data']
     if not isinstance(data, list):
-        raise dataspec.SpecException(
-            'data is should be a list or list of lists with two elements for unicode_range specs' + json.dumps(spec))
+        raise SpecException(
+            f'data should be a list or list of lists with two elements for {UNICODE_RANGE_KEY} specs: ' + json.dumps(spec))
     config = spec.get('config', {})
     if isinstance(data[0], list):
         suppliers = [_single_range(sublist, config) for sublist in data]
