@@ -1,29 +1,48 @@
 # -*- coding: utf-8 -*-
-
+import re
 from setuptools import setup, find_packages
 
-with open('README.md') as f:
-    readme = f.read()
 
-with open('LICENSE') as f:
-    project_license = f.read()
+def _read_files_to_string(*filenames):
+    strings = []
+    for filename in filenames:
+        with open(filename) as f:
+            strings.append(f.read())
+    return '\n\n'.join(strings)
 
-with open('requirements.txt') as f:
-    lines = f.readlines()
-    requires = [line.strip() for line in lines]
+
+def long_description():
+    return _read_files_to_string('README.md')
+
+
+def project_license():
+    return _read_files_to_string('LICENSE')
+
+
+def requires():
+    with open('requirements.txt') as f:
+        lines = f.readlines()
+        return [line.strip() for line in lines]
+
+
+def version():
+    with open('dataspec/__init__.py') as f:
+        match = re.search(r"__version__ = '([\d\.]+)'", f.read())
+        return match.group(1)
+
 
 setup(
     name='dataspec',
-    version='0.1.0',
+    version=version(),
     description='Data Generation Through Specification',
-    long_description=readme,
+    long_description=long_description(),
     author='Brian Buxton',
     author_email='bbux.dev@gmail.com',
     url='https://github.com/bbux-dev/dataspec',
-    license=project_license,
+    license='MIT',
     packages=find_packages(),
     keywords=['data', 'synthetic', 'generator', 'specification', 'spec', 'data spec'],
-    install_requires=requires,
+    install_requires=requires(),
     scripts=['bin/dataspec'],
     package_data={
         "dataspec": ["schema/*.schema.json", "schema/definitions.json"]
