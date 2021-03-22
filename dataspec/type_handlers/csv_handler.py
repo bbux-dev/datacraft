@@ -26,9 +26,10 @@ class CsvDataBase:
     """
 
     def __init__(self, has_headers: bool):
+        self.data = self._load_data()
         if has_headers:
-            has_headers = self.data.pop(0)
-            self.mapping = {has_headers[i]: i for i in range(len(has_headers))}
+            first_row = self.data.pop(0)
+            self.mapping = {first_row[i]: i for i in range(len(first_row))}
         else:
             self.mapping = {}
         self.valid_keys = list(self.mapping.keys())
@@ -44,6 +45,13 @@ class CsvDataBase:
         :param count: number of values to return
         :return: array of values if count > 1 else the next value
         """
+
+    def _load_data(self) -> list:
+        """
+        Method for subclass to load initial data
+        :return: the loaded data
+        """
+        raise NotImplementedError()
 
     def _get_column_index(self, field: Union[int, str]):
         """
@@ -61,12 +69,19 @@ class CsvDataBase:
 
 
 class SampleEnabledCsv(CsvDataBase):
-    def __init__(self, csv_path, delimiter, quotechar, has_headers):
-        with open(csv_path, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
-            self.data = list(reader)
-        # need to populate data before super constructor call
+    """
+    CSV Data that reads whole file into memory. Supports Sampling of columns and counts greater than 1.
+    """
+    def __init__(self, csv_path: str, delimiter: str, quotechar: str, has_headers: bool):
+        self.csv_path = csv_path
+        self.delimiter = delimiter
+        self.quotechar = quotechar
         super().__init__(has_headers)
+
+    def _load_data(self):
+        with open(self.csv_path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=self.delimiter, quotechar=self.quotechar)
+            return list(reader)
 
     def next(self, field, iteration, sample, count):
         colidx = self._get_column_index(field)
@@ -84,7 +99,11 @@ class SampleEnabledCsv(CsvDataBase):
 
 
 class BufferedCsvData(CsvDataBase):
-    def __init__(self, csv_path, delimiter, quotechar, has_headers, buffer_size):
+    """
+    CSV Data that buffers in a section of the CSV file at a time. Does NOT support sampling or counts greater than 1 for
+    columns.
+    """
+    def __init__(self, csv_path: str, delimiter: str, quotechar: str, has_headers: bool, buffer_size: int):
         self.csv_path = csv_path
         self.delimiter = delimiter
         self.quotechar = quotechar
@@ -95,16 +114,26 @@ class BufferedCsvData(CsvDataBase):
         # need to populate data before super constructor call
         super().__init__(has_headers)
 
-    def fill_buffer(self, iteration):
-        if int(iteration / self.size) == self.increment:
+    def _load_data(self):
+        self.fill_buffer(0)
+        return self.data
+
+    def fill_buffer(self, iteration: int) -> None:
+        """
+        Fills the buffer of data for this iteration
+        :param iteration: current record number being processed
+        :return: None
+        """
+        new_increment = int(iteration / self.size)
+        if new_increment == self.increment:
             return
-        else:
-            self.increment = int(iteration / self.size)
+
+        self.increment = new_increment
         start = self.size * self.increment + 1
         end = start + self.size + 1
         buff = []
-        with open(self.csv_path) as f:
-            rows = csv.reader(f, delimiter=self.delimiter, quotechar=self.quotechar)
+        with open(self.csv_path) as handle:
+            rows = csv.reader(handle, delimiter=self.delimiter, quotechar=self.quotechar)
             for line in rows:
                 if rows.line_num == end:
                     break
@@ -113,14 +142,6 @@ class BufferedCsvData(CsvDataBase):
         self.data = buff
 
     def next(self, field, iteration, sample, count):
-        """
-        Obtains the next value(s) for the field for the given iteration
-        :param field: key or one based index number
-        :param iteration: current iteration
-        :param sample: if sampling should be used
-        :param count: number of values to return
-        :return: array of values if count > 1 else the next value
-        """
         if sample:
             raise SpecException('Large CSV files do not support sample mode')
         if count > 1:
@@ -132,20 +153,6 @@ class BufferedCsvData(CsvDataBase):
         if idx >= len(self.data):
             raise SpecException("Exceeded end of CSV data, unable to proceed with large CSV files")
         return self.data[idx][colidx]
-
-    def _get_column_index(self, field):
-        """
-        Resolve the column index
-        :param field: key or one based index number
-        :return: the column index for the field
-        """
-        # if we had headers we can use that name, otherwise field should be one based index
-        colidx = self.mapping.get(field)
-        if colidx is None and not str(field).isdigit():
-            raise SpecException(f'Invalid field name: {field} for csv, known keys: {self.valid_keys}')
-        if colidx is None:
-            colidx = int(field) - 1
-        return colidx
 
 
 class CsvSupplier(ValueSupplierInterface):

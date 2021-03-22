@@ -24,11 +24,13 @@ COMBINE_LIST_KEY = 'combine-list'
 
 @registry.schemas(COMBINE_KEY)
 def get_combine_schema():
+    """ get the schema for the combine type """
     return schemas.load(COMBINE_KEY)
 
 
 @registry.schemas(COMBINE_LIST_KEY)
 def get_combine_list_schema():
+    """ get the schema for the combine_list type """
     return schemas.load(COMBINE_LIST_KEY)
 
 
@@ -64,20 +66,21 @@ def configure_combine_list_supplier(field_spec, loader):
 
 
 def _load_from_refs(combine_field_spec, loader):
+    """ loads the combine type from a set of refs """
     keys = combine_field_spec.get('refs')
+    return _load(combine_field_spec, keys, loader)
+
+
+def _load_from_fields(combine_field_spec, loader):
+    """ load the combine type from a set of field names """
+    keys = combine_field_spec.get('fields')
+    return _load(combine_field_spec, keys, loader)
+
+
+def _load(combine_field_spec, keys, loader):
+    """ create the combine supplier for the types from the given keys """
     to_combine = []
     for key in keys:
         supplier = loader.get(key)
         to_combine.append(supplier)
     return suppliers.combine(to_combine, combine_field_spec.get('config'))
-
-
-def _load_from_fields(data_spec, loader):
-    keys = data_spec.get('fields')
-    to_combine = []
-    for key in keys:
-        supplier = loader.get(key)
-        if supplier is None:
-            raise SpecException("Unable to get supplier for field key: %s" % key)
-        to_combine.append(supplier)
-    return suppliers.combine(to_combine, data_spec.get('config'))

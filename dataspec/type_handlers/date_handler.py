@@ -32,17 +32,20 @@ ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 
 @registry.schemas(DATE_KEY)
 def get_date_schema():
+    """ returns the schema for date types """
     return schemas.load(DATE_KEY)
 
 
 @registry.schemas(DATE_ISO_KEY)
 def get_date_iso_schema():
+    """ returns the schema for date.iso types """
     # NOTE: These all share a schema
     return schemas.load(DATE_KEY)
 
 
 @registry.schemas(DATE_ISO_US_KEY)
 def get_date_iso_us_schema():
+    """ returns the schema for date.iso.us types """
     # NOTE: These all share a schema
     return schemas.load(DATE_KEY)
 
