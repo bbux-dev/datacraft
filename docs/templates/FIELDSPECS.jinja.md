@@ -537,7 +537,7 @@ size range.
 
 ```shell
 # no stddev specified
-for p in $(dataspec -l off --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
+for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -552,7 +552,7 @@ done | sort | uniq -c | sort -n -k2,2
      71 8
     220 9
 # with stddev of 3 specified
-for p in $(dataspec -l off --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
+for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
