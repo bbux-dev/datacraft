@@ -38,7 +38,9 @@ def test_outputs_record_level():
     output.handle('B', '2')
     output.handle('C', '3')
     output.handle('D', '4')
-    output.finished_record()
+    output.finished_record(iteration=1,
+                           group_name='TEST',
+                           exclude_internal=True)
 
     _verify_ouput('test_record-0.txt', 'A:1, B:2, C:3\n')
 

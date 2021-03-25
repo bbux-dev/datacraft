@@ -52,6 +52,8 @@ def main():
                         help='Enforce schema validation for all registered field specs')
     parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
                         help='Debug spec after internal reformatting')
+    parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true', default=False,
+                        help='Do not include non data fields in output records')
 
     try:
         args = parser.parse_args()
@@ -74,14 +76,15 @@ def main():
 
         output = _configure_output(args)
 
-        keys = key_providers.from_spec(loader.specs)
+        key_provider = key_providers.from_spec(loader.specs)
 
         log.info('Starting Processing...')
         for i in range(0, args.iterations):
-            for key in keys.get():
+            group, keys = key_provider.get()
+            for key in keys:
                 value = loader.get(key).next(i)
                 output.handle(key, value)
-            output.finished_record()
+            output.finished_record(i, group, args.exclude_internal)
         log.info('Finished Processing')
     except SpecException as exc:
         log.error(str(exc))

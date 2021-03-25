@@ -9,16 +9,19 @@ from .types import registry
 
 @dataspec.registry.formats('json')
 def format_json(record):
+    """ formats the record as compressed json """
     return json.dumps(record)
 
 
 @dataspec.registry.formats('json-pretty')
-def format_json(record):
+def format_json_pretty(record):
+    """ pretty prints the record as json """
     return json.dumps(record, indent=4)
 
 
 @dataspec.registry.formats('csv')
 def format_csv(record):
+    """ formats the values of the record as comma separated valpues """
     return ','.join([str(val) for val in record.values()])
 
 
@@ -76,8 +79,14 @@ class RecordLevelOutput(OutputHandlerInterface):
     def handle(self, key, value):
         self.current[key] = value
 
-    def finished_record(self):
-        processed = self.record_processor.process(self.current)
+    def finished_record(self, iteration, group_name, exclude_internal=False):
+        current = self.current
+        if not exclude_internal:
+            current['_internal'] = {
+                '_iteration': iteration,
+                '_field_group': group_name
+            }
+        processed = self.record_processor.process(current)
         self.writer.write(processed)
         self.current.clear()
 
