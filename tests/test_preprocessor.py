@@ -200,8 +200,8 @@ nested_transform_tests = [
                     "type": "nested",
                     "config": {"as_array": "true"},
                     "fields": {
-                        "lat": {"type": "values", "data": 55.5},
-                        "long": {"type": "values", "data": 99.9}
+                        "lat": 55.5,
+                        "long": 99.9
                     }
                 }
             }
