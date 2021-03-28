@@ -41,7 +41,7 @@ def values(spec, loader=None):
 
     # Check for count param
     if 'count' in config:
-        return _MultipleValueSupplier(supplier, config['count'])
+        return _MultipleValueSupplier(supplier, count_supplier_from_data(config['count']))
     return supplier
 
 
@@ -77,17 +77,23 @@ def single_value(data):
     return _SingleValue(data)
 
 
+def array_supplier(wrapped: ValueSupplierInterface, count_config):
+    """ returns a supplier that always returns an array of elements  based on the count config supplied """
+    return _MultipleValueSupplier(wrapped, count_supplier_from_data(count_config))
+
+
 class _MultipleValueSupplier(ValueSupplierInterface):
     """
     Supplier that generates list of values based on count parameter
     """
 
-    def __init__(self, wrapped, count):
+    def __init__(self, wrapped: ValueSupplierInterface, count_supplier: ValueSupplierInterface):
         self.wrapped = wrapped
-        self.count = int(count)
+        self.count_supplier = count_supplier
 
     def next(self, iteration):
-        return [self.wrapped.next(iteration + i) for i in range(self.count)]
+        count = self.count_supplier.next(iteration)
+        return [self.wrapped.next(iteration + i) for i in range(count)]
 
 
 def from_list_of_suppliers(supplier_list, modulate_iteration):
