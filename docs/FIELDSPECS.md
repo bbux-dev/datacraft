@@ -11,6 +11,7 @@ Field Spec Definitions
     1. [Inline Key Config Shorthad](#Inline_Key_Config_Shorthad)
 1. [Spec Configuration](#Spec_Configuration)
     1. [Common Configurations](#Common_Configurations)
+    1. [Count Config Parameter](#CountsField)
 1. [Field Spec Types](#Field_Spec_Types)
     1. [Values](#Values)
         1. [Constant Values](#Constant_Values)
@@ -338,7 +339,7 @@ TWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]
 ```
 </details>
 
-# <a name="Common_Configurations"></a>Common Configurations
+## <a name="Common_Configurations"></a>Common Configurations
 
 There are some configuration values that can be applied to all or a subset of types. These are listed below
 
@@ -350,6 +351,7 @@ There are some configuration values that can be applied to all or a subset of ty
 |cast   | i,int,f,float,s,str,string|For numeric types, will cast results the provided type|
 |join_with|string   |For types that produce multiple values, use this string to join them   |
 |as_list|yes,true,on|For types that produce multiple values, return as list without joining |
+
 
 Example:
 
@@ -381,6 +383,15 @@ field:
   data: [world, beautiful, destiny]
 ```
 </details>
+
+## <a name="CountsField"></a>Count Config Parameter
+
+Several types support a `count` config parameter. The value of the count parameter can be any of the supported values
+specs formats. For example a constant `3`, list `[2, 3, 7]`, or weighted map `{"1": 0.5, "2": 0.3, "3": 0.2 }`. This
+will produce the number of values by creating a value supplier for the count based on the supplied parameter. Most of
+the time if the count is greater that 1, the values will be returned as an array. Some types support joining the values
+by specifying the `join_with` parameter. Some types will let you explicitly set the `as_array` parameter to force the
+results to be returned as an array and not the default for the given type.
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
@@ -1640,7 +1651,7 @@ to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "csv",
@@ -1866,26 +1877,51 @@ placeholder:
 ```
 </details>
 
-## <a name="nested"></a>Nested fields
+## <a name="nested"></a>Nested Fields
 
-Many documents or objects are not flat, but contain nested inner objects or child documents. To generate nested fields
-use the `nested` type. 
+Nested types are used to create fields that contain subfields. Nested types can also contain nested fields to allow
+multiple levels of nesting. Use the `nested` type to generate a field that contains subfields. The subfields are
+defined in the `fields` element of the nested spec. The `fields` element will be treated like a top level dataspec
+and has access to the `refs` and other elements of the root.
+
+The `nested` Field Spec structure is:
+
+```
+{
+  "<field name>": {
+    "type": "nested",
+    "config": {
+      "count": "Values Spec for Counts, default is 1"
+    },
+    "fields": {
+      "<sub field one>": { spec definition here },
+      "<sub field two>": { spec definition here },
+      ...
+    }
+  }
+}
+```
 
 ### Example:
 
-In this example a pseudo schema for our data might look like this:
+Below is an example of the data we wish to generate:
 
-```
- - id:str
- - user
-   - user_id:str
-   - geo
-     - place_id:str
-     - coordinates: List[float]
+```json
+{
+  "id": "abc123efg456",
+  "user": {
+    "user_id": "bad135dad987",
+    "geo": {
+      "place_id": 12345,
+      "coordinates": [118.2, 34.0]
+    }
+  }
+}
 ```
 
-The user is a nested object, which has a geo, which is also a nested object. Below are the specs that will generate data
-that matches this schema.
+The `user` is a nested object, which has a subfield `geo`, which is also a nested object. The `id` and `user_id` fields
+are uuids. The coordinates field is a list of longitude followed by latitude. Below are the specs that will generate
+data that matches this schema.
 
 <details open>
   <summary>JSON Spec</summary>
@@ -1894,10 +1930,14 @@ that matches this schema.
 {
   "id:uuid": {},
   "user:nested": {
-    "user_id:uuid": {},
-    "geo:nested": {
-      "place_id:uuid": {},
-      "coordinates:geo.pair?as_list=true": {}
+    "fields": {
+      "user_id:uuid": {},
+      "geo:nested": {
+        "fields": {
+          "place_id:cc-digits?mean=5": {},
+          "coordinates:geo.pair?as_list=true": {}
+        }
+      }
     }
   }
 }
@@ -1908,20 +1948,21 @@ that matches this schema.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 id:uuid: {}
 user:nested:
-  user_id:uuid: {}
-  geo:nested:
-    place_id:uuid: {}
-    coordinates:geo.pair?as_list=true: {}
+  fields:
+    user_id:uuid: {}
+    geo:nested:
+      fields:
+        place_id:cc-digits?mean=5: {}
+        coordinates:geo.pair?as_list=true: {}
 ```
 </details>
 
 If we run this example:
 
 ```shell
-dataspec -s double-nested.json -i 1 --format json-pretty
+dataspec -s double-nested.json -i 1 --format json-pretty -x
 {
     "id": "4278b060-442d-4558-bf2c-5f1df68cb265",
     "user": {
@@ -1930,7 +1971,7 @@ dataspec -s double-nested.json -i 1 --format json-pretty
                 "-167.4324",
                 " 84.6883"
             ],
-            "place_id": "510e5740-6a13-4c0b-8c53-2e3c1f88ca24"
+            "place_id": "42018569"
         },
         "user_id": "13d5c2a6-80c8-4bdb-89b2-7da9699cd0fb"
     }

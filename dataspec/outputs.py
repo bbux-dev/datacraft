@@ -36,9 +36,15 @@ class OutputHandlerInterface:
         :return: None
         """
 
-    def finished_record(self):
+    def finished_record(self,
+                        iteration: int,
+                        group_name: str,
+                        exclude_internal: bool = False):
         """
         This is called whenever all of the fields for a record have been generated for one iteration
+        :param iteration: iteration we are on
+        :param group_name: group this record is apart of
+        :param exclude_internal: if external fields should be excluded from output record
         :return: None
         """
 
@@ -58,7 +64,7 @@ class SingleFieldOutput(OutputHandlerInterface):
         else:
             self.writer.write(value)
 
-    def finished_record(self):
+    def finished_record(self, iteration=None, group_name=None, exclude_internal=False):
         pass
 
 
