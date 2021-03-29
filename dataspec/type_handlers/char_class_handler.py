@@ -30,6 +30,7 @@ _CLASS_MAPPING = {
 
 @registry.schemas(CHAR_CLASS_KEY)
 def get_char_class_schema():
+    """ get the schema for the char_class type """
     return schemas.load(CHAR_CLASS_KEY)
 
 

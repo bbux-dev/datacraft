@@ -24,7 +24,7 @@ def test_no_field_groups():
     }
     provider = key_providers.from_spec(spec)
 
-    assert provider.get() == ['one', 'two']
+    assert _get_keys(provider) == ['one', 'two']
 
 
 def test_list_of_fields():
@@ -40,9 +40,14 @@ def test_list_of_fields():
     }
     provider = key_providers.from_spec(spec)
 
-    assert provider.get() == ['one']
-    assert provider.get() == ['one', 'two']
-    assert provider.get() == ['one', 'two', 'three']
+    assert _get_keys(provider) == ['one']
+    assert _get_keys(provider) == ['one', 'two']
+    assert _get_keys(provider) == ['one', 'two', 'three']
+
+
+def _get_keys(provider):
+    _, keys = provider.get()
+    return keys
 
 
 def test_weighted_field_groups():
@@ -51,11 +56,11 @@ def test_weighted_field_groups():
         "two": ["dos", "ni"],
         "three": ["tres", "son"],
         "field_groups": {
-            "one_two": {
+            "groupA": {
                 "weight": 0.7,
                 "fields": ["one", "two"],
             },
-            "one_two_three": {
+            "groupB": {
                 "weight": 0.3,
                 "fields": ["one", "two", "three"]
             }
@@ -63,5 +68,23 @@ def test_weighted_field_groups():
     }
     provider = key_providers.from_spec(spec)
     for _ in range(100):
-        keys = provider.get()
+        field_group, keys = provider.get()
+        assert field_group == 'groupA' or field_group == 'groupB'
+        assert keys == ['one', 'two'] or keys == ['one', 'two', 'three']
+
+
+def test_named_field_groups():
+    spec = {
+        "one": ["uno", "ichi"],
+        "two": ["dos", "ni"],
+        "three": ["tres", "son"],
+        "field_groups": {
+            "groupA": ["one", "two"],
+            "groupB": ["one", "two", "three"]
+        }
+    }
+    provider = key_providers.from_spec(spec)
+    for _ in range(100):
+        field_group, keys = provider.get()
+        assert field_group == 'groupA' or field_group == 'groupB'
         assert keys == ['one', 'two'] or keys == ['one', 'two', 'three']

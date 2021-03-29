@@ -1,10 +1,12 @@
 #!/bin/env python
-
+"""
+Entry point for dataspec tool
+"""
 import sys
 import json
-import yaml
 import argparse
 import logging
+import yaml
 from dataspec import Loader, preprocess_spec
 import dataspec.template_engines as engines
 import dataspec.outputs as outputs
@@ -17,6 +19,9 @@ log = logging.getLogger(__name__)
 
 
 def main():
+    """
+    Runs the tool
+    """
     parser = argparse.ArgumentParser(description='Run dataspec.')
     group = parser.add_argument_group('input')
     group.add_argument('-s', '--spec', help='Spec to Use')
@@ -47,6 +52,8 @@ def main():
                         help='Enforce schema validation for all registered field specs')
     parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
                         help='Debug spec after internal reformatting')
+    parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true', default=False,
+                        help='Do not include non data fields in output records')
 
     try:
         args = parser.parse_args()
@@ -69,20 +76,26 @@ def main():
 
         output = _configure_output(args)
 
-        keys = key_providers.from_spec(loader.specs)
+        key_provider = key_providers.from_spec(loader.specs)
 
         log.info('Starting Processing...')
         for i in range(0, args.iterations):
-            for key in keys.get():
+            group, keys = key_provider.get()
+            for key in keys:
                 value = loader.get(key).next(i)
                 output.handle(key, value)
-            output.finished_record()
+            output.finished_record(i, group, args.exclude_internal)
         log.info('Finished Processing')
-    except SpecException as e:
-        log.error(str(e))
+    except SpecException as exc:
+        log.error(str(exc))
 
 
 def _configure_output(args):
+    """
+    Configures the output. Loads templates and applies the specified formatter if any.
+    If none of these configurations are specified, it will return the default output
+    which is to print each value to standard out.
+    """
     if args.outdir:
         log.debug('Creating output file writer for dir: %s', args.outdir)
         writer = outputs.FileWriter(
@@ -109,6 +122,10 @@ def _configure_output(args):
 
 
 def _load_spec(args):
+    """
+    Attempts to load the spec first as JSON then as YAML if JSON fails.
+    :returns: Data Spec as Dictionary if loaded correctly.
+    """
     spec_path = args.spec
     inline = args.inline
     if spec_path is None and inline is None:
@@ -128,11 +145,16 @@ def _load_spec(args):
         log.debug('Attempting to load spec as YAML')
         spec = yaml.load(handle, Loader=yaml.FullLoader)
     if not isinstance(spec, dict):
-        raise SpecException('Unable to load spec from path: %s, Please verify it is valid JSON or YAML', spec_path)
+        raise SpecException(f'Unable to load spec from path: {spec_path}, Please verify it is valid JSON or YAML')
     return spec
 
 
-def _parse_spec_string(inline):
+def _parse_spec_string(inline: str):
+    """
+    Attempts to parse the string into a dataspec. First tries to interpret as JSON, then as YAML.
+    :return: the parsed spec as a Dictionary
+    """
+
     try:
         return json.loads(inline)
     except json.decoder.JSONDecodeError:
@@ -141,11 +163,14 @@ def _parse_spec_string(inline):
     log.debug('Attempting to load spec as YAML')
     spec = yaml.load(inline, Loader=yaml.FullLoader)
     if not isinstance(spec, dict):
-        raise SpecException('Unable to load spec from string: %s, Please verify it is valid JSON or YAML', inline)
+        raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
     return spec
 
 
 def _configure_logging(args):
+    """
+    Use each logging element from the registry to configure logging
+    """
     for name in dataspec.registry.logging.get_all():
         configure_function = dataspec.registry.logging.get(name)
         configure_function(args.log_level)

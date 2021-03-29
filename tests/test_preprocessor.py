@@ -104,7 +104,8 @@ def test_preprocess_valid_specs(input_spec, expected_output_spec):
 csv_select_transform_tests = [
     (
         {
-            "placeholder": {"type": "csv_select", "data": {"one": 1, "two": 2, "six": 6}, "config": {"datafile": "not_real.csv", "headers": "no"}},
+            "placeholder": {"type": "csv_select", "data": {"one": 1, "two": 2, "six": 6},
+                            "config": {"datafile": "not_real.csv", "headers": "no"}},
             "another:range": [1, 10]
         },
         {
@@ -133,34 +134,90 @@ nested_transform_tests = [
         {
             "outer": {
                 "type": "nested",
-                "one:values": ["grey", "blue", "yellow"],
-                "two:range": [1, 10]
+                "fields": {
+                    "one:values": ["grey", "blue", "yellow"],
+                    "two:range": [1, 10]
+                }
             }
         },
         {
             "outer": {
                 "type": "nested",
-                "one": {"type": "values", "data": ["grey", "blue", "yellow"]},
-                "two": {"type": "range", "data": [1, 10]}
+                "fields": {
+                    "one": {"type": "values", "data": ["grey", "blue", "yellow"]},
+                    "two": {"type": "range", "data": [1, 10]}
+                }
             }
         }
     ),
     (
         {
             "outer:nested": {
-                "placeholder": {"type": "csv_select", "data": {"one": 1, "two": 2, "six": 6}, "config": {"datafile": "not_real.csv", "headers": "no"}}
+                "fields": {
+                    "placeholder": {"type": "csv_select", "data": {"one": 1, "two": 2, "six": 6},
+                                    "config": {"datafile": "not_real.csv", "headers": "no"}}
+                }
             },
             "another:range": [1, 10]
         },
         {
-            "refs": {"placeholder_configref": {"type": "configref", "config": {"datafile": "not_real.csv", "headers": "no"}}},
+            "refs": {"placeholder_configref": {"type": "configref",
+                                               "config": {"datafile": "not_real.csv", "headers": "no"}}},
             "outer": {
                 "type": "nested",
-                "one": {"type": "csv", "config": {"column": 1, "configref": "placeholder_configref"}},
-                "two": {"type": "csv", "config": {"column": 2, "configref": "placeholder_configref"}},
-                "six": {"type": "csv", "config": {"column": 6, "configref": "placeholder_configref"}}
+                "fields": {
+                    "one": {"type": "csv", "config": {"column": 1, "configref": "placeholder_configref"}},
+                    "two": {"type": "csv", "config": {"column": 2, "configref": "placeholder_configref"}},
+                    "six": {"type": "csv", "config": {"column": 6, "configref": "placeholder_configref"}}
+                }
             },
             "another": {"type": "range", "data": [1, 10]},
+        }
+    ),
+    (
+        {
+            "geo": {
+                "type": "nested",
+                "config": {"as_array": "true"},
+                "fields": {"lat": 55.5, "long": 99.9}
+            }
+        }, {
+            "geo": {
+                "type": "nested",
+                "config": {"as_array": "true"},
+                "fields": {
+                    "lat": {"type": "values", "data": 55.5},
+                    "long": {"type": "values", "data": 99.9}
+                }
+            }
+        },
+    ),
+    (
+        {
+            "one": {"type": "weightedref", "data": {"geo": 0.1}},
+            "refs": {
+                "geo": {
+                    "type": "nested",
+                    "config": {"as_array": "true"},
+                    "fields": {
+                        "lat": 55.5,
+                        "long": 99.9
+                    }
+                }
+            }
+        },
+        {
+            "one": {"type": "weightedref", "data": {"geo": 0.1}},
+            "refs": {
+                "geo": {
+                    "type": "nested",
+                    "config": {"as_array": "true"},
+                    "fields": {
+                        "lat": {"type": "values", "data": 55.5},
+                        "long": {"type": "values", "data": 99.9}
+                    }
+                }
+            }
         }
     )
 ]

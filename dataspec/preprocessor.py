@@ -22,8 +22,8 @@ def preprocess_spec(raw_spec):
     """
     updated_specs = {}
     for key, spec in raw_spec.items():
-        if key == 'field_groups':
-            updated_specs['field_groups'] = spec
+        if key in ['refs', 'field_groups']:
+            updated_specs[key] = spec
             continue
         if '?' not in key:
             _update_no_params(key, spec, updated_specs)
@@ -77,22 +77,38 @@ def preprocess_csv_select(raw_spec):
 @dataspec.registry.preprocessors('nested')
 def preprocess_nested(raw_spec):
     """
-    Converts and nested elements
+    Converts all nested elements
     :param raw_spec: to process
     :return: converted spec
     """
     updated_specs = {}
+    if 'refs' in raw_spec:
+        if 'refs' in updated_specs:
+            updated_specs['refs'].update(preprocess_spec(raw_spec['refs']))
+        else:
+            updated_specs['refs'] = preprocess_spec(raw_spec['refs'])
     for key, spec in raw_spec.items():
-        if key == 'refs' and 'refs' in updated_specs:
-            updated_specs.get('refs').update(spec)
+        if key == 'refs':
+            # run preprocessors on refs too
+            updated_refs = preprocess_spec(spec)
+            updated_refs = preprocess_csv_select(updated_refs)
+            # in case we have nested nested elements
+            updated_refs = preprocess_nested(updated_refs)
+            updated_specs['refs'] = updated_refs
+            continue
+
         if 'type' in spec and spec['type'] == 'nested':
-            updated = preprocess_spec(spec)
+            if 'fields' not in spec:
+                raise dataspec.SpecException('Missing fields key for nested spec: ' + json.dumps(spec))
+            fields = spec['fields']
+            updated = preprocess_spec(fields)
             updated = preprocess_csv_select(updated)
             # in case we have nested nested elements
             updated = preprocess_nested(updated)
             # this may have created a refs element, need to move this to the root
             _update_root_refs(updated_specs, updated)
-            updated_specs[key] = updated
+            spec['fields'] = updated
+            updated_specs[key] = spec
         else:
             updated_specs[key] = spec
     return updated_specs

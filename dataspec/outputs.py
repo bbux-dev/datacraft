@@ -9,16 +9,19 @@ from .types import registry
 
 @dataspec.registry.formats('json')
 def format_json(record):
+    """ formats the record as compressed json """
     return json.dumps(record)
 
 
 @dataspec.registry.formats('json-pretty')
-def format_json(record):
+def format_json_pretty(record):
+    """ pretty prints the record as json """
     return json.dumps(record, indent=4)
 
 
 @dataspec.registry.formats('csv')
 def format_csv(record):
+    """ formats the values of the record as comma separated valpues """
     return ','.join([str(val) for val in record.values()])
 
 
@@ -33,9 +36,15 @@ class OutputHandlerInterface:
         :return: None
         """
 
-    def finished_record(self):
+    def finished_record(self,
+                        iteration: int,
+                        group_name: str,
+                        exclude_internal: bool = False):
         """
         This is called whenever all of the fields for a record have been generated for one iteration
+        :param iteration: iteration we are on
+        :param group_name: group this record is apart of
+        :param exclude_internal: if external fields should be excluded from output record
         :return: None
         """
 
@@ -55,7 +64,7 @@ class SingleFieldOutput(OutputHandlerInterface):
         else:
             self.writer.write(value)
 
-    def finished_record(self):
+    def finished_record(self, iteration=None, group_name=None, exclude_internal=False):
         pass
 
 
@@ -76,8 +85,14 @@ class RecordLevelOutput(OutputHandlerInterface):
     def handle(self, key, value):
         self.current[key] = value
 
-    def finished_record(self):
-        processed = self.record_processor.process(self.current)
+    def finished_record(self, iteration, group_name, exclude_internal=False):
+        current = self.current
+        if not exclude_internal:
+            current['_internal'] = {
+                '_iteration': iteration,
+                '_field_group': group_name
+            }
+        processed = self.record_processor.process(current)
         self.writer.write(processed)
         self.current.clear()
 

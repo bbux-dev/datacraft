@@ -2,7 +2,7 @@
 """
 Utiltity to validate json and yaml example specs and apply them to templates for the READMEs
 """
-
+import os
 import json
 import yaml
 import argparse
@@ -24,7 +24,7 @@ def main():
 
     args = parser.parse_args()
 
-    with open(args.input) as f:
+    with open(args.input, encoding='utf-8') as f:
         data = json.load(f)
 
     if args.mode == 'verify' or args.mode == 'all':
@@ -129,7 +129,9 @@ def apply_template(data, template_name):
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template(template_name)
-    print(template.render(data))
+    with open('..' + os.sep + 'FIELDSPECS.md', 'w', encoding='utf-8') as handle:
+        handle.write(template.render(data))
+    print('Updated ..' + os.sep + 'FIELDSPECS.md')
 
 
 if __name__ == '__main__':

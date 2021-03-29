@@ -40,6 +40,7 @@ Field Spec Definitions
     1. [Inline Key Config Shorthad](#Inline_Key_Config_Shorthad)
 1. [Spec Configuration](#Spec_Configuration)
     1. [Common Configurations](#Common_Configurations)
+    1. [Count Config Parameter](#CountsField)
 1. [Field Spec Types](#Field_Spec_Types)
     1. [Values](#Values)
         1. [Constant Values](#Constant_Values)
@@ -190,7 +191,7 @@ using a URL parameter format in the key. For example, the following two fields w
 
 {{ show_example(examples.config_example_one) }}
 
-# <a name="Common_Configurations"></a>Common Configurations
+## <a name="Common_Configurations"></a>Common Configurations
 
 There are some configuration values that can be applied to all or a subset of types. These are listed below
 
@@ -203,9 +204,19 @@ There are some configuration values that can be applied to all or a subset of ty
 |join_with|string   |For types that produce multiple values, use this string to join them   |
 |as_list|yes,true,on|For types that produce multiple values, return as list without joining |
 
+
 Example:
 
 {{ show_example(examples.common_config_example_one) }}
+
+## <a name="CountsField"></a>Count Config Parameter
+
+Several types support a `count` config parameter. The value of the count parameter can be any of the supported values
+specs formats. For example a constant `3`, list `[2, 3, 7]`, or weighted map `{"1": 0.5, "2": 0.3, "3": 0.2 }`. This
+will produce the number of values by creating a value supplier for the count based on the supplied parameter. Most of
+the time if the count is greater that 1, the values will be returned as an array. Some types support joining the values
+by specifying the `join_with` parameter. Some types will let you explicitly set the `as_array` parameter to force the
+results to be returned as an array and not the default for the given type.
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
@@ -537,7 +548,7 @@ size range.
 
 ```shell
 # no stddev specified
-for p in $(dataspec -l off --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
+for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -552,7 +563,7 @@ done | sort | uniq -c | sort -n -k2,2
      71 8
     220 9
 # with stddev of 3 specified
-for p in $(dataspec -l off --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
+for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -800,7 +811,7 @@ to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
 
-```json
+```
 {
   "<field name>": {
     "type": "csv",
@@ -894,26 +905,51 @@ Our example doesn't have headers, so we are using the 1 based indexes.
 
 {{ show_example(examples.csv_select_example_one) }}
 
-## <a name="nested"></a>Nested fields
+## <a name="nested"></a>Nested Fields
 
-Many documents or objects are not flat, but contain nested inner objects or child documents. To generate nested fields
-use the `nested` type. 
+Nested types are used to create fields that contain subfields. Nested types can also contain nested fields to allow
+multiple levels of nesting. Use the `nested` type to generate a field that contains subfields. The subfields are
+defined in the `fields` element of the nested spec. The `fields` element will be treated like a top level dataspec
+and has access to the `refs` and other elements of the root.
+
+The `nested` Field Spec structure is:
+
+```
+{
+  "<field name>": {
+    "type": "nested",
+    "config": {
+      "count": "Values Spec for Counts, default is 1"
+    },
+    "fields": {
+      "<sub field one>": { spec definition here },
+      "<sub field two>": { spec definition here },
+      ...
+    }
+  }
+}
+```
 
 ### Example:
 
-In this example a pseudo schema for our data might look like this:
+Below is an example of the data we wish to generate:
 
-```
- - id:str
- - user
-   - user_id:str
-   - geo
-     - place_id:str
-     - coordinates: List[float]
+```json
+{
+  "id": "abc123efg456",
+  "user": {
+    "user_id": "bad135dad987",
+    "geo": {
+      "place_id": 12345,
+      "coordinates": [118.2, 34.0]
+    }
+  }
+}
 ```
 
-The user is a nested object, which has a geo, which is also a nested object. Below are the specs that will generate data
-that matches this schema.
+The `user` is a nested object, which has a subfield `geo`, which is also a nested object. The `id` and `user_id` fields
+are uuids. The coordinates field is a list of longitude followed by latitude. Below are the specs that will generate
+data that matches this schema.
 
 {{ show_example(examples.nested_example_one) }}
 
