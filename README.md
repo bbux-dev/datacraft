@@ -18,6 +18,7 @@ Data Spec Repository
         1. [Loops in Templates](#Templating_Loops)
         1. [Dynamic Loop Counters](#Dynamic_Loop_Counters)
     1. [Custom Code Loading](#Custom_Code_Loading)
+1. [Programmatic Usage](#Programmatic)
 
 ## <a name="Overview"></a>Overview
 
@@ -642,4 +643,42 @@ arbez
 gohegdeh
 amall
 ognimalf
+```
+
+# <a name="Programmatic"></a>Programmatic Usage
+
+The `dataspec.builder` module contains tools that can be used to programmatically generate Data Specs. This may be
+easier for some who are not as familiar with JSON or prefer to manage their structures in code.  The core object is
+the `Builder`. You can add fields, refs, and field groups to this. Each of the core field types has a builder function
+that will generate a Field Spec for it. See example below.
+
+This is the email address example from above using the `builder` module.
+
+```python
+from dataspec import builder
+
+animal_names = ['zebra', 'hedgehog', 'llama', 'flamingo']
+action_list = ['fling', 'jump', 'launch', 'dispatch']
+domain_weights = {
+    "gmail.com": 0.6,
+    "yahoo.com": 0.3,
+    "hotmail.com": 0.1
+}
+
+spec_builder = builder.Builder()
+
+animals_spec = builder.values(data=animal_names)
+actions_spec = builder.values(data=action_list, sample=True)
+domains_spec = builder.values(data=domain_weights)
+# combines ANIMALS and ACTIONS
+handle_spec = builder.combine(refs=['ANIMALS', 'ACTIONS'], join_with='_')
+
+spec_builder.add_ref('ANIMALS', animals_spec)
+spec_builder.add_ref('ACTIONS', actions_spec)
+spec_builder.add_ref('HANDLE', handle_spec)
+spec_builder.add_ref('DOMAINS', domains_spec)
+
+spec_builder.add_field('email', builder.combine(refs=['HANDLE', 'DOMAINS']))
+
+spec = spec_builder.to_spec()
 ```
