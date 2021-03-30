@@ -30,7 +30,7 @@ def test_date_anchor_negative_delta_string():
     _test_date_spec(spec, 'foo', 1000, ['01-01-2050', '02-01-2050', '03-01-2050'])
 
 
-def test_delta_as_array():
+def test_delta_as_list():
     config = {"delta_days": [1, 2], "anchor": "02-01-2050"}
     spec = {"foo": {"type": "date", "config": config}}
     # expect one day behind and two days ahead

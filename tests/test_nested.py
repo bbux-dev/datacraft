@@ -59,13 +59,13 @@ def test_multi_nested():
     assert list(second.keys()) == ['place_id', 'coordinates']
 
 
-def test_single_nested_as_array():
+def test_single_nested_as_list():
     spec = {
         "id:uuid": {},
         "geo": {
             "type": "nested",
             "config": {
-                "as_array": "true"
+                "as_list": "true"
             },
             "fields": {
                 "place_id:uuid": {},

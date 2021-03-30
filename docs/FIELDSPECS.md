@@ -19,6 +19,7 @@ Field Spec Definitions
         1. [Weighted Values](#Weighted_Values)
         1. [Sample Mode](#Sample_Mode)
     1. [Combine](#Combine)
+    1. [Combine List](#CombineList)
     1. [Date](#Date)
     1. [Range](#Range)
     1. [Uuid](#Uuid)

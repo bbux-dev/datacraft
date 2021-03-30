@@ -2,6 +2,7 @@ from dataspec import Loader
 import dataspec.suppliers as suppliers
 from dataspec.loader import preprocess_spec
 from dataspec.exceptions import SpecException
+import dataspec.builder as builder
 from collections import Counter
 import pytest
 
@@ -28,6 +29,15 @@ def test_weighted_values():
 
     assert 'foo' in most_common_keys
     assert 'bar' in most_common_keys
+
+
+def test_weighted_values_non_zero_count():
+    spec = builder.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1}, count=2)
+    supplier = suppliers.values(spec)
+
+    data = supplier.next(0)
+    assert isinstance(data, list)
+    assert len(data) == 2
 
 
 def test_shortcut_notation():

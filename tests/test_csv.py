@@ -62,7 +62,7 @@ def test_csv_valid_sample_mode_with_count():
     assert len(supplier.next(0)) == 2
 
 
-def test_csv_valid_sample_mode_with_count_as_array():
+def test_csv_valid_sample_mode_with_count_as_list():
     spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true": {"config": {"count": [4, 3, 2]}}}
     loader = Loader(spec, datadir=test_dir)
     supplier = loader.get('status_desc')

@@ -45,6 +45,21 @@ def test_outputs_record_level():
     _verify_ouput('test_record-0.txt', 'A:1, B:2, C:3\n')
 
 
+def test_format_json():
+    as_json = outputs.format_json({'field': 'value'})
+    assert as_json == "{\"field\": \"value\"}"
+
+
+def test_format_json_pretty():
+    as_json = outputs.format_json_pretty({'field': 'value'})
+    assert as_json == "{\n    \"field\": \"value\"\n}"
+
+
+def test_format_csv():
+    as_csv = outputs.format_csv({'field1': 'value1', 'field2': 'value2'})
+    assert as_csv == "value1,value2"
+
+
 def _verify_ouput(fild_name, expected_content):
     with open(f'{outdir}/{fild_name}') as handle:
         content = handle.read()

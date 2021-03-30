@@ -178,13 +178,13 @@ nested_transform_tests = [
         {
             "geo": {
                 "type": "nested",
-                "config": {"as_array": "true"},
+                "config": {"as_list": "true"},
                 "fields": {"lat": 55.5, "long": 99.9}
             }
         }, {
             "geo": {
                 "type": "nested",
-                "config": {"as_array": "true"},
+                "config": {"as_list": "true"},
                 "fields": {
                     "lat": {"type": "values", "data": 55.5},
                     "long": {"type": "values", "data": 99.9}
@@ -198,7 +198,7 @@ nested_transform_tests = [
             "refs": {
                 "geo": {
                     "type": "nested",
-                    "config": {"as_array": "true"},
+                    "config": {"as_list": "true"},
                     "fields": {
                         "lat": 55.5,
                         "long": 99.9
@@ -211,7 +211,7 @@ nested_transform_tests = [
             "refs": {
                 "geo": {
                     "type": "nested",
-                    "config": {"as_array": "true"},
+                    "config": {"as_list": "true"},
                     "fields": {
                         "lat": {"type": "values", "data": 55.5},
                         "long": {"type": "values", "data": 99.9}

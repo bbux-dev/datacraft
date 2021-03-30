@@ -1,7 +1,7 @@
 """
 Factory like module for core supplier related functions.
 """
-from typing import Union
+from typing import Union, Dict
 import json
 import random
 from .exceptions import SpecException
@@ -58,6 +58,18 @@ def count_supplier_from_data(data):
             raise SpecException(f'Invalid count param: {data}') from value_error
 
     return supplier
+
+
+def count_supplier_from_config(config: Dict):
+    """
+    creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
+    :param config: to use
+    :return: a count supplier
+    """
+    data = 1
+    if config and 'count' in config:
+        data = config['count']
+    return count_supplier_from_data(data)
 
 
 class _SingleValue(ValueSupplierInterface):
@@ -138,13 +150,14 @@ def value_list(data, count: Union[int, list, dict], do_sampling=False):
     return ListValueSupplier(data, count_supplier_from_data(count), do_sampling)
 
 
-def weighted_values(data):
+def weighted_values(data, config=None):
     """
     creates a weighted value supplier
     :param data: for the supplier
+    :param config: optional config
     :return: the supplier
     """
-    return WeightedValueSupplier(data)
+    return WeightedValueSupplier(data, count_supplier_from_config(config))
 
 
 def combine(suppliers, config=None):
