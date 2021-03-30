@@ -6,7 +6,7 @@ from dataspec.type_handlers import char_class_handler
 
 def test_char_class_no_data_element():
     spec = _char_class_spec(data="special", count=4)
-    spec.pop('data')
+    spec['name'].pop('data')
 
     with pytest.raises(SpecException):
         Loader(spec).get('name')
@@ -76,5 +76,5 @@ def _char_class_spec(data, **config):
 
 def _cc_abbrev_spec(abbrev, **config):
     return builder.Builder() \
-        .add_field("name", builder.char_class(cc_abbrev=abbrev, **config)) \
+        .add_field("name", builder.char_class_abbrev(cc_abbrev=abbrev, **config)) \
         .to_spec()

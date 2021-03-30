@@ -1,43 +1,45 @@
 import pytest
-from dataspec import key_providers, SpecException
+from dataspec import builder, key_providers, SpecException
 
 
 def test_invalid_fields_name():
-    spec = {
-        "one": ["uno", "ichi"],
-        "two": ["dos", "ni"],
-        "field_groups": {
-            "one_two": {
-                "weight": 1.0,
-                "name_should_be_fields": ["one", "two"],
-            }
-        }
-    }
+    field_group = builder.weighted_field_group("one_two", fields=["not_defined", "not_defined_either"], weight=0.5)
+    fields = field_group['one_two'].pop('fields')
+    field_group['one_two']['wrong_name'] = fields
+
+    spec = builder.Builder() \
+        .add_fields(
+        one=builder.values(["uno", "ichi"]),
+        two=builder.values(["dos", "ni"])) \
+        .add_field_group(field_group) \
+        .to_spec()
     with pytest.raises(SpecException):
         key_providers.from_spec(spec).get()
 
 
 def test_no_field_groups():
-    spec = {
-        "one": ["uno", "ichi"],
-        "two": ["dos", "ni"],
-    }
+    spec = builder.Builder() \
+        .add_fields(
+        one=builder.values(["uno", "ichi"]),
+        two=builder.values(["dos", "ni"])) \
+        .to_spec()
     provider = key_providers.from_spec(spec)
 
     assert _get_keys(provider) == ['one', 'two']
 
 
 def test_list_of_fields():
-    spec = {
-        "one": ["uno", "ichi"],
-        "two": ["dos", "ni"],
-        "three": ["tres", "son"],
-        "field_groups": [
-            ["one"],
-            ["one", "two"],
-            ["one", "two", "three"]
-        ]
-    }
+    field_groups = [
+        ["one"],
+        ["one", "two"],
+        ["one", "two", "three"]
+    ]
+    spec = builder.Builder() \
+        .add_fields(
+        one=builder.values(["uno", "ichi"]),
+        two=builder.values(["dos", "ni"])) \
+        .add_field_groups(field_groups) \
+        .to_spec()
     provider = key_providers.from_spec(spec)
 
     assert _get_keys(provider) == ['one']
@@ -51,21 +53,18 @@ def _get_keys(provider):
 
 
 def test_weighted_field_groups():
-    spec = {
-        "one": ["uno", "ichi"],
-        "two": ["dos", "ni"],
-        "three": ["tres", "son"],
-        "field_groups": {
-            "groupA": {
-                "weight": 0.7,
-                "fields": ["one", "two"],
-            },
-            "groupB": {
-                "weight": 0.3,
-                "fields": ["one", "two", "three"]
-            }
-        }
-    }
+    field_groups = [
+        builder.weighted_field_group("groupA", fields=["one", "two"], weight=0.7),
+        builder.weighted_field_group("groupB", fields=["one", "two", "three"], weight=0.3),
+    ]
+    spec = builder.Builder() \
+        .add_fields(
+        one=builder.values(["uno", "ichi"]),
+        two=builder.values(["dos", "ni"]),
+        three=builder.values(["tres", "son"])) \
+        .add_field_groups(field_groups) \
+        .to_spec()
+
     provider = key_providers.from_spec(spec)
     for _ in range(100):
         field_group, keys = provider.get()
@@ -74,15 +73,18 @@ def test_weighted_field_groups():
 
 
 def test_named_field_groups():
-    spec = {
-        "one": ["uno", "ichi"],
-        "two": ["dos", "ni"],
-        "three": ["tres", "son"],
-        "field_groups": {
-            "groupA": ["one", "two"],
-            "groupB": ["one", "two", "three"]
-        }
-    }
+    field_groups = [
+        builder.named_field_group("groupA", fields=["one", "two"]),
+        builder.named_field_group("groupB", fields=["one", "two", "three"]),
+    ]
+    spec = builder.Builder() \
+        .add_fields(
+        one=builder.values(["uno", "ichi"]),
+        two=builder.values(["dos", "ni"]),
+        three=builder.values(["tres", "son"])) \
+        .add_field_groups(field_groups) \
+        .to_spec()
+
     provider = key_providers.from_spec(spec)
     for _ in range(100):
         field_group, keys = provider.get()

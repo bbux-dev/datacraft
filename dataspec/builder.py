@@ -29,6 +29,7 @@ class Builder:
     def __init__(self):
         self.refs = {}
         self.fields = {}
+        self.field_groups = []
         self.keys = set()
 
     def add_fields(self, **kwargs):
@@ -103,6 +104,21 @@ class Builder:
         self.refs[key] = spec
         return self
 
+    def add_field_group(self, field_group: Union[List[str], Dict[str, Dict]]):
+        """
+        Add a single field group
+        :param field_group: to add
+        :return: self for chaining invocations
+        """
+        self.field_groups.append(field_group)
+        return self
+
+    def add_field_groups(self, field_groups: Union[List[List[str]], List[Dict[str, Dict]]]):
+        """ Add all field groups to list of field groups """
+        for entry in field_groups:
+            self.add_field_group(entry)
+        return self
+
     def to_spec(self):
         """
         Generates the spec from the provided fields, refs, and field_groups
@@ -111,7 +127,39 @@ class Builder:
         spec = {}
         spec.update(self.fields)
         spec['refs'] = self.refs
+        if len(self.field_groups) > 0:
+            self._configure_field_groups(spec)
+
         return spec
+
+    def _configure_field_groups(self, spec):
+        """
+        Adds the field_groups element to the spec if needed and defined
+        """
+        all_dict = all(isinstance(entry, dict) for entry in self.field_groups)
+        if all_dict:
+            flattened = {}
+            for entry in self.field_groups:
+                flattened.update(entry)
+            spec['field_groups'] = flattened
+        all_list = all(isinstance(entry, list) for entry in self.field_groups)
+        if all_list:
+            spec['field_groups'] = self.field_groups
+
+
+def weighted_field_group(key: str, fields: List[str], weight: float):
+    return {
+        key: {
+            "weight": weight,
+            "fields": fields
+        }
+    }
+
+
+def named_field_group(key: str, fields: List[str]):
+    return {
+        key: fields
+    }
 
 
 def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config):
@@ -235,7 +283,7 @@ def uuid(**config):
     return spec
 
 
-def char_class(data=None, cc_abbrev=None, **config):
+def char_class(data, **config):
     """
     Constructs a char_class spec
     :param cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
@@ -243,22 +291,28 @@ def char_class(data=None, cc_abbrev=None, **config):
     :param config: in **kwargs format
     :return: the char_class spec
     """
-    if data is not None:
-        spec = {
-            "type": "char_class",
-            "config": config,
-            "data": data
-        }
-    if cc_abbrev is not None:
-        if not cc_abbrev.startswith('cc-'):
-            abbrev = f'cc-{cc_abbrev}'
-        else:
-            abbrev = cc_abbrev
-        spec = {
-            "type": abbrev,
-            "config": config
-        }
-    return spec
+    return {
+        "type": "char_class",
+        "config": config,
+        "data": data
+    }
+
+
+def char_class_abbrev(cc_abbrev: str, **config):
+    """
+    Constructs a char_class spec
+    :param cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
+    :param config: in **kwargs format
+    :return: the char_class spec
+    """
+    if cc_abbrev.startswith('cc-'):
+        abbrev = cc_abbrev
+    else:
+        abbrev = 'cc-' + cc_abbrev
+    return {
+        "type": abbrev,
+        "config": config
+    }
 
 
 def unicode_range(data: Union[List[str], List[List[str]]], **config):
@@ -283,7 +337,7 @@ def geo_lat(**config):
     :return: the geo_lat spec
     """
     spec = {
-        "type": "geo_lat",
+        "type": "geo.lat",
         "config": config
     }
     return spec
@@ -296,7 +350,7 @@ def geo_long(**config):
     :return: the geo_long spec
     """
     spec = {
-        "type": "geo_long",
+        "type": "geo.long",
         "config": config
     }
     return spec
@@ -309,7 +363,7 @@ def geo_pair(**config):
     :return: the geo_pair spec
     """
     spec = {
-        "type": "geo_pair",
+        "type": "geo.pair",
         "config": config
     }
     return spec
