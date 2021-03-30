@@ -235,18 +235,29 @@ def uuid(**config):
     return spec
 
 
-def char_class(data, **config):
+def char_class(data=None, cc_abbrev=None, **config):
     """
     Constructs a char_class spec
+    :param cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
     :param data: either known character class or set of characters to use for sampling from
     :param config: in **kwargs format
     :return: the char_class spec
     """
-    spec = {
-        "type": "char_class",
-        "config": config,
-        "data": data
-    }
+    if data is not None:
+        spec = {
+            "type": "char_class",
+            "config": config,
+            "data": data
+        }
+    if cc_abbrev is not None:
+        if not cc_abbrev.startswith('cc-'):
+            abbrev = f'cc-{cc_abbrev}'
+        else:
+            abbrev = cc_abbrev
+        spec = {
+            "type": abbrev,
+            "config": config
+        }
     return spec
 
 
@@ -417,5 +428,18 @@ def nested(fields: Dict[str, Dict], **config):
         "type": "nested",
         "config": config,
         "fields": fields
+    }
+    return spec
+
+
+def configref(**config):
+    """
+    Constructs a configref spec
+    :param config: in **kwargs format
+    :return: the configref spec
+    """
+    spec = {
+        "type": "configref",
+        "config": config
     }
     return spec
