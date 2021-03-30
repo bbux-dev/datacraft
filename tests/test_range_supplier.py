@@ -1,6 +1,6 @@
 import pytest
 
-from dataspec import Loader, SpecException
+from dataspec import builder, Loader, SpecException
 from dataspec.type_handlers import range_handler
 
 
@@ -57,13 +57,9 @@ def test_range_lists_float_start_end():
 
 
 def test_rand_range():
-    spec = {
-        "field": {
-            "type": "rand_range",
-            "data": [100.9, 109.9],
-            "config": {"cast": "int"}
-        }
-    }
+    spec = builder.Builder() \
+        .add_field("field", builder.rand_range(100.9, 109.9, cast="int")) \
+        .to_spec()
     supplier = Loader(spec).get('field')
 
     first = supplier.next(0)
@@ -72,14 +68,11 @@ def test_rand_range():
 
 
 def test_nested_range_lists_simple():
-    spec = {
-        "field:range": {
-            "data": [
-                [0, 10],
-                [20, 30]
-            ]
-        }
-    }
+    data = [
+        [0, 10],
+        [20, 30]
+    ]
+    spec = builder.single_field("field:range", data).to_spec()
     supplier = Loader(spec).get('field')
 
     first = supplier.next(0)
@@ -89,14 +82,11 @@ def test_nested_range_lists_simple():
 
 
 def test_nested_range_lists_mixed_types_and_step():
-    spec = {
-        "field:range": {
-            "data": [
-                [0, 10, 2],
-                [20.0, 30.0]
-            ]
-        }
-    }
+    data = [
+        [0, 10, 2],
+        [20.0, 30.0]
+    ]
+    spec = builder.single_field("field:range", data).to_spec()
     supplier = Loader(spec).get('field')
 
     first = supplier.next(0)
@@ -107,14 +97,11 @@ def test_nested_range_lists_mixed_types_and_step():
 
 
 def test_nested_range_lists_mixed_types_and_step_cast():
-    spec = {
-        "field:range?cast=str&precision=2": {
-            "data": [
-                [0.5, 2.5, 0.5],
-                [20.01234, 30.56789]
-            ]
-        }
-    }
+    data = [
+        [0.5, 2.5, 0.5],
+        [20.01234, 30.56789]
+    ]
+    spec = builder.single_field("field:range?cast=str&precision=2", data).to_spec()
     supplier = Loader(spec).get('field')
 
     assert supplier.next(0) == '0.5'

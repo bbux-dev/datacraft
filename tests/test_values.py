@@ -38,7 +38,7 @@ def test_weighted_values_non_zero_count():
     data = supplier.next(0)
     assert isinstance(data, list)
     assert len(data) == 2
-
+    
 
 def test_shortcut_notation():
     # not type or data key, just what would have been the value for the data key

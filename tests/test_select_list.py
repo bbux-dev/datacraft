@@ -1,6 +1,6 @@
 import pytest
 from dataspec.loader import Loader
-from dataspec import SpecException, suppliers
+from dataspec import builder, suppliers, SpecException
 # to engage registration
 from dataspec.type_handlers import select_list_subset
 
@@ -14,21 +14,13 @@ def test_invalid_when_no_mean_specified():
 
 
 def test_invalid_when_ref_not_defined():
-    spec = {
-        "field:select_list_subset?mean=2": {
-            "ref": "REF"
-        }
-    }
+    spec = builder.single_field("field:select_list_subset?mean=2", {"ref": "REF"}).to_spec()
     _test_invalid_select_list_spec(spec)
 
 
 def test_invalid_when_ref_and_data_specified():
-    spec = {
-        "field:select_list_subset?mean=2": {
-            "ref": "REF",
-            "data": ["one", "two", "three", "four"]
-        }
-    }
+    spec = builder.single_field("field?mean=2",
+                                builder.select_list_subset(data=["one", "two", "three", "four"], ref="REF")).to_spec()
     _test_invalid_select_list_spec(spec)
 
 

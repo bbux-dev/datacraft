@@ -147,6 +147,11 @@ class Builder:
             spec['field_groups'] = self.field_groups
 
 
+def single_field(name: str, spec):
+    """ Creates Builder for single field and spec """
+    return Builder().add_field(name, spec)
+
+
 def weighted_field_group(key: str, fields: List[str], weight: float):
     return {
         key: {
