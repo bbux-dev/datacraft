@@ -87,7 +87,7 @@ valid_spec_build_tests = [
     (builder.ip_precise(cidr="10.0.0.0/8"),
      {"type": "ip.precise", "config": {"cidr": "10.0.0.0/8"}}),
     (builder.weightedref({"One": 0.5, "Two": 0.3, "Three": 0.2}),
-     {"type": "weightedref", "config": {}, "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}),
+     {"type": "weightedref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}),
     (builder.select_list_subset(data=["A", "B", "C"], mean=5, stddev=2),
      {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}),
     (builder.select_list_subset(ref="LIST", mean=5, stddev=2),
@@ -97,7 +97,7 @@ valid_spec_build_tests = [
     (builder.csv_select(data={"one": 1, "two": 2}, headers=False),
      {"type": "csv_select", "config": {"headers": False}, "data": {"one": 1, "two": 2}}),
     (builder.nested(fields={"one": {"type": "values", "data": 1}}),
-     {"type": "nested", "config": {}, "fields": {"one": {"type": "values", "data": 1}}}),
+     {"type": "nested", "fields": {"one": {"type": "values", "data": 1}}}),
 ]
 
 

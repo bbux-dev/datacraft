@@ -110,7 +110,7 @@ def _configure_output(args):
 
     if args.template:
         log.debug('Using template from specified file: %s', args.template)
-        return outputs.RecordLevelOutput(engines.load(args.template), writer)
+        return outputs.RecordLevelOutput(engines.for_file(args.template), writer)
 
     if args.format:
         log.debug('Using %s formatter for output', args.format)

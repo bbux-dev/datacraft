@@ -126,7 +126,8 @@ class Builder:
         """
         spec = {}
         spec.update(self.fields)
-        spec['refs'] = self.refs
+        if len(self.refs) > 0:
+            spec['refs'] = self.refs
         if len(self.field_groups) > 0:
             self._configure_field_groups(spec)
 
@@ -176,17 +177,19 @@ def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config)
     """
     spec = {
         "type": "values",
-        "data": data,
-        "config": config
+        "data": data
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
 def combine(refs: List[str] = None, fields: List[str] = None, **config):
     spec = {
         "type": "combine",
-        "config": config
     }
+    if len(config) > 0:
+        spec['config'] = config
     if refs is not None:
         spec['refs'] = refs
     if fields is not None:
@@ -197,9 +200,10 @@ def combine(refs: List[str] = None, fields: List[str] = None, **config):
 def combine_list(refs: List[List[str]] = None, **config):
     spec = {
         "type": "combine-list",
-        "config": config,
         "refs": refs
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -214,9 +218,10 @@ def range_spec(start, end, step=1, **config):
     """
     spec = {
         "type": "range",
-        "config": config,
         "data": [start, end, step]
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -230,9 +235,10 @@ def rand_range(start, end, **config):
     """
     spec = {
         "type": "rand_range",
-        "config": config,
         "data": [start, end]
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -243,9 +249,10 @@ def date(**config):
     :return: the date spec
     """
     spec = {
-        "type": "date",
-        "config": config
+        "type": "date"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -256,9 +263,10 @@ def date_iso(**config):
     :return: the date_iso spec
     """
     spec = {
-        "type": "date.iso",
-        "config": config
+        "type": "date.iso"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -269,9 +277,10 @@ def date_iso_us(**config):
     :return: the date_iso_us spec
     """
     spec = {
-        "type": "date.iso.us",
-        "config": config
+        "type": "date.iso.us"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -282,9 +291,10 @@ def uuid(**config):
     :return: the uuid spec
     """
     spec = {
-        "type": "uuid",
-        "config": config
+        "type": "uuid"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -296,11 +306,13 @@ def char_class(data, **config):
     :param config: in **kwargs format
     :return: the char_class spec
     """
-    return {
+    spec = {
         "type": "char_class",
-        "config": config,
         "data": data
     }
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
 
 
 def char_class_abbrev(cc_abbrev: str, **config):
@@ -314,10 +326,12 @@ def char_class_abbrev(cc_abbrev: str, **config):
         abbrev = cc_abbrev
     else:
         abbrev = 'cc-' + cc_abbrev
-    return {
-        "type": abbrev,
-        "config": config
+    spec = {
+        "type": abbrev
     }
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
 
 
 def unicode_range(data: Union[List[str], List[List[str]]], **config):
@@ -329,9 +343,10 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config):
     """
     spec = {
         "type": "unicode_range",
-        "config": config,
         "data": data
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -342,9 +357,10 @@ def geo_lat(**config):
     :return: the geo_lat spec
     """
     spec = {
-        "type": "geo.lat",
-        "config": config
+        "type": "geo.lat"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -355,9 +371,10 @@ def geo_long(**config):
     :return: the geo_long spec
     """
     spec = {
-        "type": "geo.long",
-        "config": config
+        "type": "geo.long"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -368,9 +385,10 @@ def geo_pair(**config):
     :return: the geo_pair spec
     """
     spec = {
-        "type": "geo.pair",
-        "config": config
+        "type": "geo.pair"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -381,9 +399,10 @@ def ip(**config):
     :return: the ip spec
     """
     spec = {
-        "type": "ip",
-        "config": config
+        "type": "ip"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -394,9 +413,10 @@ def ipv4(**config):
     :return: the ipv4 spec
     """
     spec = {
-        "type": "ipv4",
-        "config": config
+        "type": "ipv4"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -407,9 +427,10 @@ def ip_precise(**config):
     :return: the ip_precise spec
     """
     spec = {
-        "type": "ip.precise",
-        "config": config
+        "type": "ip.precise"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -422,9 +443,10 @@ def weightedref(data: Dict[str, float], **config):
     """
     spec = {
         "type": "weightedref",
-        "config": config,
         "data": data
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -437,9 +459,10 @@ def select_list_subset(data: List[Any] = None, ref: str = None, **config):
     :return: the select_list_subset spec
     """
     spec = {
-        "type": "select_list_subset",
-        "config": config
+        "type": "select_list_subset"
     }
+    if len(config) > 0:
+        spec['config'] = config
     if data is not None:
         spec['data'] = data
     if ref is not None:
@@ -454,9 +477,10 @@ def csv(**config):
     :return: the csv spec
     """
     spec = {
-        "type": "csv",
-        "config": config
+        "type": "csv"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -468,9 +492,10 @@ def csv_select(data: Dict[str, int] = None, **config):
     :return: the csv_select spec
     """
     spec = {
-        "type": "csv_select",
-        "config": config
+        "type": "csv_select"
     }
+    if len(config) > 0:
+        spec['config'] = config
     if data is not None:
         spec['data'] = data
     return spec
@@ -485,9 +510,10 @@ def nested(fields: Dict[str, Dict], **config):
     """
     spec = {
         "type": "nested",
-        "config": config,
         "fields": fields
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 
@@ -498,7 +524,8 @@ def configref(**config):
     :return: the configref spec
     """
     spec = {
-        "type": "configref",
-        "config": config
+        "type": "configref"
     }
+    if len(config) > 0:
+        spec['config'] = config
     return spec

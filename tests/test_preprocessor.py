@@ -1,6 +1,6 @@
 from dataspec.preprocessor import preprocess_spec, preprocess_csv_select, preprocess_nested
 from dataspec.preprocessor import _parse_key, _is_spec_data, _update_no_params
-from dataspec import SpecException
+from dataspec import builder, SpecException
 import pytest
 
 parse_key_tests = [
@@ -219,6 +219,12 @@ nested_transform_tests = [
                 }
             }
         }
+    ),
+    (
+        builder.single_field('enemies', builder.nested(
+            builder.single_field('inner', ['bat', 'slime', 'orc']).to_spec())).to_spec(),
+        builder.single_field('enemies', builder.nested(
+            builder.single_field('inner', builder.values(['bat', 'slime', 'orc'])).to_spec())).to_spec(),
     )
 ]
 

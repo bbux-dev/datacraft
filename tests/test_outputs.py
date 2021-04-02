@@ -30,7 +30,7 @@ def test_outputs_record_level():
         records_per_file=1
     )
 
-    engine = engines.load(f'{test_dir}/data/template.jinja')
+    engine = engines.for_file(f'{test_dir}/data/template.jinja')
     output = outputs.RecordLevelOutput(engine, writer)
 
     # template looks like: A:{{ A }}, B:{{ B }}, C:{{ C }}

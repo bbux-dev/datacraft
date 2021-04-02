@@ -50,7 +50,7 @@ def configure_nested_supplier(spec, loader):
     # each non reserved key should have a valid spec as a value
     for key in keys:
         nested_spec = fields[key]
-        if nested_spec.get('type') == 'nested':
+        if 'type' in nested_spec and nested_spec.get('type') == 'nested':
             supplier = configure_nested_supplier(nested_spec, loader)
         else:
             supplier = loader.get_from_spec(nested_spec)
