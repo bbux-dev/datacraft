@@ -11,8 +11,8 @@ def test_single_nested():
         .add_field("coordinates", builder.geo_pair(as_list=True))
     spec = builder.Builder() \
         .add_field("id:uuid", {}) \
-        .add_field("geo", builder.nested(fields=geo_spec.to_spec())) \
-        .to_spec()
+        .add_field("geo", builder.nested(fields=geo_spec.build())) \
+        .build()
     supplier = Loader(spec).get('geo')
 
     first = supplier.next(0)
@@ -30,11 +30,11 @@ def test_multi_nested():
         .add_field("coordinates", builder.geo_pair(as_list=True))
     user_spec = builder.Builder() \
         .add_field("user_id:uuid", {}) \
-        .add_field("geo", builder.nested(fields=geo_spec.to_spec()))
+        .add_field("geo", builder.nested(fields=geo_spec.build()))
     spec = builder.Builder() \
         .add_field("id:uuid", {}) \
-        .add_field("user", builder.nested(fields=user_spec.to_spec())) \
-        .to_spec()
+        .add_field("user", builder.nested(fields=user_spec.build())) \
+        .build()
     supplier = Loader(spec).get('user')
 
     first = supplier.next(0)
@@ -55,8 +55,8 @@ def test_single_nested_as_list():
         .add_field("coordinates", builder.geo_pair(as_list=True))
     spec = builder.Builder() \
         .add_field("id:uuid", {}) \
-        .add_field("geo", builder.nested(fields=geo_spec.to_spec(), as_list=True)) \
-        .to_spec()
+        .add_field("geo", builder.nested(fields=geo_spec.build(), as_list=True)) \
+        .build()
     supplier = Loader(spec).get('geo')
 
     first = supplier.next(0)

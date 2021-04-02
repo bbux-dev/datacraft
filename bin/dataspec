@@ -50,6 +50,8 @@ def main():
                         help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
     parser.add_argument('--strict', action='store_true', default=False,
                         help='Enforce schema validation for all registered field specs')
+    parser.add_argument('--apply-raw', action='store_true', dest='apply_raw', default=False,
+                        help='Data from -s argument should be applied to the template with out treating as a Data Spec')
     parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
                         help='Debug spec after internal reformatting')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true', default=False,
@@ -70,7 +72,13 @@ def main():
         log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
         spec = _load_spec(args)
         if args.debug_spec:
-            print(json.dumps(preprocess_spec(spec), indent=4))
+            writer = _get_writer(args)
+            writer.write(json.dumps(preprocess_spec(spec), indent=4))
+            return
+        if args.apply_raw:
+            engine = engines.for_file(args.template)
+            writer = _get_writer(args)
+            writer.write(engine.process(spec))
             return
         loader = Loader(spec, args.datadir, enforce_schema=args.strict)
 
@@ -96,17 +104,7 @@ def _configure_output(args):
     If none of these configurations are specified, it will return the default output
     which is to print each value to standard out.
     """
-    if args.outdir:
-        log.debug('Creating output file writer for dir: %s', args.outdir)
-        writer = outputs.FileWriter(
-            outdir=args.outdir,
-            outname=args.outfileprefix,
-            extension=args.extension,
-            records_per_file=args.recordsperfile
-        )
-    else:
-        log.debug('Writing output to stdout')
-        writer = outputs.StdOutWriter()
+    writer = _get_writer(args)
 
     if args.template:
         log.debug('Using template from specified file: %s', args.template)
@@ -119,6 +117,21 @@ def _configure_output(args):
 
     # default
     return outputs.SingleFieldOutput(writer, args.printkey)
+
+
+def _get_writer(args) -> outputs.WriterInterface:
+    if args.outdir:
+        log.debug('Creating output file writer for dir: %s', args.outdir)
+        writer = outputs.FileWriter(
+            outdir=args.outdir,
+            outname=args.outfileprefix,
+            extension=args.extension,
+            records_per_file=args.recordsperfile
+        )
+    else:
+        log.debug('Writing output to stdout')
+        writer = outputs.StdOutWriter()
+    return writer
 
 
 def _load_spec(args):

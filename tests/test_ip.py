@@ -153,16 +153,16 @@ def _create_ip_spec_with_base(base):
 def _ip_spec(**config):
     return builder.Builder() \
         .add_field('network', builder.ip(**config)) \
-        .to_spec()
+        .build()
 
 
 def _ipv4_spec(**config):
     return builder.Builder() \
         .add_field('network', builder.ipv4(**config)) \
-        .to_spec()
+        .build()
 
 
 def _ip_precise_spec(**config):
     return builder.Builder() \
         .add_field('network', builder.ip_precise(**config)) \
-        .to_spec()
+        .build()

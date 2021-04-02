@@ -71,10 +71,10 @@ def _verify_values(supplier, min_size, max_size, exclude='', iterations=100):
 def _char_class_spec(data, **config):
     return builder.Builder() \
         .add_field("name", builder.char_class(data=data, **config)) \
-        .to_spec()
+        .build()
 
 
 def _cc_abbrev_spec(abbrev, **config):
     return builder.Builder() \
         .add_field("name", builder.char_class_abbrev(cc_abbrev=abbrev, **config)) \
-        .to_spec()
+        .build()

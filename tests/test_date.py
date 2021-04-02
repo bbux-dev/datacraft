@@ -88,12 +88,12 @@ def _get_unique_values(spec, key, iterations=100):
 
 
 def _date_spec(**config):
-    return builder.Builder().add_field('foo', builder.date(**config)).to_spec()
+    return builder.Builder().add_field('foo', builder.date(**config)).build()
 
 
 def _date_iso_spec(**config):
-    return builder.Builder().add_field('foo', builder.date_iso(**config)).to_spec()
+    return builder.Builder().add_field('foo', builder.date_iso(**config)).build()
 
 
 def _date_iso_us_spec(**config):
-    return builder.Builder().add_field('foo', builder.date_iso_us(**config)).to_spec()
+    return builder.Builder().add_field('foo', builder.date_iso_us(**config)).build()

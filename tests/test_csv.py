@@ -104,7 +104,7 @@ def _build_csv_spec(field_name, **config):
     base.update(config)
     return builder.Builder() \
         .add_field(field_name, builder.csv(**base)) \
-        .to_spec()
+        .build()
 
 
 def test_buffered_csv_end_of_data_raises_spec_exception():

@@ -19,6 +19,7 @@ Data Spec Repository
         1. [Dynamic Loop Counters](#Dynamic_Loop_Counters)
     1. [Custom Code Loading](#Custom_Code_Loading)
 1. [Programmatic Usage](#Programmatic)
+    1. [Building Specs](#BuildSpecs)
 
 ## <a name="Overview"></a>Overview
 
@@ -647,6 +648,7 @@ ognimalf
 
 # <a name="Programmatic"></a>Programmatic Usage
 
+## <a name="BuildSpecs"></a>Building Specs
 The `dataspec.builder` module contains tools that can be used to programmatically generate Data Specs. This may be
 easier for some who are not as familiar with JSON or prefer to manage their structures in code.  The core object is
 the `Builder`. You can add fields, refs, and field groups to this. Each of the core field types has a builder function
@@ -664,21 +666,22 @@ domain_weights = {
     "yahoo.com": 0.3,
     "hotmail.com": 0.1
 }
-
+# for building the final spec
 spec_builder = builder.Builder()
+# for building the references, is it self also a Builder, but with no refs
+refs = spec_builder.refs_builder
+# info for each reference added
+domains = refs.values('DOMAINS', data=domain_weights)
+animals = refs.values('ANIMALS', data=animal_names)
+actions = refs.values('ACTIONS', data=action_list, sample=True)
+# combines ANIMALS and ACTIONS with an _
+handles = refs.combine('HANDLE', refs=[animals, actions], join_with='_')
 
-animals_spec = builder.values(data=animal_names)
-actions_spec = builder.values(data=action_list, sample=True)
-domains_spec = builder.values(data=domain_weights)
-# combines ANIMALS and ACTIONS
-handle_spec = builder.combine(refs=['ANIMALS', 'ACTIONS'], join_with='_')
+spec_builder.combine('email', refs=[handles, domains])
 
-spec_builder.add_ref('ANIMALS', animals_spec)
-spec_builder.add_ref('ACTIONS', actions_spec)
-spec_builder.add_ref('HANDLE', handle_spec)
-spec_builder.add_ref('DOMAINS', domains_spec)
-
-spec_builder.add_field('email', builder.combine(refs=['HANDLE', 'DOMAINS']))
-
-spec = spec_builder.to_spec()
+spec = spec_builder.build()
 ```
+
+## <a name="Generator"></a>Generating Records
+
+

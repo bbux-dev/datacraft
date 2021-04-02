@@ -71,7 +71,7 @@ def test_combine_fields():
         .add_field("first", builder.values(["bob", "rob", "ann", "sue"])) \
         .add_field("last", builder.values(["smith", "jones", "frank", "wee"])) \
         .add_field("full_name", builder.combine(fields=["first", "last"], join_with=' ')) \
-        .to_spec()
+        .build()
 
     supplier = Loader(spec).get('full_name')
     assert supplier.next(0) == 'bob smith'
@@ -102,7 +102,7 @@ def test_combine_list_spec_valid_normal():
         .add_ref("ONE", builder.values('uno')) \
         .add_ref("TWO", builder.values('dos')) \
         .add_ref("TRE", builder.values('tres')) \
-        .to_spec()
+        .build()
 
     supplier = Loader(spec).get('field')
     assert supplier.next(0) == 'unodos'
@@ -115,7 +115,7 @@ def _combine_spec_refs(ref_names, **config):
         .add_field("field", builder.combine(refs=ref_names, **config))
     for name in ref_names:
         build.add_ref(name, builder.values(name))
-    return build.to_spec()
+    return build.build()
 
 
 def _combine_spec_fields(field_names, **config):
@@ -123,7 +123,7 @@ def _combine_spec_fields(field_names, **config):
         .add_field("field", builder.combine(fields=field_names, **config))
     for name in field_names:
         build.add_field(name, builder.values(name))
-    return build.to_spec()
+    return build.build()
 
 
 def _combine_list_spec(ref_lists, **config):
@@ -132,4 +132,4 @@ def _combine_list_spec(ref_lists, **config):
     for ref_list in ref_lists:
         for name in ref_list:
             build.add_ref(name, builder.values(name))
-    return build.to_spec()
+    return build.build()

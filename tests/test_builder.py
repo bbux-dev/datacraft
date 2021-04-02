@@ -12,19 +12,16 @@ def test_api_builder():
         "hotmail.com": 0.1
     }
 
-    # first build uses **kwargs format
+    # first build uses direct build methods
     builder1 = builder.Builder()
-    builder1.add_refs(
-        DOMAINS=builder.values(domain_weights),
-        ANIMALS=builder.values(animal_names),
-        ACTIONS=builder.values(action_list, sample=True),
-        HANDLE=builder.combine(refs=['ANIMALS', 'ACTIONS'], join_with='_')  # combines ANIMALS and ACTIONS
-    )
-    builder1.add_fields(
-        email=builder.combine(refs=['HANDLE', 'DOMAINS'])
-    )
+    refs1 = builder1.refs_builder
+    domains = refs1.values('DOMAINS', domain_weights)
+    animals = refs1.values('ANIMALS', animal_names)
+    actions = refs1.values('ACTIONS', action_list, sample=True)
+    handles = refs1.combine('HANDLE', refs=[animals, actions], join_with='_')
+    builder1.combine('email', refs=[handles, domains])
 
-    spec1 = builder1.to_spec()
+    spec1 = builder1.build()
 
     # second builder uses the fluent api style
     builder2 = builder.Builder()
@@ -42,12 +39,12 @@ def test_api_builder():
 
     builder2.add_field('email', builder.combine(refs=['HANDLE', 'DOMAINS']))
 
-    spec2 = builder2.to_spec()
+    spec2 = builder2.build()
 
     assert spec1 == spec2
 
 
-valid_spec_build_tests = [
+field_spec_build_tests = [
     (builder.values([1, 2, 3], prefix="foo"),
      {"type": "values", "data": [1, 2, 3], "config": {"prefix": "foo"}}),
     (builder.combine(refs=["ONE", "TWO"], join_with='@'),
@@ -101,6 +98,101 @@ valid_spec_build_tests = [
 ]
 
 
-@pytest.mark.parametrize("generated_spec,expected_spec", valid_spec_build_tests)
+@pytest.mark.parametrize("generated_spec,expected_spec", field_spec_build_tests)
 def test_spec_builder(generated_spec, expected_spec):
     assert generated_spec == expected_spec
+
+
+full_spec_build_tests = [
+    (builder.Builder().values('name', [1, 2, 3], prefix="foo"),
+     {"name": {"type": "values", "data": [1, 2, 3], "config": {"prefix": "foo"}}}),
+    (builder.Builder().combine('name', refs=["ONE", "TWO"], join_with='@'),
+     {"name": {"type": "combine", "refs": ["ONE", "TWO"], "config": {"join_with": "@"}}}),
+    (builder.Builder().combine('name', fields=["ONE", "TWO"], join_with='-'),
+     {"name": {"type": "combine", "fields": ["ONE", "TWO"], "config": {"join_with": "-"}}}),
+    (builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
+     {"name": {"type": "combine-list", "config": {"join_with": ","}, "refs": [["A", "B"], ["A", "B", "C"]]}}),
+    (builder.Builder().range_spec('name', 1, 5, 1, as_list=True, count=2),
+     {"name": {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}}),
+    (builder.Builder().rand_range('name', 20, 44, count=[2, 3, 4]),
+     {"name": {"type": "rand_range", "config": {"count": [2, 3, 4]}, "data": [20, 44]}}),
+    (builder.Builder().date('name', delta_days=3, offset=4),
+     {"name": {"type": "date", "config": {"delta_days": 3, "offset": 4}}}),
+    (builder.Builder().date_iso('name', delta_days=4, offset=5),
+     {"name": {"type": "date.iso", "config": {"delta_days": 4, "offset": 5}}}),
+    (builder.Builder().date_iso_us('name', delta_days=5, offset=6),
+     {"name": {"type": "date.iso.us", "config": {"delta_days": 5, "offset": 6}}}),
+    (builder.Builder().uuid('name', quote="'"),
+     {"name": {"type": "uuid", "config": {"quote": "'"}}}),
+    (builder.Builder().char_class('name', "visible", min=5, max=7),
+     {"name": {"type": "char_class", "config": {"min": 5, "max": 7}, "data": "visible"}}),
+    (builder.Builder().char_class_abbrev('name', "visible", min=3, max=10),
+     {"name": {"type": "cc-visible", "config": {"min": 3, "max": 10}}}),
+    (builder.Builder().unicode_range('name', ["3040", "309f"], mean=3),
+     {"name": {"type": "unicode_range", "config": {"mean": 3}, "data": ["3040", "309f"]}}),
+    (builder.Builder().unicode_range('name', [["3040", "309f"]], mean=3),
+     {"name": {"type": "unicode_range", "config": {"mean": 3}, "data": [["3040", "309f"]]}}),
+    (builder.Builder().geo_lat('name', start_lat=75.5),
+     {"name": {"type": "geo.lat", "config": {"start_lat": 75.5}}}),
+    (builder.Builder().geo_long('name', bbox=[31.3, 22.0, 34.1, 25.0]),
+     {"name": {"type": "geo.long", "config": {"bbox": [31.3, 22.0, 34.1, 25.0]}}}),
+    (builder.Builder().geo_pair('name', join_with=":", as_list="yes"),
+     {"name": {"type": "geo.pair", "config": {"join_with": ":", "as_list": "yes"}}}),
+    (builder.Builder().ip('name', base="192.168"),
+     {"name": {"type": "ip", "config": {"base": "192.168"}}}),
+    (builder.Builder().ipv4('name', cidr="2.22.222.0/16"),
+     {"name": {"type": "ipv4", "config": {"cidr": "2.22.222.0/16"}}}),
+    (builder.Builder().ip_precise('name', cidr="10.0.0.0/8"),
+     {"name": {"type": "ip.precise", "config": {"cidr": "10.0.0.0/8"}}}),
+    (builder.Builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+     {"name": {"type": "weightedref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}}),
+    (builder.Builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
+     {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}}),
+    (builder.Builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
+     {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "ref": "LIST"}}),
+    (builder.Builder().csv('name', datafile="demo.csv", sample="on"),
+     {"name": {"type": "csv", "config": {"datafile": "demo.csv", "sample": "on"}}}),
+    (builder.Builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
+     {"name": {"type": "csv_select", "config": {"headers": False}, "data": {"one": 1, "two": 2}}}),
+    (builder.Builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
+     {"name": {"type": "nested", "fields": {"one": {"type": "values", "data": 1}}}}),
+]
+
+
+@pytest.mark.parametrize("field_info,expected_spec", full_spec_build_tests)
+def test_full_spec_builder(field_info, expected_spec):
+    generated_spec = field_info.builder.build()
+    assert generated_spec == expected_spec
+
+
+def test_api_change():
+    animal_names = ['zebra', 'hedgehog', 'llama', 'flamingo']
+    action_list = ['fling', 'jump', 'launch', 'dispatch']
+    domain_weights = {
+        "gmail.com": 0.6,
+        "yahoo.com": 0.3,
+        "hotmail.com": 0.1
+    }
+
+    # for building the final spec
+    spec_builder = builder.Builder()
+
+    # for building the regs section of the spec
+    refs = spec_builder.refs_builder
+
+    # spec for each field and reference
+    animals = refs.values('ANIMALS', data=animal_names)
+    actions = refs.values('ACTIONS', data=action_list, sample=True)
+    domains = refs.values('DOMAINS', data=domain_weights)
+    # combines ANIMALS and ACTIONS
+    handles = refs.combine('HANDLE', refs=[animals, actions], join_with='_')
+
+    spec_builder.combine('email', refs=[handles, domains])
+
+    spec = spec_builder.build()
+
+
+def test_create_key_list():
+    entries = [builder.FieldInfo('key1', 'value1'), builder.FieldInfo('key2', 'value2')]
+    keys = builder._create_key_list(entries)
+    assert keys == ['key1', 'key2']

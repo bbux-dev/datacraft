@@ -12,7 +12,7 @@ def test_weighted_ref_missing_key():
         .add_ref('foo', ['foo']) \
         .add_ref('bar', 'bar') \
         .add_ref('baz', {'baz': 0.999}) \
-        .to_spec()
+        .build()
 
     key_supplier = suppliers.values(['foo', 'bar', 'baz', 'notvalid'])
     values_map = {key: suppliers.values(value) for key, value in spec['refs'].items()}
@@ -33,7 +33,7 @@ def test_weighed_ref_count_as_list():
         .add_ref('one', 'uno') \
         .add_ref('two', 'dos') \
         .add_ref('tre', 'tres') \
-        .to_spec()
+        .build()
 
     loader = Loader(spec)
     supplier = loader.get('field')

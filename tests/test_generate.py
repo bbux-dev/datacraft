@@ -5,7 +5,7 @@ from dataspec import generator, builder
 
 def test_generator_string_template():
     names = ['bob', 'bobby', 'robert', 'bobo']
-    spec = builder.single_field('name', builder.values(names)).to_spec()
+    spec = builder.single_field('name', builder.values(names)).build()
 
     template = 'Name: {{ name }}'
 
@@ -35,7 +35,7 @@ def test_generator_path_template():
 
 def test_generator_no_template():
     names = ['bob', 'bobby', 'robert', 'bobo']
-    spec = builder.single_field('name', builder.values(names)).to_spec()
+    spec = builder.single_field('name', builder.values(names)).build()
 
     gen = generator(
         spec=spec,
@@ -50,4 +50,4 @@ def build_spec(data):
     spec_builder = builder.Builder()
     for key, value in data.items():
         spec_builder.add_field(key, value)
-    return spec_builder.to_spec()
+    return spec_builder.build()

@@ -10,7 +10,7 @@ spec = builder.Builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \
     .add_ref('ONE', builder.values(['do', 'ca', 'pi'])) \
     .add_ref('TWO', builder.values(['g', 't', 'g'])) \
-    .to_spec()
+    .build()
 
 
 def test_load_spec_invalid_key():
@@ -36,7 +36,7 @@ def test_load_spec_missing_type_defaults_to_values():
 def test_load_spec_undefined_refs():
     spec_undefined_refs = builder.Builder() \
         .add_field('foo', builder.combine(['ONE', 'TWO'])) \
-        .to_spec()
+        .build()
     loader = Loader(spec_undefined_refs)
     with pytest.raises(SpecException):
         loader.get('foo')
@@ -62,7 +62,7 @@ def test_load_spec_weighted_ref():
         .add_ref('POSITIVE', ['yes']) \
         .add_ref('NEGATIVE', ['no']) \
         .add_ref('NEUTRAL', ['meh']) \
-        .to_spec()
+        .build()
     loader = Loader(weighted_ref_spec)
     supplier = loader.get('foo')
 
@@ -90,7 +90,7 @@ def test_load_ref_by_name():
     refs_only_spec = builder.Builder() \
         .add_ref('ONE', 'uno') \
         .add_ref('TWO', 'dos') \
-        .to_spec()
+        .build()
 
     loader = Loader(refs_only_spec)
     assert loader.get('ONE').next(0) == 'uno'

@@ -222,9 +222,9 @@ nested_transform_tests = [
     ),
     (
         builder.single_field('enemies', builder.nested(
-            builder.single_field('inner', ['bat', 'slime', 'orc']).to_spec())).to_spec(),
+            builder.single_field('inner', ['bat', 'slime', 'orc']).build())).build(),
         builder.single_field('enemies', builder.nested(
-            builder.single_field('inner', builder.values(['bat', 'slime', 'orc'])).to_spec())).to_spec(),
+            builder.single_field('inner', builder.values(['bat', 'slime', 'orc'])).build())).build(),
     )
 ]
 

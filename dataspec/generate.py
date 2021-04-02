@@ -18,7 +18,7 @@ def generator(spec: Dict, iterations: int, template: Union[str, Path] = None, da
     import dataspec
     from dataspec import builder
 
-    spec = builder.single_field('name', builder.values(['bob', 'bobby', 'robert', 'bobo'])).to_spec()
+    spec = builder.single_field('name', builder.values(['bob', 'bobby', 'robert', 'bobo'])).build()
 
     template = 'Name: {{ name }}'
 

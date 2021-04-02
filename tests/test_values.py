@@ -59,7 +59,7 @@ def _get_most_common_keys(spec, iterations, num_keys_to_collect):
 
 def test_sampling_mode_invalid_for_weighted_values():
     # sampling is only valid for list based suppliers
-    spec = builder.single_field('foo?sample=True', {10: 0.5, 20: 0.3, 30: 0.2}).to_spec()
+    spec = builder.single_field('foo?sample=True', {10: 0.5, 20: 0.3, 30: 0.2}).build()
     _test_invalid_spec(spec, 'foo')
 
 
@@ -90,14 +90,14 @@ def test_configref_for_values():
     """ verifies that the values ref inherits the config from the configref """
     spec = builder.single_field("name?configref=quoteit", ["bob", "joe", "ann", "sue"]) \
         .add_ref("quoteit", builder.configref(quote="\"")) \
-        .to_spec()
+        .build()
     supplier = Loader(spec).get('name')
     assert supplier.next(0) == '"bob"'
 
 
 def test_values_list_order():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    spec = builder.single_field('field', data).to_spec()
+    spec = builder.single_field('field', data).build()
     supplier = Loader(spec).get('field')
 
     values = [supplier.next(i) for i in range(10)]
@@ -106,7 +106,7 @@ def test_values_list_order():
 
 def test_values_count_as_list():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    spec = builder.single_field('field', builder.values(data, count=[2, 3])).to_spec()
+    spec = builder.single_field('field', builder.values(data, count=[2, 3])).build()
     supplier = Loader(spec).get('field')
 
     first = supplier.next(0)

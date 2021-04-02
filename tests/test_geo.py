@@ -114,16 +114,16 @@ def _verify_in_range_and_has_precision(value, start, end, exponent):
 def _geo_lat_spec(**config):
     return builder.Builder() \
         .add_field('lat', builder.geo_lat(**config)) \
-        .to_spec()
+        .build()
 
 
 def _geo_long_spec(**config):
     return builder.Builder() \
         .add_field('long', builder.geo_long(**config)) \
-        .to_spec()
+        .build()
 
 
 def _geo_pair_spec(**config):
     return builder.Builder() \
         .add_field('pair', builder.geo_pair(**config)) \
-        .to_spec()
+        .build()

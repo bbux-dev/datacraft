@@ -8,7 +8,7 @@ UUID_REGEX = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 
 
 def test_uuid_spec():
-    spec = builder.single_field("foo:uuid", {}).to_spec()
+    spec = builder.single_field("foo:uuid", {}).build()
     loader = Loader(spec)
     supplier = loader.get('foo')
 
