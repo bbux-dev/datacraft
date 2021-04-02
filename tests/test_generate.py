@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from dataspec import generator, builder
+from dataspec import record_generator, builder
 
 
 def test_generator_string_template():
@@ -9,7 +9,7 @@ def test_generator_string_template():
 
     template = 'Name: {{ name }}'
 
-    gen = generator(
+    gen = record_generator(
         spec=spec,
         iterations=4,
         template=template)
@@ -24,7 +24,7 @@ def test_generator_path_template():
     dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
     template = dir_path / 'data' / 'template.jinja'
 
-    gen = generator(
+    gen = record_generator(
         spec=spec,
         iterations=1,
         template=template)
@@ -37,7 +37,7 @@ def test_generator_no_template():
     names = ['bob', 'bobby', 'robert', 'bobo']
     spec = builder.single_field('name', builder.values(names)).build()
 
-    gen = generator(
+    gen = record_generator(
         spec=spec,
         iterations=4,
         template=None)

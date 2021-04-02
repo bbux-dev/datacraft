@@ -21,6 +21,12 @@ class FieldInfo:
         self.type_name = type_name
         self.builder = builder
 
+    def to_spec(self):
+        """
+        Builds the Data Spec from the underlying builder
+        :return: the Data Spec
+        """
+        return self.builder.build()
 
 class Builder:
     """

@@ -38,7 +38,8 @@ def get_ip_schema():
 
 @registry.schemas(IPV4_KEY)
 def get_ipv4_schema():
-    return schemas.load(IPV4_KEY)
+    # shares schema with ip
+    return schemas.load(IP_KEY)
 
 
 @registry.types(IPV4_KEY)

@@ -20,6 +20,7 @@ Data Spec Repository
     1. [Custom Code Loading](#Custom_Code_Loading)
 1. [Programmatic Usage](#Programmatic)
     1. [Building Specs](#BuildSpecs)
+    1. [Generating Records](#Generator)
 
 ## <a name="Overview"></a>Overview
 
@@ -639,7 +640,7 @@ your code.
 To supply custom code to the tool use the -c or --code arguments. One or more module files can be imported.
 
 ```shell script
-.dataspec -s reverse-spec.json -i 4 -c custom.py another.py
+.dataspec -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
 arbez
 gohegdeh
 amall
@@ -677,11 +678,42 @@ actions = refs.values('ACTIONS', data=action_list, sample=True)
 # combines ANIMALS and ACTIONS with an _
 handles = refs.combine('HANDLE', refs=[animals, actions], join_with='_')
 
-spec_builder.combine('email', refs=[handles, domains])
+spec_builder.combine('email', refs=[handles, domains], join_with='@')
 
 spec = spec_builder.build()
 ```
 
 ## <a name="Generator"></a>Generating Records
 
+Example:
 
+```python
+import dataspec
+
+name_list = ['bob', 'bobby', 'robert', 'bobo']
+spec = dataspec.builder.Builder().values('names', name_list).to_spec()
+
+template = 'Name: {{ name }}'
+
+generator = dataspec.record_generator(
+    spec=spec,
+    iterations=4,
+    template=template)
+
+single_record = next(generator)
+
+all_records = list(generator)
+
+# since we only specified 4 iterations our batch of 100 will contain 4 items
+batch_of_100 = batch(generator)
+
+
+def batch(generator, batch_size=100):
+    values = []
+    for i in range(batch_size):
+        try:
+            values.append(next(generator))
+        except StopIteration:
+            pass
+    return values
+```

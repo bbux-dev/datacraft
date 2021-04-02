@@ -33,6 +33,11 @@ def get_char_class_schema():
     """ get the schema for the char_class type """
     return schemas.load(CHAR_CLASS_KEY)
 
+for key in _CLASS_MAPPING.keys():
+    @registry.schemas("cc-" + key)
+    def get_char_class_alias_schema():
+        """ get the schema for the char_class type """
+        return schemas.load(CHAR_CLASS_KEY)
 
 @registry.types(CHAR_CLASS_KEY)
 def configure_supplier(spec, _):

@@ -9,9 +9,9 @@ from dataspec.type_handlers import *
 from .preprocessor import *
 
 
-def generator(spec: Dict, iterations: int, template: Union[str, Path] = None, data_dir='.'):
+def record_generator(spec: Dict, iterations: int, template: Union[str, Path] = None, data_dir='.', enforce_schema=False):
     """
-    Creates a generator that will produce records or render the template for each record
+    Creates a record_generator that will produce records or render the template for each record
 
     Usage:
 
@@ -22,14 +22,14 @@ def generator(spec: Dict, iterations: int, template: Union[str, Path] = None, da
 
     template = 'Name: {{ name }}'
 
-    generator = dataspec.generator(
+    record_generator = dataspec.record_generator(
         spec=spec,
         iterations=4,
         template=template)
 
     for i in range(5):
         try:
-            record = next(generator)
+            record = next(record_generator)
             print(record)
         except StopIteration:
             pass
@@ -38,9 +38,10 @@ def generator(spec: Dict, iterations: int, template: Union[str, Path] = None, da
     :param iterations: the number of iterations to run
     :param template: to apply to the data, string or Path
     :param data_dir: directory that contains data, if needed
+    :param enforce_schema: if the schemas for each type should be checked
     :return: None
     """
-    loader = Loader(spec, datadir=data_dir)
+    loader = Loader(spec, datadir=data_dir, enforce_schema=enforce_schema)
 
     if template is not None:
         if isinstance(template, Path):

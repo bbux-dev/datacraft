@@ -1,5 +1,6 @@
 import pytest
 import dataspec.builder as builder
+from dataspec import record_generator, SpecException
 
 
 def test_api_builder():
@@ -165,6 +166,42 @@ def test_full_spec_builder(field_info, expected_spec):
     assert generated_spec == expected_spec
 
 
+invalid_spec_build_tests = [
+    builder.Builder().values('name', data=[1, 2, 3], count={}),  # invalid count
+    builder.Builder().combine('name', refs=["ONE", "TWO"], join_with='@'),  # no refs defined
+    builder.Builder().combine('name', fields=["ONE", "TWO"], join_with='-'),  # no refs defined
+    builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
+    builder.Builder().range_spec('name', 1, 5, 1, as_list=True, count={}),  # invalid count
+    builder.Builder().rand_range('name', 20, 44, count=None),  # invalid count
+    builder.Builder().date('name', delta_days={1: 0.5, 2: 0.5}, offset=4),  # invalid delta_days
+    builder.Builder().date_iso('name', delta_days=4, offset="1"),  # invalid offset
+    builder.Builder().date_iso_us('name', delta_days=5, offset=6, anchor=42),  # invalid anchor
+    builder.Builder().char_class('name', "visible", min="5", max=7),  # min should be number
+    builder.Builder().char_class_abbrev('name', "visible", min=3, max="10"),  # max should be number
+    builder.Builder().unicode_range('name', ["3040", "309f"], count=4, mean=3),  # can't have count and mean
+    builder.Builder().unicode_range('name', [["3040", "309f"]], count=5, max=6),  # can't have count and max
+    builder.Builder().geo_lat('name', start_lat=175.5),  # lat out of range
+    builder.Builder().geo_long('name', bbox=[31.3, 22.0]),  # bbox wrong dimensions
+    builder.Builder().geo_pair('name', join_with=":", precision="yes"),  # invalid precision
+    builder.Builder().ip('name', base="192.1680"),  # type in base
+    builder.Builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
+    # TODO: when schemas for these are created
+    # builder.Builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+    # builder.Builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
+    # builder.Builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
+    # builder.Builder().csv('name', datafile="demo.csv", sample="on"),
+    # builder.Builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
+    # builder.Builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
+]
+
+
+@pytest.mark.parametrize("field_info", invalid_spec_build_tests)
+def test_invalid_spec_builder(field_info):
+    generated_spec = field_info.builder.build()
+    with pytest.raises(SpecException):
+        next(record_generator(generated_spec, 1, enforce_schema=True))
+
+
 def test_api_change():
     animal_names = ['zebra', 'hedgehog', 'llama', 'flamingo']
     action_list = ['fling', 'jump', 'launch', 'dispatch']
@@ -182,14 +219,17 @@ def test_api_change():
 
     # spec for each field and reference
     animals = refs.values('ANIMALS', data=animal_names)
-    actions = refs.values('ACTIONS', data=action_list, sample=True)
+    actions = refs.values('ACTIONS', data=action_list)
     domains = refs.values('DOMAINS', data=domain_weights)
     # combines ANIMALS and ACTIONS
     handles = refs.combine('HANDLE', refs=[animals, actions], join_with='_')
 
-    spec_builder.combine('email', refs=[handles, domains])
+    spec_builder.combine('email', refs=[handles, domains], join_with='@')
 
     spec = spec_builder.build()
+
+    first = next(record_generator(spec, 1))
+    assert first['email'].startswith('zebra_fling@')
 
 
 def test_create_key_list():
