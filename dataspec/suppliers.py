@@ -4,6 +4,7 @@ Factory like module for core supplier related functions.
 from typing import Union, Dict
 import json
 import random
+from collections import deque
 from .exceptions import SpecException
 from .utils import load_config, is_affirmative, get_caster
 from .supplier.list_values import ListValueSupplier
@@ -126,7 +127,7 @@ class RotatingSupplierList(ValueSupplierInterface):
     def __init__(self, suppliers, modulate_iteration):
         """
         :param suppliers: list of suppliers to rotate through
-        :param modulate_iteration: if the iteration should be split evenly across all suppliers 
+        :param modulate_iteration: if the iteration should be split evenly across all suppliers
         """
         self.suppliers = suppliers
         self.modulate_iteration = modulate_iteration
@@ -311,3 +312,49 @@ class RandomRangeSupplier(ValueSupplierInterface):
 
 def random_range(start, end, precision=None, count=1):
     return RandomRangeSupplier(start, end, precision, count)
+
+
+def is_buffered(field_spec):
+    """
+    Should the values for this spec be buffered
+    :param field_spec: to check
+    :return: true or false
+    """
+    config = field_spec.get('config', {})
+    return 'buffer_size' in config or is_affirmative('buffer', config)
+
+
+def buffered(wrapped: ValueSupplierInterface, field_spec):
+    """
+    Creates a Value Supplier that buffers the results of the wrapped supplier
+    :param wrapped: the Value Supplir to buffer values for
+    :param field_spec: to check
+    :return:
+    """
+    config = field_spec.get('config', {})
+    buffer_size = int(config.get('buffer_size', 10))
+    return _BufferedValueSuppier(wrapped, buffer_size)
+
+
+class _BufferedValueSuppier(ValueSupplierInterface):
+    """
+    Class for buffering the values from other suppliers. This allows the interaction
+    of one supplier with the previous values of another supplier
+    """
+
+    def __init__(self, wrapped: ValueSupplierInterface, buffer_size: int):
+        self.wrapped = wrapped
+        self.buffer = deque(maxlen=buffer_size)
+        self.current = -1
+
+    def next(self, iteration):
+        if iteration > self.current:
+            value = self.wrapped.next(iteration)
+            self.buffer.append(value)
+            self.current = iteration
+            return value
+
+        idx = len(self.buffer) - (self.current - iteration) - 1
+        if idx < 0:
+            raise ValueError('Buffer index out of range')
+        return self.buffer[idx]

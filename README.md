@@ -46,8 +46,9 @@ This will install the `dataspec` command line utility which should now be on you
 ## <a name="Usage"></a>Usage
 
 ```
-usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] 
-                [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT] [--strict] [--debug-spec]
+usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION]
+                [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT]
+                [--strict] [--apply-raw] [--debug-spec] [-x]
 
 Run dataspec.
 
@@ -75,7 +76,10 @@ optional arguments:
   -f FORMAT, --format FORMAT
                         Formatter for output records, default is none, valid are: ['json', 'json-pretty', 'csv']
   --strict              Enforce schema validation for all registered field specs
+  --apply-raw           Data from -s argument should be applied to the template with out treating as a Data Spec
   --debug-spec          Debug spec after internal reformatting
+  -x, --exclude-internal
+                        Do not include non data fields in output records
 
 input:
   -s SPEC, --spec SPEC  Spec to Use
@@ -554,7 +558,7 @@ Then we could update our spec to contain a `num_users` field:
 
 ```json
 {
-  "users?count=4": ["bob", "bobby", "rob", "roberta", "steve"],
+  "users?count=4?sample=true": ["bob", "bobby", "rob", "roberta", "steve"],
   "num_users": {
     "2": 0.5,
     "3": 0.3,
@@ -563,9 +567,16 @@ Then we could update our spec to contain a `num_users` field:
 }
 ```
 
-In this spec the number of users created will be weighted so that half the time there are two, and the other half there
-are three or four. NOTE: It is important to make sure that the `count` param is equal to the maximum number that will be
-indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
+In the above spec the number of users created will be weighted so that half the time there are two, and the other half
+there are three or four. NOTE: It is important to make sure that the `count` param is equal to the maximum number that
+will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
+
+#### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
+
+The `--apply-raw` command line flag will treat the argument of the `-s` flag as the raw-data that should be applied to
+the template. This can be helpful when working on adjusting the template that is being generated. You can dump the
+generated data from N iterations using the `--format json` or `--format json-pretty` then use this as raw input to the
+template file.
 
 ### <a name="Custom_Code_Loading"></a>Custom Code Loading and Schemas
 

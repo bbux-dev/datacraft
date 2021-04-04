@@ -86,6 +86,8 @@ class Loader:
             supplier = suppliers.cast_supplier(supplier, field_spec)
         if suppliers.is_decorated(field_spec):
             supplier = suppliers.decorated(field_spec, supplier)
+        if suppliers.is_buffered(field_spec):
+            supplier = suppliers.buffered(supplier, field_spec)
         return supplier
 
     def get_ref_spec(self, key):
