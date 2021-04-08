@@ -75,6 +75,11 @@ def dump_data(data, specific_keys):
             print(value['yaml'])
             print('```')
             print()
+        if 'api' in value:
+            print('```')
+            print(value['api'])
+            print('```')
+            print()
         print()
 
 

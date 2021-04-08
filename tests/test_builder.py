@@ -236,3 +236,12 @@ def test_create_key_list():
     entries = [builder.FieldInfo('key1', 'value1'), builder.FieldInfo('key2', 'value2')]
     keys = builder._create_key_list(entries)
     assert keys == ['key1', 'key2']
+
+
+def test_shorthand_key_support():
+    spec_builder = builder.Builder()
+    spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
+    generated_spec = spec_builder.build()
+    first = next(record_generator(generated_spec, 1, enforce_schema=True))
+    assert 'network' in first
+    assert first['network'].startswith('192.168.')

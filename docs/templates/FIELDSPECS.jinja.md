@@ -22,6 +22,18 @@ Field Spec Definitions
 </details>
 
 {%- endif %}
+
+{% if example.api is defined  -%}
+
+<details>
+  <summary>API Example</summary>
+
+```python
+{{ example.api }}
+```
+</details>
+
+{%- endif %}
 {%- endmacro %}
 {% macro show_command_and_output(example) -%}
 {% if example.command is defined  -%}
@@ -96,41 +108,18 @@ Each field that should be generated needs a specification that describes the way
 refer to this as a Field Spec. The simplest type of Field Spec is a values spec. The main format of a values spec is a
 list of values to use. By default, these values are rotated through incrementally. If the number of increments is larger
 than the number of values in the list, the values start over from the beginning of the list. When combining values from
-two values providers that are lists, they will be combined in incrementing order. i.e:
+two values providers that are lists, they will be combined in incrementing order. For example, the spec below will
+produce the values A1, B2, C3 continuously.
 
 {{ show_example(examples.overview_example_one) }}
-Will produce the values A1, B2, C3 continuously.
 
-```shell script
-dataspec -s ~/scratch/sample.json -i 7
-A1
-B2
-C3
-A1
-B2
-C3
-A1
-```
+{{ show_command_and_output(examples.overview_example_one) }}
 
 If an additional number is added to TWO, we now get 12 distinct values:
 
 {{ show_example(examples.overview_example_two) }}
 
-```shell script
-dataspec -s ~/scratch/sample.json -i 12 | sort
-A1
-A2
-A3
-A4
-B1
-B2
-B3
-B4
-C1
-C2
-C3
-C4
-```
+{{ show_command_and_output(examples.overview_example_two) }}
 
 If we want our values to be generated randomly from the provided lists, we set the config param `sample` to true:
 
@@ -138,12 +127,12 @@ If we want our values to be generated randomly from the provided lists, we set t
 
 # <a name="Field_Spec_Structure"></a>Field Spec Structure
 
-There are several different ways to define a spec. There is the full spec format and a variety of short hand notations.
+There are several ways to define a Field Spec. There is the full spec format, and a variety of short hand notations.
 
 ## <a name="The_full_format."></a>The Full Format.
 
 The only required element is type. Each Type Handler requires different pieces of information. See the Field Type
-reference below for details on each type.
+reference below for details on each type. Below is the general structure.
 
 ```
 {
@@ -155,7 +144,8 @@ reference below for details on each type.
   },
   "data": ["the data"],
   "ref": "REF_POINTER_IF_USED",
-  "refs": ["USES", "MORE", "THAN", "ONE"]
+  "refs": ["USES", "MORE", "THAN", "ONE"],
+  "fields": { "for": {}, "nested": {}, "types": {} }
 }
 ```
 
@@ -165,6 +155,8 @@ The values type is very common and so has a shorthand notation. Below is an exam
 types fields and the same spec in shorthand notation.
 
 {{ show_example(examples.values_shorthand_one) }}
+
+Shorthand Format:
 
 {{ show_example(examples.values_shorthand_two) }}
 

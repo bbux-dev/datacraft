@@ -67,7 +67,8 @@ Each field that should be generated needs a specification that describes the way
 refer to this as a Field Spec. The simplest type of Field Spec is a values spec. The main format of a values spec is a
 list of values to use. By default, these values are rotated through incrementally. If the number of increments is larger
 than the number of values in the list, the values start over from the beginning of the list. When combining values from
-two values providers that are lists, they will be combined in incrementing order. i.e:
+two values providers that are lists, they will be combined in incrementing order. For example, the spec below will
+produce the values A1, B2, C3 continuously.
 
 <details open>
   <summary>JSON Spec</summary>
@@ -96,9 +97,24 @@ refs:
   TWO: [1, 2, 3]
 ```
 </details>
-Will produce the values A1, B2, C3 continuously.
 
-```shell script
+<details>
+  <summary>API Example</summary>
+
+```python
+spec_builder = dataspec.builder.Builder()
+
+refs = spec_builder.refs_builder
+one = refs.values('ONE', ["A", "B", "C"])
+two = refs.values('TWO', [1, 2, 3])
+
+spec_builder.combine('combine', refs=[one, two])
+
+spec = spec_builder.build()
+```
+</details>
+
+```shell
 dataspec -s ~/scratch/sample.json -i 7
 A1
 B2
@@ -139,7 +155,23 @@ refs:
 ```
 </details>
 
-```shell script
+<details>
+  <summary>API Example</summary>
+
+```python
+spec_builder = dataspec.builder.Builder()
+
+refs = spec_builder.refs_builder
+one = refs.values('ONE', ["A", "B", "C"])
+two = refs.values('TWO', [1, 2, 3, 4])
+
+spec_builder.combine('combine', refs=[one, two])
+
+spec = spec_builder.build()
+```
+</details>
+
+```shell
 dataspec -s ~/scratch/sample.json -i 12 | sort
 A1
 A2
@@ -185,14 +217,30 @@ refs:
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
+
+```python
+spec_builder = dataspec.builder.Builder()
+
+refs = spec_builder.refs_builder
+one = refs.values('ONE', ["A", "B", "C"], sample=True)
+two = refs.values('TWO', [1, 2, 3, 4], sample="yes")
+
+spec_builder.combine('combine', refs=[one, two])
+
+spec = spec_builder.build()
+```
+</details>
+
 # <a name="Field_Spec_Structure"></a>Field Spec Structure
 
-There are several different ways to define a spec. There is the full spec format and a variety of short hand notations.
+There are several ways to define a Field Spec. There is the full spec format, and a variety of short hand notations.
 
 ## <a name="The_full_format."></a>The Full Format.
 
 The only required element is type. Each Type Handler requires different pieces of information. See the Field Type
-reference below for details on each type.
+reference below for details on each type. Below is the general structure.
 
 ```
 {
@@ -204,7 +252,8 @@ reference below for details on each type.
   },
   "data": ["the data"],
   "ref": "REF_POINTER_IF_USED",
-  "refs": ["USES", "MORE", "THAN", "ONE"]
+  "refs": ["USES", "MORE", "THAN", "ONE"],
+  "fields": { "for": {}, "nested": {}, "types": {} }
 }
 ```
 
@@ -218,7 +267,7 @@ types fields and the same spec in shorthand notation.
 
 ```json
 {
-  "field1": {"type": "vaules", "data": [1, 2, 3, 4, 5]},
+  "field1": {"type": "values", "data": [1, 2, 3, 4, 5]},
   "field2": {"type": "values", "data": {"A": 0.5, "B": 0.3, "C": 0.2}},
   "field3": {"type": "values", "data": "CONSTANT"}
 }
@@ -245,6 +294,23 @@ field3:
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
+
+```python
+from dataspec import builder
+
+spec_builder = builder.Builder()
+spec_builder.add_field('field1', builder.values([1, 2, 3, 4, 5]))
+spec_builder.add_field('field2', builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
+spec_builder.add_field('field3', builder.values("CONSTANT"))
+
+spec = spec_builder.build()
+```
+</details>
+
+Shorthand Format:
+
 <details open>
   <summary>JSON Spec</summary>
 
@@ -268,6 +334,21 @@ field2:
   B: 0.3
   C: 0.2
 field3: CONSTANT
+```
+</details>
+
+<details>
+  <summary>API Example</summary>
+
+```python
+from dataspec import builder
+
+spec_builder = builder.Builder()
+spec_builder.add_field('field1', [1, 2, 3, 4, 5])
+spec_builder.add_field('field2', {"A": 0.5, "B": 0.3, "C": 0.2})
+spec_builder.add_field('field3', "CONSTANT")
+
+spec = spec_builder.build()
 ```
 </details>
 
@@ -300,6 +381,18 @@ It is also possible to specify configuration parameters in the key by using URL 
 ```yaml
 ---
 network:ipv4?cidr=192.168.0.0/16: {}
+```
+</details>
+
+<details>
+  <summary>API Example</summary>
+
+```python
+from dataspec import builder
+
+spec_builder = builder.Builder()
+spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
+spec = spec_builder.build()
 ```
 </details>
 
@@ -339,6 +432,8 @@ ONE:
 TWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]
 ```
 </details>
+
+
 
 ## <a name="Common_Configurations"></a>Common Configurations
 
@@ -385,13 +480,15 @@ field:
 ```
 </details>
 
+
+
 ## <a name="CountsField"></a>Count Config Parameter
 
 Several types support a `count` config parameter. The value of the count parameter can be any of the supported values
 specs formats. For example a constant `3`, list `[2, 3, 7]`, or weighted map `{"1": 0.5, "2": 0.3, "3": 0.2 }`. This
 will produce the number of values by creating a value supplier for the count based on the supplied parameter. Most of
 the time if the count is greater that 1, the values will be returned as an array. Some types support joining the values
-by specifying the `join_with` parameter. Some types will let you explicitly set the `as_array` parameter to force the
+by specifying the `join_with` parameter. Some types will let you explicitly set the `as_list` parameter to force the
 results to be returned as an array and not the default for the given type.
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
@@ -429,6 +526,8 @@ shorthand_constant: This is simulated data and should not be used for nefarious 
 ```
 </details>
 
+
+
 ### <a name="List_Values"></a>List Values
 
 List values are rotated through in order. If the number of iterations is larger than the size of the list, we start over
@@ -459,6 +558,8 @@ shorthand_list: [200, 202, 303, 400, 404, 500]
 random_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]
 ```
 </details>
+
+
 
 ### <a name="Weighted_Values"></a>Weighted Values
 
@@ -510,6 +611,8 @@ shorthand_weighted:
 ```
 </details>
 
+
+
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more
 likely the values will match their specified weights.
 
@@ -551,6 +654,8 @@ refs:
   TWO?sample=true: [1, 2, 3]
 ```
 </details>
+
+
 
 ## <a name="Combine"></a>Combine
 
@@ -617,6 +722,8 @@ refs:
     data: [jones, smith, williams]
 ```
 </details>
+
+
 
 ## <a name="CombineList"></a>Combine List
 
@@ -693,6 +800,8 @@ refs:
     w: 0.1
 ```
 </details>
+
+
 
 ## <a name="Date"></a>Date
 
@@ -815,6 +924,8 @@ zero_to_ten:
 ```
 </details>
 
+
+
 Example: Multiple Ranges One Field
 
 <details open>
@@ -848,6 +959,8 @@ salaries:
   ]
 ```
 </details>
+
+
 
 This spec produces integer values for three different ranges each with different step sizes.
 
@@ -914,6 +1027,8 @@ pop:rand_range?cast=f: [200.2, 1222.7, 2]
 ```
 </details>
 
+
+
 ## <a name="Uuid"></a>Uuid
 
 A standard uuid.
@@ -953,6 +1068,8 @@ id:
 id_shorthand:uuid: {}
 ```
 </details>
+
+
 
 ## <a name="CharClass"></a>Character Classes
 
@@ -1044,6 +1161,8 @@ one_to_five_digits:cc-digits?min=1&max=5: {}
 ```
 </details>
 
+
+
 ### Examples
 
 Below is an example selecting several character classes along with a set of custom ones to use to generate passwords.
@@ -1095,6 +1214,8 @@ password:
     exclude: ['''', '"']
 ```
 </details>
+
+
 
 If we run this example:
 
@@ -1189,6 +1310,8 @@ text:
 
 ```
 </details>
+
+
 
 If we run this example:
 
@@ -1305,6 +1428,8 @@ egypt:
 ```
 </details>
 
+
+
 ## <a name="IP_Addresses"></a>IP Addresses
 
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) or by
@@ -1358,6 +1483,8 @@ network_with_base:ip?base=192.168.0: {}
 ```
 </details>
 
+
+
 ### <a name="Precise_IP"></a> Precise CIDR Addresses
 
 The default ip type only supports cidr masks of /8 /16 and /24. If you want more precise ip ranges you need to use the
@@ -1388,6 +1515,8 @@ network:ip.precise?cidr=10.0.0.0/8: {}
 ```
 </details>
 
+
+
 Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around 250K addresses
 
 <details open>
@@ -1407,6 +1536,8 @@ network:ip.precise?cidr=192.168.0.0/14&sample=true: {}
 ```
 </details>
 
+
+
 Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 
 <details open>
@@ -1425,6 +1556,8 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 network:ip.precise?cidr=2.22.222.0/22: {}
 ```
 </details>
+
+
 
 ## <a name="Weighted_Ref"></a>Weighted Ref
 
@@ -1487,6 +1620,8 @@ refs:
     '300': 0.1
 ```
 </details>
+
+
 
 ## <a name="Select_List_Subset"></a>Select List Subset
 
@@ -1561,6 +1696,8 @@ ingredients:
 ```
 </details>
 
+
+
 ```shell script
 dataspec -s ~/scratch/ingredients.json -i 10
 garlic, onions
@@ -1623,6 +1760,8 @@ ingredients:
   - carrots
 ```
 </details>
+
+
 
 Now when we run our datespec we get:
 
@@ -1721,6 +1860,8 @@ cities:
 ```
 </details>
 
+
+
 ```shell
 dataspec --spec cities.json --datadir ./data -i 5
 Tokyo
@@ -1810,6 +1951,8 @@ refs:
 ```
 </details>
 
+
+
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
 use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we will get output
 similar to:
@@ -1877,6 +2020,8 @@ placeholder:
     delimiter: "\t"
 ```
 </details>
+
+
 
 ## <a name="nested"></a>Nested Fields
 
@@ -1959,6 +2104,8 @@ user:nested:
         coordinates:geo.pair?as_list=true: {}
 ```
 </details>
+
+
 
 If we run this example:
 
