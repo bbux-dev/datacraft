@@ -4,7 +4,8 @@ Module for storing package wide common functions
 import os
 import importlib
 import logging
-import dataspec.casters as casters
+from . import casters
+from .model import DataSpec
 
 
 def load_custom_code(code_path):
@@ -69,3 +70,12 @@ def update_config(spec, key, value):
     config[key] = value
     spec['config'] = config
     return spec
+
+
+def get_raw_spec(data_spec):
+    """ The data spec may be raw or object version, this gets the raw underlying spec """
+    if isinstance(data_spec, DataSpec):
+        raw_spec = data_spec.raw_spec
+    else:
+        raw_spec = data_spec
+    return raw_spec

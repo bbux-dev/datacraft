@@ -1,6 +1,6 @@
 import pytest
 import dataspec.builder as builder
-from dataspec import record_generator, SpecException
+from dataspec import SpecException
 
 
 def test_api_builder():
@@ -162,7 +162,7 @@ full_spec_build_tests = [
 
 @pytest.mark.parametrize("field_info,expected_spec", full_spec_build_tests)
 def test_full_spec_builder(field_info, expected_spec):
-    generated_spec = field_info.builder.build()
+    generated_spec = field_info.builder.build().raw_spec
     assert generated_spec == expected_spec
 
 
@@ -197,9 +197,9 @@ invalid_spec_build_tests = [
 
 @pytest.mark.parametrize("field_info", invalid_spec_build_tests)
 def test_invalid_spec_builder(field_info):
-    generated_spec = field_info.builder.build()
+    spec = field_info.builder.build()
     with pytest.raises(SpecException):
-        next(record_generator(generated_spec, 1, enforce_schema=True))
+        next(spec.generator(1, enforce_schema=True))
 
 
 def test_api_change():
@@ -228,7 +228,7 @@ def test_api_change():
 
     spec = spec_builder.build()
 
-    first = next(record_generator(spec, 1))
+    first = next(spec.generator(1))
     assert first['email'].startswith('zebra_fling@')
 
 
@@ -241,7 +241,7 @@ def test_create_key_list():
 def test_shorthand_key_support():
     spec_builder = builder.Builder()
     spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
-    generated_spec = spec_builder.build()
-    first = next(record_generator(generated_spec, 1, enforce_schema=True))
+    spec = spec_builder.build()
+    first = next(spec.generator(1, enforce_schema=True))
     assert 'network' in first
     assert first['network'].startswith('192.168.')

@@ -669,7 +669,7 @@ that will generate a Field Spec for it. See example below.
 This is the email address example from above using the `builder` module.
 
 ```python
-from dataspec import builder
+import dataspec
 
 animal_names = ['zebra', 'hedgehog', 'llama', 'flamingo']
 action_list = ['fling', 'jump', 'launch', 'dispatch']
@@ -679,9 +679,9 @@ domain_weights = {
     "hotmail.com": 0.1
 }
 # for building the final spec
-spec_builder = builder.Builder()
+spec_builder = dataspec.Builder()
 # for building the references, is it self also a Builder, but with no refs
-refs = spec_builder.refs_builder
+refs = spec_builder.refs()
 # info for each reference added
 domains = refs.values('DOMAINS', data=domain_weights)
 animals = refs.values('ANIMALS', data=animal_names)
@@ -702,12 +702,11 @@ Example:
 import dataspec
 
 name_list = ['bob', 'bobby', 'robert', 'bobo']
-spec = dataspec.builder.Builder().values('names', name_list).to_spec()
+spec = dataspec.Builder().values('names', name_list).to_spec()
 
 template = 'Name: {{ name }}'
 
-generator = dataspec.record_generator(
-    spec=spec,
+generator = spec.generator(
     iterations=4,
     template=template)
 

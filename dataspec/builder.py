@@ -1,11 +1,14 @@
 """
 Module for building Data Specs programmatically
 """
-
-
+from pathlib import Path
 from typing import Any, Union, Dict, List
 import json
 import logging
+from . import utils
+from .model import DataSpec
+
+from dataspec import Loader, template_engines, key_providers
 
 log = logging.getLogger(__name__)
 
@@ -28,16 +31,17 @@ class FieldInfo:
         """
         return self.builder.build()
 
+
 class Builder:
     """
     Container class for constructing the Data Spec by adding fields, refs, and field_groups
 
     Basic Usage:
 
-    builder = dataspec.builder.Builder()
-    builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
-    builder.range('ages', start=22, end=33)
-    spec = builder.build()
+    >>> builder = dataspec.Builder()
+    >>> builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
+    >>> builder.range('ages', start=22, end=33)
+    >>> spec = builder.build()
     """
 
     def __init__(self, has_refs=True):
@@ -48,6 +52,12 @@ class Builder:
         self.fields = {}
         self.field_groups = []
         self.keys = set()
+
+    def refs(self):
+        """
+        :return: the refs builder which is itself also a builder
+        """
+        return self.refs_builder
 
     def values(self, key: str, data: Union[int, float, str, bool, List, Dict[str, float]], **config):
         """
@@ -400,7 +410,7 @@ class Builder:
         self.field_groups.append(field_group)
         return self
 
-    def build(self):
+    def build(self) -> DataSpec:
         """
         Generates the spec from the provided fields, refs, and field_groups
         :return: The built spec
@@ -412,7 +422,7 @@ class Builder:
         if len(self.field_groups) > 0:
             self._configure_field_groups(spec)
 
-        return spec
+        return DataSpecImpl(spec)
 
     def _configure_field_groups(self, spec):
         """
@@ -826,7 +836,7 @@ def csv_select(data: Dict[str, int] = None, **config):
     return spec
 
 
-def nested(fields: Dict[str, Dict], **config):
+def nested(fields: Union[Dict[str, Dict], DataSpec], **config):
     """
     Constructs a nested spec
 
@@ -836,7 +846,7 @@ def nested(fields: Dict[str, Dict], **config):
     """
     spec = {
         "type": "nested",
-        "fields": fields
+        "fields": utils.get_raw_spec(fields)
     }
     if len(config) > 0:
         spec['config'] = config
@@ -871,3 +881,31 @@ def _create_key_list(entries):
         return [entry.key for entry in entries]
     # this should be a regular list of strings
     return entries
+
+
+class DataSpecImpl(DataSpec):
+    """
+    Implementation for DataSpec
+    """
+
+    def generator(self, iterations: int, template: Union[str, Path] = None, data_dir='.', enforce_schema=False):
+        loader = Loader(self.raw_spec, datadir=data_dir, enforce_schema=enforce_schema)
+
+        if template is not None:
+            if isinstance(template, Path):
+                engine = template_engines.for_file(template)
+            else:
+                engine = template_engines.string(template)
+
+        key_provider = key_providers.from_spec(loader.specs)
+
+        for i in range(0, iterations):
+            group, keys = key_provider.get()
+            record = {}
+            for key in keys:
+                value = loader.get(key).next(i)
+                record[key] = value
+            if template is not None:
+                yield engine.process(record)
+            else:
+                yield record
