@@ -12,6 +12,7 @@ import dataspec.template_engines as engines
 import dataspec.outputs as outputs
 import dataspec.types as types
 import dataspec.key_providers as key_providers
+import dataspec.builder as builder
 from dataspec import utils
 from dataspec import SpecException
 
@@ -60,9 +61,13 @@ def main():
     try:
         args = parser.parse_args()
 
+        ###################
+        # Set Up
+        ###################
+
         _configure_logging(args)
         log.info('Starting Loading Configurations...')
-        log.debug("Parsing Args")
+        log.debug('Parsing Args')
 
         if args.code:
             log.debug('Loading custom code from %s', args.code)
@@ -71,28 +76,40 @@ def main():
 
         log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
         spec = _load_spec(args)
+
+        ###################
+        # By Pass Arguments
+        ###################
+
+        # Only dump out the reformatted spec
         if args.debug_spec:
             writer = _get_writer(args)
             writer.write(json.dumps(preprocess_spec(spec), indent=4))
             return
+
+        # apply the spec as date to the template
         if args.apply_raw:
             engine = engines.for_file(args.template)
             writer = _get_writer(args)
             writer.write(engine.process(spec))
             return
-        loader = Loader(spec, args.datadir, enforce_schema=args.strict)
 
+        ###################
+        # Regular Flow
+        ##################
         output = _configure_output(args)
 
-        key_provider = key_providers.from_spec(loader.specs)
-
         log.info('Starting Processing...')
+        generator = builder.generator(
+            spec,
+            args.iterations,
+            enforce_schema=args.strict,
+            data_dir=args.datadir,
+            exclude_internal=args.exclude_internal,
+            output=output)
         for i in range(0, args.iterations):
-            group, keys = key_provider.get()
-            for key in keys:
-                value = loader.get(key).next(i)
-                output.handle(key, value)
-            output.finished_record(i, group, args.exclude_internal)
+            # Generator will handle using to configured output
+            next(generator)
         log.info('Finished Processing')
     except SpecException as exc:
         log.error(str(exc))

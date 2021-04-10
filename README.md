@@ -679,7 +679,7 @@ domain_weights = {
     "hotmail.com": 0.1
 }
 # for building the final spec
-spec_builder = dataspec.Builder()
+spec_builder = dataspec.spec_builder()
 # for building the references, is it self also a Builder, but with no refs
 refs = spec_builder.refs()
 # info for each reference added

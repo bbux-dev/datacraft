@@ -1,5 +1,6 @@
 import pytest
 import dataspec.builder as builder
+from dataspec import DataSpec
 from dataspec import SpecException
 
 
@@ -245,3 +246,12 @@ def test_shorthand_key_support():
     first = next(spec.generator(1, enforce_schema=True))
     assert 'network' in first
     assert first['network'].startswith('192.168.')
+
+
+def test_spec_builder():
+    spec_builder = builder.spec_builder()
+    spec = spec_builder.values('name', ['a', 'b', 'c']).to_spec()
+    assert isinstance(spec, DataSpec)
+
+    single = next(spec.generator(1))
+    assert single == {'name': 'a'}

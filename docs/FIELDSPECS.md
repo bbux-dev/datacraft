@@ -102,7 +102,7 @@ refs:
   <summary>API Example</summary>
 
 ```python
-spec_builder = dataspec.builder.Builder()
+spec_builder = dataspec.spec_builder()
 
 refs = spec_builder.refs_builder
 one = refs.values('ONE', ["A", "B", "C"])
@@ -159,7 +159,7 @@ refs:
   <summary>API Example</summary>
 
 ```python
-spec_builder = dataspec.builder.Builder()
+spec_builder = dataspec.spec_builder()
 
 refs = spec_builder.refs_builder
 one = refs.values('ONE', ["A", "B", "C"])
@@ -221,7 +221,7 @@ refs:
   <summary>API Example</summary>
 
 ```python
-spec_builder = dataspec.builder.Builder()
+spec_builder = dataspec.spec_builder()
 
 refs = spec_builder.refs_builder
 one = refs.values('ONE', ["A", "B", "C"], sample=True)
@@ -298,9 +298,9 @@ field3:
   <summary>API Example</summary>
 
 ```python
-from dataspec import builder
+import dataspec
 
-spec_builder = builder.Builder()
+spec_builder = dataspec.spec_builder()
 spec_builder.add_field('field1', builder.values([1, 2, 3, 4, 5]))
 spec_builder.add_field('field2', builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
 spec_builder.add_field('field3', builder.values("CONSTANT"))
@@ -341,9 +341,9 @@ field3: CONSTANT
   <summary>API Example</summary>
 
 ```python
-from dataspec import builder
+import dataspec
 
-spec_builder = builder.Builder()
+spec_builder = dataspec.spec_builder()
 spec_builder.add_field('field1', [1, 2, 3, 4, 5])
 spec_builder.add_field('field2', {"A": 0.5, "B": 0.3, "C": 0.2})
 spec_builder.add_field('field3', "CONSTANT")
@@ -388,9 +388,9 @@ network:ipv4?cidr=192.168.0.0/16: {}
   <summary>API Example</summary>
 
 ```python
-from dataspec import builder
+import dataspec
 
-spec_builder = builder.Builder()
+spec_builder = dataspec.spec_builder()
 spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
 spec = spec_builder.build()
 ```
@@ -433,7 +433,20 @@ TWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('ONE', [1, 2, 3], prefix='TEST', suffix='@DEMO')
+spec_builder.values('TWO?prefix=TEST&suffix=@DEMO', [1, 2, 3])
+
+spec = spec_builder.build()
+```
+</details>
 
 ## <a name="Common_Configurations"></a>Common Configurations
 
@@ -480,7 +493,21 @@ field:
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('field', 
+                    ["world", "beautiful", "destiny"], 
+                    prefix='hello ')
+
+spec = spec_builder.build()
+```
+</details>
 
 ## <a name="CountsField"></a>Count Config Parameter
 
@@ -526,7 +553,20 @@ shorthand_constant: This is simulated data and should not be used for nefarious 
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('constant1', 42)
+spec_builder.add_field('shorthand_constant', "This is simulated data and should not be used for nefarious purposes")
+
+spec = spec_builder.build()
+```
+</details>
 
 ### <a name="List_Values"></a>List Values
 
@@ -559,7 +599,21 @@ random_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('list1', [200, 202, 303, 400, 404, 500])
+spec_builder.add_field("shorthand_list":  [200, 202, 303, 400, 404, 500])
+spec_builder.add_field("random_pet?sample=true": ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"])
+
+spec = spec_builder.build()
+```
+</details>
 
 ### <a name="Weighted_Values"></a>Weighted Values
 
@@ -611,7 +665,27 @@ shorthand_weighted:
 ```
 </details>
 
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('weighted1', {
+    "200": 0.4, "202": 0.3, "303": 0.1,
+    "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
+}
+                    )
+spec_builder.add_field("shorthand_weighted", {
+    "200": 0.4, "202": 0.3, "303": 0.1,
+    "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
+})
+
+spec = spec_builder.build()
+```
+</details>
 
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more
 likely the values will match their specified weights.

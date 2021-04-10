@@ -3,56 +3,61 @@
     "overview_example_one": {
       "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE\": [\"A\", \"B\", \"C\"],\n    \"TWO\": [1, 2, 3]\n  }\n}",
       "yaml": "---\ncombine:\n  type: combine\n  refs: [ONE, TWO]\nrefs:\n  ONE: [A, B, C]\n  TWO: [1, 2, 3]",
-      "api": "spec_builder = dataspec.builder.Builder()\n\nrefs = spec_builder.refs_builder\none = refs.values('ONE', [\"A\", \"B\", \"C\"])\ntwo = refs.values('TWO', [1, 2, 3])\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()",
+      "api": "spec_builder = dataspec.spec_builder()\n\nrefs = spec_builder.refs_builder\none = refs.values('ONE', [\"A\", \"B\", \"C\"])\ntwo = refs.values('TWO', [1, 2, 3])\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()",
       "command": "dataspec -s ~/scratch/sample.json -i 7",
       "output": "A1\nB2\nC3\nA1\nB2\nC3\nA1"
     },
     "overview_example_two": {
       "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE\": [\"A\", \"B\", \"C\"],\n    \"TWO\": [1, 2, 3, 4]\n  }\n}",
       "yaml": "---\ncombine:\n  type: combine\n  refs: [ONE, TWO]\nrefs:\n  ONE: [A, B, C]\n  TWO: [1, 2, 3 ,4]",
-      "api": "spec_builder = dataspec.builder.Builder()\n\nrefs = spec_builder.refs_builder\none = refs.values('ONE', [\"A\", \"B\", \"C\"])\ntwo = refs.values('TWO', [1, 2, 3, 4])\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()",
+      "api": "spec_builder = dataspec.spec_builder()\n\nrefs = spec_builder.refs_builder\none = refs.values('ONE', [\"A\", \"B\", \"C\"])\ntwo = refs.values('TWO', [1, 2, 3, 4])\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()",
       "command": "dataspec -s ~/scratch/sample.json -i 12 | sort",
       "output": "A1\nA2\nA3\nA4\nB1\nB2\nB3\nB4\nC1\nC2\nC3\nC4"
     },
     "overview_example_three": {
       "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE?sample=true\": [\"A\", \"B\", \"C\"],\n    \"TWO?sample=true\": [1, 2, 3, 4]\n  }\n}",
       "yaml": "---\ncombine:\n  type: combine\n  refs: [ONE, TWO]\nrefs:\n  ONE?sample=true: [A, B, C]\n  TWO?sample=true: [1, 2, 3 ,4]",
-      "api": "spec_builder = dataspec.builder.Builder()\n\nrefs = spec_builder.refs_builder\none = refs.values('ONE', [\"A\", \"B\", \"C\"], sample=True)\ntwo = refs.values('TWO', [1, 2, 3, 4], sample=\"yes\")\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()"
+      "api": "spec_builder = dataspec.spec_builder()\n\nrefs = spec_builder.refs_builder\none = refs.values('ONE', [\"A\", \"B\", \"C\"], sample=True)\ntwo = refs.values('TWO', [1, 2, 3, 4], sample=\"yes\")\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()"
     },
     "values_shorthand_one": {
       "json": "{\n  \"field1\": {\"type\": \"values\", \"data\": [1, 2, 3, 4, 5]},\n  \"field2\": {\"type\": \"values\", \"data\": {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}},\n  \"field3\": {\"type\": \"values\", \"data\": \"CONSTANT\"}\n}",
       "yaml": "---\nfield1:\n  type: vaules\n  data: [1, 2, 3, 4, 5]\nfield2:\n  type: values\n  data:\n    A: 0.5\n    B: 0.3\n    C: 0.2\nfield3:\n  type: values\n  data: CONSTANT",
-      "api": "from dataspec import builder\n\nspec_builder = builder.Builder()\nspec_builder.add_field('field1', builder.values([1, 2, 3, 4, 5]))\nspec_builder.add_field('field2', builder.values({\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}))\nspec_builder.add_field('field3', builder.values(\"CONSTANT\"))\n\nspec = spec_builder.build()"
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\nspec_builder.add_field('field1', builder.values([1, 2, 3, 4, 5]))\nspec_builder.add_field('field2', builder.values({\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}))\nspec_builder.add_field('field3', builder.values(\"CONSTANT\"))\n\nspec = spec_builder.build()"
     },
     "values_shorthand_two": {
       "json": "{\n  \"field1\": [1, 2, 3, 4, 5],\n  \"field2\": {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2},\n  \"field3\": \"CONSTANT\"\n}",
       "yaml": "---\nfield1: [1, 2, 3, 4, 5]\nfield2:\n  A: 0.5\n  B: 0.3\n  C: 0.2\nfield3: CONSTANT",
-      "api": "from dataspec import builder\n\nspec_builder = builder.Builder()\nspec_builder.add_field('field1', [1, 2, 3, 4, 5])\nspec_builder.add_field('field2', {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2})\nspec_builder.add_field('field3', \"CONSTANT\")\n\nspec = spec_builder.build()"
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\nspec_builder.add_field('field1', [1, 2, 3, 4, 5])\nspec_builder.add_field('field2', {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2})\nspec_builder.add_field('field3', \"CONSTANT\")\n\nspec = spec_builder.build()"
     },
     "inline_key_example": {
       "json": "{\n  \"network:ipv4?cidr=192.168.0.0/16\": {}\n}",
       "yaml": "---\nnetwork:ipv4?cidr=192.168.0.0/16: {}",
-      "api": "from dataspec import builder\n\nspec_builder = builder.Builder()\nspec_builder.add_field(\"network:ipv4?cidr=192.168.0.0/16\", {})\nspec = spec_builder.build()"
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\nspec_builder.add_field(\"network:ipv4?cidr=192.168.0.0/16\", {})\nspec = spec_builder.build()"
     },
     "config_example_one": {
       "json": "{\n  \"ONE\": {\n    \"type\": \"values\",\n    \"data\": [1, 2, 3],\n    \"config\": {\"prefix\": \"TEST\", \"suffix\": \"@DEMO\"}\n  },\n  \"TWO?prefix=TEST&suffix=@DEMO\": [1, 2, 3]\n}",
-      "yaml": "---\nONE:\n  type: values\n  config:\n    prefix: TEST\n    suffix: '@DEMO'\n  data: [1, 2, 3]\nTWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]"
+      "yaml": "---\nONE:\n  type: values\n  config:\n    prefix: TEST\n    suffix: '@DEMO'\n  data: [1, 2, 3]\nTWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('ONE', [1, 2, 3], prefix='TEST', suffix='@DEMO')\nspec_builder.values('TWO?prefix=TEST&suffix=@DEMO', [1, 2, 3])\n\nspec = spec_builder.build()"
     },
     "common_config_example_one": {
       "json": "{\n  \"field\": {\n      \"type\": \"values\",\n      \"config\": {\n        \"prefix\": \"Hello \"\n      },\n      \"data\": [\"world\", \"beautiful\", \"destiny\"]\n    }\n}",
-      "yaml": "---\nfield:\n  type: values\n  config:\n    prefix: 'Hello '\n  data: [world, beautiful, destiny]"
+      "yaml": "---\nfield:\n  type: values\n  config:\n    prefix: 'Hello '\n  data: [world, beautiful, destiny]",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('field', \n                    [\"world\", \"beautiful\", \"destiny\"], \n                    prefix='hello ')\n\nspec = spec_builder.build()"
     },
     "constants_example_one": {
       "json": "{\n  \"constant1\": {\"type\": \"values\", \"data\": 42},\n  \"shorthand_constant\": \"This is simulated data and should not be used for nefarious purposes\"\n}",
-      "yaml": "constant1:\n  type: values\n  data: 42\nshorthand_constant: This is simulated data and should not be used for nefarious purposes"
+      "yaml": "constant1:\n  type: values\n  data: 42\nshorthand_constant: This is simulated data and should not be used for nefarious purposes",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('constant1', 42)\nspec_builder.add_field('shorthand_constant', \"This is simulated data and should not be used for nefarious purposes\")\n\nspec = spec_builder.build()"
     },
     "list_values_example_one": {
       "json": "{\n  \"list1\": {\"type\": \"values\", \"data\": [200, 202, 303, 400, 404, 500]},\n  \"shorthand_list\":  [200, 202, 303, 400, 404, 500],\n  \"random_pet?sample=true\": [\"dog\", \"cat\", \"bunny\", \"pig\", \"rhino\", \"hedgehog\"]\n}",
-      "yaml": "---\nlist1:\n  type: values\n  data: [200, 202, 303, 400, 404, 500]\nshorthand_list: [200, 202, 303, 400, 404, 500]\nrandom_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]"
+      "yaml": "---\nlist1:\n  type: values\n  data: [200, 202, 303, 400, 404, 500]\nshorthand_list: [200, 202, 303, 400, 404, 500]\nrandom_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('list1', [200, 202, 303, 400, 404, 500])\nspec_builder.add_field(\"shorthand_list\":  [200, 202, 303, 400, 404, 500])\nspec_builder.add_field(\"random_pet?sample=true\": [\"dog\", \"cat\", \"bunny\", \"pig\", \"rhino\", \"hedgehog\"])\n\nspec = spec_builder.build()"
     },
     "weighted_values_example_one": {
       "json": "{\n  \"weighted1\": {\n    \"type\": \"values\",\n    \"data\": {\n      \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n      \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n    }\n  },\n  \"shorthand_weighted\": {\n    \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n    \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n  }\n}",
-      "yaml": "---\nweighted1:\n  type: values\n  data:\n    '200': 0.4\n    '202': 0.3\n    '303': 0.1\n    '400': 0.05\n    '403': 0.05\n    '404': 0.05\n    '500': 0.05\nshorthand_weighted:\n  '200': 0.4\n  '202': 0.3\n  '303': 0.1\n  '400': 0.05\n  '403': 0.05\n  '404': 0.05\n  '500': 0.05"
+      "yaml": "---\nweighted1:\n  type: values\n  data:\n    '200': 0.4\n    '202': 0.3\n    '303': 0.1\n    '400': 0.05\n    '403': 0.05\n    '404': 0.05\n    '500': 0.05\nshorthand_weighted:\n  '200': 0.4\n  '202': 0.3\n  '303': 0.1\n  '400': 0.05\n  '403': 0.05\n  '404': 0.05\n  '500': 0.05",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('weighted1', {\n    \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n    \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n}\n                    )\nspec_builder.add_field(\"shorthand_weighted\", {\n    \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n    \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n})\n\nspec = spec_builder.build()"
     },
     "sample_mode_example_one": {
       "json": "{\n  \"combine\": {\"type\": \"combine\", \"refs\": [\"ONE\", \"TWO\"]},\n  \"refs\": {\n    \"ONE?sample=true\": [\"A\", \"B\", \"C\"],\n    \"TWO?sample=true\": [1, 2, 3]\n  }\n}",

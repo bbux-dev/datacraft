@@ -31,7 +31,7 @@ class DataSpec(dict):
     def __init__(self, raw_spec):
         self.raw_spec = raw_spec
 
-    def generator(self, iterations: int, template: Union[str, Path] = None, data_dir='.', enforce_schema=False):
+    def generator(self, iterations: int, **kwargs):
         """
         Creates a generator that will produce records or render the template for each record
 
@@ -58,8 +58,5 @@ class DataSpec(dict):
         >>>          pass
 
         :param iterations: the number of iterations to run
-        :param template: to apply to the data, string or Path
-        :param data_dir: directory that contains data, if needed
-        :param enforce_schema: if the schemas for each type should be checked
-        :return: None
+        :return: record generator
         """

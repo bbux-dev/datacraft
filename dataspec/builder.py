@@ -32,6 +32,15 @@ class FieldInfo:
         return self.builder.build()
 
 
+def spec_builder():
+    """
+    Creates a new DataSpec builder
+
+    :return: the Builder()
+    """
+    return Builder()
+
+
 class Builder:
     """
     Container class for constructing the Data Spec by adding fields, refs, and field_groups
@@ -180,7 +189,7 @@ class Builder:
         :param data: hex start and end unicode ranges or lists of these
         :param config: in **kwargs format
         """
-        return self._add_field_spec(key, unicode_range  (data, **config))
+        return self._add_field_spec(key, unicode_range(data, **config))
 
     def geo_lat(self, key: str, **config):
         """
@@ -883,12 +892,29 @@ def _create_key_list(entries):
     return entries
 
 
+def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs):
+    """
+    Creates a generator for the raw spec for the specified iterations
+
+    :param raw_spec: to create generator for
+    :param iterations: number of iterations before max
+    :param kwargs: args to generator i.e. enforce_schema, ect.
+    :return: the generator for the provided spec
+    """
+    return DataSpecImpl(raw_spec).generator(iterations, **kwargs)
+
+
 class DataSpecImpl(DataSpec):
     """
     Implementation for DataSpec
     """
 
-    def generator(self, iterations: int, template: Union[str, Path] = None, data_dir='.', enforce_schema=False):
+    def generator(self, iterations: int, **kwargs):
+        template = kwargs.get('template')
+        data_dir = kwargs.get('data_dir', '.')
+        enforce_schema = kwargs.get('enforce_schema', False)
+        exclude_internal = kwargs.get('exclude_internal', False)
+        output = kwargs.get('output', None)
         loader = Loader(self.raw_spec, datadir=data_dir, enforce_schema=enforce_schema)
 
         if template is not None:
@@ -904,7 +930,12 @@ class DataSpecImpl(DataSpec):
             record = {}
             for key in keys:
                 value = loader.get(key).next(i)
+                if output:
+                    output.handle(key, value)
                 record[key] = value
+            if output:
+                output.finished_record(i, group, exclude_internal)
+
             if template is not None:
                 yield engine.process(record)
             else:
