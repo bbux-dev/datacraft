@@ -8,7 +8,7 @@ Field Spec Definitions
     1. [The Full Format](#The_full_format.)
     1. [Values Shorthand](#Values_Shorthand)
     1. [Inline Key Type Shorthand](#Inline_Key_Type_Shorthand)
-    1. [Inline Key Config Shorthad](#Inline_Key_Config_Shorthad)
+    1. [Inline Key Config Shorthand](#Inline_Key_Config_Shorthad)
 1. [Spec Configuration](#Spec_Configuration)
     1. [Common Configurations](#Common_Configurations)
     1. [Count Config Parameter](#CountsField)
@@ -102,9 +102,11 @@ refs:
   <summary>API Example</summary>
 
 ```python
+import dataspec
+
 spec_builder = dataspec.spec_builder()
 
-refs = spec_builder.refs_builder
+refs = spec_builder.refs()
 one = refs.values('ONE', ["A", "B", "C"])
 two = refs.values('TWO', [1, 2, 3])
 
@@ -159,9 +161,11 @@ refs:
   <summary>API Example</summary>
 
 ```python
+import dataspec
+
 spec_builder = dataspec.spec_builder()
 
-refs = spec_builder.refs_builder
+refs = spec_builder.refs()
 one = refs.values('ONE', ["A", "B", "C"])
 two = refs.values('TWO', [1, 2, 3, 4])
 
@@ -221,9 +225,11 @@ refs:
   <summary>API Example</summary>
 
 ```python
+import dataspec
+
 spec_builder = dataspec.spec_builder()
 
-refs = spec_builder.refs_builder
+refs = spec_builder.refs()
 one = refs.values('ONE', ["A", "B", "C"], sample=True)
 two = refs.values('TWO', [1, 2, 3, 4], sample="yes")
 
@@ -301,9 +307,9 @@ field3:
 import dataspec
 
 spec_builder = dataspec.spec_builder()
-spec_builder.add_field('field1', builder.values([1, 2, 3, 4, 5]))
-spec_builder.add_field('field2', builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
-spec_builder.add_field('field3', builder.values("CONSTANT"))
+spec_builder.add_field('field1', spec_builder.values([1, 2, 3, 4, 5]))
+spec_builder.add_field('field2', spec_builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
+spec_builder.add_field('field3', spec_builder.values("CONSTANT"))
 
 spec = spec_builder.build()
 ```
@@ -361,7 +367,7 @@ Some specs lend themselves to being easily specified with few parameters. One sh
 colon in the key to specify the type after the field name. For example `{"id:uuid":{}}`. This says the field `id` is of
 type `uuid` and has no further configuration. If no type is specified, the field is assumed to be a `values` type.
 
-## <a name="Inline_Key_Config_Shorthad"></a>Inline Key Config Shorthad
+## <a name="Inline_Key_Config_Shorthad"></a>Inline Key Config Shorthand
 
 It is also possible to specify configuration parameters in the key by using URL style parameters. For example.
 
@@ -520,7 +526,7 @@ results to be returned as an array and not the default for the given type.
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
-These are the built in types
+These are the built-in types
 
 ## <a name="Values"></a>Values
 
@@ -608,8 +614,8 @@ import dataspec
 spec_builder = dataspec.spec_builder()
 
 spec_builder.values('list1', [200, 202, 303, 400, 404, 500])
-spec_builder.add_field("shorthand_list":  [200, 202, 303, 400, 404, 500])
-spec_builder.add_field("random_pet?sample=true": ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"])
+spec_builder.add_field("shorthand_list",  [200, 202, 303, 400, 404, 500])
+spec_builder.add_field("random_pet?sample=true", ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"])
 
 spec = spec_builder.build()
 ```
@@ -938,7 +944,7 @@ the `date.iso.us` type to generate them with microseconds.
 ## <a name="Range"></a>Range
 
 A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
-step can be integers or floating point numbers.
+step can be integers or floating-point numbers.
 
 The range Field Spec structure is:
 
@@ -1165,9 +1171,9 @@ characters to sample from. Below is the list of supported character classes:
 |visible    |All printable ascii chars excluding whitespace|
 |punctuation|local specific punctuation|
 |special    |local specific punctuation|
-|hex        |Hexidecimal digits including upper and lower case a-f|
-|hex-lower  |Hexidecimal digits only including lower case a-f|
-|hex-upper  |Hexidecimal digits only including upper case A-F|
+|hex        |Hexadecimal digits including upper and lower case a-f|
+|hex-lower  |Hexadecimal digits only including lower case a-f|
+|hex-upper  |Hexadecimal digits only including upper case A-F|
 
 Helpful Links:
 
@@ -1837,7 +1843,7 @@ ingredients:
 
 
 
-Now when we run our datespec we get:
+Now when we run our dataspec we get:
 
 ```shell script
 dataspec -s ~/scratch/quoted_ingredients.json -i 10

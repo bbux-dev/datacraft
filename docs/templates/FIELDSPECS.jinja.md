@@ -49,7 +49,7 @@ Field Spec Definitions
     1. [The Full Format](#The_full_format.)
     1. [Values Shorthand](#Values_Shorthand)
     1. [Inline Key Type Shorthand](#Inline_Key_Type_Shorthand)
-    1. [Inline Key Config Shorthad](#Inline_Key_Config_Shorthad)
+    1. [Inline Key Config Shorthand](#Inline_Key_Config_Shorthad)
 1. [Spec Configuration](#Spec_Configuration)
     1. [Common Configurations](#Common_Configurations)
     1. [Count Config Parameter](#CountsField)
@@ -169,7 +169,7 @@ Some specs lend themselves to being easily specified with few parameters. One sh
 colon in the key to specify the type after the field name. For example `{"id:uuid":{}}`. This says the field `id` is of
 type `uuid` and has no further configuration. If no type is specified, the field is assumed to be a `values` type.
 
-## <a name="Inline_Key_Config_Shorthad"></a>Inline Key Config Shorthad
+## <a name="Inline_Key_Config_Shorthad"></a>Inline Key Config Shorthand
 
 It is also possible to specify configuration parameters in the key by using URL style parameters. For example.
 
@@ -213,7 +213,7 @@ results to be returned as an array and not the default for the given type.
 
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
-These are the built in types
+These are the built-in types
 
 ## <a name="Values"></a>Values
 
@@ -363,7 +363,7 @@ the `date.iso.us` type to generate them with microseconds.
 ## <a name="Range"></a>Range
 
 A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
-step can be integers or floating point numbers.
+step can be integers or floating-point numbers.
 
 The range Field Spec structure is:
 
@@ -467,9 +467,9 @@ characters to sample from. Below is the list of supported character classes:
 |visible    |All printable ascii chars excluding whitespace|
 |punctuation|local specific punctuation|
 |special    |local specific punctuation|
-|hex        |Hexidecimal digits including upper and lower case a-f|
-|hex-lower  |Hexidecimal digits only including lower case a-f|
-|hex-upper  |Hexidecimal digits only including upper case A-F|
+|hex        |Hexadecimal digits including upper and lower case a-f|
+|hex-lower  |Hexadecimal digits only including lower case a-f|
+|hex-upper  |Hexadecimal digits only including upper case A-F|
 
 Helpful Links:
 
@@ -776,7 +776,7 @@ our ingredients surrounded with double quotes. We would update our spec this way
 
 {{ show_example(examples.select_list_example_two) }}
 
-Now when we run our datespec we get:
+Now when we run our dataspec we get:
 
 ```shell script
 dataspec -s ~/scratch/quoted_ingredients.json -i 10
