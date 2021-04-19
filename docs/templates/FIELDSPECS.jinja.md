@@ -51,15 +51,22 @@ Field Spec Definitions
 {%- endif %}
 {%- endmacro %}
 {% macro show_params(schema, definitions) -%}
-| param | type | description                                      | examples |
-|-------|------|--------------------------------------------------|----------|
+### Parameters
+
+<details>
+
+<summary>Details</summary>
+
+| param | type | description                                      | default | examples |
+|-------|------|--------------------------------------------------|---------|----------|
 {%- for param, def in schema.properties.config.properties.items() if param not in ['prefix', 'suffix', 'quote', 'count'] %}
 {%- if param in definitions %}
-|{{ param }} |{{definitions[param].type}} |{{ definitions[param].description }} |{{ format_examples(definitions[param]) }} |
-{% else %}
-|{{ param }} |{{def.type}} |{{ def.description }} |{{ format_examples(def) }} |
+|{{ param }} |{{definitions[param].type}} |{{ definitions[param].description }}|{{ definitions[param].default }} |{{ format_examples(definitions[param]) }} |
+{%- else %}
+|{{ param }} |{{def.type}} |{{ def.description }} |{{ def.default }} |{{ format_examples(def) }} |
 {%- endif %}
 {%- endfor %}
+</details>
 {%- endmacro %}
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
@@ -81,6 +88,7 @@ Field Spec Definitions
     1. [Combine List](#CombineList)
     1. [Date](#Date)
     1. [Range](#Range)
+    1. [Random Range](#RandRange)
     1. [Uuid](#Uuid)
     1. [Character Class](#CharClass)
        1. [Built In Classes](#SupportedClasses)
@@ -332,8 +340,6 @@ with an array of two elements, where one is zero. If the first is zero then all 
 base/anchor date. If the second element is zero then all generated dates will be before the base/anchor date. There are
 a lot of configuration parameters for the date module. Each are described below.
 
-### Parameters
-
 {{ show_params(schemas.date, definitions) }}
 
 The date Field Spec structure is:
@@ -373,12 +379,18 @@ default date formatted for today would be 15-01-2050
 The type `date.iso` will produce a ISO8601 formatted date in the bounds configured without milliseconds. Use
 the `date.iso.us` type to generate them with microseconds.
 
+## <a name="DateRange"></a>Date Range
+
+A `date_range` spec is used to generate a date range for each iteration. The range will be returned as an array with the
+start of the range as the first element, and the end as the second, unless the `join_with` config parameter is
+specified.
+
+{{ show_params(schemas.date_range, definitions) }}
+
 ## <a name="Range"></a>Range
 
 A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
 step can be integers or floating-point numbers.
-
-### Parameters
 
 {{ show_params(schemas.range, definitions) }}
 

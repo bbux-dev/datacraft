@@ -83,7 +83,6 @@ class DateRangeSupplier(ValueSupplierInterface):
     """
 
     def __init__(self,
-                 delta_days: int,
                  offset: ValueSupplierInterface,
                  anchor: str,
                  date_format_string: str,
@@ -97,8 +96,6 @@ class DateRangeSupplier(ValueSupplierInterface):
         else:
             self.anchor_date = datetime.datetime.now()
 
-        # self.start_date, end_date = _calculate_start_end_dates(base, delta_days)
-        # self.delta_seconds = _calculate_delta_seconds(self.start_date, end_date)
         self.days_in_range = days_in_range
         self.join_with = join_with
 
@@ -108,10 +105,6 @@ class DateRangeSupplier(ValueSupplierInterface):
         delta_days = self.days_in_range.next(iteration)
         base = self.anchor_date - offset_date
         start_date, end_date = _calculate_start_end_dates(base, delta_days)
-        # random_second = random.randrange(self.delta_seconds)
-        # random_day = random.randrange(self.days_in_range)
-        # start_date = self.start_date + datetime.timedelta(seconds=random_second)
-        # end_date = start_date + datetime.timedelta(days=random_day)
         if self.date_format:
             start_date = start_date.strftime(self.date_format)
             end_date = end_date.strftime(self.date_format)
@@ -150,23 +143,20 @@ def configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
 def configure_date_range_type(field_spec: dict, loader: Loader):
     """ configures the date range value supplier """
     config = load_config(field_spec, loader)
-    delta_days = config.get('delta_days', 15)
     offset = get_param(config, ['offset', 'rand_offset'], default=0)
-    print(offset)
     offset_supplier = get_value_supplier_for_param(offset)
-    print(type(offset_supplier))
     anchor = config.get('anchor')
     date_format = config.get('format', DEFAULT_FORMAT)
     duration_days = get_param(config, ['duration_days', 'rand_duration_days'], default=30)
     duration_days_supplier = get_value_supplier_for_param(duration_days)
     join_with = config.get('join_with')
-    return DateRangeSupplier(delta_days, offset_supplier, anchor, date_format, duration_days_supplier, join_with)
+    return DateRangeSupplier(offset_supplier, anchor, date_format, duration_days_supplier, join_with)
 
 
 def get_param(config: dict, names: List, default):
     for name in names:
         if name in config:
-            return config.get(names)
+            return config.get(name)
     return default
 
 

@@ -12,9 +12,9 @@
         "suffix": {"$ref": "#/definitions/suffix"},
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
+        "join_with": {"$ref": "#/definitions/join_with"},
         "format": {
           "description": "Valid datetime format string",
-          "default": "%d-%m-%Y",
           "examples": [
             "%Y%m%d",
             "%m/%d/%Y",
@@ -24,7 +24,7 @@
         },
         "delta_days": {
           "description": "The number of days (or range of days) +- from the base/anchor date to create date strings for",
-          "default": 15,
+          "default": 30,
           "examples": [
             1, 12, [14, 0], [0, 30]
           ],
@@ -40,7 +40,6 @@
         },
         "anchor": {
           "type": "string",
-          "default": null,
           "description": "date string matching format or default format to use for base date",
           "examples": [
             "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
@@ -49,7 +48,6 @@
         "offset": {
           "type": "integer",
           "description": "number of days to shift base date by, positive means shift backwards, negative means forward",
-          "default": 0,
           "examples": [
             30, -30, 365, 730
           ]

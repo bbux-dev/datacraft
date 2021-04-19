@@ -116,7 +116,7 @@ def test_date_range():
     supplier = loader.get('single_date_range')
 
     date_range = supplier.next(0)
-
+    print(date_range)
     assert len(date_range) == 17
 
 

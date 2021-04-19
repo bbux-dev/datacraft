@@ -15,23 +15,27 @@
         "min": {
           "type": "integer",
           "description": "minimum number of characters in string",
+          "default": null,
           "examples": [1, 7, 2255],
           "minimum": 1
         },
         "max": {
           "type": "integer",
           "description": "maximum number of characters in string",
+          "default": null,
           "examples": [1, 7, 2255],
           "minimum": 1
         },
         "mean": {
           "type": "number",
           "description": "mean number of characters in string",
+          "default": null,
           "examples": [3, 5, 7.5]
         },
         "stddev": {
           "type": "number",
           "description": "standard deviation from mean for number of characters in string",
+          "default": null,
           "examples": [0.5, 3, 7]
         }
       },

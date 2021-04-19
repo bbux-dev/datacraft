@@ -24,6 +24,7 @@ Field Spec Definitions
     1. [Combine List](#CombineList)
     1. [Date](#Date)
     1. [Range](#Range)
+    1. [Random Range](#RandRange)
     1. [Uuid](#Uuid)
     1. [Character Class](#CharClass)
        1. [Built In Classes](#SupportedClasses)
@@ -899,12 +900,17 @@ a lot of configuration parameters for the date module. Each are described below.
 
 ### Parameters
 
-| param | type | description                                      | examples |
-|-------|------|--------------------------------------------------|----------|
-|format |string |Valid datetime format string |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> |
-|delta_days | |The number of days (or range of days) +- from the base/anchor date to create date strings for |1</br>12</br>[14, 0]</br>[0, 30]</br> |
-|anchor |string |date string matching format or default format to use for base date |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> |
-|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward |30</br>-30</br>365</br>730</br> |
+<details>
+
+<summary>Details</summary>
+
+| param | type | description                                      | default | examples |
+|-------|------|--------------------------------------------------|---------|----------|
+|format |string |Valid datetime format string |%d-%m-%Y |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> |
+|delta_days | |The number of days (or range of days) +- from the base/anchor date to create date strings for |15 |1</br>12</br>[14, 0]</br>[0, 30]</br> |
+|anchor |string |date string matching format or default format to use for base date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> |
+|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward |0 |30</br>-30</br>365</br>730</br> |
+</details>
 
 The date Field Spec structure is:
 
@@ -943,6 +949,27 @@ default date formatted for today would be 15-01-2050
 The type `date.iso` will produce a ISO8601 formatted date in the bounds configured without milliseconds. Use
 the `date.iso.us` type to generate them with microseconds.
 
+## <a name="DateRange"></a>Date Range
+
+A `date_range` spec is used to generate a date range for each iteration. The range will be returned as an array with the
+start of the range as the first element, and the end as the second, unless the `join_with` config parameter is
+specified.
+
+### Parameters
+
+<details>
+
+<summary>Details</summary>
+
+| param | type | description                                      | default | examples |
+|-------|------|--------------------------------------------------|---------|----------|
+|join_with |string |String or character to join multiple values together with|None |,</br>@</br> OR </br> && </br> |
+|format |string |Valid datetime format string | |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> |
+|delta_days | |The number of days (or range of days) +- from the base/anchor date to create date strings for |30 |1</br>12</br>[14, 0]</br>[0, 30]</br> |
+|anchor |string |date string matching format or default format to use for base date | |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> |
+|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward | |30</br>-30</br>365</br>730</br> |
+</details>
+
 ## <a name="Range"></a>Range
 
 A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
@@ -950,10 +977,15 @@ step can be integers or floating-point numbers.
 
 ### Parameters
 
-| param | type | description                                      | examples |
-|-------|------|--------------------------------------------------|----------|
-|cast |string |Type to cast values to for field |i</br>int</br>f</br>float</br>s</br>str</br>string</br>h</br>hex</br> |
+<details>
 
+<summary>Details</summary>
+
+| param | type | description                                      | default | examples |
+|-------|------|--------------------------------------------------|---------|----------|
+|cast |string |Type to cast values to for field| |i</br>int</br>f</br>float</br>s</br>str</br>string</br>h</br>hex</br> |
+|precision |integer |How many digits after decimal point to include in values|None |0</br>2</br>7</br>12</br> |
+</details>
 
 The range Field Spec structure is:
 
@@ -1192,16 +1224,19 @@ Helpful Links:
 
 ### Parameters
 
-| param | type | description                                      | examples |
-|-------|------|--------------------------------------------------|----------|
-|min |number | | |
+### Parameters
 
-|max |number | | |
+<details>
 
-|mean |number | | |
+<summary>Details</summary>
 
-|stddev |number | | |
-
+| param | type | description                                      | default | examples |
+|-------|------|--------------------------------------------------|---------|----------|
+|min |integer |minimum number of characters in string |None |1</br>7</br>2255</br> |
+|max |integer |maximum number of characters in string |None |1</br>7</br>2255</br> |
+|mean |number |mean number of characters in string |None |3</br>5</br>7.5</br> |
+|stddev |number |standard deviation from mean for number of characters in string |None |0.5</br>3</br>7</br> |
+</details>
 
 ### Usage
 
@@ -1540,10 +1575,17 @@ specifying a base.
 
 ### Parameters
 
-| param | type | description                                      | examples |
-|-------|------|--------------------------------------------------|----------|
-|base |string |base of ip address |192</br>10.</br>100.100</br>192.168.</br>10.10.10</br> |
-|cidr |string |cidr notation i.e. 192.168.0.0/16, only /8 /16 /24 supported |192.168.0.0/24</br>10.0.0.0/16</br>100.0.0.0/8</br> |
+### Parameters
+
+<details>
+
+<summary>Details</summary>
+
+| param | type | description                                      | default | examples |
+|-------|------|--------------------------------------------------|---------|----------|
+|base |string |base of ip address | |192</br>10.</br>100.100</br>192.168.</br>10.10.10</br> |
+|cidr |string |cidr notation i.e. 192.168.0.0/16, only /8 /16 /24 supported | |192.168.0.0/24</br>10.0.0.0/16</br>100.0.0.0/8</br> |
+</details>
 
 ### Usage
 
