@@ -1,6 +1,7 @@
 """
 Factory like module for core supplier related functions.
 """
+import types
 from typing import Union, Dict
 import json
 import random
@@ -22,7 +23,7 @@ def values(spec, loader=None):
     Based on data, return the appropriate values supplier
     """
     # shortcut notations no type, or data, the spec is the data
-    if 'data' not in spec:
+    if _data_not_in_spec(spec):
         data = spec
     else:
         data = spec['data']
@@ -44,6 +45,12 @@ def values(spec, loader=None):
     if 'count' in config:
         return _MultipleValueSupplier(supplier, count_supplier_from_data(config['count']))
     return supplier
+
+
+def _data_not_in_spec(spec):
+    if isinstance(spec, dict):
+        return 'data' not in spec
+    return True
 
 
 def count_supplier_from_data(data):

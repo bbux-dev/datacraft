@@ -43,6 +43,24 @@ Field Spec Definitions
 ```
 {%- endif %}
 {%- endmacro %}
+{% macro format_examples(def) -%}
+{% if def.examples is defined  -%}
+{% for example in def.examples -%}
+{{ example }}</br>
+{%- endfor %}
+{%- endif %}
+{%- endmacro %}
+{% macro show_params(schema, definitions) -%}
+| param | type | description                                      | examples |
+|-------|------|--------------------------------------------------|----------|
+{%- for param, def in schema.properties.config.properties.items() if param not in ['prefix', 'suffix', 'quote', 'count'] %}
+{%- if param in definitions %}
+|{{ param }} |{{definitions[param].type}} |{{ definitions[param].description }} |{{ format_examples(definitions[param]) }} |
+{% else %}
+|{{ param }} |{{def.type}} |{{ def.description }} |{{ format_examples(def) }} |
+{%- endif %}
+{%- endfor %}
+{%- endmacro %}
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
 1. [Field Spec Structure](#Field_Spec_Structure)
@@ -316,12 +334,7 @@ a lot of configuration parameters for the date module. Each are described below.
 
 ### Parameters
 
-| param | description                                      | examples |
-|-------|--------------------------------------------------|----------|
-|format | datetime compatible format specification         | %Y-%m-%d, %m/%d/%Y, %H:%M:%S,... |
-|delta_days | The number of days +- from the base/anchor date to create date strings for | 1, 12, \[14, 0\] |
-|anchor | date string matching format or default format to use for base date | 22-02-2022 |
-|offset | number of days to shift base date by, positive means shift backwards, negative means forward | 30, -7, ...|
+{{ show_params(schemas.date, definitions) }}
 
 The date Field Spec structure is:
 
@@ -364,6 +377,10 @@ the `date.iso.us` type to generate them with microseconds.
 
 A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
 step can be integers or floating-point numbers.
+
+### Parameters
+
+{{ show_params(schemas.range, definitions) }}
 
 The range Field Spec structure is:
 
@@ -476,6 +493,10 @@ Helpful Links:
   * https://en.wikipedia.org/wiki/ASCII#Character_groups
   * https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
   * https://docs.python.org/3/library/string.html
+
+### Parameters
+
+{{ show_params(schemas.char_class, definitions) }}
 
 ### Usage
 
@@ -660,6 +681,13 @@ Generates a `longitude,latitude` pair with in the bounding box defining Egypt wi
 
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) or by
 specifying a base.
+
+
+### Parameters
+
+{{ show_params(schemas.ip, definitions) }}
+
+### Usage
 
 The ipv4 Field Spec structure is:
 

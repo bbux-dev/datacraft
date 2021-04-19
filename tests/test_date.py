@@ -97,3 +97,45 @@ def _date_iso_spec(**config):
 
 def _date_iso_us_spec(**config):
     return builder.Builder().add_field('foo', builder.date_iso_us(**config)).build()
+
+
+def test_date_range():
+    spec = {
+        'type': 'date_range',
+        'config': {
+            'join_with': '-',
+            'format': '%Y%m%d',
+            'offset': 365,
+            'duration_days': 730
+        }
+    }
+    spec = builder.spec_builder().add_field('single_date_range', spec).build()
+
+    loader = Loader(spec)
+
+    supplier = loader.get('single_date_range')
+
+    date_range = supplier.next(0)
+
+    assert len(date_range) == 17
+
+
+def test_date_range_rand():
+    spec = {
+        'type': 'date_range',
+        'config': {
+            'join_with': '-',
+            'format': '%Y%m%d',
+            "rand_offset": [30, 90],
+            "rand_duration_days": [30, 90]
+        }
+    }
+    spec = builder.spec_builder().add_field('rand_date_range', spec).build()
+
+    loader = Loader(spec)
+
+    supplier = loader.get('rand_date_range')
+
+    date_range = supplier.next(0)
+    print(date_range)
+    assert len(date_range) == 17

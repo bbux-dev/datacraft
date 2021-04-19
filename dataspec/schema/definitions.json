@@ -2,10 +2,26 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/bbux-dev/dataspec/schemas/definitions.json",
   "definitions": {
-    "prefix": {"type": "string"},
-    "suffix": {"type": "string"},
-    "quote": {"type": "string"},
-    "join_with": {"type": "string"},
+    "prefix": {
+      "type": "string",
+      "description": "Prefix string pre-pended to all values for field",
+      "examples": ["@", "www.", "<h1>", "#"]
+    },
+    "suffix": {
+      "type": "string",
+      "description": "Suffix string appended to all values for field",
+      "examples": [".com", "</h1>", "@"]
+    },
+    "quote": {
+      "type": "string",
+      "description": "String to surround all values for field with",
+      "examples": ["\"", "'", "||"]
+    },
+    "join_with": {
+      "type": "string",
+      "description": "String or character to join multiple values together with",
+      "examples": [",", "@", " OR ", " && "]
+    },
     "affirmative_check": {
       "description": "Either true, false, 'on', 'off', 'yes', 'no', 'true', 'false', case insensitive",
       "oneOf": [
@@ -14,7 +30,12 @@
       ]
     },
     "as_list": {"$ref": "#/definitions/affirmative_check"},
-    "cast": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
+    "cast": {
+      "type": "string",
+      "description": "Type to cast values to for field",
+      "examples": ["i", "int", "f", "float", "s", "str", "string", "h", "hex"],
+      "enum": ["i", "int", "f", "float", "s", "str", "string", "h", "hex"]
+    },
     "count": {
       "oneOf": [
         {"type": "integer"},

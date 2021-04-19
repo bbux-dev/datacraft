@@ -7,6 +7,7 @@ import json
 import logging
 from . import utils
 from .model import DataSpec
+from .type_handlers import *
 
 from dataspec import Loader, template_engines, key_providers
 

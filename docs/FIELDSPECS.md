@@ -2,6 +2,8 @@ Field Spec Definitions
 ========================
 
 
+
+
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
 1. [Field Spec Structure](#Field_Spec_Structure)
@@ -897,12 +899,12 @@ a lot of configuration parameters for the date module. Each are described below.
 
 ### Parameters
 
-| param | description                                      | examples |
-|-------|--------------------------------------------------|----------|
-|format | datetime compatible format specification         | %Y-%m-%d, %m/%d/%Y, %H:%M:%S,... |
-|delta_days | The number of days +- from the base/anchor date to create date strings for | 1, 12, \[14, 0\] |
-|anchor | date string matching format or default format to use for base date | 22-02-2022 |
-|offset | number of days to shift base date by, positive means shift backwards, negative means forward | 30, -7, ...|
+| param | type | description                                      | examples |
+|-------|------|--------------------------------------------------|----------|
+|format |string |Valid datetime format string |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> |
+|delta_days | |The number of days (or range of days) +- from the base/anchor date to create date strings for |1</br>12</br>[14, 0]</br>[0, 30]</br> |
+|anchor |string |date string matching format or default format to use for base date |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> |
+|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward |30</br>-30</br>365</br>730</br> |
 
 The date Field Spec structure is:
 
@@ -945,6 +947,13 @@ the `date.iso.us` type to generate them with microseconds.
 
 A `range` spec is used to generate a range of values. The ranges are inclusive for start and end. The start, stop, and
 step can be integers or floating-point numbers.
+
+### Parameters
+
+| param | type | description                                      | examples |
+|-------|------|--------------------------------------------------|----------|
+|cast |string |Type to cast values to for field |i</br>int</br>f</br>float</br>s</br>str</br>string</br>h</br>hex</br> |
+
 
 The range Field Spec structure is:
 
@@ -1180,6 +1189,19 @@ Helpful Links:
   * https://en.wikipedia.org/wiki/ASCII#Character_groups
   * https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
   * https://docs.python.org/3/library/string.html
+
+### Parameters
+
+| param | type | description                                      | examples |
+|-------|------|--------------------------------------------------|----------|
+|min |number | | |
+
+|max |number | | |
+
+|mean |number | | |
+
+|stddev |number | | |
+
 
 ### Usage
 
@@ -1514,6 +1536,16 @@ egypt:
 
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) or by
 specifying a base.
+
+
+### Parameters
+
+| param | type | description                                      | examples |
+|-------|------|--------------------------------------------------|----------|
+|base |string |base of ip address |192</br>10.</br>100.100</br>192.168.</br>10.10.10</br> |
+|cidr |string |cidr notation i.e. 192.168.0.0/16, only /8 /16 /24 supported |192.168.0.0/24</br>10.0.0.0/16</br>100.0.0.0/8</br> |
+
+### Usage
 
 The ipv4 Field Spec structure is:
 
