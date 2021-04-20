@@ -22,26 +22,35 @@
           ],
           "type": "string"
         },
-        "delta_days": {
-          "description": "The number of days (or range of days) +- from the base/anchor date to create date strings for",
-          "default": 15,
+        "duration_days": {
+          "description": "The number of days from the start date to create date strings for",
+          "default": 30,
           "examples": [
-            1, 12, [14, 0], [0, 30]
+            1, 30, 90, 9999
           ],
           "oneOf": [
-            {"type": "integer"},
             {
-              "type": "array",
-              "minItems": 2,
-              "maxItems": 2,
-              "items": { "type": "integer" }
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "[1-9][0-9]*"
             }
           ]
         },
-        "anchor": {
+        "start": {
           "type": "string",
           "default": null,
-          "description": "date string matching format or default format to use for base date",
+          "description": "date string matching format or default format to use for start date",
+          "examples": [
+            "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
+          ]
+        },
+        "end": {
+          "type": "string",
+          "default": null,
+          "description": "date string matching format or default format to use for end date",
           "examples": [
             "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
           ]
@@ -53,7 +62,34 @@
           "examples": [
             30, -30, 365, 730
           ]
+        },
+        "center_date": {
+          "type": "string",
+          "default": null,
+          "description": "date string matching format or default format to use for center date",
+          "examples": [
+            "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
+          ]
+        },
+        "stddev_days": {
+          "type": "integer",
+          "description": "The standard deviation in days from the center date that dates should be distributed",
+          "default": 15,
+          "examples": [
+            1, 12, 720
+          ]
         }
+      },
+      "not": {
+        "description": "center_date and stddev_days should not appear with start, end, or duration_days",
+        "anyOf": [
+          {"required": ["center_date", "start"]},
+          {"required": ["center_date", "end"]},
+          {"required": ["center_date", "duration_days"]},
+          {"required": ["stddev_days", "start"]},
+          {"required": ["stddev_days", "end"]},
+          {"required": ["stddev_days", "duration_days"]}
+        ]
       }
     },
     "additionalProperties": false

@@ -22,8 +22,8 @@
           ],
           "type": "string"
         },
-        "delta_days": {
-          "description": "The number of days (or range of days) +- from the base/anchor date to create date strings for",
+        "duration_days": {
+          "description": "The number of days (or range of days) +- from the base/start date to create date strings for",
           "default": 30,
           "examples": [
             1, 12, [14, 0], [0, 30]
@@ -38,7 +38,7 @@
             }
           ]
         },
-        "anchor": {
+        "start": {
           "type": "string",
           "description": "date string matching format or default format to use for base date",
           "examples": [

@@ -298,7 +298,7 @@ def cast_supplier(supplier, field_spec, cast_to=None):
 
 class RandomRangeSupplier(ValueSupplierInterface):
     """
-    Class that supplies random ranges between specified bounds
+    Class that supplies values uniformly selected from specified bounds
     """
 
     def __init__(self, start, end, precision, count=1):
@@ -319,6 +319,31 @@ class RandomRangeSupplier(ValueSupplierInterface):
 
 def random_range(start, end, precision=None, count=1):
     return RandomRangeSupplier(start, end, precision, count)
+
+
+class GaussRangeSupplier(ValueSupplierInterface):
+    """
+    Class that supplies values selected from a normal distribution
+    """
+
+    def __init__(self, mean, stddev, precision, count=1):
+        self.mean = float(mean)
+        self.stddev = float(stddev)
+        self.precision = precision
+        self.format_str = '{: .' + str(precision) + 'f}'
+        self.count = count
+
+    def next(self, iteration):
+        next_nums = [random.gauss(self.mean, self.stddev) for _ in range(self.count)]
+        if self.precision is not None:
+            next_nums = [self.format_str.format(next_num) for next_num in next_nums]
+        if self.count == 1:
+            return next_nums[0]
+        return next_nums
+
+
+def gauss_range(mean, stddev, precision=None, count=1):
+    return GaussRangeSupplier(mean, stddev, precision, count)
 
 
 def is_buffered(field_spec):

@@ -1,8 +1,8 @@
 Field Spec Definitions
 ========================
-
-
-
+ 
+ 
+ 
 
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
@@ -64,6 +64,7 @@ Field Spec Definitions
 |[csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below       |
 |[csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below |
 |[nested](#Nested)            | For nested fields                      |                              |
+
 # <a name="Overview"></a>Overview
 
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
@@ -85,8 +86,8 @@ produce the values A1, B2, C3 continuously.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -99,8 +100,8 @@ refs:
   ONE: [A, B, C]
   TWO: [1, 2, 3]
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -117,6 +118,7 @@ spec_builder.combine('combine', refs=[one, two])
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 ```shell
@@ -144,8 +146,8 @@ If an additional number is added to TWO, we now get 12 distinct values:
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -158,8 +160,8 @@ refs:
   ONE: [A, B, C]
   TWO: [1, 2, 3 ,4]
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -176,6 +178,7 @@ spec_builder.combine('combine', refs=[one, two])
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 ```shell
@@ -208,8 +211,8 @@ If we want our values to be generated randomly from the provided lists, we set t
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -222,8 +225,8 @@ refs:
   ONE?sample=true: [A, B, C]
   TWO?sample=true: [1, 2, 3 ,4]
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -240,6 +243,7 @@ spec_builder.combine('combine', refs=[one, two])
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 # <a name="Field_Spec_Structure"></a>Field Spec Structure
@@ -256,7 +260,7 @@ reference below for details on each type. Below is the general structure.
   "type": "<the type>",
   "config": {
     "key1": "value1",
-    ...
+    ...</br>
     "keyN": "valueN"
   },
   "data": ["the data"],
@@ -281,8 +285,8 @@ types fields and the same spec in shorthand notation.
   "field3": {"type": "values", "data": "CONSTANT"}
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -301,8 +305,8 @@ field3:
   type: values
   data: CONSTANT
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -316,6 +320,7 @@ spec_builder.add_field('field3', spec_builder.values("CONSTANT"))
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 Shorthand Format:
@@ -330,8 +335,8 @@ Shorthand Format:
   "field3": "CONSTANT"
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -344,8 +349,8 @@ field2:
   C: 0.2
 field3: CONSTANT
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -359,6 +364,7 @@ spec_builder.add_field('field3', "CONSTANT")
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 The value after the field name is just the value of the data element from the full Field Spec. Config params can be
@@ -382,8 +388,8 @@ It is also possible to specify configuration parameters in the key by using URL 
   "network:ipv4?cidr=192.168.0.0/16": {}
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -391,8 +397,8 @@ It is also possible to specify configuration parameters in the key by using URL 
 ---
 network:ipv4?cidr=192.168.0.0/16: {}
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -403,6 +409,7 @@ spec_builder = dataspec.spec_builder()
 spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
 spec = spec_builder.build()
 ```
+
 </details>
 
 The `network` field is of type `ipv4` and the required `cidr` param is specified in the key.
@@ -425,8 +432,8 @@ using a URL parameter format in the key. For example, the following two fields w
   "TWO?prefix=TEST&suffix=@DEMO": [1, 2, 3]
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -440,8 +447,8 @@ ONE:
   data: [1, 2, 3]
 TWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -455,6 +462,7 @@ spec_builder.values('TWO?prefix=TEST&suffix=@DEMO', [1, 2, 3])
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 ## <a name="Common_Configurations"></a>Common Configurations
@@ -469,7 +477,6 @@ There are some configuration values that can be applied to all or a subset of ty
 |cast   | i,int,f,float,s,str,string|For numeric types, will cast results the provided type|
 |join_with|string   |For types that produce multiple values, use this string to join them   |
 |as_list|yes,true,on|For types that produce multiple values, return as list without joining |
-
 
 Example:
 
@@ -487,8 +494,8 @@ Example:
     }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -500,8 +507,8 @@ field:
     prefix: 'Hello '
   data: [world, beautiful, destiny]
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -516,6 +523,7 @@ spec_builder.values('field',
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 ## <a name="CountsField"></a>Count Config Parameter
@@ -549,8 +557,8 @@ A Constant Value is just a single value that is used in every iteration
   "shorthand_constant": "This is simulated data and should not be used for nefarious purposes"
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -560,8 +568,8 @@ constant1:
   data: 42
 shorthand_constant: This is simulated data and should not be used for nefarious purposes
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -575,6 +583,7 @@ spec_builder.add_field('shorthand_constant', "This is simulated data and should 
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 ### <a name="List_Values"></a>List Values
@@ -593,8 +602,8 @@ from the provided list.
   "random_pet?sample=true": ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"]
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -606,8 +615,8 @@ list1:
 shorthand_list: [200, 202, 303, 400, 404, 500]
 random_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -622,6 +631,7 @@ spec_builder.add_field("random_pet?sample=true", ["dog", "cat", "bunny", "pig", 
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 ### <a name="Weighted_Values"></a>Weighted Values
@@ -646,8 +656,8 @@ Weighted values are generated according to their weights.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -672,8 +682,8 @@ shorthand_weighted:
   '404': 0.05
   '500': 0.05
 ```
-</details>
 
+</details>
 <details>
   <summary>API Example</summary>
 
@@ -694,6 +704,7 @@ spec_builder.add_field("shorthand_weighted", {
 
 spec = spec_builder.build()
 ```
+
 </details>
 
 The example above will generate 200 40% of the time and 400 and 403 5%. The higher the number of iterations the more
@@ -720,8 +731,8 @@ valid with entries that are lists.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -736,8 +747,8 @@ refs:
   ONE?sample=true: [A, B, C]
   TWO?sample=true: [1, 2, 3]
 ```
-</details>
 
+</details>
 
 
 ## <a name="Combine"></a>Combine
@@ -782,8 +793,8 @@ Example below uses the first and last refs to create a full name field.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -804,8 +815,8 @@ refs:
     type: values
     data: [jones, smith, williams]
 ```
-</details>
 
+</details>
 
 
 ## <a name="CombineList"></a>Combine List
@@ -822,7 +833,7 @@ The combine Field Spec structure is:
     "type": "combine-list",
     "refs": [
       ["valid ref1", "valid ref2"],
-      ["valid ref1", "valid ref2", "valid_ref3", ...], ...
+      ["valid ref1", "valid ref2", "valid_ref3", ...</br>], ...</br>
       ["another_ref", "one_more_ref"]
     ],
     "config": {"join_with": "<optional string to use to join fields or refs, default is none>"}
@@ -854,8 +865,8 @@ This is a slight modification to the above combine Example.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -882,8 +893,8 @@ refs:
     e: 0.1
     w: 0.1
 ```
-</details>
 
+</details>
 
 
 ## <a name="Date"></a>Date
@@ -892,11 +903,47 @@ A Date Field Spec is used to generate date strings. The default format is day-mo
 25-12-2050. There is also a `date.iso` type that generates ISO8601 formatted date strings without microseconds and a
 `date.iso.us` for one that generates them with microseconds. We use
 the [format specification](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
-from the datetime module. The default strategy is to create dates around a center date. The default is to use today with
-a spread of +-15 days. To make the base or anchor date the start or end of the date range, use the delta_days parameter
-with an array of two elements, where one is zero. If the first is zero then all generated dates will only be after the
-base/anchor date. If the second element is zero then all generated dates will be before the base/anchor date. There are
-a lot of configuration parameters for the date module. Each are described below.
+from the datetime module. 
+
+### Uniformly Sampled Dates
+
+The default strategy is to create random dates within a 30 day range, where the start date is
+today. You can use the `start` parameter to set a specific start date for the dates. You can also explicitly specify
+an `end` date. The `start` and `end` parameters should conform to the specified date format, or the default if none is
+provided. The `offset` parameter can be used to shift the dates by a specified number of days. A positive
+`offset` will shift the start date back. A negative `offset` will shift the date forward. The `duration_days`
+parameter can be used to specify the number of days that should be covered in the date range, this parameter can take
+the place of the `end` parameter to make specifying the number of days the dates should cover. This parameter is usually
+specified as an integer constant.
+
+```
+       start                              end (default start + 30 days)
+          |--------------------------------|
+  |+offset|                           start+duration_days
+  |--------------------------------|
+          |-offset|
+                  |--------------------------------|    
+```
+
+### Dates Distributed around a Center Point
+
+An alternative strategy is to specify a `center_date` parameter with an optional `stddev_days`. This will crate a 
+normal or gaussian distribution of dates around the center point.
+
+```  
+                   |
+                   |
+                |  |  |
+             |  |  |  |  |
+          |  |  |  |  |  |  |  
+ |  |  |  |  |  |  |  |  |  |  |  |  |
+|-------------------------------------|
+|    stddev        |      stddev      |
+                center
+```
+
+
+There are a lot of configuration parameters for the date type. Each are described below.
 
 ### Parameters
 
@@ -905,11 +952,14 @@ a lot of configuration parameters for the date module. Each are described below.
 <summary>Details</summary>
 
 | param | type | description                                      | default | examples |
-|-------|------|--------------------------------------------------|---------|----------|
-|format |string |Valid datetime format string |%d-%m-%Y |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> |
-|delta_days | |The number of days (or range of days) +- from the base/anchor date to create date strings for |15 |1</br>12</br>[14, 0]</br>[0, 30]</br> |
-|anchor |string |date string matching format or default format to use for base date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> |
-|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward |0 |30</br>-30</br>365</br>730</br> |
+|-------|------|--------------------------------------------------|---------|----------| 
+|format |string |Valid datetime format string |%d-%m-%Y |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> | 
+|duration_days | |The number of days from the start date to create date strings for |30 |1</br>30</br>90</br>9999</br> | 
+|start |string |date string matching format or default format to use for start date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
+|end |string |date string matching format or default format to use for end date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
+|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward |0 |30</br>-30</br>365</br>730</br> | 
+|center_date |string |date string matching format or default format to use for center date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
+|stddev_days |integer |The standard deviation in days from the center date that dates should be distributed |15 |1</br>12</br>720</br> |
 </details>
 
 The date Field Spec structure is:
@@ -922,7 +972,7 @@ The date Field Spec structure is:
     "type": "date.iso",
     OR,
     "type": "date.iso.us",
-    "config": {"...": "..."}
+    "config": {"...</br>": "...</br>"}
   }
 }
 ```
@@ -932,17 +982,17 @@ The date Field Spec structure is:
 To help with the number of variations of date formats, below is a table of examples. Assume today is 15 Jan 2050, so the
 default date formatted for today would be 15-01-2050
 
-|format  |delta_days|anchor     |offset|produces                 |spec|
-|--------|----------|-----------|------|-------------------------|----|
-|-       |-         |-          |-     |12-31-2049 ... 30-01-2050|`{"dates:date":{}}`|
-|-       |-         |-          |1     |12-30-2049 ... 29-01-2050|`{"dates:date?offset=1":{}}`|
-|-       |1         |-          |-     |14-01-2050 ... 16-01-2050|`{"dates:date?delta_days=1":{}}`|
-|-       |-1        |-          |-     |same as above            |`{"dates:date?delta_days=-1":{}}`|
-|-       |1         |-          |1     |13-01-2050 ... 15-01-2050|`{"dates:date?delta_days=1&offset=1":{}}`|
-|-       |1         |-          |-1    |15-01-2050 ... 17-01-2050|`{"dates:date?delta_days=1&offset=-1":{}}`|
-|-       |1         |15-12-2050 |1     |13-12-2050 ... 15-12-2050|`{"dates:date?delta_days=1&offset=1&anchor=15-12-2050":{}}`|
-|%d-%b-%Y|1         |15-Dec-2050|-     |14-Dec-2050 ... 16-Dec-2050|`{"dates:date?delta_days=1&anchor=15-Dec-2050&format=%d-%b-%Y":{}}`|
-|-       |\[1,2\]   |-          |-     |15-01-2050 ... 17-01-2050|`{"dates:date":{"config":{"delta_days":[0, 2]}}}`|
+|format  |duration_days|start      |offset|produces                 |spec|
+|--------|-------------|-----------|------|-------------------------|----|
+|-       |-            |-          |-     |15-01-2050 ...</br> 13-02-2050|`{"dates:date":{}}`|
+|-       |-            |-          |1     |14-01-2050 ...</br> 12-02-2050|`{"dates:date?offset=1":{}}`|
+|-       |1            |-          |-     |15-01-2050 ...</br> 16-01-2050|`{"dates:date?duration_days=1":{}}`|
+|-       |10           |-          |-     |15-01-2050 ...</br> 25-01-2050|`{"dates:date?duration_days=10":{}}`|
+|-       |1            |-          |1     |14-01-2050 ...</br> 15-01-2050|`{"dates:date?duration_days=1&offset=1":{}}`|
+|-       |1            |-          |-1    |16-01-2050 ...</br> 17-01-2050|`{"dates:date?duration_days=1&offset=-1":{}}`|
+|-       |1            |15-12-2050 |1     |14-12-2050 ...</br> 14-12-2050|`{"dates:date?duration_days=1&offset=1&start=15-12-2050":{}}`|
+|%d-%b-%Y|1            |15-Dec-2050 12:00|-     |15-Dec-2050 12:00 ...</br> 16-Dec-2050 11:59|`{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M":{}}`|
+|-       |\[10,30\]    |-          |-     |15-01-2050 ...</br> 12-02-2050|`{"dates:date":{"config":{"duration_days":[10, 30]}}}`|
 
 ### ISO8601 formatted dates
 
@@ -962,11 +1012,11 @@ specified.
 <summary>Details</summary>
 
 | param | type | description                                      | default | examples |
-|-------|------|--------------------------------------------------|---------|----------|
-|join_with |string |String or character to join multiple values together with|None |,</br>@</br> OR </br> && </br> |
-|format |string |Valid datetime format string | |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> |
-|delta_days | |The number of days (or range of days) +- from the base/anchor date to create date strings for |30 |1</br>12</br>[14, 0]</br>[0, 30]</br> |
-|anchor |string |date string matching format or default format to use for base date | |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> |
+|-------|------|--------------------------------------------------|---------|----------| 
+|join_with |string |String or character to join multiple values together with|None |,</br>@</br> OR </br> && </br> | 
+|format |string |Valid datetime format string | |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> | 
+|duration_days | |The number of days (or range of days) +- from the base/start date to create date strings for |30 |1</br>12</br>[14, 0]</br>[0, 30]</br> | 
+|start |string |date string matching format or default format to use for base date | |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
 |offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward | |30</br>-30</br>365</br>730</br> |
 </details>
 
@@ -982,8 +1032,8 @@ step can be integers or floating-point numbers.
 <summary>Details</summary>
 
 | param | type | description                                      | default | examples |
-|-------|------|--------------------------------------------------|---------|----------|
-|cast |string |Type to cast values to for field| |i</br>int</br>f</br>float</br>s</br>str</br>string</br>h</br>hex</br> |
+|-------|------|--------------------------------------------------|---------|----------| 
+|cast |string |Type to cast values to for field| |i</br>int</br>f</br>float</br>s</br>str</br>string</br>h</br>hex</br> | 
 |precision |integer |How many digits after decimal point to include in values|None |0</br>2</br>7</br>12</br> |
 </details>
 
@@ -998,7 +1048,7 @@ The range Field Spec structure is:
     "data": [
       [<start>, <end>, <step> (optional)],
       [<start>, <end>, <step> (optional)],
-      ...
+      ...</br>
       [<start>, <end>, <step> (optional)],
     ],
   }
@@ -1020,8 +1070,8 @@ Example: Range 0 to 10 with a step of 0.5
   "range_shorthand2:range": [0, 10, 0.5]
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1043,8 +1093,8 @@ zero_to_ten:
   - 0.5
   type: range
 ```
-</details>
 
+</details>
 
 
 Example: Multiple Ranges One Field
@@ -1064,8 +1114,8 @@ Example: Multiple Ranges One Field
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1079,8 +1129,8 @@ salaries:
     [55000, 155000, 10000]
   ]
 ```
-</details>
 
+</details>
 
 
 This spec produces integer values for three different ranges each with different step sizes.
@@ -1132,8 +1182,8 @@ float between 200.2 and 1222.7 with two values after the decimal place. Note the
   "pop:rand_range?cast=f": [200.2, 1222.7, 2]
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1146,8 +1196,8 @@ population:
     cast: int
 pop:rand_range?cast=f: [200.2, 1222.7, 2]
 ```
-</details>
 
+</details>
 
 
 ## <a name="Uuid"></a>Uuid
@@ -1177,8 +1227,8 @@ Example Spec
   "id_shorthand:uuid": {}
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1188,15 +1238,15 @@ id:
   type: uuid
 id_shorthand:uuid: {}
 ```
-</details>
 
+</details>
 
 
 ## <a name="CharClass"></a>Character Classes
 
-A `char_class` type is used to create strings that are made up of characters from specific character classes. The strings
-can be of fixed or variable length. There are several built in character classes. You can also provide your own set of
-characters to sample from. Below is the list of supported character classes:
+A `char_class` type is used to create strings that are made up of characters from specific character classes. The
+strings can be of fixed or variable length. There are several built in character classes. You can also provide your own
+set of characters to sample from. Below is the list of supported character classes:
 
 ### <a name="SupportedClasses"></a>Built In Classes
 
@@ -1218,9 +1268,9 @@ characters to sample from. Below is the list of supported character classes:
 
 Helpful Links:
 
-  * https://en.wikipedia.org/wiki/ASCII#Character_groups
-  * https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
-  * https://docs.python.org/3/library/string.html
+* https://en.wikipedia.org/wiki/ASCII#Character_groups
+* https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
+* https://docs.python.org/3/library/string.html
 
 ### Parameters
 
@@ -1231,10 +1281,10 @@ Helpful Links:
 <summary>Details</summary>
 
 | param | type | description                                      | default | examples |
-|-------|------|--------------------------------------------------|---------|----------|
-|min |integer |minimum number of characters in string |None |1</br>7</br>2255</br> |
-|max |integer |maximum number of characters in string |None |1</br>7</br>2255</br> |
-|mean |number |mean number of characters in string |None |3</br>5</br>7.5</br> |
+|-------|------|--------------------------------------------------|---------|----------| 
+|min |integer |minimum number of characters in string |None |1</br>7</br>2255</br> | 
+|max |integer |maximum number of characters in string |None |1</br>7</br>2255</br> | 
+|mean |number |mean number of characters in string |None |3</br>5</br>7.5</br> | 
 |stddev |number |standard deviation from mean for number of characters in string |None |0.5</br>3</br>7</br> |
 </details>
 
@@ -1254,7 +1304,7 @@ A `char_class` Field Spec takes the form
     or
     "data": <string with custom set of characters to sample from>
     or
-    "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>, ...]
+    "data": [<char_class_name1>, <char_class_name2>, ...</br>, <custom characters>, ...</br>]
     # configuration
     "config":{
       # General Parameters
@@ -1288,16 +1338,16 @@ element is ignored and only characters from the single character class are sampl
   "one_to_five_digits:cc-digits?min=1&max=5": {}
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
 ```yaml
 one_to_five_digits:cc-digits?min=1&max=5: {}
 ```
-</details>
 
+</details>
 
 
 ### Examples
@@ -1329,8 +1379,8 @@ deviation of 2.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1350,8 +1400,8 @@ password:
     max: 18
     exclude: ['''', '"']
 ```
-</details>
 
+</details>
 
 
 If we run this example:
@@ -1433,8 +1483,8 @@ points 0x3040 to 0x30FF) characters as one of our fields we could use the follow
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1446,8 +1496,8 @@ text:
     mean: 5
 
 ```
-</details>
 
+</details>
 
 
 If we run this example:
@@ -1481,7 +1531,7 @@ A `unicode_range` Field Spec takes the form
     "data": [
         [<start_code_point_in_hex>, <end_code_point_in_hex>],
         [<start_code_point_in_hex>, <end_code_point_in_hex>],
-        ...
+        ...</br>
         [<start_code_point_in_hex>, <end_code_point_in_hex>],
     ],
     # configuration
@@ -1546,8 +1596,8 @@ Generates a `longitude,latitude` pair with in the bounding box defining Egypt wi
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1563,15 +1613,14 @@ egypt:
     - 25.00562
     precision: 3
 ```
-</details>
 
+</details>
 
 
 ## <a name="IP_Addresses"></a>IP Addresses
 
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) or by
 specifying a base.
-
 
 ### Parameters
 
@@ -1582,8 +1631,8 @@ specifying a base.
 <summary>Details</summary>
 
 | param | type | description                                      | default | examples |
-|-------|------|--------------------------------------------------|---------|----------|
-|base |string |base of ip address | |192</br>10.</br>100.100</br>192.168.</br>10.10.10</br> |
+|-------|------|--------------------------------------------------|---------|----------| 
+|base |string |base of ip address | |192</br>10.</br>100.100</br>192.168.</br>10.10.10</br> | 
 |cidr |string |cidr notation i.e. 192.168.0.0/16, only /8 /16 /24 supported | |192.168.0.0/24</br>10.0.0.0/16</br>100.0.0.0/8</br> |
 </details>
 
@@ -1621,8 +1670,8 @@ Example Spec:
   "network_with_base:ip?base=192.168.0": {}
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1635,8 +1684,8 @@ network:
 network_shorthand:ip?cidr=2.22.222.0/16: {}
 network_with_base:ip?base=192.168.0: {}
 ```
-</details>
 
+</details>
 
 
 ### <a name="Precise_IP"></a> Precise CIDR Addresses
@@ -1658,8 +1707,8 @@ Ips in the 10.n.n.n range, extremely slow, this is around 16 Million unique ip a
 ```json
 {"network:ip.precise?cidr=10.0.0.0/8":{}}
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1667,8 +1716,8 @@ Ips in the 10.n.n.n range, extremely slow, this is around 16 Million unique ip a
 ---
 network:ip.precise?cidr=10.0.0.0/8: {}
 ```
-</details>
 
+</details>
 
 
 Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around 250K addresses
@@ -1679,8 +1728,8 @@ Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around
 ```json
 {"network:ip.precise?cidr=192.168.0.0/14&sample=true": {}}
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1688,8 +1737,8 @@ Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around
 ---
 network:ip.precise?cidr=192.168.0.0/14&sample=true: {}
 ```
-</details>
 
+</details>
 
 
 Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
@@ -1700,8 +1749,8 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 ```json
 {"network:ip.precise?cidr=2.22.222.0/22": {}}
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1709,8 +1758,8 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 ---
 network:ip.precise?cidr=2.22.222.0/22: {}
 ```
-</details>
 
+</details>
 
 
 ## <a name="Weighted_Ref"></a>Weighted Ref
@@ -1723,7 +1772,7 @@ The weightedref Field Spec structure is:
 {
   "<field name>": {
     "type": "weightedref",
-    "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...}
+    "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...</br>}
   }
 }
 ```
@@ -1749,8 +1798,8 @@ the follow spec.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1773,8 +1822,8 @@ refs:
     '203': 0.1
     '300': 0.1
 ```
-</details>
 
+</details>
 
 
 ## <a name="Select_List_Subset"></a>Select List Subset
@@ -1803,8 +1852,8 @@ The select_list_subset Field Spec structure is:
 
 The join_with config option is used to specify how the selected values should be combined. The mean and stddev config
 options tell how many items should be chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items then
-sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen.
-You can also set a min and max. Example:
+sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen. You can also set a min
+and max. Example:
 
 <details open>
   <summary>JSON Spec</summary>
@@ -1824,8 +1873,8 @@ You can also set a min and max. Example:
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1848,8 +1897,8 @@ ingredients:
   - carrots
   type: select_list_subset
 ```
-</details>
 
+</details>
 
 
 ```shell script
@@ -1888,8 +1937,8 @@ our ingredients surrounded with double quotes. We would update our spec this way
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -1913,8 +1962,8 @@ ingredients:
   - potatoes
   - carrots
 ```
-</details>
 
+</details>
 
 
 Now when we run our dataspec we get:
@@ -1940,8 +1989,8 @@ paste the data into a spec. To make use of data already in a tabular format you 
 allow you to identify a column from a tabular data file to use to provide the values for a field. Another advantage of
 using a csv spec is that it is easy to have fields that are correlated be generated together. All rows will be selected
 incrementally, unless any of the fields are configured to use `sample` mode. You can use `sample` mode on individual
-columns, or you can use it across all columns by creating a `configref` spec. See [csv_select](#csv_select) for an efficient way
-to select multiple columns from a csv file.
+columns, or you can use it across all columns by creating a `configref` spec. See [csv_select](#csv_select) for an
+efficient way to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
 
@@ -1998,8 +2047,8 @@ smaller input files.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -2012,8 +2061,8 @@ cities:
     delimiter: '~'
     sample: true
 ```
-</details>
 
+</details>
 
 
 ```shell
@@ -2039,7 +2088,7 @@ status	status_description	status_type
 200	OK	Successful
 201	Created	Successful
 202	Accepted	Successful
-...
+...</br>
 ```
 
 Our Data Spec looks like:
@@ -2076,8 +2125,8 @@ Our Data Spec looks like:
     }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -2103,13 +2152,13 @@ refs:
       delimiter: '\t'
       headers: true
 ```
+
 </details>
 
 
-
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
-use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we will get output
-similar to:
+use the following template `{{ status }},{{ description }},{{ status_type }}` and run this spec we
+will get output similar to:
 
 ```shell
 dataspec --spec tabs.yaml --datadir ./data -t template.jinja -i 5
@@ -2152,8 +2201,8 @@ Our example doesn't have headers, so we are using the 1 based indexes.
     }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -2173,16 +2222,16 @@ placeholder:
     headers: no
     delimiter: "\t"
 ```
-</details>
 
+</details>
 
 
 ## <a name="nested"></a>Nested Fields
 
 Nested types are used to create fields that contain subfields. Nested types can also contain nested fields to allow
-multiple levels of nesting. Use the `nested` type to generate a field that contains subfields. The subfields are
-defined in the `fields` element of the nested spec. The `fields` element will be treated like a top level dataspec
-and has access to the `refs` and other elements of the root.
+multiple levels of nesting. Use the `nested` type to generate a field that contains subfields. The subfields are defined
+in the `fields` element of the nested spec. The `fields` element will be treated like a top level dataspec and has
+access to the `refs` and other elements of the root.
 
 The `nested` Field Spec structure is:
 
@@ -2196,7 +2245,7 @@ The `nested` Field Spec structure is:
     "fields": {
       "<sub field one>": { spec definition here },
       "<sub field two>": { spec definition here },
-      ...
+      ...</br>
     }
   }
 }
@@ -2213,7 +2262,10 @@ Below is an example of the data we wish to generate:
     "user_id": "bad135dad987",
     "geo": {
       "place_id": 12345,
-      "coordinates": [118.2, 34.0]
+      "coordinates": [
+        118.2,
+        34.0
+      ]
     }
   }
 }
@@ -2242,8 +2294,8 @@ data that matches this schema.
   }
 }
 ```
-</details>
 
+</details>
 <details>
   <summary>YAML Spec</summary>
 
@@ -2257,8 +2309,8 @@ user:nested:
         place_id:cc-digits?mean=5: {}
         coordinates:geo.pair?as_list=true: {}
 ```
-</details>
 
+</details>
 
 
 If we run this example:

@@ -1,17 +1,17 @@
 Field Spec Definitions
 ========================
 {% macro show_example(example) -%}
-{% if example.json is defined  -%}
+{% if example.json is defined -%}
 <details open>
   <summary>JSON Spec</summary>
 
 ```json
 {{ example.json }}
 ```
+
 </details>
 {%- endif %}
-
-{% if example.yaml is defined  -%}
+{% if example.yaml is defined -%}
 
 <details>
   <summary>YAML Spec</summary>
@@ -19,38 +19,41 @@ Field Spec Definitions
 ```yaml
 {{ example.yaml }}
 ```
+
 </details>
 
 {%- endif %}
-
-{% if example.api is defined  -%}
+{% if example.api is defined -%}
 
 <details>
   <summary>API Example</summary>
 
 ```python
-{{ example.api }}
+{{example.api}}
 ```
+
 </details>
 
-{%- endif %}
-{%- endmacro %}
-{% macro show_command_and_output(example) -%}
-{% if example.command is defined  -%}
+{%- endif %} 
+{%- endmacro %} 
+{% macro show_command_and_output(example) -%} {% if example.command is defined -%}
+
 ```shell
 {{ example.command }}
 {{ example.output }}
 ```
-{%- endif %}
-{%- endmacro %}
+
+{%- endif %} 
+{%- endmacro %} 
 {% macro format_examples(def) -%}
-{% if def.examples is defined  -%}
-{% for example in def.examples -%}
+{% if def.examples is defined -%} 
+{% for example in def.examples -%} 
 {{ example }}</br>
 {%- endfor %}
 {%- endif %}
-{%- endmacro %}
+{%- endmacro %} 
 {% macro show_params(schema, definitions) -%}
+
 ### Parameters
 
 <details>
@@ -59,14 +62,16 @@ Field Spec Definitions
 
 | param | type | description                                      | default | examples |
 |-------|------|--------------------------------------------------|---------|----------|
-{%- for param, def in schema.properties.config.properties.items() if param not in ['prefix', 'suffix', 'quote', 'count'] %}
-{%- if param in definitions %}
-|{{ param }} |{{definitions[param].type}} |{{ definitions[param].description }}|{{ definitions[param].default }} |{{ format_examples(definitions[param]) }} |
-{%- else %}
-|{{ param }} |{{def.type}} |{{ def.description }} |{{ def.default }} |{{ format_examples(def) }} |
-{%- endif %}
+
+{%- for param, def in schema.properties.config.properties.items() if param not in ['prefix', 'suffix', 'quote', 'count']%} 
+{%- if param in definitions %} 
+|{{ param }} |{{definitions[param].type}} |{{ definitions[param].description }}|{{definitions[param].default }} |{{ format_examples(definitions[param]) }} |
+{%- else %} 
+|{{ param }} |{{def.type}} |{{def.description }} |{{ def.default }} |{{ format_examples(def) }} | 
+{%- endif %} 
 {%- endfor %}
 </details>
+
 {%- endmacro %}
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
@@ -128,6 +133,7 @@ Field Spec Definitions
 |[csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below       |
 |[csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below |
 |[nested](#Nested)            | For nested fields                      |                              |
+
 # <a name="Overview"></a>Overview
 
 Each field that should be generated needs a specification that describes the way the values for it should be created. We
@@ -165,7 +171,7 @@ reference below for details on each type. Below is the general structure.
   "type": "<the type>",
   "config": {
     "key1": "value1",
-    ...
+    ...</br>
     "keyN": "valueN"
   },
   "data": ["the data"],
@@ -222,7 +228,6 @@ There are some configuration values that can be applied to all or a subset of ty
 |cast   | i,int,f,float,s,str,string|For numeric types, will cast results the provided type|
 |join_with|string   |For types that produce multiple values, use this string to join them   |
 |as_list|yes,true,on|For types that produce multiple values, return as list without joining |
-
 
 Example:
 
@@ -316,7 +321,7 @@ The combine Field Spec structure is:
     "type": "combine-list",
     "refs": [
       ["valid ref1", "valid ref2"],
-      ["valid ref1", "valid ref2", "valid_ref3", ...], ...
+      ["valid ref1", "valid ref2", "valid_ref3", ...</br>], ...</br>
       ["another_ref", "one_more_ref"]
     ],
     "config": {"join_with": "<optional string to use to join fields or refs, default is none>"}
@@ -334,11 +339,47 @@ A Date Field Spec is used to generate date strings. The default format is day-mo
 25-12-2050. There is also a `date.iso` type that generates ISO8601 formatted date strings without microseconds and a
 `date.iso.us` for one that generates them with microseconds. We use
 the [format specification](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
-from the datetime module. The default strategy is to create dates around a center date. The default is to use today with
-a spread of +-15 days. To make the base or anchor date the start or end of the date range, use the delta_days parameter
-with an array of two elements, where one is zero. If the first is zero then all generated dates will only be after the
-base/anchor date. If the second element is zero then all generated dates will be before the base/anchor date. There are
-a lot of configuration parameters for the date module. Each are described below.
+from the datetime module. 
+
+### Uniformly Sampled Dates
+
+The default strategy is to create random dates within a 30 day range, where the start date is
+today. You can use the `start` parameter to set a specific start date for the dates. You can also explicitly specify
+an `end` date. The `start` and `end` parameters should conform to the specified date format, or the default if none is
+provided. The `offset` parameter can be used to shift the dates by a specified number of days. A positive
+`offset` will shift the start date back. A negative `offset` will shift the date forward. The `duration_days`
+parameter can be used to specify the number of days that should be covered in the date range, this parameter can take
+the place of the `end` parameter to make specifying the number of days the dates should cover. This parameter is usually
+specified as an integer constant.
+
+```
+       start                              end (default start + 30 days)
+          |--------------------------------|
+  |+offset|                           start+duration_days
+  |--------------------------------|
+          |-offset|
+                  |--------------------------------|    
+```
+
+### Dates Distributed around a Center Point
+
+An alternative strategy is to specify a `center_date` parameter with an optional `stddev_days`. This will crate a 
+normal or gaussian distribution of dates around the center point.
+
+```  
+                   |
+                   |
+                |  |  |
+             |  |  |  |  |
+          |  |  |  |  |  |  |  
+ |  |  |  |  |  |  |  |  |  |  |  |  |
+|-------------------------------------|
+|    stddev        |      stddev      |
+                center
+```
+
+
+There are a lot of configuration parameters for the date type. Each are described below.
 
 {{ show_params(schemas.date, definitions) }}
 
@@ -352,7 +393,7 @@ The date Field Spec structure is:
     "type": "date.iso",
     OR,
     "type": "date.iso.us",
-    "config": {"...": "..."}
+    "config": {"...</br>": "...</br>"}
   }
 }
 ```
@@ -362,17 +403,17 @@ The date Field Spec structure is:
 To help with the number of variations of date formats, below is a table of examples. Assume today is 15 Jan 2050, so the
 default date formatted for today would be 15-01-2050
 
-|format  |delta_days|anchor     |offset|produces                 |spec|
-|--------|----------|-----------|------|-------------------------|----|
-|-       |-         |-          |-     |12-31-2049 ... 30-01-2050|`{"dates:date":{}}`|
-|-       |-         |-          |1     |12-30-2049 ... 29-01-2050|`{"dates:date?offset=1":{}}`|
-|-       |1         |-          |-     |14-01-2050 ... 16-01-2050|`{"dates:date?delta_days=1":{}}`|
-|-       |-1        |-          |-     |same as above            |`{"dates:date?delta_days=-1":{}}`|
-|-       |1         |-          |1     |13-01-2050 ... 15-01-2050|`{"dates:date?delta_days=1&offset=1":{}}`|
-|-       |1         |-          |-1    |15-01-2050 ... 17-01-2050|`{"dates:date?delta_days=1&offset=-1":{}}`|
-|-       |1         |15-12-2050 |1     |13-12-2050 ... 15-12-2050|`{"dates:date?delta_days=1&offset=1&anchor=15-12-2050":{}}`|
-|%d-%b-%Y|1         |15-Dec-2050|-     |14-Dec-2050 ... 16-Dec-2050|`{"dates:date?delta_days=1&anchor=15-Dec-2050&format=%d-%b-%Y":{}}`|
-|-       |\[1,2\]   |-          |-     |15-01-2050 ... 17-01-2050|`{"dates:date":{"config":{"delta_days":[0, 2]}}}`|
+|format  |duration_days|start      |offset|produces                 |spec|
+|--------|-------------|-----------|------|-------------------------|----|
+|-       |-            |-          |-     |15-01-2050 ...</br> 13-02-2050|`{"dates:date":{}}`|
+|-       |-            |-          |1     |14-01-2050 ...</br> 12-02-2050|`{"dates:date?offset=1":{}}`|
+|-       |1            |-          |-     |15-01-2050 ...</br> 16-01-2050|`{"dates:date?duration_days=1":{}}`|
+|-       |10           |-          |-     |15-01-2050 ...</br> 25-01-2050|`{"dates:date?duration_days=10":{}}`|
+|-       |1            |-          |1     |14-01-2050 ...</br> 15-01-2050|`{"dates:date?duration_days=1&offset=1":{}}`|
+|-       |1            |-          |-1    |16-01-2050 ...</br> 17-01-2050|`{"dates:date?duration_days=1&offset=-1":{}}`|
+|-       |1            |15-12-2050 |1     |14-12-2050 ...</br> 14-12-2050|`{"dates:date?duration_days=1&offset=1&start=15-12-2050":{}}`|
+|%d-%b-%Y|1            |15-Dec-2050 12:00|-     |15-Dec-2050 12:00 ...</br> 16-Dec-2050 11:59|`{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M":{}}`|
+|-       |\[10,30\]    |-          |-     |15-01-2050 ...</br> 12-02-2050|`{"dates:date":{"config":{"duration_days":[10, 30]}}}`|
 
 ### ISO8601 formatted dates
 
@@ -405,7 +446,7 @@ The range Field Spec structure is:
     "data": [
       [<start>, <end>, <step> (optional)],
       [<start>, <end>, <step> (optional)],
-      ...
+      ...</br>
       [<start>, <end>, <step> (optional)],
     ],
   }
@@ -478,9 +519,9 @@ Example Spec
 
 ## <a name="CharClass"></a>Character Classes
 
-A `char_class` type is used to create strings that are made up of characters from specific character classes. The strings
-can be of fixed or variable length. There are several built in character classes. You can also provide your own set of
-characters to sample from. Below is the list of supported character classes:
+A `char_class` type is used to create strings that are made up of characters from specific character classes. The
+strings can be of fixed or variable length. There are several built in character classes. You can also provide your own
+set of characters to sample from. Below is the list of supported character classes:
 
 ### <a name="SupportedClasses"></a>Built In Classes
 
@@ -502,9 +543,9 @@ characters to sample from. Below is the list of supported character classes:
 
 Helpful Links:
 
-  * https://en.wikipedia.org/wiki/ASCII#Character_groups
-  * https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
-  * https://docs.python.org/3/library/string.html
+* https://en.wikipedia.org/wiki/ASCII#Character_groups
+* https://www.cs.cmu.edu/~pattis/15-1XX/common/handouts/ascii.html
+* https://docs.python.org/3/library/string.html
 
 ### Parameters
 
@@ -526,7 +567,7 @@ A `char_class` Field Spec takes the form
     or
     "data": <string with custom set of characters to sample from>
     or
-    "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>, ...]
+    "data": [<char_class_name1>, <char_class_name2>, ...</br>, <custom characters>, ...</br>]
     # configuration
     "config":{
       # General Parameters
@@ -636,7 +677,7 @@ A `unicode_range` Field Spec takes the form
     "data": [
         [<start_code_point_in_hex>, <end_code_point_in_hex>],
         [<start_code_point_in_hex>, <end_code_point_in_hex>],
-        ...
+        ...</br>
         [<start_code_point_in_hex>, <end_code_point_in_hex>],
     ],
     # configuration
@@ -693,7 +734,6 @@ Generates a `longitude,latitude` pair with in the bounding box defining Egypt wi
 
 Ip addresses can be generated using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) or by
 specifying a base.
-
 
 ### Parameters
 
@@ -753,7 +793,7 @@ The weightedref Field Spec structure is:
 {
   "<field name>": {
     "type": "weightedref",
-    "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...}
+    "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...</br>}
   }
 }
 ```
@@ -789,8 +829,8 @@ The select_list_subset Field Spec structure is:
 
 The join_with config option is used to specify how the selected values should be combined. The mean and stddev config
 options tell how many items should be chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items then
-sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen.
-You can also set a min and max. Example:
+sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of items should be chosen. You can also set a min
+and max. Example:
 
 {{ show_example(examples.select_list_example_one) }}
 
@@ -839,8 +879,8 @@ paste the data into a spec. To make use of data already in a tabular format you 
 allow you to identify a column from a tabular data file to use to provide the values for a field. Another advantage of
 using a csv spec is that it is easy to have fields that are correlated be generated together. All rows will be selected
 incrementally, unless any of the fields are configured to use `sample` mode. You can use `sample` mode on individual
-columns, or you can use it across all columns by creating a `configref` spec. See [csv_select](#csv_select) for an efficient way
-to select multiple columns from a csv file.
+columns, or you can use it across all columns by creating a `configref` spec. See [csv_select](#csv_select) for an
+efficient way to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
 
@@ -907,7 +947,7 @@ status	status_description	status_type
 200	OK	Successful
 201	Created	Successful
 202	Accepted	Successful
-...
+...</br>
 ```
 
 Our Data Spec looks like:
@@ -915,8 +955,8 @@ Our Data Spec looks like:
 {{ show_example(examples.csv_spec_example_two) }}
 
 The `configref` exist so that we don't have to repeat ourselves for common configurations across multiple fields. If we
-use the following template {% raw %}`{{ status }},{{ description }},{{ status_type }}`{% endraw %} and run this spec we will get output
-similar to:
+use the following template {% raw %}`{{ status }},{{ description }},{{ status_type }}`{% endraw %} and run this spec we
+will get output similar to:
 
 ```shell
 dataspec --spec tabs.yaml --datadir ./data -t template.jinja -i 5
@@ -941,9 +981,9 @@ Our example doesn't have headers, so we are using the 1 based indexes.
 ## <a name="nested"></a>Nested Fields
 
 Nested types are used to create fields that contain subfields. Nested types can also contain nested fields to allow
-multiple levels of nesting. Use the `nested` type to generate a field that contains subfields. The subfields are
-defined in the `fields` element of the nested spec. The `fields` element will be treated like a top level dataspec
-and has access to the `refs` and other elements of the root.
+multiple levels of nesting. Use the `nested` type to generate a field that contains subfields. The subfields are defined
+in the `fields` element of the nested spec. The `fields` element will be treated like a top level dataspec and has
+access to the `refs` and other elements of the root.
 
 The `nested` Field Spec structure is:
 
@@ -957,7 +997,7 @@ The `nested` Field Spec structure is:
     "fields": {
       "<sub field one>": { spec definition here },
       "<sub field two>": { spec definition here },
-      ...
+      ...</br>
     }
   }
 }
@@ -974,7 +1014,10 @@ Below is an example of the data we wish to generate:
     "user_id": "bad135dad987",
     "geo": {
       "place_id": 12345,
-      "coordinates": [118.2, 34.0]
+      "coordinates": [
+        118.2,
+        34.0
+      ]
     }
   }
 }
