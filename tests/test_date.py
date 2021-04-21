@@ -58,7 +58,7 @@ def test_date_start_format_iso():
 
 
 def test_date_start_format_iso_microseconds():
-    config = {"duration_days": 3, "start": "02-Feb-2050", "format": "%d-%b-%Y"}
+    config = {"start": "02-Feb-2050", "end": "10-Feb-2050", "format": "%d-%b-%Y"}
     spec = _date_iso_us_spec(**config)
     _test_date_start_format_iso_type(spec)
 

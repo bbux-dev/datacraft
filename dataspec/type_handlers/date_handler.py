@@ -17,9 +17,8 @@ The date Field Spec structure is:
 """
 from typing import List
 import json
-import random
 import datetime
-from dataspec import registry, Loader, ValueSupplierInterface, SpecException
+from dataspec import registry, distributions, Loader, ValueSupplierInterface, SpecException
 from dataspec.utils import load_config
 import dataspec.schemas as schemas
 
@@ -60,35 +59,17 @@ class DateSupplier(ValueSupplierInterface):
     """
 
     def __init__(self,
-                 timestamp_supplier: ValueSupplierInterface,
+                 timestamp_distribution: distributions.Distribution,
                  date_format_string: str):
         self.date_format = date_format_string
-        self.timestamp_supplier = timestamp_supplier
+        self.timestamp_distribution = timestamp_distribution
 
     def next(self, iteration):
-        random_seconds = self.timestamp_supplier.next(iteration)
+        random_seconds = self.timestamp_distribution.next_value()
         next_date = datetime.datetime.fromtimestamp(random_seconds)
         if self.date_format:
             return next_date.strftime(self.date_format)
         return next_date.replace(microsecond=0).isoformat()
-
-
-class UniformTimestampRange(ValueSupplierInterface):
-    def __init__(self, start_ts, end_ts):
-        self.start_ts = start_ts
-        self.end_ts = end_ts
-
-    def next(self, iteration):
-        return random.uniform(self.start_ts, self.end_ts)
-
-
-class GaussTimestampRange(ValueSupplierInterface):
-    def __init__(self, mean, stddev):
-        self.mean = mean
-        self.stddev = stddev
-
-    def next(self, iteration):
-        return random.gauss(self.mean, self.stddev)
 
 
 def uniform_date_timestamp(
@@ -114,7 +95,7 @@ def uniform_date_timestamp(
     end_ts = int(end_date.timestamp())
     if end_ts < start_ts:
         return None
-    return UniformTimestampRange(start_ts, end_ts)
+    return distributions.uniform(start=start_ts, end=end_ts)
 
 
 def gauss_date_timestamp(
@@ -127,7 +108,7 @@ def gauss_date_timestamp(
         center_date = datetime.datetime.now()
     mean = center_date.timestamp()
     stddev = stddev_days * SECONDS_IN_DAY
-    return GaussTimestampRange(mean, stddev)
+    return distributions.normal(mean=mean, stddev=stddev)
 
 
 @registry.types(DATE_KEY)
@@ -143,8 +124,8 @@ def _create_stats_based_date_supplier(config):
     center_date = config.get('center_date')
     stddev_days = config.get('stddev_days', 15)
     date_format = config.get('format', DEFAULT_FORMAT)
-    timestamp_supplier = gauss_date_timestamp(center_date, float(stddev_days), date_format)
-    return DateSupplier(timestamp_supplier, date_format)
+    timestamp_distribution = gauss_date_timestamp(center_date, float(stddev_days), date_format)
+    return DateSupplier(timestamp_distribution, date_format)
 
 
 def _create_uniform_date_supplier(config):
@@ -153,10 +134,10 @@ def _create_uniform_date_supplier(config):
     start = config.get('start')
     end = config.get('end')
     date_format = config.get('format', DEFAULT_FORMAT)
-    timestamp_supplier = uniform_date_timestamp(start, end, offset, duration_days, date_format)
-    if timestamp_supplier is None:
+    timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)
+    if timestamp_distribution is None:
         raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
-    return DateSupplier(timestamp_supplier, date_format)
+    return DateSupplier(timestamp_distribution, date_format)
 
 
 @registry.types(DATE_ISO_KEY)
@@ -169,13 +150,6 @@ def configure_supplier_iso(field_spec: dict, loader: Loader):
 def configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
     """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_WITH_MICRO)
-
-
-def get_param(config: dict, names: List, default):
-    for name in names:
-        if name in config:
-            return config.get(name)
-    return default
 
 
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
@@ -198,43 +172,3 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     if 'center_date' in config or 'stddev_days' in config:
         return _create_stats_based_date_supplier(config)
     return _create_uniform_date_supplier(config)
-
-
-def _calculate_start_end_dates(base, duration_days):
-    """
-    Calculates the datetime objects for the start of duration_days ago and the start of duration_days+1 ahead
-    To guarantee that the desired date range strings are created
-    :param base:
-    :param duration_days:
-    :return:
-    """
-    lower, upper = _calculate_upper_lower(duration_days)
-    start_date = (base + datetime.timedelta(days=lower)).replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date = (base + datetime.timedelta(days=upper)).replace(hour=0, minute=0, second=0, microsecond=0)
-    return start_date, end_date
-
-
-def _calculate_upper_lower(duration_days):
-    """
-    Calculates the lower and upper bounds based on the many formats accepted by delta days
-    :param duration_days:
-    :return: the lower and upper number of days for delta
-    """
-    if isinstance(duration_days, list):
-        lower = int(duration_days[0])
-        upper = int(duration_days[1])
-    else:
-        lower = -int(duration_days)
-        upper = int(duration_days)
-    lower = -(abs(lower))
-    # this makes end date inclusive
-    upper = abs(upper) + 1
-    return lower, upper
-
-
-def _calculate_delta_seconds(start, end):
-    """ calculates the delta in seconds between the two dates """
-    delta = end - start
-    delta_days = delta.days if delta.days > 0 else 1
-    int_delta = (delta_days * 24 * 60 * 60) + delta.seconds
-    return int_delta

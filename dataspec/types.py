@@ -16,6 +16,7 @@ class registry:
     preprocessors = catalogue.create('dataspec', 'preprocessor')
     logging = catalogue.create('dataspec', 'logging')
     formats = catalogue.create('dataspec', 'format')
+    distribution = catalogue.create('dataspec', 'distribution')
 
 
 def lookup_type(key):
