@@ -72,11 +72,20 @@
           ]
         },
         "stddev_days": {
-          "type": "integer",
           "description": "The standard deviation in days from the center date that dates should be distributed",
           "default": 15,
           "examples": [
             1, 12, 720
+          ],
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "[1-9][0-9]*"
+            }
           ]
         }
       },

@@ -938,7 +938,7 @@ normal or gaussian distribution of dates around the center point.
           |  |  |  |  |  |  |  
  |  |  |  |  |  |  |  |  |  |  |  |  |
 |-------------------------------------|
-|    stddev        |      stddev      |
+|         | stddev | stddev |         |
                 center
 ```
 
@@ -959,7 +959,7 @@ There are a lot of configuration parameters for the date type. Each are describe
 |end |string |date string matching format or default format to use for end date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
 |offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward |0 |30</br>-30</br>365</br>730</br> | 
 |center_date |string |date string matching format or default format to use for center date |None |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
-|stddev_days |integer |The standard deviation in days from the center date that dates should be distributed |15 |1</br>12</br>720</br> |
+|stddev_days | |The standard deviation in days from the center date that dates should be distributed |15 |1</br>12</br>720</br> |
 </details>
 
 The date Field Spec structure is:
@@ -982,43 +982,32 @@ The date Field Spec structure is:
 To help with the number of variations of date formats, below is a table of examples. Assume today is 15 Jan 2050, so the
 default date formatted for today would be 15-01-2050
 
-|format  |duration_days|start      |offset|produces                 |spec|
-|--------|-------------|-----------|------|-------------------------|----|
-|-       |-            |-          |-     |15-01-2050 ...</br> 13-02-2050|`{"dates:date":{}}`|
-|-       |-            |-          |1     |14-01-2050 ...</br> 12-02-2050|`{"dates:date?offset=1":{}}`|
-|-       |1            |-          |-     |15-01-2050 ...</br> 16-01-2050|`{"dates:date?duration_days=1":{}}`|
-|-       |10           |-          |-     |15-01-2050 ...</br> 25-01-2050|`{"dates:date?duration_days=10":{}}`|
-|-       |1            |-          |1     |14-01-2050 ...</br> 15-01-2050|`{"dates:date?duration_days=1&offset=1":{}}`|
-|-       |1            |-          |-1    |16-01-2050 ...</br> 17-01-2050|`{"dates:date?duration_days=1&offset=-1":{}}`|
-|-       |1            |15-12-2050 |1     |14-12-2050 ...</br> 14-12-2050|`{"dates:date?duration_days=1&offset=1&start=15-12-2050":{}}`|
-|%d-%b-%Y|1            |15-Dec-2050 12:00|-     |15-Dec-2050 12:00 ...</br> 16-Dec-2050 11:59|`{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M":{}}`|
+#### Uniform Dates
+
+|format  |duration_days|start      |offset|dates uniformly sampled from range|shorthand JSON spec |
+|--------|-------------|-----------|------|----------------------------------|--------------------|
+|-       |-            |-          |-     |15-01-2050 ...</br> 13-02-2050    |`{"dates:date":{}}` |
+|-       |-            |-          |1     |14-01-2050 ...</br> 12-02-2050    |`{"dates:date?offset=1":{}}`|
+|-       |1            |-          |-     |15-01-2050 ...</br> 16-01-2050    |`{"dates:date?duration_days=1":{}}`|
+|-       |10           |-          |-     |15-01-2050 ...</br> 25-01-2050    |`{"dates:date?duration_days=10":{}}`|
+|-       |1            |-          |1     |14-01-2050 ...</br> 15-01-2050    |`{"dates:date?duration_days=1&offset=1":{}}`|
+|-       |1            |-          |-1    |16-01-2050 ...</br> 17-01-2050    |`{"dates:date?duration_days=1&offset=-1":{}}`|
+|-       |1            |15-12-2050 |1     |14-12-2050 ...</br> 14-12-2050    |`{"dates:date?duration_days=1&offset=1&start=15-12-2050":{}}`|
+|`%d-%b-%Y`|1          |15-Dec-2050 12:00|- |15-Dec-2050 12:00 ...</br> 16-Dec-2050 11:59|`{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M":{}}`|
 |-       |\[10,30\]    |-          |-     |15-01-2050 ...</br> 12-02-2050|`{"dates:date":{"config":{"duration_days":[10, 30]}}}`|
+
+#### Centered Dates
+
+|format      |center_date   |stddev_days|dates mostly in range             |shorthand JSON spec |
+|------------|--------------|-----------|----------------------------------|--------------------|
+|-           |-             |1          |13-01-2050 ...</br> 17-02-2050    |`{"dates:date?stddev_days=1":{}}` |
+|-           |-             |15         |23-12-2050 ...</br> 08-02-2050    |`{"dates:date?stddev_days=15":{}}`|
+|`%Y%m%d %H:%M`|20500601 12:00|2        |20500528 ...</br> 20500605        |`{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2":{}}`|
 
 ### ISO8601 formatted dates
 
 The type `date.iso` will produce a ISO8601 formatted date in the bounds configured without milliseconds. Use
 the `date.iso.us` type to generate them with microseconds.
-
-## <a name="DateRange"></a>Date Range
-
-A `date_range` spec is used to generate a date range for each iteration. The range will be returned as an array with the
-start of the range as the first element, and the end as the second, unless the `join_with` config parameter is
-specified.
-
-### Parameters
-
-<details>
-
-<summary>Details</summary>
-
-| param | type | description                                      | default | examples |
-|-------|------|--------------------------------------------------|---------|----------| 
-|join_with |string |String or character to join multiple values together with|None |,</br>@</br> OR </br> && </br> | 
-|format |string |Valid datetime format string | |%Y%m%d</br>%m/%d/%Y</br>%H:%M:%S</br> | 
-|duration_days | |The number of days (or range of days) +- from the base/start date to create date strings for |30 |1</br>12</br>[14, 0]</br>[0, 30]</br> | 
-|start |string |date string matching format or default format to use for base date | |22-02-2022</br>02/22/1972</br>2009-09-01T08:08.000Z</br> | 
-|offset |integer |number of days to shift base date by, positive means shift backwards, negative means forward | |30</br>-30</br>365</br>730</br> |
-</details>
 
 ## <a name="Range"></a>Range
 
