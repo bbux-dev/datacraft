@@ -2,16 +2,16 @@
 """
 Entry point for dataspec tool
 """
+import os
 import sys
 import json
 import argparse
 import logging
 import yaml
-from dataspec import Loader, preprocess_spec
+from dataspec import preprocess_spec
 import dataspec.template_engines as engines
 import dataspec.outputs as outputs
 import dataspec.types as types
-import dataspec.key_providers as key_providers
 import dataspec.builder as builder
 from dataspec import utils
 from dataspec import SpecException
@@ -76,6 +76,8 @@ def main():
 
         log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
         spec = _load_spec(args)
+        if spec is None:
+            return
 
         ###################
         # By Pass Arguments
@@ -164,6 +166,9 @@ def _load_spec(args):
         raise SpecException('Only one of --spec <spec path> or --inline "<spec string>" must be specified')
     if inline:
         return _parse_spec_string(inline)
+    if not os.path.exists(spec_path):
+        log.error('Unable to load spec from path: %s', spec_path)
+        return None
     with open(spec_path, 'r') as handle:
         log.debug('Attempting to load spec as JSON')
         try:
