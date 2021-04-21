@@ -979,30 +979,502 @@ The date Field Spec structure is:
 
 ### Examples
 
-To help with the number of variations of date formats, below is a table of examples. Assume today is 15 Jan 2050, so the
-default date formatted for today would be 15-01-2050
+To help with the number of variations of date formats, there are a number of examples below.  They all assume today is
+15 Jan 2050, so the default date formatted for today would be 15-01-2050. Click More Examples to see all examples.
 
-#### Uniform Dates
+#### Uniform Dates Examples
 
-|format  |duration_days|start      |offset|dates uniformly sampled from range|shorthand JSON spec |
-|--------|-------------|-----------|------|----------------------------------|--------------------|
-|-       |-            |-          |-     |15-01-2050 ...</br> 13-02-2050    |`{"dates:date":{}}` |
-|-       |-            |-          |1     |14-01-2050 ...</br> 12-02-2050    |`{"dates:date?offset=1":{}}`|
-|-       |1            |-          |-     |15-01-2050 ...</br> 16-01-2050    |`{"dates:date?duration_days=1":{}}`|
-|-       |10           |-          |-     |15-01-2050 ...</br> 25-01-2050    |`{"dates:date?duration_days=10":{}}`|
-|-       |1            |-          |1     |14-01-2050 ...</br> 15-01-2050    |`{"dates:date?duration_days=1&offset=1":{}}`|
-|-       |1            |-          |-1    |16-01-2050 ...</br> 17-01-2050    |`{"dates:date?duration_days=1&offset=-1":{}}`|
-|-       |1            |15-12-2050 |1     |14-12-2050 ...</br> 14-12-2050    |`{"dates:date?duration_days=1&offset=1&start=15-12-2050":{}}`|
-|`%d-%b-%Y`|1          |15-Dec-2050 12:00|- |15-Dec-2050 12:00 ...</br> 16-Dec-2050 11:59|`{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M":{}}`|
-|-       |\[10,30\]    |-          |-     |15-01-2050 ...</br> 12-02-2050|`{"dates:date":{"config":{"duration_days":[10, 30]}}}`|
+##### Generate dates uniformly over a 90 period starting at 15 Dec 2050 12:00 PM, and formats with Hours and Minutes and Month as abbreviated name.
 
-#### Centered Dates
+<details open>
+  <summary>JSON Spec</summary>
 
-|format      |center_date   |stddev_days|dates mostly in range             |shorthand JSON spec |
-|------------|--------------|-----------|----------------------------------|--------------------|
-|-           |-             |1          |13-01-2050 ...</br> 17-02-2050    |`{"dates:date?stddev_days=1":{}}` |
-|-           |-             |15         |23-12-2050 ...</br> 08-02-2050    |`{"dates:date?stddev_days=15":{}}`|
-|`%Y%m%d %H:%M`|20500601 12:00|2        |20500528 ...</br> 20500605        |`{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2":{}}`|
+```json
+{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' -i 1000 --log-level error \
+  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
+15-Dec-2050 16:04
+15-Mar-2051 11:25
+```
+
+<details>
+<summary>More Examples</summary>
+
+##### Generate dates uniformly over a 30 day range starting at today
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+15-01-2050 
+13-02-2050
+```
+
+##### Generate dates uniformly over a 30 day range starting at yesterday
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?offset=1": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?offset=1: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?offset=1", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?offset=1": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+14-01-2050 
+12-02-2050
+```
+
+##### Generate dates uniformly over a 24 hour (1 day) period starting at today
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?duration_days=1": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=1: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=1", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+15-01-2050 
+16-01-2050
+```
+
+##### Generate dates uniformly over a 10 day period  starting at today
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?duration_days=10": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=10: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=10", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+15-01-2050 
+25-01-2050
+```
+
+##### Generate dates uniformly over a 24 hour (1 day) period starting at yesterday
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?duration_days=1&offset=1": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=1&offset=1: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=1&offset=1", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+14-01-2050 
+15-01-2050
+```
+
+##### Generate dates uniformly over a 24 hour (1 day) period starting at tomorrow
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?duration_days=1&offset=-1": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=1&offset=-1: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=1&offset=-1", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+16-01-2050 
+17-01-2050
+```
+
+##### Generate dates uniformly over a 24 hour (1 day) period starting at 14 Dec 2050
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=1&offset=1&start=15-12-2050: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=1&offset=1&start=15-12-2050", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+14-12-2050
+14-12-2050
+```
+
+##### Generate dates uniformly over a 24 hour (1 day) period starting at 15 Dec 2050 12:00 PM, and formats with Hours and Minutes and Month as abbreviated name.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error \
+  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
+15-Dec-2050 12:04
+16-Dec-2050 11:46
+```
+
+</details>
+
+#### Centered Dates Examples
+
+##### Generate dates uniformly over a 24 hour (1 day) period centered at 01 Jun 2050 12:00 PM, and formats with YearMonthDay Hour:Minute.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error \
+  | sort -n | uniq | sed -n '1p;$p'
+20500528 07:11
+20500606 16:27
+```
+
+<details>
+<summary>More Examples</summary>
+
+##### Generate dates centered at today with most +- 1 day, but some +- more than that.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?stddev_days=1": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?stddev_days=1: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?stddev_days=1", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+12-01-2050 
+17-01-2050
+```
+
+##### Generate dates centered at today with most +- 15 days, but some +- more than that.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{"dates:date?stddev_days=15": {}}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+dates:date?stddev_days=15: {}
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("dates:date?stddev_days=15", {})
+
+spec = spec_builder.build()
+```
+
+</details>
+
+```shell
+dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+17-12-2049 
+14-02-2050
+```
+
+</details>
 
 ### ISO8601 formatted dates
 
