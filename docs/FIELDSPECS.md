@@ -121,8 +121,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec -s ~/scratch/sample.json -i 7
@@ -186,8 +186,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec -s ~/scratch/sample.json -i 12 | sort
@@ -1027,8 +1027,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' -i 1000 --log-level error \
@@ -1044,7 +1044,8 @@ dataspec --inline '{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=
 
 ##### Generate dates uniformly over a 30 day range starting at today
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1075,8 +1076,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date": {}}' --log-level error \
@@ -1089,7 +1090,8 @@ dataspec --inline '{"dates:date": {}}' --log-level error \
 
 ##### Generate dates uniformly over a 30 day range starting at yesterday
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1120,8 +1122,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?offset=1": {}}' --log-level error \
@@ -1134,7 +1136,8 @@ dataspec --inline '{"dates:date?offset=1": {}}' --log-level error \
 
 ##### Generate dates uniformly over a 24 hour (1 day) period starting at today
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1165,8 +1168,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error \
@@ -1179,7 +1182,8 @@ dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error \
 
 ##### Generate dates uniformly over a 10 day period  starting at today
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1210,8 +1214,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error \
@@ -1224,7 +1228,8 @@ dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error \
 
 ##### Generate dates uniformly over a 24 hour (1 day) period starting at yesterday
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1255,8 +1260,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error \
@@ -1269,7 +1274,8 @@ dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level erro
 
 ##### Generate dates uniformly over a 24 hour (1 day) period starting at tomorrow
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1300,8 +1306,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error \
@@ -1314,7 +1320,8 @@ dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level err
 
 ##### Generate dates uniformly over a 24 hour (1 day) period starting at 14 Dec 2050
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1345,8 +1352,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error \
@@ -1359,7 +1366,8 @@ dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}'
 
 ##### Generate dates uniformly over a 24 hour (1 day) period starting at 15 Dec 2050 12:00 PM, and formats with Hours and Minutes and Month as abbreviated name.
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1390,8 +1398,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error \
@@ -1401,6 +1409,7 @@ dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%
 ```
 
 </details>
+
 
 </details>
 
@@ -1439,8 +1448,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error \
@@ -1456,7 +1465,8 @@ dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&s
 
 ##### Generate dates centered at today with most +- 1 day, but some +- more than that.
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1487,8 +1497,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error \
@@ -1501,7 +1511,8 @@ dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error \
 
 ##### Generate dates centered at today with most +- 15 days, but some +- more than that.
 
-<details open>
+
+<details>
   <summary>JSON Spec</summary>
 
 ```json
@@ -1532,8 +1543,8 @@ spec = spec_builder.build()
 
 </details>
 
-<details>
-  <summary>Example Command and Ouput</summary>
+<details open>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error \
@@ -1935,8 +1946,9 @@ password:
 </details>
 
 
+
 <details>
-  <summary>Example Command and Ouput</summary>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec -s password.json -i 10
@@ -2034,8 +2046,9 @@ text:
 </details>
 
 
+
 <details>
-  <summary>Example Command and Ouput</summary>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec -s unicode.yaml -i 10 -l off
@@ -2850,8 +2863,9 @@ user:nested:
 </details>
 
 
+
 <details>
-  <summary>Example Command and Ouput</summary>
+  <summary>Example Command and Output</summary>
 
 ```shell
 dataspec -s double-nested.json -i 1 --format json-pretty -x

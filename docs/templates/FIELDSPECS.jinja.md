@@ -1,12 +1,16 @@
 Field Spec Definitions
 ========================
-{% macro show_example(example) -%}
+{% macro show_example(example, expand_json=True) -%}
 {% if example.description is defined -%}
 ##### {{ example.description }}
 
 {% endif -%}
 {% if example.json is defined -%}
+{% if expand_json -%}
 <details open>
+{%- else %}
+<details>
+{%- endif %}
   <summary>JSON Spec</summary>
 
 ```json
@@ -40,11 +44,14 @@ Field Spec Definitions
 
 {%- endif %} 
 {%- endmacro %} 
-{% macro show_command_and_output(example) -%}
+{% macro show_command_and_output(example, expand=False) -%}
 {% if example.command is defined -%}
-
+{% if expand -%}
+<details open>
+{%- else %}
 <details>
-  <summary>Example Command and Ouput</summary>
+{%- endif %}
+  <summary>Example Command and Output</summary>
 
 ```shell
 {{ example.command }}
@@ -155,13 +162,13 @@ produce the values A1, B2, C3 continuously.
 
 {{ show_example(examples.overview_example_one) }}
 
-{{ show_command_and_output(examples.overview_example_one) }}
+{{ show_command_and_output(examples.overview_example_one, True) }}
 
 If an additional number is added to TWO, we now get 12 distinct values:
 
 {{ show_example(examples.overview_example_two) }}
 
-{{ show_command_and_output(examples.overview_example_two) }}
+{{ show_command_and_output(examples.overview_example_two, True) }}
 
 If we want our values to be generated randomly from the provided lists, we set the config param `sample` to true:
 
@@ -417,42 +424,43 @@ To help with the number of variations of date formats, there are a number of exa
 
 {{show_example(examples.uniform_date_example_exhaustive)}}
 
-{{show_command_and_output(examples.uniform_date_example_exhaustive)}}
+{{show_command_and_output(examples.uniform_date_example_exhaustive, True)}}
 
 <details>
 <summary>More Examples</summary>
 
-{{show_example(examples.uniform_date_example_one)}}
+{{show_example(examples.uniform_date_example_one, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_one)}}
+{{show_command_and_output(examples.uniform_date_example_one, True)}}
 
-{{show_example(examples.uniform_date_example_two)}}
+{{show_example(examples.uniform_date_example_two, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_two)}}
+{{show_command_and_output(examples.uniform_date_example_two, True)}}
 
-{{show_example(examples.uniform_date_example_three)}}
+{{show_example(examples.uniform_date_example_three, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_three)}}
+{{show_command_and_output(examples.uniform_date_example_three, True)}}
 
-{{show_example(examples.uniform_date_example_four)}}
+{{show_example(examples.uniform_date_example_four, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_four)}}
+{{show_command_and_output(examples.uniform_date_example_four, True)}}
 
-{{show_example(examples.uniform_date_example_five)}}
+{{show_example(examples.uniform_date_example_five, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_five)}}
+{{show_command_and_output(examples.uniform_date_example_five, True)}}
 
-{{show_example(examples.uniform_date_example_six)}}
+{{show_example(examples.uniform_date_example_six, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_six)}}
+{{show_command_and_output(examples.uniform_date_example_six, True)}}
 
-{{show_example(examples.uniform_date_example_seven)}}
+{{show_example(examples.uniform_date_example_seven, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_seven)}}
+{{show_command_and_output(examples.uniform_date_example_seven, True)}}
 
-{{show_example(examples.uniform_date_example_eight)}}
+{{show_example(examples.uniform_date_example_eight, False)}}
 
-{{show_command_and_output(examples.uniform_date_example_eight)}}
+{{show_command_and_output(examples.uniform_date_example_eight, True)}}
+
 
 </details>
 
@@ -460,18 +468,18 @@ To help with the number of variations of date formats, there are a number of exa
 
 {{show_example(examples.centered_date_example_exhaustive)}}
 
-{{show_command_and_output(examples.centered_date_example_exhaustive)}}
+{{show_command_and_output(examples.centered_date_example_exhaustive, True)}}
 
 <details>
 <summary>More Examples</summary>
 
-{{show_example(examples.centered_date_example_one)}}
+{{show_example(examples.centered_date_example_one, False)}}
 
-{{show_command_and_output(examples.centered_date_example_one)}}
+{{show_command_and_output(examples.centered_date_example_one, True)}}
 
-{{show_example(examples.centered_date_example_two)}}
+{{show_example(examples.centered_date_example_two, False)}}
 
-{{show_command_and_output(examples.centered_date_example_two)}}
+{{show_command_and_output(examples.centered_date_example_two, True)}}
 
 </details>
 
