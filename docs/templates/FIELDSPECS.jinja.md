@@ -43,10 +43,15 @@ Field Spec Definitions
 {% macro show_command_and_output(example) -%}
 {% if example.command is defined -%}
 
+<details>
+  <summary>Example Command and Ouput</summary>
+
 ```shell
 {{ example.command }}
 {{ example.output }}
 ```
+
+</details>
 
 {%- endif %} 
 {%- endmacro %} 
@@ -650,8 +655,6 @@ deviation of 2.
 
 {{ show_example(examples.char_class_spec_example_two) }}
 
-If we run this example:
-
 {{ show_command_and_output(examples.char_class_spec_example_two) }}
 
 The `stddev` config parameters is not required, but without it the sizes will tend to stack on the edges of the allowed
@@ -704,8 +707,6 @@ with two elements each specifying the start and end hex code points. If we wante
 points 0x3040 to 0x30FF) characters as one of our fields we could use the following spec:
 
 {{ show_example(examples.unicode_range_example_one) }}
-
-If we run this example:
 
 {{ show_command_and_output(examples.unicode_range_example_one) }}
 
@@ -1075,7 +1076,5 @@ are uuids. The coordinates field is a list of longitude followed by latitude. Be
 data that matches this schema.
 
 {{ show_example(examples.nested_example_one) }}
-
-If we run this example:
 
 {{ show_command_and_output(examples.nested_example_one) }}
