@@ -144,7 +144,7 @@
         "output": "15-Dec-2050 12:04\n16-Dec-2050 11:46"
     },
     "centered_date_example_exhaustive": {
-        "description": "Generate dates uniformly over a 24 hour (1 day) period centered at 01 Jun 2050 12:00 PM, and formats with YearMonthDay Hour:Minute.",
+        "description": "Generate dates with a normal distribution over a 24 hour (1 day) period centered at 01 Jun 2050 12:00 PM with a standard deviation of 2 days. Formats with YearMonthDay Hour:Minute.",
         "json": "{\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\": {}}",
         "yaml": "dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2: {}",
         "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\", {})\n\nspec = spec_builder.build()",
