@@ -239,13 +239,20 @@ def test_create_key_list():
     assert keys == ['key1', 'key2']
 
 
-def test_shorthand_key_support():
+short_hand_tests = [
+    ("network:ipv4?cidr=192.168.0.0/16", "network", "192.168."),
+    ("dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", "dates", "-Dec-2050")
+]
+
+
+@pytest.mark.parametrize("key_as_spec,field_name,first_value_contains", short_hand_tests)
+def test_shorthand_key_support(key_as_spec, field_name, first_value_contains):
     spec_builder = builder.Builder()
-    spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
+    spec_builder.add_field(key_as_spec, {})
     spec = spec_builder.build()
     first = next(spec.generator(1, enforce_schema=True))
-    assert 'network' in first
-    assert first['network'].startswith('192.168.')
+    assert field_name in first
+    assert first_value_contains in str(first[field_name])
 
 
 def test_spec_builder():
