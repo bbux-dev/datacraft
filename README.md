@@ -33,6 +33,12 @@ types that are used to generate the data for each field. Where the built-in type
 way to create custom types and handlers for them. The tool supports templating using
 the [Jinja2](https://pypi.org/project/Jinja2/) templating engine format.
 
+Data is a key part of any application.  Synthetic data can be used to test and exercise a system while it is under
+development or modification.  By using a Data Spec to generate this synthetic data, it is more compact and easier to
+modify, update and manage.  It also lends itself to sharing. Instead of hosting large data files full of synthetic test
+data, you can build Data Specs that encapsulate the information needed to generate the data. If well-designed, these
+can be easier to inspect and reason through compared with scanning thousands of lines of a csv file.
+
 ## <a name="Build"></a>Build
 
 To Install:
@@ -41,7 +47,8 @@ To Install:
 pip install git+https://github.com/bbux-dev/dataspec.git
 ```
 
-This will install the `dataspec` command line utility which should now be on your path
+This will install the `dataspec` command line utility which should now be on your path. Assumes there is a python
+executable on the path.
 
 ## <a name="Usage"></a>Usage
 

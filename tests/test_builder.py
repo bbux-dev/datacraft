@@ -59,12 +59,12 @@ field_spec_build_tests = [
      {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}),
     (builder.rand_range(20, 44, count=[2, 3, 4]),
      {"type": "rand_range", "config": {"count": [2, 3, 4]}, "data": [20, 44]}),
-    (builder.date(delta_days=3, offset=4),
-     {"type": "date", "config": {"delta_days": 3, "offset": 4}}),
-    (builder.date_iso(delta_days=4, offset=5),
-     {"type": "date.iso", "config": {"delta_days": 4, "offset": 5}}),
-    (builder.date_iso_us(delta_days=5, offset=6),
-     {"type": "date.iso.us", "config": {"delta_days": 5, "offset": 6}}),
+    (builder.date(duration_days=3, offset=4),
+     {"type": "date", "config": {"duration_days": 3, "offset": 4}}),
+    (builder.date_iso(duration_days=4, offset=5),
+     {"type": "date.iso", "config": {"duration_days": 4, "offset": 5}}),
+    (builder.date_iso_us(duration_days=5, offset=6),
+     {"type": "date.iso.us", "config": {"duration_days": 5, "offset": 6}}),
     (builder.uuid(quote="'"),
      {"type": "uuid", "config": {"quote": "'"}}),
     (builder.char_class("visible", min=5, max=7),
@@ -118,12 +118,12 @@ full_spec_build_tests = [
      {"name": {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}}),
     (builder.Builder().rand_range('name', 20, 44, count=[2, 3, 4]),
      {"name": {"type": "rand_range", "config": {"count": [2, 3, 4]}, "data": [20, 44]}}),
-    (builder.Builder().date('name', delta_days=3, offset=4),
-     {"name": {"type": "date", "config": {"delta_days": 3, "offset": 4}}}),
-    (builder.Builder().date_iso('name', delta_days=4, offset=5),
-     {"name": {"type": "date.iso", "config": {"delta_days": 4, "offset": 5}}}),
-    (builder.Builder().date_iso_us('name', delta_days=5, offset=6),
-     {"name": {"type": "date.iso.us", "config": {"delta_days": 5, "offset": 6}}}),
+    (builder.Builder().date('name', duration_days=3, offset=4),
+     {"name": {"type": "date", "config": {"duration_days": 3, "offset": 4}}}),
+    (builder.Builder().date_iso('name', duration_days=4, offset=5),
+     {"name": {"type": "date.iso", "config": {"duration_days": 4, "offset": 5}}}),
+    (builder.Builder().date_iso_us('name', duration_days=5, offset=6),
+     {"name": {"type": "date.iso.us", "config": {"duration_days": 5, "offset": 6}}}),
     (builder.Builder().uuid('name', quote="'"),
      {"name": {"type": "uuid", "config": {"quote": "'"}}}),
     (builder.Builder().char_class('name', "visible", min=5, max=7),
@@ -174,9 +174,9 @@ invalid_spec_build_tests = [
     builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
     builder.Builder().range_spec('name', 1, 5, 1, as_list=True, count={}),  # invalid count
     builder.Builder().rand_range('name', 20, 44, count=None),  # invalid count
-    builder.Builder().date('name', delta_days={1: 0.5, 2: 0.5}, offset=4),  # invalid delta_days
-    builder.Builder().date_iso('name', delta_days=4, offset="1"),  # invalid offset
-    builder.Builder().date_iso_us('name', delta_days=5, offset=6, anchor=42),  # invalid anchor
+    builder.Builder().date('name', duration_days={1: 0.5, 2: 0.5}, offset=4),  # invalid duration_days
+    builder.Builder().date_iso('name', duration_days=4, offset="1"),  # invalid offset
+    builder.Builder().date_iso_us('name', duration_days=5, offset=6, start=42),  # invalid start
     builder.Builder().char_class('name', "visible", min="5", max=7),  # min should be number
     builder.Builder().char_class_abbrev('name', "visible", min=3, max="10"),  # max should be number
     builder.Builder().unicode_range('name', ["3040", "309f"], count=4, mean=3),  # can't have count and mean
@@ -239,13 +239,20 @@ def test_create_key_list():
     assert keys == ['key1', 'key2']
 
 
-def test_shorthand_key_support():
+short_hand_tests = [
+    ("network:ipv4?cidr=192.168.0.0/16", "network", "192.168."),
+    ("dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", "dates", "-Dec-2050")
+]
+
+
+@pytest.mark.parametrize("key_as_spec,field_name,first_value_contains", short_hand_tests)
+def test_shorthand_key_support(key_as_spec, field_name, first_value_contains):
     spec_builder = builder.Builder()
-    spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
+    spec_builder.add_field(key_as_spec, {})
     spec = spec_builder.build()
     first = next(spec.generator(1, enforce_schema=True))
-    assert 'network' in first
-    assert first['network'].startswith('192.168.')
+    assert field_name in first
+    assert first_value_contains in str(first[field_name])
 
 
 def test_spec_builder():
