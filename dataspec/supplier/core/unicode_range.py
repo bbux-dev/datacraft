@@ -2,13 +2,13 @@
 Module for handling unicode ranges
 """
 import json
+
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 UNICODE_RANGE_KEY = 'unicode_range'
 
 
-class UnicodeRangeSupplier(ValueSupplierInterface):
+class UnicodeRangeSupplier(dataspec.ValueSupplierInterface):
     """ Value Supplier for unicode_range type """
 
     def __init__(self, wrapped):

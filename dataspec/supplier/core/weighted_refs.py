@@ -12,10 +12,10 @@ The weightedref Field Spec structure is:
 }
 """
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 
-class WeightedRefsSupplier(ValueSupplierInterface):
+
+class WeightedRefsSupplier(dataspec.ValueSupplierInterface):
     """
     Value supplier that uses a weighted scheme to supply values from different reference value suppliers
     """

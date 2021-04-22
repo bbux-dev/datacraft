@@ -3,11 +3,11 @@ Module for implementation of select list subset value supplier
 """
 import math
 import random
+
 import dataspec
-from .core.value_supplier import ValueSupplierInterface
 
 
-class ListStatSamplerSupplier(ValueSupplierInterface):
+class ListStatSamplerSupplier(dataspec.ValueSupplierInterface):
     """
     Implementation for supplying values from a list by select a portion of them
     and optionally joining them by some delimiter

@@ -15,13 +15,11 @@ The date Field Spec structure is:
 }
 
 """
-from typing import List
-import json
 import datetime
+import json
+
 import dataspec
 import dataspec.model
-from .value_supplier import ValueSupplierInterface
-
 
 DATE_KEY = 'date'
 DATE_ISO_KEY = 'date.iso'
@@ -54,7 +52,7 @@ def get_date_iso_us_schema():
     return dataspec.schemas.load(DATE_KEY)
 
 
-class DateSupplier(ValueSupplierInterface):
+class DateSupplier(dataspec.ValueSupplierInterface):
     """
     Value Supplier implementation for dates
     """

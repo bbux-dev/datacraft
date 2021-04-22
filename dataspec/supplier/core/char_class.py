@@ -3,6 +3,7 @@ Module for handling character class types
 """
 import json
 import string
+
 import dataspec
 
 CHAR_CLASS_KEY = 'char_class'

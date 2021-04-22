@@ -2,13 +2,13 @@
 Module for handling uuid types
 """
 import uuid
+
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 UUID_KEY = 'uuid'
 
 
-class UuidSupplier(ValueSupplierInterface):
+class UuidSupplier(dataspec.ValueSupplierInterface):
     """ Value Supplier for uuid type """
     def next(self, _):
         return str(uuid.uuid4())

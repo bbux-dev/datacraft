@@ -7,7 +7,6 @@ from .exceptions import SpecException
 from .supplier.common import SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier, \
     CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier, BufferedValueSuppier
 from .utils import load_config, is_affirmative, get_caster
-from .supplier.core.value_supplier import ValueSupplierInterface
 from .supplier.core.combine import CombineValuesSupplier
 from .supplier.core.weighted_refs import WeightedRefsSupplier
 from .supplier.list_values import ListValueSupplier
@@ -16,12 +15,17 @@ from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
 from .distributions import from_string
 from .model import Distribution
-from . import casters
+from . import casters, ValueSupplierInterface
 
 
-def values(spec, loader=None):
+def values(spec, loader=None) -> ValueSupplierInterface:
     """
     Based on data, return the appropriate values supplier
+
+    >>> fib_supplier = dataspec.suppliers.values({"fibonacci": [1,2,3,5,8,13])
+
+    >>> weighted_spec = {"mostly_even": {"1": 0.1, "2": 0.2, "3": 0.1, "4": 0.2, "5": 0.1, "6": 0.2, "7": 0.1}}
+    >>> mostly_even_supplier = dataspec.suppliers.values(weighted_spec)
     """
     # shortcut notations no type, or data, the spec is the data
     if _data_not_in_spec(spec):
@@ -49,13 +53,22 @@ def values(spec, loader=None):
 
 
 def _data_not_in_spec(spec):
+    """ check to see if the data element is defined for this spec """
     if isinstance(spec, dict):
         return 'data' not in spec
     return True
 
 
-def count_supplier_from_data(data):
-    """ generates a supplier for the count parameter based on the type of the data """
+def count_supplier_from_data(data) -> ValueSupplierInterface:
+    """
+    generates a supplier for the count parameter based on the type of the data
+
+    valid data for counts:
+     * integer i.e. 1, 7, 99
+     * list of integers: [1, 7, 99], [1], [1, 2, 1, 2, 3]
+     * weighted map, where keys are numeric strings: {"1": 0.6, "2": 0.4}
+
+    """
     if isinstance(data, list):
         supplier = value_list(data, 1, False)
     elif isinstance(data, dict):

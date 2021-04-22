@@ -8,9 +8,8 @@ provides classes that provide these fields according to various schemes such as 
 """
 from typing import List, Tuple, Union, Dict
 import json
-from . import suppliers
+from . import suppliers, ValueSupplierInterface
 from .model import DataSpec
-from .suppliers import ValueSupplierInterface
 from .exceptions import SpecException
 
 ROOT_KEYS = ['refs', 'field_groups']

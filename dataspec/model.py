@@ -69,3 +69,15 @@ class Distribution:
 
     def next_value(self) -> float:
         """ get the next value for this distribution """
+
+
+class ValueSupplierInterface:
+    """
+    Interface for Classes that supply values
+    """
+    def next(self, iteration):
+        """
+        Produces the next value for the given iteration
+        :param iteration: current iteration
+        :return: the next value
+        """

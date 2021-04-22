@@ -7,10 +7,9 @@ import random
 from collections import deque
 
 import dataspec
-from .core.value_supplier import ValueSupplierInterface
 
 
-class SingleValue(ValueSupplierInterface):
+class SingleValue(dataspec.ValueSupplierInterface):
     """
     Encapsulates supplier that only returns a static value
     """
@@ -22,12 +21,12 @@ class SingleValue(ValueSupplierInterface):
         return self.data
 
 
-class MultipleValueSupplier(ValueSupplierInterface):
+class MultipleValueSupplier(dataspec.ValueSupplierInterface):
     """
     Supplier that generates list of values based on count parameter
     """
 
-    def __init__(self, wrapped: ValueSupplierInterface, count_supplier: ValueSupplierInterface):
+    def __init__(self, wrapped: dataspec.ValueSupplierInterface, count_supplier: dataspec.ValueSupplierInterface):
         self.wrapped = wrapped
         self.count_supplier = count_supplier
 
@@ -36,7 +35,7 @@ class MultipleValueSupplier(ValueSupplierInterface):
         return [self.wrapped.next(iteration + i) for i in range(count)]
 
 
-class RotatingSupplierList(ValueSupplierInterface):
+class RotatingSupplierList(dataspec.ValueSupplierInterface):
     """
     Class that rotates through a list of suppliers incrementally to provide the next value
     """
@@ -57,7 +56,7 @@ class RotatingSupplierList(ValueSupplierInterface):
         return self.suppliers[idx].next(iteration)
 
 
-class DecoratedSupplier(ValueSupplierInterface):
+class DecoratedSupplier(dataspec.ValueSupplierInterface):
     """
     Class used to add additional data to other suppliers output, such as a
     prefix or suffix or to surround the output with quotes
@@ -75,7 +74,7 @@ class DecoratedSupplier(ValueSupplierInterface):
         return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
 
 
-class CastingSupplier(ValueSupplierInterface):
+class CastingSupplier(dataspec.ValueSupplierInterface):
     """
     Class that just casts the results of other suppliers
     """
@@ -88,7 +87,7 @@ class CastingSupplier(ValueSupplierInterface):
         return self.caster.cast(self.wrapped.next(iteration))
 
 
-class RandomRangeSupplier(ValueSupplierInterface):
+class RandomRangeSupplier(dataspec.ValueSupplierInterface):
     """
     Class that supplies values uniformly selected from specified bounds
     """
@@ -109,7 +108,7 @@ class RandomRangeSupplier(ValueSupplierInterface):
         return next_nums
 
 
-class DistributionBackedSupplier(ValueSupplierInterface):
+class DistributionBackedSupplier(dataspec.ValueSupplierInterface):
     """
     Class that supplies values selected from a distribution such as a Guassian or Uniform distribution.
 
@@ -123,13 +122,13 @@ class DistributionBackedSupplier(ValueSupplierInterface):
         return self.distribution.next_value()
 
 
-class BufferedValueSuppier(ValueSupplierInterface):
+class BufferedValueSuppier(dataspec.ValueSupplierInterface):
     """
     Class for buffering the values from other suppliers. This allows the interaction
     of one supplier with the previous values of another supplier
     """
 
-    def __init__(self, wrapped: ValueSupplierInterface, buffer_size: int):
+    def __init__(self, wrapped: dataspec.ValueSupplierInterface, buffer_size: int):
         self.wrapped = wrapped
         self.buffer = deque(maxlen=buffer_size)
         self.current = -1

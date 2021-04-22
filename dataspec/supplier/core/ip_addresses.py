@@ -1,17 +1,17 @@
 """
 Module for handling ip types
 """
+import ipaddress
 import json
 import random
-import ipaddress
+
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 IP_KEY = 'ip'
 IPV4_KEY = 'ipv4'
 
 
-class IpV4Supplier(ValueSupplierInterface):
+class IpV4Supplier(dataspec.ValueSupplierInterface):
     """
     Default implementation for generating ip values, uses separate suppliers for each octet of the ip
     """
@@ -118,7 +118,7 @@ def _create_octet_supplier(parts, index, sample):
     return dataspec.suppliers.values(spec)
 
 
-class IpV4PreciseSupplier(ValueSupplierInterface):
+class IpV4PreciseSupplier(dataspec.ValueSupplierInterface):
     """
     Class that supports precise ip address generation by specifying cidr values, much slower for large ip ranges
     """

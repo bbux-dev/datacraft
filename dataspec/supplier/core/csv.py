@@ -1,13 +1,13 @@
 """
 Module for handling csv related data, deals with data typed as 'csv'
 """
-import os
 import csv
 import json
+import os
 import random
 from typing import Union
+
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 # 250 MB
 ONE_MB = 1024 * 1024
@@ -154,12 +154,12 @@ class BufferedCsvData(CsvDataBase):
         return self.data[idx][colidx]
 
 
-class CsvSupplier(ValueSupplierInterface):
+class CsvSupplier(dataspec.ValueSupplierInterface):
     """
     Class for supplying data from a specific field in a csv file
     """
 
-    def __init__(self, csv_data, field_name, sample, count_supplier: ValueSupplierInterface):
+    def __init__(self, csv_data, field_name, sample, count_supplier: dataspec.ValueSupplierInterface):
         self.csv_data = csv_data
         self.field_name = field_name
         self.sample = sample

@@ -1,15 +1,15 @@
 """ Module for ListCountSamplerSupplier """
 import random
 
-from .core.value_supplier import ValueSupplierInterface
+import dataspec
 
 
-class ListCountSamplerSupplier(ValueSupplierInterface):
+class ListCountSamplerSupplier(dataspec.ValueSupplierInterface):
     """
     Supplies values by sampling from a list with hard min max and count
     """
 
-    def __init__(self, data: list, count_supplier: ValueSupplierInterface, join_with: bool = None):
+    def __init__(self, data: list, count_supplier: dataspec.ValueSupplierInterface, join_with: bool = None):
         self.values = data
         self.count_supplier = count_supplier
         self.join_with = join_with

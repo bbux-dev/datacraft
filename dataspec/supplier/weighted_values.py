@@ -2,15 +2,16 @@
 Module for the class that implements supplying weighted values
 """
 import random
-from .core.value_supplier import ValueSupplierInterface
+
+import dataspec
 
 
-class WeightedValueSupplier(ValueSupplierInterface):
+class WeightedValueSupplier(dataspec.ValueSupplierInterface):
     """
     Value supplier implementation for weighted values
     """
 
-    def __init__(self, data, count_supplier: ValueSupplierInterface):
+    def __init__(self, data, count_supplier: dataspec.ValueSupplierInterface):
         # may be passed raw data or a spec
         if isinstance(data, dict) and 'data' in data:
             data = data.get('data')

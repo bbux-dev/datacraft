@@ -2,15 +2,15 @@
 Module for handling geo types
 """
 import json
+
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 GEO_LAT_KEY = 'geo.lat'
 GEO_LONG_KEY = 'geo.long'
 GEO_PAIR_KEY = 'geo.pair'
 
 
-class GeoSupplier(ValueSupplierInterface):
+class GeoSupplier(dataspec.ValueSupplierInterface):
     """
     Default implementation for generating geo related values
     """

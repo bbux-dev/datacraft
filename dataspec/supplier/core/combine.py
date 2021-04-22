@@ -14,14 +14,14 @@ The combine field structure is:
 }
 """
 import json
+
 import dataspec
-from .value_supplier import ValueSupplierInterface
 
 COMBINE_KEY = 'combine'
 COMBINE_LIST_KEY = 'combine-list'
 
 
-class CombineValuesSupplier(ValueSupplierInterface):
+class CombineValuesSupplier(dataspec.ValueSupplierInterface):
     """
     Class for combining the values from the output of two or more value suppliers
     """
