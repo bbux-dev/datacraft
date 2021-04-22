@@ -4,15 +4,7 @@ Module for numeric distributions such as uniform or gaussian
 import random
 import inspect
 import dataspec
-
-
-class Distribution:
-    """
-    Interface Class for a numeric distribution such as a Uniform or Gaussian distribution
-    """
-
-    def next_value(self) -> float:
-        """ get the next value for this distribution """
+from dataspec.model import Distribution
 
 
 class UniformDistribution(Distribution):

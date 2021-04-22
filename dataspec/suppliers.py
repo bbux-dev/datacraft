@@ -14,7 +14,8 @@ from .supplier.list_values import ListValueSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
-from .distributions import from_string, Distribution
+from .distributions import from_string
+from .model import Distribution
 from . import casters
 
 

@@ -19,6 +19,7 @@ from typing import List
 import json
 import datetime
 import dataspec
+import dataspec.model
 from .value_supplier import ValueSupplierInterface
 
 
@@ -59,7 +60,7 @@ class DateSupplier(ValueSupplierInterface):
     """
 
     def __init__(self,
-                 timestamp_distribution: dataspec.distributions.Distribution,
+                 timestamp_distribution: dataspec.model.Distribution,
                  date_format_string: str):
         self.date_format = date_format_string
         self.timestamp_distribution = timestamp_distribution

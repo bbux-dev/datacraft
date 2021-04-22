@@ -5,6 +5,8 @@ modify or wrap the functionality of the core suppliers.
 """
 import random
 from collections import deque
+
+import dataspec
 from .core.value_supplier import ValueSupplierInterface
 
 
@@ -114,7 +116,7 @@ class DistributionBackedSupplier(ValueSupplierInterface):
     @see dataspec.distributions
     """
 
-    def __init__(self, distribution):
+    def __init__(self, distribution: dataspec.Distribution):
         self.distribution = distribution
 
     def next(self, _):

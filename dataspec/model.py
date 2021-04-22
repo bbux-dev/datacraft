@@ -60,3 +60,12 @@ class DataSpec(dict):
         :param iterations: the number of iterations to run
         :return: record generator
         """
+
+
+class Distribution:
+    """
+    Interface Class for a numeric distribution such as a Uniform or Gaussian distribution
+    """
+
+    def next_value(self) -> float:
+        """ get the next value for this distribution """
