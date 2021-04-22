@@ -14,7 +14,6 @@ The weightedref Field Spec structure is:
 import dataspec
 
 
-
 class WeightedRefsSupplier(dataspec.ValueSupplierInterface):
     """
     Value supplier that uses a weighted scheme to supply values from different reference value suppliers
@@ -42,7 +41,7 @@ def configure_supplier(parent_field_spec, loader):
     for key in data.keys():
         supplier = loader.get(key)
         values_map[key] = supplier
-    supplier = dataspec.suppliers.weighted_ref(key_supplier, values_map)
+    supplier = WeightedRefsSupplier(key_supplier, values_map)
     if 'count' in config:
-        return dataspec.suppliers.array_supplier(supplier, config.get('count'))
+        return dataspec.suppliers.array_supplier(supplier, config)
     return supplier

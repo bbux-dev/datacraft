@@ -36,7 +36,7 @@ def is_affirmative(key, config, default=False):
     return value in ['yes', 'true', 'on']
 
 
-def load_config(field_spec, loader):
+def load_config(field_spec, loader, **kwargs):
     """
     Loads the config and any secondary configs into one object
     :param field_spec: that should contain config
@@ -44,9 +44,10 @@ def load_config(field_spec, loader):
     :return: the full config
     """
     if not isinstance(field_spec, dict):
-        return {}
+        return kwargs
 
     config = field_spec.get('config', {})
+    config.update(kwargs)
     refkey = config.get('configref')
     if refkey:
         configref = loader.get_ref_spec(refkey)

@@ -92,18 +92,19 @@ class RandomRangeSupplier(dataspec.ValueSupplierInterface):
     Class that supplies values uniformly selected from specified bounds
     """
 
-    def __init__(self, start, end, precision, count=1):
+    def __init__(self, start, end, precision, count_supplier: dataspec.ValueSupplierInterface):
         self.start = float(start)
         self.end = float(end)
         self.precision = precision
         self.format_str = '{: .' + str(precision) + 'f}'
-        self.count = count
+        self.count_supplier = count_supplier
 
     def next(self, iteration):
-        next_nums = [random.uniform(self.start, self.end) for _ in range(self.count)]
+        count = self.count_supplier.next(iteration)
+        next_nums = [random.uniform(self.start, self.end) for _ in range(count)]
         if self.precision is not None:
             next_nums = [self.format_str.format(next_num) for next_num in next_nums]
-        if self.count == 1:
+        if count == 1:
             return next_nums[0]
         return next_nums
 
