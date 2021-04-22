@@ -1,8 +1,8 @@
 import pytest
 from dataspec import ResourceError, SpecException
 from dataspec.schemas import load, validate_schema_for_spec
-from dataspec.type_handlers import range_handler
-from dataspec.type_handlers import values
+from dataspec.supplier.core import range_suppliers
+from dataspec.supplier.core import values
 import dataspec.types as types
 
 

@@ -2,7 +2,7 @@
 Module for value list supplier implementation
 """
 import random
-from .value_supplier import ValueSupplierInterface
+from .core.value_supplier import ValueSupplierInterface
 
 
 class ListValueSupplier(ValueSupplierInterface):
@@ -10,7 +10,7 @@ class ListValueSupplier(ValueSupplierInterface):
     Value Supplier implementation for supplying values from lists
     """
 
-    def __init__(self, data: list, count: ValueSupplierInterface, do_sampling: bool=False):
+    def __init__(self, data: list, count: ValueSupplierInterface, do_sampling: bool = False):
         self.values = data
         self.do_sampling = do_sampling
         self.count = count

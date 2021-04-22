@@ -6,9 +6,8 @@ import csv
 import json
 import random
 from typing import Union
-from dataspec import registry, ValueSupplierInterface, SpecException
-from dataspec.suppliers import count_supplier_from_data
-from dataspec.utils import load_config, is_affirmative
+import dataspec
+from .value_supplier import ValueSupplierInterface
 
 # 250 MB
 ONE_MB = 1024 * 1024
@@ -62,7 +61,7 @@ class CsvDataBase:
         # if we had headers we can use that name, otherwise field should be one based index
         colidx = self.mapping.get(field)
         if colidx is None and not str(field).isdigit():
-            raise SpecException(f'Invalid field name: {field} for csv, known keys: {self.valid_keys}')
+            raise dataspec.SpecException(f'Invalid field name: {field} for csv, known keys: {self.valid_keys}')
         if colidx is None:
             colidx = int(field) - 1
         return colidx
@@ -143,15 +142,15 @@ class BufferedCsvData(CsvDataBase):
 
     def next(self, field, iteration, sample, count):
         if sample:
-            raise SpecException('Large CSV files do not support sample mode')
+            raise dataspec.SpecException('Large CSV files do not support sample mode')
         if count > 1:
-            raise SpecException('Large CSV files only support count of 1')
+            raise dataspec.SpecException('Large CSV files only support count of 1')
         self.fill_buffer(iteration)
         colidx = self._get_column_index(field)
 
         idx = iteration % self.size
         if idx >= len(self.data):
-            raise SpecException("Exceeded end of CSV data, unable to proceed with large CSV files")
+            raise dataspec.SpecException("Exceeded end of CSV data, unable to proceed with large CSV files")
         return self.data[idx][colidx]
 
 
@@ -171,14 +170,14 @@ class CsvSupplier(ValueSupplierInterface):
         return self.csv_data.next(self.field_name, iteration, self.sample, count)
 
 
-@registry.types('csv')
+@dataspec.registry.types('csv')
 def configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
-    config = load_config(field_spec, loader)
+    config = dataspec.utils.load_config(field_spec, loader)
 
     field_name = config.get('column', 1)
-    sample = is_affirmative('sample', config)
-    count_supplier = count_supplier_from_data(config.get('count', 1))
+    sample = dataspec.utils.is_affirmative('sample', config)
+    count_supplier = dataspec.suppliers.count_supplier_from_data(config.get('count', 1))
 
     csv_data = _load_csv_data(field_spec, config, loader.datadir)
     return CsvSupplier(csv_data, field_name, sample, count_supplier)
@@ -198,14 +197,14 @@ def _load_csv_data(field_spec, config, datadir):
         return _csv_data_cache.get(csv_path)
 
     if not os.path.exists(csv_path):
-        raise SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
+        raise dataspec.SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
                             + json.dumps(field_spec))
     delimiter = config.get('delimiter', ',')
     # in case tab came in as string
     if delimiter == '\\t':
         delimiter = '\t'
     quotechar = config.get('quotechar', '"')
-    has_headers = is_affirmative('headers', config)
+    has_headers = dataspec.utils.is_affirmative('headers', config)
 
     size_in_bytes = os.stat(csv_path).st_size
     if size_in_bytes <= SMALL_ENOUGH_THRESHOLD:

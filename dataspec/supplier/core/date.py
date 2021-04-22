@@ -18,9 +18,9 @@ The date Field Spec structure is:
 from typing import List
 import json
 import datetime
-from dataspec import registry, distributions, Loader, ValueSupplierInterface, SpecException
-from dataspec.utils import load_config
-import dataspec.schemas as schemas
+import dataspec
+from .value_supplier import ValueSupplierInterface
+
 
 DATE_KEY = 'date'
 DATE_ISO_KEY = 'date.iso'
@@ -33,24 +33,24 @@ ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
 
 
-@registry.schemas(DATE_KEY)
+@dataspec.registry.schemas(DATE_KEY)
 def get_date_schema():
     """ returns the schema for date types """
-    return schemas.load(DATE_KEY)
+    return dataspec.schemas.load(DATE_KEY)
 
 
-@registry.schemas(DATE_ISO_KEY)
+@dataspec.registry.schemas(DATE_ISO_KEY)
 def get_date_iso_schema():
     """ returns the schema for date.iso types """
     # NOTE: These all share a schema
-    return schemas.load(DATE_KEY)
+    return dataspec.schemas.load(DATE_KEY)
 
 
-@registry.schemas(DATE_ISO_US_KEY)
+@dataspec.registry.schemas(DATE_ISO_US_KEY)
 def get_date_iso_us_schema():
     """ returns the schema for date.iso.us types """
     # NOTE: These all share a schema
-    return schemas.load(DATE_KEY)
+    return dataspec.schemas.load(DATE_KEY)
 
 
 class DateSupplier(ValueSupplierInterface):
@@ -59,7 +59,7 @@ class DateSupplier(ValueSupplierInterface):
     """
 
     def __init__(self,
-                 timestamp_distribution: distributions.Distribution,
+                 timestamp_distribution: dataspec.distributions.Distribution,
                  date_format_string: str):
         self.date_format = date_format_string
         self.timestamp_distribution = timestamp_distribution
@@ -95,7 +95,7 @@ def uniform_date_timestamp(
     end_ts = int(end_date.timestamp())
     if end_ts < start_ts:
         return None
-    return distributions.uniform(start=start_ts, end=end_ts)
+    return dataspec.distributions.uniform(start=start_ts, end=end_ts)
 
 
 def gauss_date_timestamp(
@@ -108,13 +108,13 @@ def gauss_date_timestamp(
         center_date = datetime.datetime.now()
     mean = center_date.timestamp()
     stddev = stddev_days * SECONDS_IN_DAY
-    return distributions.normal(mean=mean, stddev=stddev)
+    return dataspec.distributions.normal(mean=mean, stddev=stddev)
 
 
-@registry.types(DATE_KEY)
-def configure_supplier(field_spec: dict, loader: Loader):
+@dataspec.registry.types(DATE_KEY)
+def configure_supplier(field_spec: dict, loader: dataspec.Loader):
     """ configures the date value supplier """
-    config = load_config(field_spec, loader)
+    config = dataspec.utils.load_config(field_spec, loader)
     if 'center_date' in config or 'stddev_days' in config:
         return _create_stats_based_date_supplier(config)
     return _create_uniform_date_supplier(config)
@@ -136,25 +136,25 @@ def _create_uniform_date_supplier(config):
     date_format = config.get('format', DEFAULT_FORMAT)
     timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)
     if timestamp_distribution is None:
-        raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
+        raise dataspec.SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
     return DateSupplier(timestamp_distribution, date_format)
 
 
-@registry.types(DATE_ISO_KEY)
-def configure_supplier_iso(field_spec: dict, loader: Loader):
+@dataspec.registry.types(DATE_ISO_KEY)
+def configure_supplier_iso(field_spec: dict, loader: dataspec.Loader):
     """ configures the date.iso value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_NO_MICRO)
 
 
-@registry.types(DATE_ISO_US_KEY)
-def configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
+@dataspec.registry.types(DATE_ISO_US_KEY)
+def configure_supplier_iso_microseconds(field_spec: dict, loader: dataspec.Loader):
     """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, ISO_FORMAT_WITH_MICRO)
 
 
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     """ configures an iso based date supplier using the provided date format """
-    config = load_config(field_spec, loader)
+    config = dataspec.utils.load_config(field_spec, loader)
 
     # make sure the start and end dates match the ISO format we are using
     start = config.get('start')

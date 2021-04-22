@@ -3,8 +3,8 @@ Module for implementation of select list subset value supplier
 """
 import math
 import random
-from dataspec.utils import is_affirmative
-from dataspec.supplier.value_supplier import ValueSupplierInterface
+import dataspec
+from .core.value_supplier import ValueSupplierInterface
 
 
 class ListStatSamplerSupplier(ValueSupplierInterface):
@@ -25,7 +25,7 @@ class ListStatSamplerSupplier(ValueSupplierInterface):
             lower_delta = abs(int(self.mean - self.max))
         self.stddev = float(config.get('stddev', lower_delta))
         self.join_with = config.get('join_with', ' ')
-        self.as_list = is_affirmative('as_list', config, False)
+        self.as_list = dataspec.utils.is_affirmative('as_list', config, False)
 
     def next(self, _):
         if self.stddev == 0:

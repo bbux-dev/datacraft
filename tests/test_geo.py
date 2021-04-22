@@ -1,7 +1,7 @@
 import decimal
 from dataspec import builder, Loader
 # need this to trigger registration
-from dataspec.type_handlers import geo_handler
+from dataspec.supplier.core import geo
 
 
 def test_geo_lat_default_precision():

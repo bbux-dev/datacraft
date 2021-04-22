@@ -2,8 +2,8 @@
 Module for handling uuid types
 """
 import uuid
-from dataspec import registry, ValueSupplierInterface
-import dataspec.schemas as schemas
+import dataspec
+from .value_supplier import ValueSupplierInterface
 
 UUID_KEY = 'uuid'
 
@@ -14,12 +14,12 @@ class UuidSupplier(ValueSupplierInterface):
         return str(uuid.uuid4())
 
 
-@registry.schemas(UUID_KEY)
+@dataspec.registry.schemas(UUID_KEY)
 def get_uuid_schema():
-    return schemas.load(UUID_KEY)
+    return dataspec.schemas.load(UUID_KEY)
 
 
-@registry.types(UUID_KEY)
+@dataspec.registry.types(UUID_KEY)
 def configure_supplier(_, __):
     """ configure the supplier for uuid types """
     return UuidSupplier()

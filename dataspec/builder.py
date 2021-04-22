@@ -7,7 +7,6 @@ import json
 import logging
 from . import utils
 from .model import DataSpec
-from .type_handlers import *
 
 from dataspec import Loader, template_engines, key_providers
 
@@ -916,7 +915,7 @@ class DataSpecImpl(DataSpec):
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output = kwargs.get('output', None)
-        loader = Loader(self.raw_spec, datadir=data_dir, enforce_schema=enforce_schema)
+        loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
         if template is not None:
             if isinstance(template, Path):

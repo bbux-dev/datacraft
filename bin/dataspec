@@ -213,7 +213,7 @@ def _configure_logging(args):
 
 if __name__ == '__main__':
     # this activates the decorators, so they will be discoverable
-    from dataspec.type_handlers import *
+    from dataspec.supplier import *
     import dataspec.preprocessor
     import dataspec.logging_handler
 

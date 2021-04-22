@@ -3,19 +3,19 @@ Factory like module for core supplier related functions.
 """
 from typing import Union, Dict
 import json
-import random
-from collections import deque
 from .exceptions import SpecException
+from .supplier.common import SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier, \
+    CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier, BufferedValueSuppier
 from .utils import load_config, is_affirmative, get_caster
+from .supplier.core.value_supplier import ValueSupplierInterface
+from .supplier.core.combine import CombineValuesSupplier
+from .supplier.core.weighted_refs import WeightedRefsSupplier
 from .supplier.list_values import ListValueSupplier
-from .supplier.combine import CombineValuesSupplier
 from .supplier.weighted_values import WeightedValueSupplier
-from .supplier.weighted_refs import WeightedRefsSupplier
 from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
-from .supplier.value_supplier import ValueSupplierInterface
-from . import casters
 from .distributions import from_string, Distribution
+from . import casters
 
 
 def values(spec, loader=None):
@@ -43,7 +43,7 @@ def values(spec, loader=None):
 
     # Check for count param
     if 'count' in config:
-        return _MultipleValueSupplier(supplier, count_supplier_from_data(config['count']))
+        return MultipleValueSupplier(supplier, count_supplier_from_data(config['count']))
     return supplier
 
 
@@ -84,40 +84,14 @@ def count_supplier_from_config(config: Dict):
     return count_supplier_from_data(data)
 
 
-class _SingleValue(ValueSupplierInterface):
-    """
-    Encapsulates supplier that only returns a static value
-    """
-
-    def __init__(self, data):
-        self.data = data
-
-    def next(self, _):
-        return self.data
-
-
 def single_value(data):
     """ Creates value supplier for the single value """
-    return _SingleValue(data)
+    return SingleValue(data)
 
 
 def array_supplier(wrapped: ValueSupplierInterface, count_config):
     """ returns a supplier that always returns an array of elements  based on the count config supplied """
-    return _MultipleValueSupplier(wrapped, count_supplier_from_data(count_config))
-
-
-class _MultipleValueSupplier(ValueSupplierInterface):
-    """
-    Supplier that generates list of values based on count parameter
-    """
-
-    def __init__(self, wrapped: ValueSupplierInterface, count_supplier: ValueSupplierInterface):
-        self.wrapped = wrapped
-        self.count_supplier = count_supplier
-
-    def next(self, iteration):
-        count = self.count_supplier.next(iteration)
-        return [self.wrapped.next(iteration + i) for i in range(count)]
+    return MultipleValueSupplier(wrapped, count_supplier_from_data(count_config))
 
 
 def from_list_of_suppliers(supplier_list, modulate_iteration):
@@ -128,27 +102,6 @@ def from_list_of_suppliers(supplier_list, modulate_iteration):
     :return: a supplier for these suppliers
     """
     return RotatingSupplierList(supplier_list, modulate_iteration)
-
-
-class RotatingSupplierList(ValueSupplierInterface):
-    """
-    Class that rotates through a list of suppliers incrementally to provide the next value
-    """
-
-    def __init__(self, suppliers, modulate_iteration):
-        """
-        :param suppliers: list of suppliers to rotate through
-        :param modulate_iteration: if the iteration should be split evenly across all suppliers
-        """
-        self.suppliers = suppliers
-        self.modulate_iteration = modulate_iteration
-
-    def next(self, iteration):
-        idx = iteration % len(self.suppliers)
-        if self.modulate_iteration:
-            modulated_iteration = int(iteration / len(self.suppliers))
-            return self.suppliers[idx].next(modulated_iteration)
-        return self.suppliers[idx].next(iteration)
 
 
 def value_list(data, count: Union[int, list, dict], do_sampling=False):
@@ -232,24 +185,6 @@ def is_decorated(field_spec):
     return 'prefix' in config or 'suffix' in config or 'quote' in config
 
 
-class DecoratedSupplier(ValueSupplierInterface):
-    """
-    Class used to add additional data to other suppliers output, such as a
-    prefix or suffix or to surround the output with quotes
-    """
-
-    def __init__(self, config, supplier):
-        self.prefix = config.get('prefix', '')
-        self.suffix = config.get('suffix', '')
-        self.quote = config.get('quote', '')
-        self.wrapped = supplier
-
-    def next(self, iteration):
-        value = self.wrapped.next(iteration)
-        # todo: cache mapping for efficiency?
-        return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
-
-
 def decorated(field_spec, supplier):
     """
     Creates a decorated supplier around the provided on
@@ -258,19 +193,6 @@ def decorated(field_spec, supplier):
     :return: the decorated supplier
     """
     return DecoratedSupplier(field_spec.get('config'), supplier)
-
-
-class CastingSupplier(ValueSupplierInterface):
-    """
-    Class that just casts the results of other suppliers
-    """
-
-    def __init__(self, wrapped, caster):
-        self.wrapped = wrapped
-        self.caster = caster
-
-    def next(self, iteration):
-        return self.caster.cast(self.wrapped.next(iteration))
 
 
 def is_cast(field_spec):
@@ -303,41 +225,8 @@ def cast_supplier(supplier: ValueSupplierInterface,
     return CastingSupplier(supplier, caster)
 
 
-class RandomRangeSupplier(ValueSupplierInterface):
-    """
-    Class that supplies values uniformly selected from specified bounds
-    """
-
-    def __init__(self, start, end, precision, count=1):
-        self.start = float(start)
-        self.end = float(end)
-        self.precision = precision
-        self.format_str = '{: .' + str(precision) + 'f}'
-        self.count = count
-
-    def next(self, iteration):
-        next_nums = [random.uniform(self.start, self.end) for _ in range(self.count)]
-        if self.precision is not None:
-            next_nums = [self.format_str.format(next_num) for next_num in next_nums]
-        if self.count == 1:
-            return next_nums[0]
-        return next_nums
-
-
 def random_range(start, end, precision=None, count=1):
     return RandomRangeSupplier(start, end, precision, count)
-
-
-class DistributionBackedSupplier(ValueSupplierInterface):
-    """
-    Class that supplies values selected from a distribution
-    """
-
-    def __init__(self, distribution: Distribution):
-        self.distribution = distribution
-
-    def next(self, _):
-        return self.distribution.next_value()
 
 
 def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
@@ -371,28 +260,4 @@ def buffered(wrapped: ValueSupplierInterface, field_spec):
     """
     config = field_spec.get('config', {})
     buffer_size = int(config.get('buffer_size', 10))
-    return _BufferedValueSuppier(wrapped, buffer_size)
-
-
-class _BufferedValueSuppier(ValueSupplierInterface):
-    """
-    Class for buffering the values from other suppliers. This allows the interaction
-    of one supplier with the previous values of another supplier
-    """
-
-    def __init__(self, wrapped: ValueSupplierInterface, buffer_size: int):
-        self.wrapped = wrapped
-        self.buffer = deque(maxlen=buffer_size)
-        self.current = -1
-
-    def next(self, iteration):
-        if iteration > self.current:
-            value = self.wrapped.next(iteration)
-            self.buffer.append(value)
-            self.current = iteration
-            return value
-
-        idx = len(self.buffer) - (self.current - iteration) - 1
-        if idx < 0:
-            raise ValueError('Buffer index out of range')
-        return self.buffer[idx]
+    return BufferedValueSuppier(wrapped, buffer_size)

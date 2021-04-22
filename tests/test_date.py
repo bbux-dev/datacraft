@@ -7,7 +7,7 @@ import dataspec
 from dataspec.loader import Loader
 from dataspec import builder
 # need this to trigger type handler registration
-from dataspec.type_handlers import date_handler
+from dataspec.supplier.core import date
 
 
 def test_basic_spec():

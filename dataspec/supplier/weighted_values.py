@@ -2,7 +2,7 @@
 Module for the class that implements supplying weighted values
 """
 import random
-from .value_supplier import ValueSupplierInterface
+from .core.value_supplier import ValueSupplierInterface
 
 
 class WeightedValueSupplier(ValueSupplierInterface):

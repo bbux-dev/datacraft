@@ -1,7 +1,7 @@
 """ Module for ListCountSamplerSupplier """
 import random
 
-from dataspec.supplier.value_supplier import ValueSupplierInterface
+from .core.value_supplier import ValueSupplierInterface
 
 
 class ListCountSamplerSupplier(ValueSupplierInterface):

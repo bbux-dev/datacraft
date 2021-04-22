@@ -35,10 +35,10 @@ class Loader:
     """
     RESERVED = ['type', 'data', 'ref', 'refs', 'config']
 
-    def __init__(self, data_spec, datadir='./data', enforce_schema=False):
+    def __init__(self, data_spec, data_dir='./data', enforce_schema=False):
         raw_spec = utils.get_raw_spec(data_spec)
         self.specs = preprocess_spec(raw_spec)
-        self.datadir = datadir
+        self.datadir = data_dir
         self.enforce_schema = enforce_schema
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
