@@ -1,7 +1,6 @@
 import pytest
 import dataspec.builder as builder
-from dataspec import DataSpec
-from dataspec import SpecException
+from dataspec import distributions, DataSpec, SpecException
 
 
 def test_api_builder():
@@ -262,3 +261,13 @@ def test_spec_builder():
 
     single = next(spec.generator(1))
     assert single == {'name': 'a'}
+
+
+def test_distribution_as_count():
+    spec_builder = builder.spec_builder()
+    distribution = distributions.uniform(1, 3)
+    spec = spec_builder.values('name', ['a', 'b', 'c'], count=distribution).to_spec()
+    assert isinstance(spec, DataSpec)
+
+    single = next(spec.generator(1))
+    assert 1 <= len(single['name']) < 3

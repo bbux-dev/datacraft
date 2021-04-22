@@ -11,16 +11,16 @@ class Distribution:
     Interface Class for a numeric distribution such as a Uniform or Gaussian distribution
     """
 
-    def next_value(self):
+    def next_value(self) -> float:
         """ get the next value for this distribution """
 
 
 class UniformDistribution(Distribution):
     """
-    Class the samples values from a uniform distribution between the start and end points
+    Class that samples values from a uniform distribution between the start and end points
     """
 
-    def __init__(self, start, end):
+    def __init__(self, start: float, end: float) -> Distribution:
         self.start = start
         self.end = end
 
@@ -33,7 +33,7 @@ class GaussDistribution(Distribution):
     Class the samples values from a normal distribution with provided mean and standard deviation
     """
 
-    def __init__(self, mean, stddev):
+    def __init__(self, mean: float, stddev: float) -> Distribution:
         self.mean = mean
         self.stddev = stddev
 
@@ -43,6 +43,7 @@ class GaussDistribution(Distribution):
 
 @dataspec.registry.distribution('uniform')
 def uniform(start, end):
+    """ uniform distribution for from start to end """
     return UniformDistribution(start, end)
 
 
@@ -65,7 +66,7 @@ def _gaussian_distribution(mean, stddev):
     return GaussDistribution(mean, stddev)
 
 
-def from_string(dist_func_str: str):
+def from_string(dist_func_str: str) -> Distribution:
     """
     Uses a function form of the distribution to look up and configure it
 

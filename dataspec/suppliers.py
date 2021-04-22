@@ -1,7 +1,6 @@
 """
 Factory like module for core supplier related functions.
 """
-import types
 from typing import Union, Dict
 import json
 import random
@@ -16,6 +15,7 @@ from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
 from .supplier.value_supplier import ValueSupplierInterface
 from . import casters
+from .distributions import from_string, Distribution
 
 
 def values(spec, loader=None):
@@ -59,6 +59,8 @@ def count_supplier_from_data(data):
         supplier = value_list(data, 1, False)
     elif isinstance(data, dict):
         supplier = weighted_values(data)
+    elif isinstance(data, Distribution):
+        supplier = cast_supplier(distribution_supplier(data), cast_to='int')
     else:
         try:
             supplier = single_value(int(data))
@@ -77,6 +79,8 @@ def count_supplier_from_config(config: Dict):
     data = 1
     if config and 'count' in config:
         data = config['count']
+    if config and 'count_dist' in config:
+        data = from_string(config['count_dist'])
     return count_supplier_from_data(data)
 
 
@@ -281,9 +285,12 @@ def is_cast(field_spec):
     return 'cast' in config
 
 
-def cast_supplier(supplier, field_spec, cast_to=None):
+def cast_supplier(supplier: ValueSupplierInterface,
+                  field_spec: dict = None,
+                  cast_to: str = None) -> ValueSupplierInterface:
     """
     Provides a cast_supplier either from config or from explicit cast_to
+
     :param supplier: to cast results of
     :param field_spec: to look up cast config from
     :param cast_to: explicit cast type to use
@@ -321,29 +328,28 @@ def random_range(start, end, precision=None, count=1):
     return RandomRangeSupplier(start, end, precision, count)
 
 
-class GaussRangeSupplier(ValueSupplierInterface):
+class DistributionBackedSupplier(ValueSupplierInterface):
     """
-    Class that supplies values selected from a normal distribution
+    Class that supplies values selected from a distribution
     """
 
-    def __init__(self, mean, stddev, precision, count=1):
-        self.mean = float(mean)
-        self.stddev = float(stddev)
-        self.precision = precision
-        self.format_str = '{: .' + str(precision) + 'f}'
-        self.count = count
+    def __init__(self, distribution: Distribution):
+        self.distribution = distribution
 
-    def next(self, iteration):
-        next_nums = [random.gauss(self.mean, self.stddev) for _ in range(self.count)]
-        if self.precision is not None:
-            next_nums = [self.format_str.format(next_num) for next_num in next_nums]
-        if self.count == 1:
-            return next_nums[0]
-        return next_nums
+    def next(self, _):
+        return self.distribution.next_value()
 
 
-def gauss_range(mean, stddev, precision=None, count=1):
-    return GaussRangeSupplier(mean, stddev, precision, count)
+def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
+    """
+    creates a ValueSupplier that uses the given distribution to generate values
+
+    :param distribution: to use
+    :return:
+    """
+    wrapped = DistributionBackedSupplier(distribution)
+    # buffer the values
+    return buffered(wrapped, {})
 
 
 def is_buffered(field_spec):
