@@ -102,28 +102,25 @@ class Builder:
         """
         return self._add_field_spec(key, combine_list(refs, **config))
 
-    def range_spec(self, key: str, start: Union[int, float], end: Union[int, float], step: Union[int, float], **config):
+    def range_spec(self, key: str, data: list, **config):
         """
         creates range Field Spec and adds to Data Spec
 
         :param key: name of ref/field
-        :param start: start of range inclusive
-        :param end: end of range inclusive
-        :param step: step for range
+        :param data: with start, end, and optional step
         :param config: in **kwargs format
         """
-        return self._add_field_spec(key, range_spec(start, end, step, **config))
+        return self._add_field_spec(key, range_spec(data, **config))
 
-    def rand_range(self, key: str, start: Union[int, float], end: Union[int, float], **config):
+    def rand_range(self, key: str,  data: list, **config):
         """
         creates rand_range Field Spec and adds to Data Spec
 
         :param key: name of ref/field
-        :param start: start of range inclusive
-        :param end: end of range inclusive
+        :param data: with start, end
         :param config: in **kwargs format
         """
-        return self._add_field_spec(key, rand_range(start, end, **config))
+        return self._add_field_spec(key, rand_range(data, **config))
 
     def date(self, key: str, **config):
         """
@@ -285,7 +282,7 @@ class Builder:
         """
         return self._add_field_spec(key, csv_select(data, **config))
 
-    def nested(self, key: str, fields: Dict[str, Dict], **config):
+    def nested(self, key: str, fields: Union[DataSpec, Dict[str, Dict]], **config):
         """
         creates nested Field Spec and adds to Data Spec
 
@@ -294,6 +291,20 @@ class Builder:
         :param config: in **kwargs format
         """
         return self._add_field_spec(key, nested(fields, **config))
+
+    def configref(self, key: str, **config):
+        """
+        Adds the configref to the refs for this spec
+
+        :param key: name for configref
+        :param config: for configref
+        :return: None
+        """
+        # this must be a refs instance
+        if self.refs_builder is None:
+            self.add_field(key, configref(**config))
+        else:
+            self.add_ref(key, configref(**config))
 
     def _add_field_spec(self, key, spec):
         self.add_field(key, spec)
@@ -316,7 +327,7 @@ class Builder:
             self.add_field(key, spec)
         return self
 
-    def add_field(self, key: str, spec: dict):
+    def add_field(self, key: Union[str, FieldInfo], spec: dict):
         """
         Add single field to the spec.
 
@@ -331,6 +342,8 @@ class Builder:
         if key in self.keys:
             log.warning('%s key already defined, overwriting with %s',
                         key, json.dumps(spec))
+        if isinstance(key, FieldInfo):
+            key = key.key
         self.keys.add(key)
         self.fields[key] = spec
         return self
@@ -514,20 +527,18 @@ def combine_list(refs: List[List[Union[str, FieldInfo]]] = None, **config):
     return spec
 
 
-def range_spec(start: Union[int, float], end: Union[int, float], step: Union[int, float], **config):
+def range_spec(data: list, **config):
     """
     Constructs a range Field Spec
 
-    :param start: start of range inclusive
-    :param end: end of range inclusive
-    :param step: step for range
+    :param data: with start, end, and optional step
     :param config: in **kwargs format
     :return: the range spec
     """
 
     spec = {
         "type": "range",
-        "data": [start, end, step]
+        "data": data
     }
 
     if len(config) > 0:
@@ -535,19 +546,18 @@ def range_spec(start: Union[int, float], end: Union[int, float], step: Union[int
     return spec
 
 
-def rand_range(start: Union[int, float], end: Union[int, float], **config):
+def rand_range(data: list, **config):
     """
     Constructs a rand_range Field Spec
 
-    :param start: start of range inclusive
-    :param end: end of range inclusive
+    :param data: with start, end
     :param config: in **kwargs format
     :return: the rand_range spec
     """
 
     spec = {
         "type": "rand_range",
-        "data": [start, end]
+        "data": data
     }
 
     if len(config) > 0:

@@ -54,9 +54,9 @@ field_spec_build_tests = [
      {"type": "combine", "fields": ["ONE", "TWO"], "config": {"join_with": "-"}}),
     (builder.combine_list(refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
      {"type": "combine-list", "config": {"join_with": ","}, "refs": [["A", "B"], ["A", "B", "C"]]}),
-    (builder.range_spec(1, 5, 1, as_list=True, count=2),
+    (builder.range_spec([1, 5, 1], as_list=True, count=2),
      {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}),
-    (builder.rand_range(20, 44, count=[2, 3, 4]),
+    (builder.rand_range([20, 44], count=[2, 3, 4]),
      {"type": "rand_range", "config": {"count": [2, 3, 4]}, "data": [20, 44]}),
     (builder.date(duration_days=3, offset=4),
      {"type": "date", "config": {"duration_days": 3, "offset": 4}}),
@@ -113,9 +113,9 @@ full_spec_build_tests = [
      {"name": {"type": "combine", "fields": ["ONE", "TWO"], "config": {"join_with": "-"}}}),
     (builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
      {"name": {"type": "combine-list", "config": {"join_with": ","}, "refs": [["A", "B"], ["A", "B", "C"]]}}),
-    (builder.Builder().range_spec('name', 1, 5, 1, as_list=True, count=2),
+    (builder.Builder().range_spec('name', [1, 5, 1], as_list=True, count=2),
      {"name": {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}}),
-    (builder.Builder().rand_range('name', 20, 44, count=[2, 3, 4]),
+    (builder.Builder().rand_range('name', [20, 44], count=[2, 3, 4]),
      {"name": {"type": "rand_range", "config": {"count": [2, 3, 4]}, "data": [20, 44]}}),
     (builder.Builder().date('name', duration_days=3, offset=4),
      {"name": {"type": "date", "config": {"duration_days": 3, "offset": 4}}}),
@@ -171,8 +171,8 @@ invalid_spec_build_tests = [
     builder.Builder().combine('name', refs=["ONE", "TWO"], join_with='@'),  # no refs defined
     builder.Builder().combine('name', fields=["ONE", "TWO"], join_with='-'),  # no refs defined
     builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
-    builder.Builder().range_spec('name', 1, 5, 1, as_list=True, count={}),  # invalid count
-    builder.Builder().rand_range('name', 20, 44, count=None),  # invalid count
+    builder.Builder().range_spec('name', [1, 5, 1], as_list=True, count={}),  # invalid count
+    builder.Builder().rand_range('name', [20, 44], count=None),  # invalid count
     builder.Builder().date('name', duration_days={1: 0.5, 2: 0.5}, offset=4),  # invalid duration_days
     builder.Builder().date_iso('name', duration_days=4, offset="1"),  # invalid offset
     builder.Builder().date_iso_us('name', duration_days=5, offset=6, start=42),  # invalid start

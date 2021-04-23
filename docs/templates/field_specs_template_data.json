@@ -248,6 +248,13 @@
       "yaml": "text:\n  type: unicode_range\n  data: ['3040', '309f']\n  config:\n    mean: 5\n",
       "command": "dataspec -s unicode.yaml -i 10 -l off",
       "output": "そぬをく\nが\nとしぶ\nぉけべ゙\nゃれげえ\nっぴ\nつざめよがぽ\nえろぱづゖごそ\u3040べかっ\nい\u3098\nぱまる"
+    },
+    "count_dist_example_one": {
+      "json": "{\n  \"field\": {\n    \"type\": \"char_class\",\n    \"data\": \"visible\",\n    \"config\": {\n      \"count_dist\": \"normal(mean=5, stddev=2, min=1, max=9)\"\n    }\n  }\n}",
+      "yaml": "field:\n  type: char_class\n  data: visible\n  config:\n    count_dist: normal(mean=5, stddev=2, min=1, max=9)",
+      "api": "import dataspec\n\nbuilder = dataspec.spec_builder()\n\nbuilder.char_class(key='field',\n                   data='visible',\n                   count_dist='normal(mean=5, stddev=2, min=1, max=9)')\n\nspec = builder.build()",
+      "command": "dataspec --inline '{\"field\": {\"type\": \"char_class\", \"data\": \"visible\", \"config\": {\"count_dist\": \"normal(mean=5, stddev=2, min=1, max=9)\"}}}' --log-level error -i 5",
+      "output": ";7~(\noSk\n5L\n#8`}H\n~F>Ey"
     }
   }
 }

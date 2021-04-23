@@ -564,6 +564,71 @@ parameter. Some types will let you explicitly set the `as_list` parameter to
 force the results to be returned as an array and not the default for the given
 type.
 
+### Count Distributions
+
+Another way to specify a count is to use a count distribution. This is done with
+the `count_dist` param.  The param takes a string argument which is the
+distribution along with its required arguments in function call form with
+parameters explicitly named.  See the table below.
+
+distribution|required arguments|optional args|examples
+------------|------------------|-------------|---
+uniform     |start</br>end     |             |"uniform(start=10, end=30)"
+</i>        |                  |             |"uniform(start=1, end=3)"
+guass       |mean</br>stddev   |min</br>max  |"gauss(mean=2, stddev=1)"
+guassian    |                  |             |"guassian(mean=7, stddev=1, min=4)"
+normal      |                  |             |"normal(mean=25, stddev=10, max=40)"
+
+`normal`, `guassian`, and `gauss` are all aliases for a
+[Normal Distribution](https://en.wikipedia.org/wiki/Normal_distribution).
+
+Example:
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "field": {
+    "type": "char_class",
+    "data": "visible",
+    "config": {
+      "count_dist": "normal(mean=5, stddev=2, min=1, max=9)"
+    }
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+field:
+  type: char_class
+  data: visible
+  config:
+    count_dist: normal(mean=5, stddev=2, min=1, max=9)
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+builder = dataspec.spec_builder()
+
+builder.char_class(key='field',
+                   data='visible',
+                   count_dist='normal(mean=5, stddev=2, min=1, max=9)')
+
+spec = builder.build()
+```
+
+</details>
+
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
 These are the built-in types
@@ -2167,21 +2232,21 @@ See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
 
 Config Params:
 
-|type    |param     |description                                  |
-|--------|----------|---------------------------------------------|
-|all     |precision |number of decimal places for lat or long, default is 4          |
-|        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]|
-|geo.lat |start_lat |lower bound for latitude                                        |
-|        |end_lat   |upper bound for latitude                                        |
-|geo.long|start_long|lower bound for longitude                                       |
-|        |end_long  |upper bound for longitude                                       |
-|geo.pair|join_with |delimiter to join long and lat with, default is comma           |
-|        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
-|        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
-|        |start_lat |lower bound for latitude                                        |
-|        |end_lat   |upper bound for latitude                                        |
-|        |start_long|lower bound for longitude                                       |
-|        |end_long  |upper bound for longitude                                       |
+type    |param     |description
+--------|----------|---------------------------------------------
+all     |precision |number of decimal places for lat or long, default is 4
+        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
+geo.lat |start_lat |lower bound for latitude
+        |end_lat   |upper bound for latitude
+geo.long|start_long|lower bound for longitude
+        |end_long  |upper bound for longitude
+geo.pair|join_with |delimiter to join long and lat with, default is comma
+        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
+        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
+        |start_lat |lower bound for latitude
+        |end_lat   |upper bound for latitude
+        |start_long|lower bound for longitude
+        |end_long  |upper bound for longitude
 
 Examples:
 
@@ -2227,7 +2292,9 @@ egypt:
 
 Ip addresses can be generated
 using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-or by specifying a base.
+or by specifying a base. For example, if you wanted to generate ips in the
+10.0.0.0 to 10.0.0.255 range, you could either specify a `cidr` param of
+10.0.0.0/24 or a `base` param of 10.0.0.
 
 ### Parameters
 

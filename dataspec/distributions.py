@@ -22,7 +22,7 @@ class UniformDistribution(Distribution):
 
 class GaussDistribution(Distribution):
     """
-    Class the samples values from a normal distribution with provided mean and standard deviation
+    Class that samples values from a normal distribution with provided mean and standard deviation
     """
 
     def __init__(self, mean: float, stddev: float) -> Distribution:
@@ -33,6 +33,28 @@ class GaussDistribution(Distribution):
         return random.gauss(self.mean, self.stddev)
 
 
+class BoundedDistribution(Distribution):
+    """
+    Class bounds another distribution
+    """
+
+    def __init__(self,
+                 distribution: Distribution,
+                 min_val: float = 0.0,
+                 max_val: float = None) -> Distribution:
+        self.distribution = distribution
+        self.min = min_val
+        self.max = max_val
+
+    def next_value(self):
+        value = self.distribution.next_value()
+        if self.min and value < self.min:
+            return self.min
+        if self.max and value > self.max:
+            return self.max
+        return value
+
+
 @dataspec.registry.distribution('uniform')
 def uniform(start, end):
     """ uniform distribution for from start to end """
@@ -40,22 +62,26 @@ def uniform(start, end):
 
 
 @dataspec.registry.distribution('normal')
-def normal(mean, stddev):
-    return _gaussian_distribution(mean, stddev)
+def normal(mean, stddev, **kwargs):
+    return _gaussian_distribution(mean, stddev, **kwargs)
 
 
 @dataspec.registry.distribution('gauss')
-def gauss(mean, stddev):
-    return _gaussian_distribution(mean, stddev)
+def gauss(mean, stddev, **kwargs):
+    return _gaussian_distribution(mean, stddev, **kwargs)
 
 
 @dataspec.registry.distribution('gaussian')
-def gaussian(mean, stddev):
-    return _gaussian_distribution(mean, stddev)
+def gaussian(mean, stddev, **kwargs):
+    return _gaussian_distribution(mean, stddev, **kwargs)
 
 
-def _gaussian_distribution(mean, stddev):
-    return GaussDistribution(mean, stddev)
+def _gaussian_distribution(mean, stddev, **kwargs):
+    """ uniform distribution for from start to end """
+    distribution = GaussDistribution(mean, stddev)
+    if 'min' in kwargs or 'max' in kwargs:
+        return BoundedDistribution(distribution, kwargs.get('min'), kwargs.get('max'))
+    return distribution
 
 
 def from_string(dist_func_str: str) -> Distribution:
@@ -80,16 +106,23 @@ def from_string(dist_func_str: str) -> Distribution:
     name = dist_func_str[0:open_paren]
     dist_func = dataspec.registry.distribution.get(name)
     # for check what the names of the expected args are
-    argspec = inspect.getfullargspec(dist_func)
 
     args = dist_func_str[open_paren + 1:close_paren]
 
     kwargs = _convert_to_kwargs(args)
 
-    if kwargs is None or argspec.args != list(kwargs.keys()):
+    if kwargs is None or _invalid_args_for_func(dist_func, kwargs):
         raise ValueError('Invalid args for function: ' + dist_func_str)
 
     return dist_func(**kwargs)
+
+
+def _invalid_args_for_func(dist_func, kwargs):
+    """ verifies the args match """
+    argspec = inspect.getfullargspec(dist_func)
+    expected_args = argspec.args
+    actual_args = list(set(kwargs.keys()) - {'min', 'max'})
+    return sorted(actual_args) != sorted(expected_args)
 
 
 def _convert_to_kwargs(args):
