@@ -55,7 +55,9 @@ def test_char_class_multiple_classes():
     exclude = "CUSTOM"
     spec = _char_class_spec(data=["lower", "digits", "CUSTOM"], exclude=exclude)
 
-    value = Loader(spec).get('name').next(0)
+    supplier = Loader(spec).get('name')
+    value = supplier.next(0)
+    assert isinstance(value, str)
     for char in value:
         assert char in string.ascii_lowercase or char in string.digits
 

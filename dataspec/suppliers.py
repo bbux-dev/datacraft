@@ -6,17 +6,16 @@ import json
 
 import dataspec
 from .exceptions import SpecException
-from .supplier.common import SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier, \
-    CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier, BufferedValueSuppier
+from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
+                              CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier, BufferedValueSuppier)
 from .utils import load_config, is_affirmative, get_caster
 from .supplier.core.combine import CombineValuesSupplier
 from .supplier.list_values import ListValueSupplier
 from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
-from .distributions import from_string
 from .model import Distribution
-from . import casters, ValueSupplierInterface
+from . import casters, distributions, ValueSupplierInterface
 
 
 def values(spec, loader=None, **kwargs) -> ValueSupplierInterface:
@@ -122,7 +121,7 @@ def count_supplier_from_config(config: Dict) -> ValueSupplierInterface:
     if config and 'count' in config:
         data = config['count']
     if config and 'count_dist' in config:
-        data = from_string(config['count_dist'])
+        data = distributions.from_string(config['count_dist'])
     return count_supplier_from_data(data)
 
 
@@ -140,9 +139,10 @@ def single_value(data):
     return SingleValue(data)
 
 
-def array_supplier(wrapped: ValueSupplierInterface, count_config) -> ValueSupplierInterface:
+def array_supplier(wrapped: ValueSupplierInterface,
+                   count_config: dict) -> ValueSupplierInterface:
     """
-    Wraps and existing supplier and always returns an array/list of elements, uses count config to determine
+    Wraps an existing supplier and always returns an array/list of elements, uses count config to determine
     number of items in the list
 
     Example:
@@ -208,9 +208,9 @@ def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
 
 def combine(suppliers, config=None):
     """
-    Creates a value supplier that will combine the outputs of the provides suppliers in order. The default is to
-    join the values with an empty string.  provide the join_with config param to specify a different string to
-    join the values with. Set as_list to true, if the values should be return as a list and not joined
+    Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
+    join the values with an empty string. Provide the join_with config param to specify a different string to
+    join the values with. Set as_list to true, if the values should be returned as a list and not joined
 
     Example:
 
@@ -239,7 +239,6 @@ def random_range(start: Union[int, float],
     >>> range_supplier = dataspec.suppliers.random_range(5, 25, precision=3)
     >>> # should be between 5 and 25 with 3 decimal places
     >>> next_value = range_supplier.next(0))
-
 
     :param start: of range
     :param end: of range
@@ -373,6 +372,7 @@ def cast_supplier(supplier: ValueSupplierInterface,
 def is_buffered(field_spec):
     """
     Should the values for this spec be buffered
+
     :param field_spec: to check
     :return: true or false
     """
@@ -383,6 +383,7 @@ def is_buffered(field_spec):
 def buffered(wrapped: ValueSupplierInterface, field_spec):
     """
     Creates a Value Supplier that buffers the results of the wrapped supplier
+
     :param wrapped: the Value Supplir to buffer values for
     :param field_spec: to check
     :return:
