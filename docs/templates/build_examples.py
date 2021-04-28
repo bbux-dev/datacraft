@@ -1,14 +1,29 @@
 #!/bin/env python
 
 import json
+import logging
 import yaml
 from collections import OrderedDict
 import subprocess
+import argparse
 
 from examples import EXAMPLES
 
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger('example')
 
-def build_example(spec, iterations=5, pipes=""):
+template = """
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+FRAGMENT
+
+spec = spec_builder.build()
+"""
+
+
+def build_example(name, spec, iterations=5, pipes=""):
     if pipes is None:
         pipes = ""
     spec_string = json.dumps(spec.raw_spec)
@@ -18,10 +33,22 @@ def build_example(spec, iterations=5, pipes=""):
     if len(spec_string) > 80:
         cmd_display = f"dataspec -s dataspec.json --log-level error -i {iterations} {pipes}"
     ordered = order_spec(spec.raw_spec)
+    dirty_yaml = yaml.dump(ordered, sort_keys=False, width=4096).strip()
+    cleaned_yaml = clean_semi_formatted_yaml(dirty_yaml)
+    try:
+        if yaml.load(cleaned_yaml) != spec.raw_spec:
+            print('yaml does not match raw')
+            print(name)
+            print(json.dumps(yaml.load(cleaned_yaml), indent=4))
+            print(json.dumps(spec.raw_spec, indent=4))
+    except Exception:
+        print('yaml does not load')
+        print(cleaned_yaml)
+        print(dirty_yaml)
 
     example = {
         "json": json.dumps(ordered, cls=MyEncoder, sort_keys=False, indent=2).strip(),
-        "yaml": yaml.dump(spec.raw_spec, default_flow_style=False, sort_keys=False).strip(),
+        "yaml": cleaned_yaml,
         "api": code.strip(),
         "command": cmd_display.strip(),
         "output": out.decode('utf-8').strip()
@@ -29,10 +56,37 @@ def build_example(spec, iterations=5, pipes=""):
     return example
 
 
+def clean_semi_formatted_yaml(toclean: str):
+    """
+    Our custom YAML formatter adds a bunch of stuff we need to clean up since it is working with
+    and OrderdDict as the underlying structure.
+    """
+    return toclean.replace('!!list ', '')
+    # return toclean.replace(' !!omap', '') \
+    #     .replace('!<%20> ', '') \
+    #     .replace('"', '') \
+    #     .replace(' - [', 'CONSERVE_NESTED_LIST') \
+    #     .replace('- ', '  ') \
+    #     .replace('CONSERVE_NESTED_LIST', ' - [')\
+    #     .replace("'[", "[") \
+    #     .replace("]'", "]") \
+    #     .replace("[]", "{}")
+    # return toclean.replace(' !!omap', '') \
+    #     .replace('!<%20> ', '')\
+    #     .replace("[]", "{}")
+
+
 def order_spec(raw_spec):
     outer = {}
     for field, spec in raw_spec.items():
+        if field == 'refs':
+            continue
         outer[field] = order_field_spec(spec)
+    if 'refs' in raw_spec:
+        updated_refs = {}
+        for ref, spec in raw_spec['refs'].items():
+            updated_refs[ref] = order_field_spec(spec)
+        outer['refs'] = updated_refs
     return outer
 
 
@@ -44,10 +98,20 @@ def order_field_spec(field_spec):
         ordered['type'] = field_spec['type']
     if 'data' in field_spec:
         ordered['data'] = NoIndent(field_spec['data'])
-    for key in ['config', 'ref', 'refs', 'fields']:
+    if 'refs' in field_spec:
+        refs = field_spec['refs']
+        if isinstance(refs[0], list):
+            ordered['refs'] = [NoIndent(ref) for ref in refs]
+        else:
+            ordered['refs'] = NoIndent(refs)
+    for key in ['config', 'ref', 'fields']:
         if key in field_spec:
             ordered[key] = field_spec[key]
+    for key, val in field_spec.items():
+        if key not in ['type', 'data', 'config', 'ref', 'refs', 'fields']:
+            ordered[key] = val
     return ordered
+
 
 ##################################
 # from https://stackoverflow.com/questions/13249415/how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
@@ -62,6 +126,13 @@ class NoIndent(object):
 
     def __init__(self, value):
         self.value = value
+
+    @classmethod
+    def to_yaml(cls, representer, node):
+        """
+        Added to support formatting for YAML
+        """
+        return representer.represent_scalar(' ', u'{.value}'.format(node))
 
 
 class MyEncoder(json.JSONEncoder):
@@ -98,29 +169,60 @@ class MyEncoder(json.JSONEncoder):
         return json_repr
 
 
-template = """
-import dataspec
+#########################
+# from https://til.simonwillison.net/python/style-yaml-dump
+# via: https://stackoverflow.com/a/8641732 and https://stackoverflow.com/a/16782282
+#########################
+def represent_ordereddict(dumper, data):
+    value = []
 
-spec_builder = dataspec.spec_builder()
+    for item_key, item_value in data.items():
+        node_key = dumper.represent_data(item_key)
+        node_value = dumper.represent_data(item_value)
 
-FRAGMENT
+        value.append((node_key, node_value))
 
-spec = spec_builder.build()
-"""
+    return yaml.nodes.MappingNode(u"tag:yaml.org,2002:map", value)
+
+
+yaml.add_representer(OrderedDict, represent_ordereddict)
+
+
+def represent_noindent(dumper, data):
+    if isinstance(data.value, list):
+        return dumper.represent_sequence("tag:yaml.org,2002:list", data.value, flow_style=True)
+    if isinstance(data.value, dict):
+        return dumper.represent_mapping("tag:yaml.org,2002:map", data.value, flow_style=True)
+    return dumper.represent_data(data.value)
+
+
+yaml.add_representer(NoIndent, represent_noindent)
+######################
+# Begin Processing
+#####################
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('-k', '--key-filter', dest='key_filter',
+                    help='where to get the input')
+
+args = parser.parse_args()
 
 built_examples = {}
 for name, iterations, fragment, pipes in EXAMPLES:
+    if args.key_filter and name not in args.key_filter:
+        continue
     code = template.replace('FRAGMENT', fragment)
     try:
+        log.info(name)
+        log.debug(code)
         exec(code)
-        data = build_example(spec, iterations, pipes)
+        # spec should be created when running exec
+        data = build_example(name, spec, iterations, pipes)
         built_examples[name] = data
-    except TypeError as err:
+    except (TypeError, SyntaxError) as err:
         print(err)
         print(name)
         print(code)
         raise Exception() from err
-        #exit(-1)
-    # spec should be created when running exec
+        # exit(-1)
 
 print(json.dumps({"examples": built_examples}, cls=MyEncoder, sort_keys=False, indent=2))
