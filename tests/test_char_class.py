@@ -1,7 +1,7 @@
 import string
 import pytest
 from dataspec import builder, Loader, SpecException
-from dataspec.type_handlers import char_class_handler
+from dataspec.supplier.core import char_class
 
 
 def test_char_class_no_data_element():
@@ -42,7 +42,7 @@ def test_char_class_printable():
 
 
 def test_char_class_abbreviations():
-    abbreviations = ['cc-' + key for key in char_class_handler._CLASS_MAPPING.keys()]
+    abbreviations = ['cc-' + key for key in char_class._CLASS_MAPPING.keys()]
 
     for abbreviation in abbreviations:
         spec = _cc_abbrev_spec(abbrev=abbreviation, count=7)
@@ -55,7 +55,9 @@ def test_char_class_multiple_classes():
     exclude = "CUSTOM"
     spec = _char_class_spec(data=["lower", "digits", "CUSTOM"], exclude=exclude)
 
-    value = Loader(spec).get('name').next(0)
+    supplier = Loader(spec).get('name')
+    value = supplier.next(0)
+    assert isinstance(value, str)
     for char in value:
         assert char in string.ascii_lowercase or char in string.digits
 

@@ -2,7 +2,7 @@ import pytest
 from dataspec.loader import Loader
 from dataspec import builder, SpecException
 # need this to trigger registration
-from dataspec.type_handlers import ip_handler
+from dataspec.supplier.core import ip_addresses
 
 
 def test_ip_v4_spec():

@@ -282,6 +282,28 @@ parameter. Some types will let you explicitly set the `as_list` parameter to
 force the results to be returned as an array and not the default for the given
 type.
 
+### Count Distributions
+
+Another way to specify a count is to use a count distribution. This is done with
+the `count_dist` param.  The param takes a string argument which is the
+distribution along with its required arguments in function call form with
+parameters explicitly named.  See the table below.
+
+distribution|required arguments|optional args|examples
+------------|------------------|-------------|---
+uniform     |start</br>end     |             |"uniform(start=10, end=30)"
+</i>        |                  |             |"uniform(start=1, end=3)"
+guass       |mean</br>stddev   |min</br>max  |"gauss(mean=2, stddev=1)"
+guassian    |                  |             |"guassian(mean=7, stddev=1, min=4)"
+normal      |                  |             |"normal(mean=25, stddev=10, max=40)"
+
+`normal`, `guassian`, and `gauss` are all aliases for a
+[Normal Distribution](https://en.wikipedia.org/wiki/Normal_distribution).
+
+Example:
+
+{{ show_example(examples.count_dist_example_one) }}
+
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
 These are the built-in types
@@ -606,6 +628,8 @@ two values after the decimal place. Note the abbreviation for cast.
 
 {{ show_example(examples.rand_range_spec_example_one) }}
 
+{{show_command_and_output(examples.rand_range_spec_example_one, True)}}
+
 ## <a name="Uuid"></a>Uuid
 
 A standard uuid.
@@ -817,21 +841,21 @@ See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
 
 Config Params:
 
-|type    |param     |description                                  |
-|--------|----------|---------------------------------------------|
-|all     |precision |number of decimal places for lat or long, default is 4          |
-|        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]|
-|geo.lat |start_lat |lower bound for latitude                                        |
-|        |end_lat   |upper bound for latitude                                        |
-|geo.long|start_long|lower bound for longitude                                       |
-|        |end_long  |upper bound for longitude                                       |
-|geo.pair|join_with |delimiter to join long and lat with, default is comma           |
-|        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
-|        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
-|        |start_lat |lower bound for latitude                                        |
-|        |end_lat   |upper bound for latitude                                        |
-|        |start_long|lower bound for longitude                                       |
-|        |end_long  |upper bound for longitude                                       |
+type    |param     |description
+--------|----------|---------------------------------------------
+all     |precision |number of decimal places for lat or long, default is 4
+        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
+geo.lat |start_lat |lower bound for latitude
+        |end_lat   |upper bound for latitude
+geo.long|start_long|lower bound for longitude
+        |end_long  |upper bound for longitude
+geo.pair|join_with |delimiter to join long and lat with, default is comma
+        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
+        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
+        |start_lat |lower bound for latitude
+        |end_lat   |upper bound for latitude
+        |start_long|lower bound for longitude
+        |end_long  |upper bound for longitude
 
 Examples:
 
@@ -844,7 +868,9 @@ with 3 decimal points of precision.
 
 Ip addresses can be generated
 using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-or by specifying a base.
+or by specifying a base. For example, if you wanted to generate ips in the
+10.0.0.0 to 10.0.0.255 range, you could either specify a `cidr` param of
+10.0.0.0/24 or a `base` param of 10.0.0.
 
 {{ show_params(schemas.ip, definitions) }}
 
@@ -934,6 +960,8 @@ The select_list_subset Field Spec structure is:
       "stddev": N,
       "min": N,
       "max": N,
+      or
+      "count": N,
       "join_with": "<delimiter to join with>"
     },
     "data": ["data", "to", "select", "from"],
@@ -951,19 +979,7 @@ items should be chosen. You can also set a min and max. Example:
 
 {{ show_example(examples.select_list_example_one) }}
 
-```shell script
-dataspec -s ~/scratch/ingredients.json -i 10
-garlic, onions
-garlic, spinach
-bell peppers, spinach
-mushrooms, bell peppers, carrots, potatoes
-mushrooms, potatoes, bell peppers
-potatoes, onions, garlic, bell peppers
-potatoes, bell peppers, onions, garlic
-spinach, bell peppers
-spinach, onions, garlic
-carrots, garlic, mushrooms, potatoes
-```
+{{ show_command_and_output(examples.select_list_example_one) }}
 
 ### <a name='quoting_sublist'></a> Quoting Sublist Elements
 
@@ -975,21 +991,7 @@ spec this way.
 
 {{ show_example(examples.select_list_example_two) }}
 
-Now when we run our dataspec we get:
-
-```shell script
-dataspec -s ~/scratch/quoted_ingredients.json -i 10
-"spinach", "mushrooms", "bell peppers", "onions"
-"spinach", "onions", "mushrooms", "garlic"
-"carrots", "garlic", "mushrooms", "onions"
-"mushrooms", "bell peppers", "carrots"
-"carrots", "potatoes", "bell peppers", "onions"
-"spinach", "mushrooms"
-"mushrooms", "bell peppers", "onions"
-"potatoes", "carrots", "bell peppers", "spinach"
-"garlic", "mushrooms", "potatoes"
-"carrots", "spinach", "bell peppers", "potatoes"
-```
+{{ show_command_and_output(examples.select_list_example_two) }}
 
 ## <a name='CSV_Data'></a> CSV Data
 
@@ -1101,7 +1103,7 @@ type. Below is an example that will Convert data from the
 [allCountries.zip](http://download.geonames.org/export/dump/allCountries.zip)
 dataset by selecting a subset of the columns from the tab delimited file. The
 key in the data element is the new name for the field. The value can either be
-the 1 indexed column number or the name of the field if the data has `headers`.
+the 1 indexed column number, or the name of the field if the data has `headers`.
 Our example doesn't have headers, so we are using the 1 based indexes.
 
 {{ show_example(examples.csv_select_example_one) }}

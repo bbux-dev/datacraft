@@ -1,4 +1,3 @@
-""" module for dealing with schemas """
 import json
 import logging
 import importlib.resources as pkg_resources

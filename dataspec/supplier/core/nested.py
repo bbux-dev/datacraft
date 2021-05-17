@@ -2,17 +2,19 @@
 Module for handling nested types
 """
 from typing import Dict, Any
+
 import dataspec
+import dataspec.model
 
 
-class NestedSupplier(dataspec.ValueSupplierInterface):
+class NestedSupplier(dataspec.model.ValueSupplierInterface):
     """
     Implementation for Nested Value Supplier
     """
 
     def __init__(self,
-                 field_supplier_map: Dict[str, dataspec.ValueSupplierInterface],
-                 count_supplier: dataspec.ValueSupplierInterface,
+                 field_supplier_map: Dict[str, dataspec.model.ValueSupplierInterface],
+                 count_supplier: dataspec.model.ValueSupplierInterface,
                  as_list: bool):
         self.field_supplier_map = field_supplier_map
         self.count_supplier = count_supplier

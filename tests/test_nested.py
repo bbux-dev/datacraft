@@ -1,5 +1,5 @@
 from dataspec import builder, Loader
-from dataspec.type_handlers import nested_handler
+from dataspec.supplier.core import nested
 
 
 def test_single_nested():

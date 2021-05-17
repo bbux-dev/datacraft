@@ -1,7 +1,7 @@
 import string
 import pytest
 from dataspec import builder, Loader, SpecException
-from dataspec.type_handlers import unicode_range
+from dataspec.supplier.core import unicode_range
 
 
 def test_unicode_no_data_element():

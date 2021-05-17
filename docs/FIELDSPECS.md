@@ -83,10 +83,19 @@ B2, C3 continuously.
 
 ```json
 {
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
+  "combine": {
+    "type": "combine",
+    "refs": ["ONE", "TWO"]
+  },
   "refs": {
-    "ONE": ["A", "B", "C"],
-    "TWO": [1, 2, 3]
+    "ONE": {
+      "type": "values",
+      "data": ["A", "B", "C"]
+    },
+    "TWO": {
+      "type": "values",
+      "data": [1, 2, 3]
+    }
   }
 }
 ```
@@ -96,13 +105,16 @@ B2, C3 continuously.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 combine:
   type: combine
   refs: [ONE, TWO]
 refs:
-  ONE: [A, B, C]
-  TWO: [1, 2, 3]
+  ONE:
+    type: values
+    data: [A, B, C]
+  TWO:
+    type: values
+    data: [1, 2, 3]
 ```
 
 </details>
@@ -129,7 +141,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s ~/scratch/sample.json -i 7
+dataspec -s dataspec.json --log-level error -i 7
 A1
 B2
 C3
@@ -148,10 +160,19 @@ If an additional number is added to TWO, we now get 12 distinct values:
 
 ```json
 {
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
+  "combine": {
+    "type": "combine",
+    "refs": ["ONE", "TWO"]
+  },
   "refs": {
-    "ONE": ["A", "B", "C"],
-    "TWO": [1, 2, 3, 4]
+    "ONE": {
+      "type": "values",
+      "data": ["A", "B", "C"]
+    },
+    "TWO": {
+      "type": "values",
+      "data": [1, 2, 3, 4]
+    }
   }
 }
 ```
@@ -161,13 +182,16 @@ If an additional number is added to TWO, we now get 12 distinct values:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 combine:
   type: combine
   refs: [ONE, TWO]
 refs:
-  ONE: [A, B, C]
-  TWO: [1, 2, 3 ,4]
+  ONE:
+    type: values
+    data: [A, B, C]
+  TWO:
+    type: values
+    data: [1, 2, 3, 4]
 ```
 
 </details>
@@ -194,7 +218,8 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s ~/scratch/sample.json -i 12 | sort
+dataspec -s dataspec.json --log-level error -i 12 \
+  | sort
 A1
 A2
 A3
@@ -219,10 +244,25 @@ the config param `sample` to true:
 
 ```json
 {
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
+  "combine": {
+    "type": "combine",
+    "refs": ["ONE", "TWO"]
+  },
   "refs": {
-    "ONE?sample=true": ["A", "B", "C"],
-    "TWO?sample=true": [1, 2, 3, 4]
+    "ONE": {
+      "type": "values",
+      "data": ["A", "B", "C"],
+      "config": {
+        "sample": true
+      }
+    },
+    "TWO": {
+      "type": "values",
+      "data": [1, 2, 3, 4],
+      "config": {
+        "sample": "yes"
+      }
+    }
   }
 }
 ```
@@ -232,13 +272,20 @@ the config param `sample` to true:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 combine:
   type: combine
   refs: [ONE, TWO]
 refs:
-  ONE?sample=true: [A, B, C]
-  TWO?sample=true: [1, 2, 3 ,4]
+  ONE:
+    type: values
+    data: [A, B, C]
+    config:
+      sample: true
+  TWO:
+    type: values
+    data: [1, 2, 3, 4]
+    config:
+      sample: 'yes'
 ```
 
 </details>
@@ -298,9 +345,18 @@ shorthand notation.
 
 ```json
 {
-  "field1": {"type": "values", "data": [1, 2, 3, 4, 5]},
-  "field2": {"type": "values", "data": {"A": 0.5, "B": 0.3, "C": 0.2}},
-  "field3": {"type": "values", "data": "CONSTANT"}
+  "field1": {
+    "type": "values",
+    "data": [1, 2, 3, 4, 5]
+  },
+  "field2": {
+    "type": "values",
+    "data": {"A": 0.5, "B": 0.3, "C": 0.2}
+  },
+  "field3": {
+    "type": "values",
+    "data": "CONSTANT"
+  }
 }
 ```
 
@@ -309,16 +365,12 @@ shorthand notation.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 field1:
-  type: vaules
+  type: values
   data: [1, 2, 3, 4, 5]
 field2:
   type: values
-  data:
-    A: 0.5
-    B: 0.3
-    C: 0.2
+  data: {A: 0.5, B: 0.3, C: 0.2}
 field3:
   type: values
   data: CONSTANT
@@ -332,9 +384,10 @@ field3:
 import dataspec
 
 spec_builder = dataspec.spec_builder()
-spec_builder.add_field('field1', spec_builder.values([1, 2, 3, 4, 5]))
-spec_builder.add_field('field2', spec_builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
-spec_builder.add_field('field3', spec_builder.values("CONSTANT"))
+
+spec_builder.add_field('field1', dataspec.builder.values([1, 2, 3, 4, 5]))
+spec_builder.add_field('field2', dataspec.builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
+spec_builder.add_field('field3', dataspec.builder.values("CONSTANT"))
 
 spec = spec_builder.build()
 ```
@@ -349,7 +402,11 @@ Shorthand Format:
 ```json
 {
   "field1": [1, 2, 3, 4, 5],
-  "field2": {"A": 0.5, "B": 0.3, "C": 0.2},
+  "field2": {
+    "A": 0.5,
+    "B": 0.3,
+    "C": 0.2
+  },
   "field3": "CONSTANT"
 }
 ```
@@ -359,7 +416,6 @@ Shorthand Format:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 field1: [1, 2, 3, 4, 5]
 field2:
   A: 0.5
@@ -376,6 +432,7 @@ field3: CONSTANT
 import dataspec
 
 spec_builder = dataspec.spec_builder()
+
 spec_builder.add_field('field1', [1, 2, 3, 4, 5])
 spec_builder.add_field('field2', {"A": 0.5, "B": 0.3, "C": 0.2})
 spec_builder.add_field('field3', "CONSTANT")
@@ -416,7 +473,6 @@ style parameters. For example.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 network:ipv4?cidr=192.168.0.0/16: {}
 ```
 
@@ -428,7 +484,9 @@ network:ipv4?cidr=192.168.0.0/16: {}
 import dataspec
 
 spec_builder = dataspec.spec_builder()
+
 spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
+
 spec = spec_builder.build()
 ```
 
@@ -451,9 +509,15 @@ For example, the following two fields will produce the same values:
   "ONE": {
     "type": "values",
     "data": [1, 2, 3],
-    "config": {"prefix": "TEST", "suffix": "@DEMO"}
+    "config": {
+      "prefix": "TEST",
+      "suffix": "@DEMO"
+    }
   },
-  "TWO?prefix=TEST&suffix=@DEMO": [1, 2, 3]
+  "TWO?prefix=TEST&suffix=@DEMO": {
+    "type": "values",
+    "data": [1, 2, 3]
+  }
 }
 ```
 
@@ -462,14 +526,15 @@ For example, the following two fields will produce the same values:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 ONE:
   type: values
+  data: [1, 2, 3]
   config:
     prefix: TEST
     suffix: '@DEMO'
+TWO?prefix=TEST&suffix=@DEMO:
+  type: values
   data: [1, 2, 3]
-TWO?prefix=TEST&suffix=@DEMO: [1, 2, 3]
 ```
 
 </details>
@@ -511,12 +576,12 @@ Example:
 ```json
 {
   "field": {
-      "type": "values",
-      "config": {
-        "prefix": "Hello "
-      },
-      "data": ["world", "beautiful", "destiny"]
+    "type": "values",
+    "data": ["world", "beautiful", "destiny"],
+    "config": {
+      "prefix": "hello "
     }
+  }
 }
 ```
 
@@ -525,12 +590,11 @@ Example:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 field:
   type: values
-  config:
-    prefix: 'Hello '
   data: [world, beautiful, destiny]
+  config:
+    prefix: 'hello '
 ```
 
 </details>
@@ -564,6 +628,71 @@ parameter. Some types will let you explicitly set the `as_list` parameter to
 force the results to be returned as an array and not the default for the given
 type.
 
+### Count Distributions
+
+Another way to specify a count is to use a count distribution. This is done with
+the `count_dist` param.  The param takes a string argument which is the
+distribution along with its required arguments in function call form with
+parameters explicitly named.  See the table below.
+
+distribution|required arguments|optional args|examples
+------------|------------------|-------------|---
+uniform     |start</br>end     |             |"uniform(start=10, end=30)"
+</i>        |                  |             |"uniform(start=1, end=3)"
+guass       |mean</br>stddev   |min</br>max  |"gauss(mean=2, stddev=1)"
+guassian    |                  |             |"guassian(mean=7, stddev=1, min=4)"
+normal      |                  |             |"normal(mean=25, stddev=10, max=40)"
+
+`normal`, `guassian`, and `gauss` are all aliases for a
+[Normal Distribution](https://en.wikipedia.org/wiki/Normal_distribution).
+
+Example:
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "field": {
+    "type": "char_class",
+    "data": "visible",
+    "config": {
+      "count_dist": "normal(mean=5, stddev=2, min=1, max=9)"
+    }
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+field:
+  type: char_class
+  data: visible
+  config:
+    count_dist: normal(mean=5, stddev=2, min=1, max=9)
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.char_class(key='field',
+                        data='visible',
+                        count_dist='normal(mean=5, stddev=2, min=1, max=9)')
+
+spec = spec_builder.build()
+```
+
+</details>
+
 # <a name="Field_Spec_Types"></a>Field Spec Types
 
 These are the built-in types
@@ -583,7 +712,10 @@ A Constant Value is just a single value that is used in every iteration
 
 ```json
 {
-  "constant1": {"type": "values", "data": 42},
+  "constant1": {
+    "type": "values",
+    "data": 42
+  },
   "shorthand_constant": "This is simulated data and should not be used for nefarious purposes"
 }
 ```
@@ -628,8 +760,11 @@ random from the provided list.
 
 ```json
 {
-  "list1": {"type": "values", "data": [200, 202, 303, 400, 404, 500]},
-  "shorthand_list":  [200, 202, 303, 400, 404, 500],
+  "list1": {
+    "type": "values",
+    "data": [200, 202, 303, 400, 404, 500]
+  },
+  "shorthand_list": [200, 202, 303, 400, 404, 500],
   "random_pet?sample=true": ["dog", "cat", "bunny", "pig", "rhino", "hedgehog"]
 }
 ```
@@ -639,7 +774,6 @@ random from the provided list.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 list1:
   type: values
   data: [200, 202, 303, 400, 404, 500]
@@ -676,14 +810,16 @@ Weighted values are generated according to their weights.
 {
   "weighted1": {
     "type": "values",
-    "data": {
-      "200": 0.4, "202": 0.3, "303": 0.1,
-      "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
-    }
+    "data": {"200": 0.4, "202": 0.3, "303": 0.1, "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05}
   },
   "shorthand_weighted": {
-    "200": 0.4, "202": 0.3, "303": 0.1,
-    "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
+    "200": 0.4,
+    "202": 0.3,
+    "303": 0.1,
+    "400": 0.05,
+    "403": 0.05,
+    "404": 0.05,
+    "500": 0.05
   }
 }
 ```
@@ -693,17 +829,9 @@ Weighted values are generated according to their weights.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 weighted1:
   type: values
-  data:
-    '200': 0.4
-    '202': 0.3
-    '303': 0.1
-    '400': 0.05
-    '403': 0.05
-    '404': 0.05
-    '500': 0.05
+  data: {'200': 0.4, '202': 0.3, '303': 0.1, '400': 0.05, '403': 0.05, '404': 0.05, '500': 0.05}
 shorthand_weighted:
   '200': 0.4
   '202': 0.3
@@ -724,13 +852,12 @@ import dataspec
 spec_builder = dataspec.spec_builder()
 
 spec_builder.values('weighted1', {
-    "200": 0.4, "202": 0.3, "303": 0.1,
-    "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
-}
-                    )
+        "200": 0.4, "202": 0.3, "303": 0.1,
+        "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
+})
 spec_builder.add_field("shorthand_weighted", {
-    "200": 0.4, "202": 0.3, "303": 0.1,
-    "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
+        "200": 0.4, "202": 0.3, "303": 0.1,
+        "400": 0.05, "403": 0.05, "404": 0.05, "500": 0.05
 })
 
 spec = spec_builder.build()
@@ -758,10 +885,13 @@ or `true`. NOTE: Sample mode is only valid with entries that are lists.
 
 ```json
 {
-  "combine": {"type": "combine", "refs": ["ONE", "TWO"]},
+  "combine": {
+    "type": "combine",
+    "refs": ["ONE", "TWO"]
+  },
   "refs": {
     "ONE?sample=true": ["A", "B", "C"],
-    "TWO?sample=true": [1, 2, 3]
+    "TWO?sample=true": [1, 2, 3, 4]
   }
 }
 ```
@@ -771,19 +901,33 @@ or `true`. NOTE: Sample mode is only valid with entries that are lists.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 combine:
   type: combine
-  refs:
-  - ONE
-  - TWO
+  refs: [ONE, TWO]
 refs:
   ONE?sample=true: [A, B, C]
-  TWO?sample=true: [1, 2, 3]
+  TWO?sample=true: [1, 2, 3, 4]
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+refs = spec_builder.refs()
+refs.add_field('ONE?sample=true', ["A", "B", "C"])
+refs.add_field('TWO?sample=true', [1, 2, 3, 4])
+
+spec_builder.combine('combine', refs=['ONE', 'TWO'])
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="Combine"></a>Combine
 
@@ -813,10 +957,12 @@ Example below uses the first and last refs to create a full name field.
 
 ```json
 {
-  "full name": {
+  "combine": {
     "type": "combine",
     "refs": ["first", "last"],
-    "config": {"join_with": " "}
+    "config": {
+      "join_with": " "
+    }
   },
   "refs": {
     "first": {
@@ -836,12 +982,9 @@ Example below uses the first and last refs to create a full name field.
   <summary>YAML Spec</summary>
 
 ```yaml
----
-full name:
+combine:
   type: combine
-  refs:
-  - first
-  - last
+  refs: [first, last]
   config:
     join_with: ' '
 refs:
@@ -854,7 +997,26 @@ refs:
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+refs = spec_builder.refs()
+first = refs.values(key="first",
+                    data=["zebra", "hedgehog", "llama", "flamingo"])
+last = refs.values(key="last",
+                   data=["jones", "smith", "williams"])
+
+spec_builder.combine('combine', refs=[first, last], join_with=" ")
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="CombineList"></a>Combine List
 
@@ -886,20 +1048,34 @@ This is a slight modification to the above combine Example.
 
 ```json
 {
-  "full name": {
+  "full_name": {
     "type": "combine-list",
     "refs": [
       ["first", "last"],
       ["first", "middle", "last"],
       ["first", "middle_initial", "last"]
     ],
-    "config": {"join_with": " "}
+    "config": {
+      "join_with": " "
+    }
   },
   "refs": {
-    "first": ["zebra", "hedgehog", "llama", "flamingo"],
-    "last": ["jones", "smith", "williams"],
-    "middle": ["cloud", "sage", "river"],
-    "middle_initial": {"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1}
+    "first": {
+      "type": "values",
+      "data": ["zebra", "hedgehog", "llama", "flamingo"]
+    },
+    "last": {
+      "type": "values",
+      "data": ["jones", "smith", "williams"]
+    },
+    "middle": {
+      "type": "values",
+      "data": ["cloud", "sage", "river"]
+    },
+    "middle_initial": {
+      "type": "values",
+      "data": {"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1}
+    }
   }
 }
 ```
@@ -909,31 +1085,65 @@ This is a slight modification to the above combine Example.
   <summary>YAML Spec</summary>
 
 ```yaml
----
-full name:
+full_name:
   type: combine-list
-  refs: [
-    [first, last],
-    [first, middle, last],
-    [first, middle_initial, last]
-  ]
+  refs:
+  - [first, last]
+  - [first, middle, last]
+  - [first, middle_initial, last]
   config:
     join_with: ' '
 refs:
-  first: [zebra, hedgehog, llama, flamingo]
-  last: [jones, smith, williams]
-  middle: [cloud, sage, river]
+  first:
+    type: values
+    data: [zebra, hedgehog, llama, flamingo]
+  last:
+    type: values
+    data: [jones, smith, williams]
+  middle:
+    type: values
+    data: [cloud, sage, river]
   middle_initial:
-    a: 0.3
-    m: 0.3
-    j: 0.1
-    l: 0.1
-    e: 0.1
-    w: 0.1
+    type: values
+    data: {a: 0.3, m: 0.3, j: 0.1, l: 0.1, e: 0.1, w: 0.1}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+refs = spec_builder.refs()
+first = refs.values(
+    key="first",
+    data=["zebra", "hedgehog", "llama", "flamingo"])
+last = refs.values(
+    key="last",
+    data=["jones", "smith", "williams"])
+middle = refs.values(
+    key="middle",
+    data=["cloud", "sage", "river"])
+middle_initial = refs.values(
+    key="middle_initial",
+    data={"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1})
+
+spec_builder.combine_list(
+    key='full_name',
+    refs=[
+        [first, last],
+        [first, middle, last],
+        [first, middle_initial, last],
+        ],
+    join_with=" ")
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="Date"></a>Date
 
@@ -1031,14 +1241,13 @@ examples.
 
 #### Uniform Dates Examples
 
-**Generate dates uniformly over a 90 period starting at 15 Dec 2050 12:00 PM,
-and formats with Hours and Minutes and Month as abbreviated name.**
-
 <details open>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}
+{
+  "dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}
+}
 ```
 
 </details>
@@ -1069,10 +1278,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' -i 1000 --log-level error \
-  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
-15-Dec-2050 16:04
-15-Mar-2051 11:25
+dataspec -s dataspec.json --log-level error -i 1000 \
+  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+15-Dec-2050 13:41
+31-Jan-2051 23:32
 ```
 
 </details>
@@ -1080,14 +1289,14 @@ dataspec --inline '{"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=
 <details>
 <summary>More Examples</summary>
 
-**Generate dates uniformly over a 30 day range starting at today**
-
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date": {}}
+{
+  "dates:date": {}
+}
 ```
 
 </details>
@@ -1118,22 +1327,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date": {}}' --log-level error \
+dataspec --inline '{"dates:date": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-15-01-2050 
-13-02-2050
+02-05-2021
+15-05-2021
 ```
 
 </details>
-
-**Generate dates uniformly over a 30 day range starting at yesterday**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?offset=1": {}}
+{
+  "dates:date?offset=1": {}
+}
 ```
 
 </details>
@@ -1164,22 +1373,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?offset=1": {}}' --log-level error \
+dataspec --inline '{"dates:date?offset=1": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-14-01-2050 
-12-02-2050
+30-04-2021
+18-05-2021
 ```
 
 </details>
-
-**Generate dates uniformly over a 24 hour (1 day) period starting at today**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=1": {}}
+{
+  "dates:date?duration_days=1": {}
+}
 ```
 
 </details>
@@ -1210,22 +1419,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error \
+dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-15-01-2050 
-16-01-2050
+28-04-2021
+29-04-2021
 ```
 
 </details>
-
-**Generate dates uniformly over a 10 day period  starting at today**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=10": {}}
+{
+  "dates:date?duration_days=10": {}
+}
 ```
 
 </details>
@@ -1256,22 +1465,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error \
+dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-15-01-2050 
-25-01-2050
+28-04-2021
+06-05-2021
 ```
 
 </details>
-
-**Generate dates uniformly over a 24 hour (1 day) period starting at yesterday**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=1&offset=1": {}}
+{
+  "dates:date?duration_days=1&offset=1": {}
+}
 ```
 
 </details>
@@ -1302,22 +1511,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error \
+dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-14-01-2050 
-15-01-2050
+27-04-2021
+28-04-2021
 ```
 
 </details>
-
-**Generate dates uniformly over a 24 hour (1 day) period starting at tomorrow**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=1&offset=-1": {}}
+{
+  "dates:date?duration_days=1&offset=-1": {}
+}
 ```
 
 </details>
@@ -1348,22 +1557,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error \
+dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-16-01-2050 
-17-01-2050
+29-04-2021
+29-04-2021
 ```
 
 </details>
-
-**Generate dates uniformly over a 24 hour (1 day) period starting at 14 Dec 2050**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}
+{
+  "dates:date?duration_days=1&offset=1&start=15-12-2050": {}
+}
 ```
 
 </details>
@@ -1394,7 +1603,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error \
+dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 14-12-2050
 14-12-2050
@@ -1402,15 +1611,14 @@ dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}'
 
 </details>
 
-**Generate dates uniformly over a 24 hour (1 day) period starting at 15 Dec 2050
-12:00 PM, and formats with Hours and Minutes and Month as abbreviated name.**
-
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}
+{
+  "dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}
+}
 ```
 
 </details>
@@ -1441,10 +1649,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error \
+dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
-15-Dec-2050 12:04
-16-Dec-2050 11:46
+15-Dec-2050 16:11
+16-Dec-2050 10:53
 ```
 
 </details>
@@ -1454,15 +1662,13 @@ dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%
 
 #### Centered Dates Examples
 
-**Generate dates with a normal distribution over a 24 hour (1 day) period
-centered at 01 Jun 2050 12:00 PM with a standard deviation of 2 days. Formats
-with YearMonthDay Hour:Minute.**
-
 <details open>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}
+{
+  "dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}
+}
 ```
 
 </details>
@@ -1493,10 +1699,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error \
+dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error -i 5 \
   | sort -n | uniq | sed -n '1p;$p'
-20500528 07:11
-20500606 16:27
+20500601 15:19
+20500604 17:13
 ```
 
 </details>
@@ -1504,15 +1710,14 @@ dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&s
 <details>
 <summary>More Examples</summary>
 
-**Generate dates centered at today with most +- 1 day, but some +- more than
-that.**
-
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?stddev_days=1": {}}
+{
+  "dates:date?stddev_days=1": {}
+}
 ```
 
 </details>
@@ -1543,23 +1748,22 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error \
+dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-12-01-2050 
-17-01-2050
+27-04-2021
+28-04-2021
 ```
 
 </details>
-
-**Generate dates centered at today with most +- 15 days, but some +- more than
-that.**
 
 
 <details>
   <summary>JSON Spec</summary>
 
 ```json
-{"dates:date?stddev_days=15": {}}
+{
+  "dates:date?stddev_days=15": {}
+}
 ```
 
 </details>
@@ -1590,10 +1794,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error \
+dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error -i 5 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-17-12-2049 
-14-02-2050
+08-04-2021
+09-05-2021
 ```
 
 </details>
@@ -1653,7 +1857,9 @@ Example: Range 0 to 10 with a step of 0.5
     "type": "range",
     "data": [0, 10, 0.5]
   },
-  "range_shorthand1:range": {"data": [0, 10, 0.5]},
+  "range_shorthand1:range": {
+    "data": [0, 10, 0.5]
+  },
   "range_shorthand2:range": [0, 10, 0.5]
 }
 ```
@@ -1663,26 +1869,31 @@ Example: Range 0 to 10 with a step of 0.5
   <summary>YAML Spec</summary>
 
 ```yaml
----
-range_shorthand1:range:
-  data:
-  - 0
-  - 10
-  - 0.5
-range_shorthand2:range:
-- 0
-- 10
-- 0.5
 zero_to_ten:
-  data:
-  - 0
-  - 10
-  - 0.5
   type: range
+  data: [0, 10, 0.5]
+range_shorthand1:range:
+  data: [0, 10, 0.5]
+range_shorthand2:range: [0, 10, 0.5]
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.range_spec(key="zero_to_ten", data=[0, 10, 0.5])
+spec_builder.add_field(key="range_shorthand1:range", spec={"data": [0, 10, 0.5]})
+spec_builder.add_field(key="range_shorthand2:range", spec=[0, 10, 0.5])
+
+spec = spec_builder.build()
+```
+
+</details>
 
 Example: Multiple Ranges One Field
 
@@ -1693,11 +1904,7 @@ Example: Multiple Ranges One Field
 {
   "salaries": {
     "type": "range",
-    "data": [
-      [1000, 10000, 1000],
-      [10000, 55000, 5000],
-      [55000, 155000, 10000]
-    ]
+    "data": [[1000, 10000, 1000], [10000, 55000, 5000], [55000, 155000, 10000]]
   }
 }
 ```
@@ -1707,18 +1914,32 @@ Example: Multiple Ranges One Field
   <summary>YAML Spec</summary>
 
 ```yaml
----
 salaries:
   type: range
-  data: [
-    [1000, 10000, 1000],
-    [10000, 55000, 5000],
-    [55000, 155000, 10000]
-  ]
+  data: [[1000, 10000, 1000], [10000, 55000, 5000], [55000, 155000, 10000]]
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.range_spec(
+    key="salaries",
+    data=[
+      [1000, 10000, 1000],
+      [10000, 55000, 5000],
+      [55000, 155000, 10000]
+    ])
+
+spec = spec_builder.build()
+```
+
+</details>
 
 This spec produces integer values for three different ranges each with different
 step sizes.
@@ -1768,9 +1989,10 @@ two values after the decimal place. Note the abbreviation for cast.
   "population": {
     "type": "rand_range",
     "data": [100, 1000],
-    "config": {"cast": "int"}
-  },
-  "pop:rand_range?cast=f": [200.2, 1222.7, 2]
+    "config": {
+      "cast": "int"
+    }
+  }
 }
 ```
 
@@ -1779,17 +2001,45 @@ two values after the decimal place. Note the abbreviation for cast.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 population:
   type: rand_range
   data: [100, 1000]
   config:
     cast: int
-pop:rand_range?cast=f: [200.2, 1222.7, 2]
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.rand_range(
+    key="population",
+    data=[100, 1000],
+    cast="int")
+
+spec = spec_builder.build()
 ```
 
 </details>
 
+<details open>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 5
+632
+972
+725
+409
+647
+```
+
+</details>
 
 ## <a name="Uuid"></a>Uuid
 
@@ -1824,14 +2074,27 @@ Example Spec
   <summary>YAML Spec</summary>
 
 ```yaml
----
 id:
   type: uuid
 id_shorthand:uuid: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.uuid(key="id")
+spec_builder.add_field("id_shorthand:uuid", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="CharClass"></a>Character Classes
 
@@ -1939,7 +2202,20 @@ one_to_five_digits:cc-digits?min=1&max=5: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("one_to_five_digits:cc-digits?min=1&max=5", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ### Examples
 
@@ -1955,18 +2231,16 @@ deviation of 2.
 {
   "password": {
     "type": "char_class",
-    "data": [
-      "word",
-      "special",
-      "hex-lower",
-      "M4$p3c!@l$@uc3"
-    ],
+    "data": ["word", "special", "hex-lower", "M4$p3c!@l$@uc3"],
     "config": {
       "mean": 14,
       "stddev": 2,
       "min": 10,
       "max": 18,
-      "exclude": ["'", "\""]
+      "exclude": [
+        "-",
+        "\""
+      ]
     }
   }
 }
@@ -1977,41 +2251,63 @@ deviation of 2.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 password:
   type: char_class
-  data:
-  - word
-  - special
-  - hex-lower
-  - M4$p3c!@l$@uc3
+  data: [word, special, hex-lower, M4$p3c!@l$@uc3]
   config:
     mean: 14
     stddev: 2
     min: 10
     max: 18
-    exclude: ['''', '"']
+    exclude:
+    - '-'
+    - '"'
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.char_class(
+    key="password",
+    data=[
+      "word",
+      "special",
+      "hex-lower",
+      "M4$p3c!@l$@uc3"
+    ],
+    mean=14,
+    stddev=2,
+    min=10,
+    max=18,
+    exclude=["-", "\""])
+
+spec = spec_builder.build()
+```
+
+</details>
 
 
 <details>
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s password.json -i 10
-61Nl=U35LVY^*
-pe576Z*P198&f4t
-1p}=HA9b?iJDc
-7$C])[o<BDh&W9kz
-F%iGot-j~eUfpT3qR
-(TM9b$o$A4KG*{&
-{WPm1;]O:w@y27l\
-JeTmpZ@zYN2Ms3,
-96i@FPA$^Q#%(|7Cba
-Q=+6D*8I36R%<n`$8
+dataspec -s dataspec.json --log-level error -i 10
+c3cFwpv!7c>(
+@qf`4;3yF7d#DM
+;'&5]$8pu3_7,E?
+|$aULq73cJY
+hb2cM4Zl2pPMnX_
+NV3TDhFsyQ)|4c
+pd01u|859!p)iT
+i7$8F93x+3uKG
+d8hb@_SfHaP!
+,ps]`Sbw;k<3o[
 ```
 
 </details>
@@ -2090,31 +2386,43 @@ use the following spec:
 ```yaml
 text:
   type: unicode_range
-  data: ['3040', '309f']
+  data: ['3040', 309f]
   config:
     mean: 5
-
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.unicode_range("text", ["3040", "309f"], mean=5)
+
+spec = spec_builder.build()
+```
+
+</details>
 
 
 <details>
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s unicode.yaml -i 10 -l off
-そぬをく
-が
-としぶ
-ぉけべ゙
-ゃれげえ
-っぴ
-つざめよがぽ
-えろぱづゖごそ぀べかっ
-い゘
-ぱまる
+dataspec -s dataspec.json --log-level error -i 10
+じ
+んじ
+むぬ
+でど゗
+あぉごそはぶふ
+ぬりよゖび
+ん゜れゆひつど
+ぁそゝどぞおしろ
+ぇゃぴけ
+めき゚
 ```
 
 </details>
@@ -2167,21 +2475,21 @@ See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
 
 Config Params:
 
-|type    |param     |description                                  |
-|--------|----------|---------------------------------------------|
-|all     |precision |number of decimal places for lat or long, default is 4          |
-|        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]|
-|geo.lat |start_lat |lower bound for latitude                                        |
-|        |end_lat   |upper bound for latitude                                        |
-|geo.long|start_long|lower bound for longitude                                       |
-|        |end_long  |upper bound for longitude                                       |
-|geo.pair|join_with |delimiter to join long and lat with, default is comma           |
-|        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
-|        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
-|        |start_lat |lower bound for latitude                                        |
-|        |end_lat   |upper bound for latitude                                        |
-|        |start_long|lower bound for longitude                                       |
-|        |end_long  |upper bound for longitude                                       |
+type    |param     |description
+--------|----------|---------------------------------------------
+all     |precision |number of decimal places for lat or long, default is 4
+        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
+geo.lat |start_lat |lower bound for latitude
+        |end_lat   |upper bound for latitude
+geo.long|start_long|lower bound for longitude
+        |end_long  |upper bound for longitude
+geo.pair|join_with |delimiter to join long and lat with, default is comma
+        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
+        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
+        |start_lat |lower bound for latitude
+        |end_lat   |upper bound for latitude
+        |start_long|lower bound for longitude
+        |end_long  |upper bound for longitude
 
 Examples:
 
@@ -2194,9 +2502,14 @@ with 3 decimal points of precision.
 ```json
 {
   "egypt": {
-    "type": "geo.point",
+    "type": "geo.pair",
     "config": {
-      "bbox": [31.33134, 22.03795, 34.19295, 25.00562],
+      "bbox": [
+        31.33134,
+        22.03795,
+        34.19295,
+        25.00562
+      ],
       "precision": 3
     }
   }
@@ -2208,9 +2521,8 @@ with 3 decimal points of precision.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 egypt:
-  type: geo.point
+  type: geo.pair
   config:
     bbox:
     - 31.33134
@@ -2221,13 +2533,28 @@ egypt:
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.geo_pair("egypt", bbox=[31.33134, 22.03795, 34.19295, 25.00562], precision=3)
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="IP_Addresses"></a>IP Addresses
 
 Ip addresses can be generated
 using [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
-or by specifying a base.
+or by specifying a base. For example, if you wanted to generate ips in the
+10.0.0.0 to 10.0.0.255 range, you could either specify a `cidr` param of
+10.0.0.0/24 or a `base` param of 10.0.0.
 
 ### Parameters
 
@@ -2281,7 +2608,6 @@ Example Spec:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 network:
   type: ipv4
   config:
@@ -2291,7 +2617,22 @@ network_with_base:ip?base=192.168.0: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.ipv4(key="network", cidr="2.22.222.0/16")
+spec_builder.add_field("network_shorthand:ip?cidr=2.22.222.0/16", {})
+spec_builder.add_field("network_with_base:ip?base=192.168.0", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ### <a name="Precise_IP"></a> Precise CIDR Addresses
 
@@ -2314,7 +2655,9 @@ addresses
   <summary>JSON Spec</summary>
 
 ```json
-{"network:ip.precise?cidr=10.0.0.0/8":{}}
+{
+  "network:ip.precise?cidr=10.0.0.0/8": {}
+}
 ```
 
 </details>
@@ -2322,12 +2665,24 @@ addresses
   <summary>YAML Spec</summary>
 
 ```yaml
----
 network:ip.precise?cidr=10.0.0.0/8: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("network:ip.precise?cidr=10.0.0.0/8", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around
 250K addresses
@@ -2336,7 +2691,9 @@ Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around
   <summary>JSON Spec</summary>
 
 ```json
-{"network:ip.precise?cidr=192.168.0.0/14&sample=true": {}}
+{
+  "network:ip.precise?cidr=192.168.0.0/14&sample=true": {}
+}
 ```
 
 </details>
@@ -2344,12 +2701,24 @@ Ips in the 192.168.0.0 to 192.171.255.255 range, relatively slow, creates around
   <summary>YAML Spec</summary>
 
 ```yaml
----
 network:ip.precise?cidr=192.168.0.0/14&sample=true: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("network:ip.precise?cidr=192.168.0.0/14&sample=true", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 
@@ -2357,7 +2726,9 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
   <summary>JSON Spec</summary>
 
 ```json
-{"network:ip.precise?cidr=2.22.222.0/22": {}}
+{
+  "network:ip.precise?cidr=2.22.0.0/22": {}
+}
 ```
 
 </details>
@@ -2365,12 +2736,24 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
   <summary>YAML Spec</summary>
 
 ```yaml
----
-network:ip.precise?cidr=2.22.222.0/22: {}
+network:ip.precise?cidr=2.22.0.0/22: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.add_field("network:ip.precise?cidr=2.22.0.0/22", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="Weighted_Ref"></a>Weighted Ref
 
@@ -2398,14 +2781,21 @@ mostly success related codes we could use the follow spec.
 {
   "http_code": {
     "type": "weightedref",
-    "data": {
-      "GOOD_CODES": 0.7,
-      "BAD_CODES": 0.3
-    }
+    "data": {"GOOD_CODES": 0.7, "BAD_CODES": 0.3}
   },
   "refs": {
-    "GOOD_CODES": {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1},
-    "BAD_CODES": {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1}
+    "GOOD_CODES": {
+      "200": 0.5,
+      "202": 0.3,
+      "203": 0.1,
+      "300": 0.1
+    },
+    "BAD_CODES": {
+      "400": 0.5,
+      "403": 0.3,
+      "404": 0.1,
+      "500": 0.1
+    }
   }
 }
 ```
@@ -2415,27 +2805,41 @@ mostly success related codes we could use the follow spec.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 http_code:
   type: weightedref
-  data:
-    GOOD_CODES: 0.7
-    BAD_CODES: 0.3
+  data: {GOOD_CODES: 0.7, BAD_CODES: 0.3}
 refs:
-  BAD_CODES:
-    '400': 0.5
-    '403': 0.3
-    '404': 0.1
-    '500': 0.1
   GOOD_CODES:
     '200': 0.5
     '202': 0.3
     '203': 0.1
     '300': 0.1
+  BAD_CODES:
+    '400': 0.5
+    '403': 0.3
+    '404': 0.1
+    '500': 0.1
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+refs = spec_builder.refs()
+refs.add_field('GOOD_CODES', {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1})
+refs.add_field('BAD_CODES', {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1})
+
+spec_builder.weightedref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="Select_List_Subset"></a>Select List Subset
 
@@ -2453,6 +2857,8 @@ The select_list_subset Field Spec structure is:
       "stddev": N,
       "min": N,
       "max": N,
+      or
+      "count": N,
       "join_with": "<delimiter to join with>"
     },
     "data": ["data", "to", "select", "from"],
@@ -2475,14 +2881,14 @@ items should be chosen. You can also set a min and max. Example:
 {
   "ingredients": {
     "type": "select_list_subset",
+    "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
     "config": {
       "mean": 3,
       "stddev": 1,
       "min": 2,
       "max": 4,
       "join_with": ", "
-    },
-    "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
+    }
   }
 }
 ```
@@ -2492,41 +2898,54 @@ items should be chosen. You can also set a min and max. Example:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 ingredients:
-  config:
-    join_with: ', '
-    max: 4
-    mean: 3
-    min: 2
-    stddev: 1
-  data:
-  - onions
-  - mushrooms
-  - garlic
-  - bell peppers
-  - spinach
-  - potatoes
-  - carrots
   type: select_list_subset
+  data: [onions, mushrooms, garlic, bell peppers, spinach, potatoes, carrots]
+  config:
+    mean: 3
+    stddev: 1
+    min: 2
+    max: 4
+    join_with: ', '
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.select_list_subset(
+    key="ingredients",
+    data=["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
+    mean=3,
+    stddev=1,
+    min=2,
+    max=4,
+    join_with=", ")
+
+spec = spec_builder.build()
 ```
 
 </details>
 
 
-```shell script
-dataspec -s ~/scratch/ingredients.json -i 10
+<details>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 5
+mushrooms, garlic
+carrots, potatoes
 garlic, onions
-garlic, spinach
-bell peppers, spinach
-mushrooms, bell peppers, carrots, potatoes
-mushrooms, potatoes, bell peppers
-potatoes, onions, garlic, bell peppers
-potatoes, bell peppers, onions, garlic
-spinach, bell peppers
-spinach, onions, garlic
-carrots, garlic, mushrooms, potatoes
+carrots, potatoes, mushrooms
+garlic, bell peppers, mushrooms
 ```
+
+</details>
 
 ### <a name='quoting_sublist'></a> Quoting Sublist Elements
 
@@ -2543,12 +2962,15 @@ spec this way.
 {
   "ingredients": {
     "type": "select_list_subset",
+    "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
     "config": {
-      "mean": 3, "stddev": 1, "min": 2, "max": 4,
+      "mean": 3,
+      "stddev": 1,
+      "min": 2,
+      "max": 4,
       "join_with": "\", \"",
       "quote": "\""
-    },
-    "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"]
+    }
   }
 }
 ```
@@ -2558,44 +2980,56 @@ spec this way.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 ingredients:
   type: select_list_subset
+  data: [onions, mushrooms, garlic, bell peppers, spinach, potatoes, carrots]
   config:
-    join_with: '", "'
     mean: 3
     stddev: 1
     min: 2
     max: 4
+    join_with: '", "'
     quote: '"'
-  data:
-  - onions
-  - mushrooms
-  - garlic
-  - bell peppers
-  - spinach
-  - potatoes
-  - carrots
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.select_list_subset(
+    key="ingredients",
+    data=["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
+    mean=3,
+    stddev=1,
+    min=2,
+    max=4,
+    join_with="\", \"",
+    quote="\"")
+
+spec = spec_builder.build()
 ```
 
 </details>
 
 
-Now when we run our dataspec we get:
+<details>
+  <summary>Example Command and Output</summary>
 
-```shell script
-dataspec -s ~/scratch/quoted_ingredients.json -i 10
-"spinach", "mushrooms", "bell peppers", "onions"
-"spinach", "onions", "mushrooms", "garlic"
-"carrots", "garlic", "mushrooms", "onions"
+```shell
+dataspec -s dataspec.json --log-level error -i 5
+"onions", "bell peppers"
+"carrots", "spinach"
 "mushrooms", "bell peppers", "carrots"
-"carrots", "potatoes", "bell peppers", "onions"
-"spinach", "mushrooms"
-"mushrooms", "bell peppers", "onions"
-"potatoes", "carrots", "bell peppers", "spinach"
-"garlic", "mushrooms", "potatoes"
-"carrots", "spinach", "bell peppers", "potatoes"
+"bell peppers", "garlic"
+"potatoes", "spinach"
 ```
+
+</details>
 
 ## <a name='CSV_Data'></a> CSV Data
 
@@ -2672,7 +3106,6 @@ by creating directories that have smaller input files.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 cities:
   type: csv
   config:
@@ -2682,7 +3115,24 @@ cities:
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.csv(
+    key="cities",
+    datafile="cities.csv",
+    delimiter="~",
+    sample=True)
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ```shell
 dataspec --spec cities.json --datadir ./data -i 5
@@ -2718,31 +3168,31 @@ Our Data Spec looks like:
 
 ```json
 {
-    "status": {
-        "type": "csv",
-        "config": {
-            "configref": "tabs_config",
-            "column": 1
-        }
-    },
-    "description": {
-        "type": "csv",
-        "config": {
-            "configref": "tabs_config",
-            "column": 2
-        }
-    },
-    "status_type:csv?configref=tabs_config&column=3": {},
-    "refs": {
-        "tabs_config": {
-            "type": "configref",
-            "config": {
-                "datafile": "tabs.csv",
-                "delimiter": "\\t",
-                "headers": true
-            }
-        }
+  "status": {
+    "type": "csv",
+    "config": {
+      "column": 1,
+      "configref": "tabs_config"
     }
+  },
+  "description": {
+    "type": "csv",
+    "config": {
+      "column": 2,
+      "configref": "tabs_config"
+    }
+  },
+  "status_type:csv?configref=tabs_config&column=3": {},
+  "refs": {
+    "tabs_config": {
+      "type": "configref",
+      "config": {
+        "datafile": "tabs.csv",
+        "delimiter": "\t",
+        "headers": true
+      }
+    }
+  }
 }
 ```
 
@@ -2751,30 +3201,54 @@ Our Data Spec looks like:
   <summary>YAML Spec</summary>
 
 ```yaml
----
 status:
   type: csv
   config:
-    configref: tabs_config
     column: 1
+    configref: tabs_config
 description:
   type: csv
   config:
-    configref: tabs_config
     column: 2
-# shorthand notation
-status_type:csv?configref=tabs_config&column=3: { }
+    configref: tabs_config
+status_type:csv?configref=tabs_config&column=3: {}
 refs:
   tabs_config:
     type: configref
     config:
       datafile: tabs.csv
-      delimiter: '\t'
+      delimiter: "\t"
       headers: true
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.configref(
+    key="tabs_config",
+    datafile="tabs.csv",
+    delimiter="\t",
+    headers=True)
+spec_builder.csv(
+    key="status",
+    column=1,
+    configref="tabs_config")
+spec_builder.csv(
+    key="description",
+    column=2,
+    configref="tabs_config")
+spec_builder.add_field("status_type:csv?configref=tabs_config&column=3", {})
+
+spec = spec_builder.build()
+```
+
+</details>
 
 The `configref` exist so that we don't have to repeat ourselves for common
 configurations across multiple fields. If we use the following template `{{ status }},{{ description }},{{ status_type }}` and run this
@@ -2798,7 +3272,7 @@ type. Below is an example that will Convert data from the
 [allCountries.zip](http://download.geonames.org/export/dump/allCountries.zip)
 dataset by selecting a subset of the columns from the tab delimited file. The
 key in the data element is the new name for the field. The value can either be
-the 1 indexed column number or the name of the field if the data has `headers`.
+the 1 indexed column number, or the name of the field if the data has `headers`.
 Our example doesn't have headers, so we are using the 1 based indexes.
 
 <details open>
@@ -2806,22 +3280,15 @@ Our example doesn't have headers, so we are using the 1 based indexes.
 
 ```json
 {
-    "placeholder": {
-        "type": "csv_select",
-        "data": {
-            "geonameid": 1,
-            "name": 2,
-            "latitude": 5,
-            "longitude": 6,
-            "country_code": 9,
-            "population": 15
-        },
-        "config": {
-            "datafile": "allCountries.txt",
-            "headers": false,
-            "delimiter": "\t"
-        }
+  "placeholder": {
+    "type": "csv_select",
+    "data": {"geonameid": 1, "name": 2, "latitude": 5, "longitude": 6, "country_code": 9, "population": 15},
+    "config": {
+      "datafile": "allCountries.txt",
+      "headers": false,
+      "delimiter": "\t"
     }
+  }
 }
 ```
 
@@ -2830,24 +3297,42 @@ Our example doesn't have headers, so we are using the 1 based indexes.
   <summary>YAML Spec</summary>
 
 ```yaml
----
 placeholder:
   type: csv_select
-  data:
-    geonameid: 1
-    name: 2
-    latitude: 5
-    longitude: 6
-    country_code: 9
-    population: 15
+  data: {geonameid: 1, name: 2, latitude: 5, longitude: 6, country_code: 9, population: 15}
   config:
     datafile: allCountries.txt
-    headers: no
+    headers: false
     delimiter: "\t"
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.csv_select(
+    key="placeholder",
+    data={
+        "geonameid": 1,
+        "name": 2,
+        "latitude": 5,
+        "longitude": 6,
+        "country_code": 9,
+        "population": 15
+    },
+    datafile="allCountries.txt",
+    headers=False,
+    delimiter="	")
+
+spec = spec_builder.build()
+```
+
+</details>
 
 ## <a name="nested"></a>Nested Fields
 
@@ -2906,11 +3391,17 @@ data that matches this schema.
 
 ```json
 {
-  "id:uuid": {},
-  "user:nested": {
+  "id": {
+    "type": "uuid"
+  },
+  "user": {
+    "type": "nested",
     "fields": {
-      "user_id:uuid": {},
-      "geo:nested": {
+      "user_id": {
+        "type": "uuid"
+      },
+      "geo": {
+        "type": "nested",
         "fields": {
           "place_id:cc-digits?mean=5": {},
           "coordinates:geo.pair?as_list=true": {}
@@ -2926,38 +3417,53 @@ data that matches this schema.
   <summary>YAML Spec</summary>
 
 ```yaml
-id:uuid: {}
-user:nested:
+id:
+  type: uuid
+user:
+  type: nested
   fields:
-    user_id:uuid: {}
-    geo:nested:
+    user_id:
+      type: uuid
+    geo:
+      type: nested
       fields:
         place_id:cc-digits?mean=5: {}
         coordinates:geo.pair?as_list=true: {}
 ```
 
 </details>
+<details>
+  <summary>API Example</summary>
 
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+geo_fields = dataspec.spec_builder()
+geo_fields.add_field("place_id:cc-digits?mean=5", {})
+geo_fields.add_field("coordinates:geo.pair?as_list=true", {})
+
+user_fields = dataspec.spec_builder()
+user_fields.uuid("user_id")
+user_fields.nested("geo", geo_fields.build())
+
+spec_builder.uuid("id")
+spec_builder.nested("user", user_fields.build())
+
+spec = spec_builder.build()
+```
+
+</details>
 
 
 <details>
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s double-nested.json -i 1 --format json-pretty -x
-{
-    "id": "4278b060-442d-4558-bf2c-5f1df68cb265",
-    "user": {
-        "geo": {
-            "coordinates": [
-                "-167.4324",
-                " 84.6883"
-            ],
-            "place_id": "42018569"
-        },
-        "user_id": "13d5c2a6-80c8-4bdb-89b2-7da9699cd0fb"
-    }
-} 
+dataspec -s dataspec.json --log-level error -i 1
+e428ba7a-1108-465a-89ab-0d479649dcaa
+{'user_id': 'c053f2e5-7b15-4f4f-a33f-b517391c53b2', 'geo': {'place_id': '1947', 'coordinates': [' 133.8512', ' 22.3990']}}
 ```
 
 </details>

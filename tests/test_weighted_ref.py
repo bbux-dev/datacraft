@@ -1,4 +1,5 @@
 from dataspec import builder, suppliers, Loader, SpecException
+from dataspec.supplier.core.weighted_refs import WeightedRefsSupplier
 import pytest
 
 
@@ -16,7 +17,7 @@ def test_weighted_ref_missing_key():
 
     key_supplier = suppliers.values(['foo', 'bar', 'baz', 'notvalid'])
     values_map = {key: suppliers.values(value) for key, value in spec['refs'].items()}
-    supplier = suppliers.weighted_ref(key_supplier, values_map)
+    supplier = WeightedRefsSupplier(key_supplier, values_map)
 
     with pytest.raises(SpecException) as exception:
         [supplier.next(i) for i in range(0, 10)]

@@ -7,7 +7,7 @@ import dataspec
 from dataspec.loader import Loader
 from dataspec import builder
 # need this to trigger type handler registration
-from dataspec.type_handlers import date_handler
+from dataspec.supplier.core import date
 
 
 def test_basic_spec():
@@ -17,20 +17,20 @@ def test_basic_spec():
 
 
 date_duration_tests = [
-    (0, [1, 2]),
-    (1, [1, 2]),
-    (5, [6]),
-    (22, [23]),
-    (55, [56]),
+    (0, 1, 2),
+    (1, 1, 2),
+    (5, 5, 6),
+    (22, 22, 23),
+    (55, 55, 56),
 ]
 
 
-@pytest.mark.parametrize("duration, expected_sizes", date_duration_tests)
-def test_spec_builder(duration, expected_sizes):
+@pytest.mark.parametrize("duration, min, max", date_duration_tests)
+def test_spec_builder(duration, min, max):
     spec = _date_spec(duration_days=duration)
     values = _get_unique_values(spec, 'foo', iterations=1000)
-    # this should create two unique dates
-    assert len(values) in expected_sizes
+    # total number of values created should be in this range
+    assert min <= len(values) <= max
 
 
 def test_date_start_positive_duration():
