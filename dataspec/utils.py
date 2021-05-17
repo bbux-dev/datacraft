@@ -16,7 +16,7 @@ def load_custom_code(code_path):
     :return: None
     """
     if not os.path.exists(code_path):
-        raise Exception(f'Path to {code_path} not found.')
+        raise FileNotFoundError(f'Path to {code_path} not found.')
     try:
         spec = importlib.util.spec_from_file_location("python_code", str(code_path))
         module = importlib.util.module_from_spec(spec)
@@ -64,14 +64,6 @@ def get_caster(config):
 def any_key_exists(config, keys):
     """ checks if any of the keys exist in the config object """
     return any(key in config for key in keys)
-
-
-def update_config(spec, key, value):
-    """ add the key and value to the spec config """
-    config = spec.get('config', {})
-    config[key] = value
-    spec['config'] = config
-    return spec
 
 
 def get_raw_spec(data_spec):

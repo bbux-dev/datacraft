@@ -31,8 +31,8 @@ import dataspec
 def configure_supplier(field_spec, loader):
     """ configures supplier for select_list_subset type """
     config = dataspec.utils.load_config(field_spec, loader)
-    if config is None or 'mean' not in config:
-        raise dataspec.SpecException('Config with mean defined must be provided: %s' % json.dumps(field_spec))
+    if config is None or ('mean' not in config and 'count' not in config):
+        raise dataspec.SpecException('Config with mean or count defined must be provided: %s' % json.dumps(field_spec))
     if 'ref' in field_spec and 'data' in field_spec:
         raise dataspec.SpecException('Only one of "data" or "ref" can be provided for: %s' % json.dumps(field_spec))
 
@@ -49,5 +49,6 @@ def configure_supplier(field_spec, loader):
 
     if 'data' in field_spec:
         data = field_spec.get('data')
-
-    return dataspec.suppliers.list_stat_sampler(data, config)
+    if dataspec.utils.any_key_exists(config, ['mean', 'stddev']):
+        return dataspec.suppliers.list_stat_sampler(data, config)
+    return dataspec.suppliers.list_count_sampler(data, config)

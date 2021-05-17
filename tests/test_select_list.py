@@ -68,3 +68,14 @@ def test_select_list_using_loader():
     supplier = loader.get('pets')
     value = supplier.next(0)
     assert len(value) == 7
+
+
+def test_select_list_ref_contains_data():
+    spec_builder = builder.spec_builder()
+    spec_builder.select_list_subset('pets', data=None, ref='pets_list', count=2)
+    spec_builder.refs().values(key='pets_list', data=['goat', 'sheep', 'bear', 'cow', 'dragon'])
+    loader = Loader(spec_builder.build())
+    supplier = loader.get('pets')
+    value = supplier.next(0)
+    assert isinstance(value, list)
+    assert len(value) == 2

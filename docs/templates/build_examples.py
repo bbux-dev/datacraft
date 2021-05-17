@@ -49,7 +49,7 @@ def build_example(name, spec, iterations=5, pipes=""):
     example = {
         "json": json.dumps(ordered, cls=MyEncoder, sort_keys=False, indent=2).strip(),
         "yaml": cleaned_yaml,
-        "api": code.strip(),
+        "api": code.strip().replace('\n\n\n', '\n\n'),
         "command": cmd_display.strip(),
         "output": out.decode('utf-8').strip()
     }
@@ -62,18 +62,6 @@ def clean_semi_formatted_yaml(toclean: str):
     and OrderdDict as the underlying structure.
     """
     return toclean.replace('!!list ', '')
-    # return toclean.replace(' !!omap', '') \
-    #     .replace('!<%20> ', '') \
-    #     .replace('"', '') \
-    #     .replace(' - [', 'CONSERVE_NESTED_LIST') \
-    #     .replace('- ', '  ') \
-    #     .replace('CONSERVE_NESTED_LIST', ' - [')\
-    #     .replace("'[", "[") \
-    #     .replace("]'", "]") \
-    #     .replace("[]", "{}")
-    # return toclean.replace(' !!omap', '') \
-    #     .replace('!<%20> ', '')\
-    #     .replace("[]", "{}")
 
 
 def order_spec(raw_spec):
