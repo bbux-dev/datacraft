@@ -2,13 +2,6 @@ from typing import NamedTuple
 
 
 class Example(NamedTuple):
-    name: str
-    iterations: int
-    fragment: str
-    pipes: str = ""
-
-
-class Example(NamedTuple):
     """
     :param name: of example
     :param iterations: number of iterations to run to capture output

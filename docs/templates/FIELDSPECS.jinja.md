@@ -974,8 +974,9 @@ The select_list_subset Field Spec structure is:
 The join_with config option is used to specify how the selected values should be
 combined. The mean and stddev config options tell how many items should be
 chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items
-then sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of
-items should be chosen. You can also set a min and max. Example:
+then sometimes 1 or 3 or more. There are two ways to produce an exact number of
+elements.  The first is to use the `count` param by itself.  The second is to set
+the stddev to 0. You can also set a min and max. Example:
 
 {{ show_example(examples.select_list_example_one) }}
 

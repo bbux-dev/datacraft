@@ -67,6 +67,10 @@ def test_ip_schema():
     _test_run_validation("ip.tests.json")
 
 
+def test_select_list_subset():
+    _test_run_validation("select_list_subset.tests.json")
+
+
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)

@@ -1,5 +1,5 @@
 """
-Module for implementation of select list subset value supplier
+Module list stats sampler class
 """
 import math
 import random
@@ -15,7 +15,7 @@ class ListStatSamplerSupplier(dataspec.ValueSupplierInterface):
 
     def __init__(self, data, config):
         self.values = data
-        self.mean = float(config.get('mean'))
+        self.mean = float(config.get('mean', 1))
         self.min = int(config.get('min', 1))
         self.max = int(config.get('max', len(self.values)))
         # attempt to create a reasonable standard deviation
