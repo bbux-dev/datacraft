@@ -286,7 +286,7 @@ flamingo_jump@gmail.com
 
 #### <a name="YAML_Format"></a>YAML Format
 
-Dats specs can also be created using YAML. Below is the same spec above in YAML.
+Data specs can also be created using YAML. Below is the same spec above in YAML.
 
 ```yaml
 ---
@@ -459,7 +459,7 @@ dataspec --spec csv-select.yaml \
          --iterations 5  \
          --datadir ./data \
          --format json \
-         --log-level off
+         --log-level off -x
 {"geonameid": "2986043", "name": "Pic de Font Blanca", "latitude": "42.64991", "longitude": "1.53335", "country_code": "AD", "population": "0"}
 {"geonameid": "2994701", "name": "Roc M\u00e9l\u00e9", "latitude": "42.58765", "longitude": "1.74028", "country_code": "AD", "population": "0"}
 {"geonameid": "3007683", "name": "Pic des Langounelles", "latitude": "42.61203", "longitude": "1.47364", "country_code": "AD", "population": "0"}
@@ -493,7 +493,7 @@ We could then create a spec to populate the id, name, age, and gender fields. Su
 When we run the tool we get the data populated for the template:
 
 ```shell script
-dataspec -s ~/scratch/es-spec.json -t ~/scratch/template.json -i 10
+dataspec -s es-spec.json -t template.json -i 10 --log-level off -x
 { "index" : { "_index" : "test", "_id" : "1" } }
 { "doc" : {"name" : "bob", "age": "22", "gender": "F" } }
 { "index" : { "_index" : "test", "_id" : "2" } }
@@ -627,7 +627,7 @@ def get_reverse_string_schema():
         "type": "object",
         "required": ["type", "ref"],
         "properties": {
-            "type": {"type": "string", "pattern": "^reverse_string"},
+            "type": {"type": "string", "pattern": "^reverse_string$"},
             "ref": {"type": "string"}
         }
     }
@@ -702,6 +702,9 @@ spec = spec_builder.build()
 ```
 
 ## <a name="Generator"></a>Generating Records
+
+The `spec.generator` function will create a python generator that can be used to incrementally
+generate the records from the DataSpec.
 
 Example:
 

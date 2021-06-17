@@ -2871,8 +2871,9 @@ The select_list_subset Field Spec structure is:
 The join_with config option is used to specify how the selected values should be
 combined. The mean and stddev config options tell how many items should be
 chosen. For example a mean of 2 and stddev of 1, would mostly choose 2 items
-then sometimes 1 or 3 or more. Set the stddev to 0 if only the exact number of
-items should be chosen. You can also set a min and max. Example:
+then sometimes 1 or 3 or more. There are two ways to produce an exact number of
+elements.  The first is to use the `count` param by itself.  The second is to set
+the stddev to 0. You can also set a min and max. Example:
 
 <details open>
   <summary>JSON Spec</summary>
@@ -3462,8 +3463,23 @@ spec = spec_builder.build()
 
 ```shell
 dataspec -s dataspec.json --log-level error -i 1
-e428ba7a-1108-465a-89ab-0d479649dcaa
-{'user_id': 'c053f2e5-7b15-4f4f-a33f-b517391c53b2', 'geo': {'place_id': '1947', 'coordinates': [' 133.8512', ' 22.3990']}}
+{
+    "id": "327658cd-b3de-477a-a902-742efd03ef89",
+    "user": {
+        "user_id": "c14c7709-d0f6-4cd8-b9ff-a936960ca63f",
+        "geo": {
+            "place_id": "59283706",
+            "coordinates": [
+                "-142.8146",
+                " 66.3702"
+            ]
+        }
+    },
+    "_internal": {
+        "_iteration": 0,
+        "_field_group": "ALL"
+    }
+}
 ```
 
 </details>

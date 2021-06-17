@@ -455,6 +455,7 @@ user_fields.nested("geo", geo_fields.build())
 
 spec_builder.uuid("id")
 spec_builder.nested("user", user_fields.build())
-"""
+""",
+        pipes="--format json-pretty"
     ),
 ]
