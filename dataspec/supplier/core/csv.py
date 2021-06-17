@@ -1,6 +1,7 @@
 """
 Module for handling csv related data, deals with data typed as 'csv'
 """
+from typing import Dict
 import csv
 import json
 import os
@@ -13,9 +14,6 @@ import dataspec
 ONE_MB = 1024 * 1024
 SMALL_ENOUGH_THRESHOLD = 250 * ONE_MB
 _DEFAULT_BUFFER_SIZE = 1000000
-
-# to keep from reloading the same CsvData
-_csv_data_cache = {}
 
 
 class CsvDataBase:
@@ -108,7 +106,7 @@ class BufferedCsvData(CsvDataBase):
         self.quotechar = quotechar
         self.size = buffer_size
         self.increment = -1
-        self.data = None
+        self.data = None  # type: ignore
         self.fill_buffer(0)
         # need to populate data before super constructor call
         super().__init__(has_headers)
@@ -168,6 +166,10 @@ class CsvSupplier(dataspec.ValueSupplierInterface):
     def next(self, iteration):
         count = self.count_supplier.next(iteration)
         return self.csv_data.next(self.field_name, iteration, self.sample, count)
+
+
+# to keep from reloading the same CsvData
+_csv_data_cache: Dict[str, CsvDataBase] = {}
 
 
 @dataspec.registry.types('csv')

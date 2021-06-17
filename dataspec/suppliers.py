@@ -1,7 +1,7 @@
 """
 Factory like module for core supplier related functions.
 """
-from typing import Union, Dict
+from typing import Union, Dict, Any
 import json
 
 import dataspec
@@ -117,7 +117,7 @@ def count_supplier_from_config(config: Dict) -> ValueSupplierInterface:
     :param config: to use
     :return: a count supplier
     """
-    data = 1
+    data = 1  # type: Any
     if config and 'count' in config:
         data = config['count']
     if config and 'count_dist' in config:
@@ -185,6 +185,8 @@ def _value_list(data: list,
     :param config: config with optional count param
     :return: the supplier
     """
+    if config is None:
+        config = {}
     return ListValueSupplier(data, count_supplier_from_config(config), do_sampling)
 
 
@@ -362,10 +364,15 @@ def cast_supplier(supplier: ValueSupplierInterface,
     :param cast_to: explicit cast type to use
     :return: the casting supplier
     """
+
     if cast_to:
         caster = casters.get(cast_to)
     else:
-        caster = get_caster(field_spec.get('config', {}))
+        if field_spec is None:
+            config = {}
+        else:
+            config = field_spec.get('config', {})
+        caster = get_caster(config)
     return CastingSupplier(supplier, caster)
 
 

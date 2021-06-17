@@ -131,7 +131,7 @@ class BufferedValueSuppier(dataspec.ValueSupplierInterface):
 
     def __init__(self, wrapped: dataspec.ValueSupplierInterface, buffer_size: int):
         self.wrapped = wrapped
-        self.buffer = deque(maxlen=buffer_size)
+        self.buffer: deque = deque(maxlen=buffer_size)
         self.current = -1
         self.buffer_size = buffer_size
 

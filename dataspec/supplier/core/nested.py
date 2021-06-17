@@ -30,7 +30,7 @@ class NestedSupplier(dataspec.model.ValueSupplierInterface):
             vals = [self._single_pass(iteration + i) for i in range(count)]
             return vals
         # this is dict
-        vals = self._single_pass(iteration)
+        vals = self._single_pass(iteration)  # type: ignore
         if self.as_list:
             return [vals]
         return vals

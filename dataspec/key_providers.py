@@ -18,7 +18,7 @@ ROOT_KEYS = ['refs', 'field_groups']
 class KeyProviderInterface:
     """ Interface for KeyProviders """
 
-    def get(self) -> (str, List[str]):
+    def get(self) -> Tuple[str, List[str]]:
         """
         get the next set of field names to process
         :return: key_group_name, key_list_for_group_name
