@@ -1,7 +1,7 @@
 import json
 import logging
 import importlib.resources as pkg_resources
-from jsonschema import Draft7Validator
+from jsonschema import Draft7Validator  # type: ignore
 from dataspec import schema
 from .exceptions import ResourceError, SpecException
 

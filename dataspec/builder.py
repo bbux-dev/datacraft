@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Any, Union, Dict, List
 import json
 import logging
-from . import utils
 from .model import DataSpec
+from .loader import Loader
+from . import utils, template_engines, key_providers
 
-from dataspec import Loader, template_engines, key_providers
 
 log = logging.getLogger(__name__)
 
@@ -79,8 +79,8 @@ class Builder:
         return self._add_field_spec(key, values(data, **config))
 
     def combine(self, key: str,
-                refs: List[Union[str, FieldInfo]] = None,
-                fields: List[Union[str, FieldInfo]] = None,
+                refs: Union[List[str], List[FieldInfo]] = None,
+                fields: Union[List[str], List[FieldInfo]] = None,
                 **config):
         """
         creates combine Field Spec and adds to Data Spec
@@ -92,7 +92,7 @@ class Builder:
         """
         return self._add_field_spec(key, combine(refs, fields, **config))
 
-    def combine_list(self, key: str, refs: List[List[Union[str, FieldInfo]]] = None, **config):
+    def combine_list(self, key: str, refs: List[Union[List[str], List[FieldInfo]]] = None, **config):
         """
         creates combine-list Field Spec and adds to Data Spec
 
@@ -307,6 +307,7 @@ class Builder:
             self.add_ref(key, configref(**config))
 
     def _add_field_spec(self, key, spec):
+        """ adds the fieldspec and creates a FieldInfo object """
         self.add_field(key, spec)
         return FieldInfo(key, spec['type'], self)
 
@@ -485,7 +486,9 @@ def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config)
     return spec
 
 
-def combine(refs: List[Union[str, FieldInfo]] = None, fields: List[Union[str, FieldInfo]] = None, **config):
+def combine(refs: Union[List[str], List[FieldInfo]] = None,
+            fields: Union[List[str], List[FieldInfo]] = None,
+            **config):
     """
     Constructs a combine Field Spec
 
@@ -497,7 +500,7 @@ def combine(refs: List[Union[str, FieldInfo]] = None, fields: List[Union[str, Fi
 
     spec = {
         "type": "combine"
-    }
+    }  # type: Dict[str, Any]
     if refs is not None:
         spec['refs'] = _create_key_list(refs)
     if fields is not None:
@@ -508,7 +511,7 @@ def combine(refs: List[Union[str, FieldInfo]] = None, fields: List[Union[str, Fi
     return spec
 
 
-def combine_list(refs: List[List[Union[str, FieldInfo]]] = None, **config):
+def combine_list(refs: List[Union[List[str], List[FieldInfo]]] = None, **config):
     """
     Constructs a combine-list Field Spec
 
@@ -516,11 +519,12 @@ def combine_list(refs: List[List[Union[str, FieldInfo]]] = None, **config):
     :param config: in **kwargs format
     :return: the combine-list spec
     """
-
+    if refs is None:
+        refs = []
     spec = {
         "type": "combine-list",
         "refs": [_create_key_list(ref_list) for ref_list in refs]
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -539,7 +543,7 @@ def range_spec(data: list, **config):
     spec = {
         "type": "range",
         "data": data
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -558,7 +562,7 @@ def rand_range(data: list, **config):
     spec = {
         "type": "rand_range",
         "data": data
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -575,7 +579,7 @@ def date(**config):
 
     spec = {
         "type": "date"
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -592,7 +596,7 @@ def date_iso(**config):
 
     spec = {
         "type": "date.iso"
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -609,7 +613,7 @@ def date_iso_us(**config):
 
     spec = {
         "type": "date.iso.us"
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -626,7 +630,7 @@ def uuid(**config):
 
     spec = {
         "type": "uuid"
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -645,7 +649,7 @@ def char_class(data: Union[str, List[str]], **config):
     spec = {
         "type": "char_class",
         "data": data
-    }
+    }  # type: Dict[str, Any]
 
     if len(config) > 0:
         spec['config'] = config
@@ -662,7 +666,8 @@ def char_class_abbrev(cc_abbrev: str, **config):
     """
     spec = {
         "type": 'char_class_abbrev'
-    }
+    }  # type: Dict[str, Any]
+
     if cc_abbrev.startswith('cc-'):
         spec['type'] = cc_abbrev
     else:
@@ -684,7 +689,8 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config):
     spec = {
         "type": "unicode_range",
         "data": data
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -699,7 +705,8 @@ def geo_lat(**config):
     """
     spec = {
         "type": "geo.lat"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -714,7 +721,8 @@ def geo_long(**config):
     """
     spec = {
         "type": "geo.long"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -729,7 +737,8 @@ def geo_pair(**config):
     """
     spec = {
         "type": "geo.pair"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -744,7 +753,8 @@ def ip(**config):
     """
     spec = {
         "type": "ip"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -759,7 +769,8 @@ def ipv4(**config):
     """
     spec = {
         "type": "ipv4"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -774,7 +785,8 @@ def ip_precise(**config):
     """
     spec = {
         "type": "ip.precise"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -791,7 +803,8 @@ def weightedref(data: Dict[str, float], **config):
     spec = {
         "type": "weightedref",
         "data": data
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -808,7 +821,7 @@ def select_list_subset(data: List[Any] = None, ref: str = None, **config):
     """
     spec = {
         "type": "select_list_subset"
-    }
+    }  # type: Dict[str, Any]
 
     if data is not None:
         spec['data'] = data
@@ -829,7 +842,8 @@ def csv(**config):
     """
     spec = {
         "type": "csv"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -845,7 +859,7 @@ def csv_select(data: Dict[str, int] = None, **config):
     """
     spec = {
         "type": "csv_select"
-    }
+    }  # type: Dict[str, Any]
 
     if data is not None:
         spec['data'] = data
@@ -866,7 +880,8 @@ def nested(fields: Union[Dict[str, Dict], DataSpec], **config):
     spec = {
         "type": "nested",
         "fields": utils.get_raw_spec(fields)
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -881,7 +896,8 @@ def configref(**config):
     """
     spec = {
         "type": "configref"
-    }
+    }  # type: Dict[str, Any]
+
     if len(config) > 0:
         spec['config'] = config
     return spec
@@ -896,7 +912,7 @@ def _create_key_list(entries):
     """
     if len(entries) == 0:
         return []
-    if isinstance(entries[0], FieldInfo):
+    if all(isinstance(entry, FieldInfo) for entry in entries):
         return [entry.key for entry in entries]
     # this should be a regular list of strings
     return entries

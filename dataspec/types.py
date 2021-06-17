@@ -2,7 +2,7 @@
 Module for the dataspec registration system
 """
 import logging
-import catalogue
+import catalogue  # type: ignore
 
 log = logging.getLogger(__name__)
 

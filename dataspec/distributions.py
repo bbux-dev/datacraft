@@ -12,7 +12,7 @@ class UniformDistribution(Distribution):
     Class that samples values from a uniform distribution between the start and end points
     """
 
-    def __init__(self, start: float, end: float) -> Distribution:
+    def __init__(self, start: float, end: float):
         self.start = start
         self.end = end
 
@@ -25,7 +25,7 @@ class GaussDistribution(Distribution):
     Class that samples values from a normal distribution with provided mean and standard deviation
     """
 
-    def __init__(self, mean: float, stddev: float) -> Distribution:
+    def __init__(self, mean: float, stddev: float):
         self.mean = mean
         self.stddev = stddev
 
@@ -41,7 +41,7 @@ class BoundedDistribution(Distribution):
     def __init__(self,
                  distribution: Distribution,
                  min_val: float = 0.0,
-                 max_val: float = None) -> Distribution:
+                 max_val: float = None):
         self.distribution = distribution
         self.min = min_val
         self.max = max_val
