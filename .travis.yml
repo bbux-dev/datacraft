@@ -9,7 +9,7 @@ before_install:
   - pip install -U pip
   - pip install -U pytest
   - pip install -U pytest-cov
-  - pip install codecov mypy
+  - pip install codecov mypy types-Jinja2
 install:
   - pip install -r requirements.txt
   - pip install .
