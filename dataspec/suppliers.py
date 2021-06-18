@@ -23,7 +23,7 @@ def values(spec, loader=None, **kwargs) -> ValueSupplierInterface:
     Based on data, return the appropriate values supplier. data can be a spec, constant, list, or dict.
 
     >>> import dataspec
-    >>> spec = {"type": "values": "data": [1,2,3,5,8,13]}
+    >>> spec = {"type": "values", "data": [1,2,3,5,8,13]}
     >>> fib_supplier = dataspec.suppliers.values(spec)
 
     or just the raw data

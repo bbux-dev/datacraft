@@ -25,7 +25,7 @@ def load_custom_code(code_path):
         logging.warning("Couldn't load custom Python code: %s: %s", code_path, str(exception))
 
 
-def is_affirmative(key, config, default=False):
+def is_affirmative(key: str, config: dict, default=False) -> bool:
     """
     Checks if the config value is one of true, yes, or on (case doesn't matter), default is False
     :param key: to check
