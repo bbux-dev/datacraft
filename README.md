@@ -53,9 +53,8 @@ executable on the path.
 ## <a name="Usage"></a>Usage
 
 ```
-usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION]
-                [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT]
-                [--strict] [--apply-raw] [--debug-spec] [-x]
+usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]]
+                [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT] [--strict] [--apply-raw] [--debug-spec] [--debug-defaults] [-x] [--sample-lists] [--defaults DEFAULTS]
 
 Run dataspec.
 
@@ -85,8 +84,11 @@ optional arguments:
   --strict              Enforce schema validation for all registered field specs
   --apply-raw           Data from -s argument should be applied to the template with out treating as a Data Spec
   --debug-spec          Debug spec after internal reformatting
+  --debug-defaults      List default values from registry after any external code loading
   -x, --exclude-internal
                         Do not include non data fields in output records
+  --sample-lists        Turns on sampling for all list backed types
+  --defaults DEFAULTS   Path to defaults overrides
 
 input:
   -s SPEC, --spec SPEC  Spec to Use
@@ -201,9 +203,10 @@ dataspec --inline 'geo:geo.pair?start_lat=-99.0: {}' \
 
 #### Schema Level Validation
 
-Most of the default supported field spec types have JSON based schemas defined for them. Schema based validation is
-turned off by default.  Use the `--strict` command line flag to turn on the strict schema based checks for types that
-have schemas defined.  Example:
+Most of the default supported field spec types have JSON based schemas defined
+for them. Schema based validation is turned off by default. Use the `--strict`
+command line flag to turn on the strict schema based checks for types that have
+schemas defined. Example:
 
 ```shell
 dataspec --inline 'geo: {type: geo.pair, config: {start_lat: -99.0}}' \
@@ -217,20 +220,72 @@ WARNING [12-Mar-2050 07:24:11 PM] -99.0 is less than the minimum of -90
 ERROR [12-Mar-2050 07:24:11 PM] Failed to validate spec type: geo.pair with spec: {'type': 'geo.pair', 'config': {'start_lat': -99.0}}
 ```
 
+#### Default Values
+
+There are some default values used when a given spec does not provide them.
+These defaults can be viewed using the `--debug-defaults` flag.
+
+```shell
+dataspec --debug-defaults -l off
+{
+    "sample_mode": false,
+    "combine_join_with": "",
+    "char_class_join_with": "",
+    "geo_as_list": false,
+    "combine_as_list": false,
+    "geo_lat_first": false,
+    "geo_join_with": ",",
+    "date_stddev_days": 15,
+    "date_format": "%d-%m-%Y",
+    "geo_precision": 4,
+    "json_indent": 4
+}
+```
+
+The general convention is to use the type as a prefix for the key that it
+effects. You can save this information to disk by specifying the `-o`
+or `--outdir` flag. In the output above the default `join_with` config param is
+a comma for the `geo` type, but is an empty string for the `combine`
+and `char_class` types.
+
+#### Override Defaults
+
+To override the default values, use the `--defaults` /path/to/custom_defaults.json
+
+```shell
+dataspec --debug-defaults -l off --defaults /path/to/custom_defaults.json
+{
+    "sample_mode": true,
+    "combine_join_with": ";",
+    "char_class_join_with": "-",
+    "geo_as_list": true,
+    "combine_as_list": false,
+    "geo_lat_first": false,
+    "geo_join_with": ",",
+    "date_stddev_days": 42,
+    "date_format": "%Y-%m-%d",
+    "geo_precision": 5,
+    "json_indent": 2,
+    "custom_thing": "foo"
+}
+```
+
 ## <a name="Examples"></a>Examples
 
-See [examples](docs/EXAMPLES.md) to dive into detailed examples and practical use cases.
+See [examples](docs/EXAMPLES.md) to dive into detailed example and practical use case.
 
 ## <a name="Core_Concepts"></a>Core Concepts
 
 ### <a name="Data_Spec"></a>Data Spec
 
-A Data Spec is a Dictionary where the keys are the names of the fields to generate and each value is
-a [Field Spec](docs/FIELDSPECS.md)
-that describes how the values for that field are to be generated. There is one reserved key in the root of the Data
-Spec: refs. The refs is a special section of the Data Spec where Field Specs are defined but not tied to any specific
-field. These refs can then be used or referenced by other Specs. An example would be a combine Spec which points to two
-references that should be joined. Below is an example Data Spec for creating email addresses.
+A Data Spec is a Dictionary where the keys are the names of the fields to
+generate and each value is a [Field Spec](docs/FIELDSPECS.md)
+that describes how the values for that field are to be generated. There is one
+reserved key in the root of the Data Spec: refs. The refs is a special section
+of the Data Spec where Field Specs are defined but not tied to any specific
+field. These refs can then be used or referenced by other Specs. An example
+would be a combine Spec which points to two references that should be joined.
+Below is an example Data Spec for creating email addresses.
 
 ```json
 {

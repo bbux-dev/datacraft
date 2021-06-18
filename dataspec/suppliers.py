@@ -15,7 +15,8 @@ from .supplier.weighted_values import WeightedValueSupplier
 from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
 from .model import Distribution
-from . import casters, distributions, ValueSupplierInterface
+from . import types, casters, distributions, ValueSupplierInterface
+from .defaults import *
 
 
 def values(spec, loader=None, **kwargs) -> ValueSupplierInterface:
@@ -47,7 +48,7 @@ def values(spec, loader=None, **kwargs) -> ValueSupplierInterface:
         data = spec['data']
 
     config = load_config(spec, loader, **kwargs)
-    do_sampling = is_affirmative('sample', config)
+    do_sampling = is_affirmative('sample', config, default=types.get_default('sample_mode'))
 
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it

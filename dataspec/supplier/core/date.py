@@ -25,7 +25,6 @@ DATE_KEY = 'date'
 DATE_ISO_KEY = 'date.iso'
 DATE_ISO_US_KEY = 'date.iso.us'
 
-DEFAULT_FORMAT = "%d-%m-%Y"
 ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
 ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 
@@ -121,8 +120,8 @@ def configure_supplier(field_spec: dict, loader: dataspec.Loader):
 
 def _create_stats_based_date_supplier(config):
     center_date = config.get('center_date')
-    stddev_days = config.get('stddev_days', 15)
-    date_format = config.get('format', DEFAULT_FORMAT)
+    stddev_days = config.get('stddev_days', dataspec.types.get_default('date_stddev_days'))
+    date_format = config.get('format', dataspec.types.get_default('date_format'))
     timestamp_distribution = gauss_date_timestamp(center_date, float(stddev_days), date_format)
     return DateSupplier(timestamp_distribution, date_format)
 
@@ -132,7 +131,7 @@ def _create_uniform_date_supplier(config):
     offset = int(config.get('offset', 0))
     start = config.get('start')
     end = config.get('end')
-    date_format = config.get('format', DEFAULT_FORMAT)
+    date_format = config.get('format', dataspec.types.get_default('date_format'))
     timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)
     if timestamp_distribution is None:
         raise dataspec.SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
@@ -158,7 +157,7 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     # make sure the start and end dates match the ISO format we are using
     start = config.get('start')
     end = config.get('end')
-    date_format = config.get('format', DEFAULT_FORMAT)
+    date_format = config.get('format', )
     if start:
         start_date = datetime.datetime.strptime(start, date_format)
         config['start'] = start_date.strftime(iso_date_format)
