@@ -13,6 +13,7 @@ The combine field structure is:
   }
 }
 """
+from typing import List
 import json
 
 import dataspec
@@ -26,13 +27,10 @@ class CombineValuesSupplier(dataspec.ValueSupplierInterface):
     Class for combining the values from the output of two or more value suppliers
     """
 
-    def __init__(self, suppliers, config=None):
+    def __init__(self, suppliers: List[dataspec.ValueSupplierInterface], config: dict):
         self.suppliers = suppliers
-        self.as_list = config.get('as_list', False) if config else False
-        if config and 'join_with' in config:
-            self.joiner = config.get('join_with')
-        else:
-            self.joiner = ''
+        self.as_list = config.get('as_list', dataspec.types.get_default('combine_as_list'))
+        self.joiner = config.get('join_with', dataspec.types.get_default('combine_join_with'))
 
     def next(self, iteration):
         values = [str(supplier.next(iteration)) for supplier in self.suppliers]
@@ -103,4 +101,5 @@ def _load(combine_field_spec, keys, loader):
     for key in keys:
         supplier = loader.get(key)
         to_combine.append(supplier)
-    return CombineValuesSupplier(to_combine, combine_field_spec.get('config'))
+    config = combine_field_spec.get('config', {})
+    return CombineValuesSupplier(to_combine, config)

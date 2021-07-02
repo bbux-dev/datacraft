@@ -22,11 +22,13 @@ RAND_RANGE_KEY = 'rand_range'
 
 @dataspec.registry.schemas(RANGE_KEY)
 def get_range_schema():
+    """ schema for range type """
     return dataspec.schemas.load(RANGE_KEY)
 
 
 @dataspec.registry.schemas(RAND_RANGE_KEY)
 def get_rand_range_schema():
+    """ schema for rand range type """
     # This shares a schema with range
     return dataspec.schemas.load(RANGE_KEY)
 
@@ -43,12 +45,13 @@ def configure_range_supplier(field_spec, _):
             'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
     # we have the nested case
     if isinstance(data[0], list):
-        suppliers_list = [_configure_supplier_for_range_data(field_spec, subdata) for subdata in data]
+        suppliers_list = [_configure_supplier_for_data(field_spec, subdata) for subdata in data]
         return dataspec.suppliers.from_list_of_suppliers(suppliers_list, True)
-    return _configure_supplier_for_range_data(field_spec, data)
+    return _configure_supplier_for_data(field_spec, data)
 
 
-def _configure_supplier_for_range_data(field_spec, data):
+def _configure_supplier_for_data(field_spec, data):
+    """ configures the supplier based on the range data supplied """
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
     # more intuitive behavior
@@ -83,7 +86,7 @@ def configure_rand_range_supplier(field_spec, loader):
     start = 0
     if len(data) == 1:
         end = data[0]
-    if len(data) == 2:
+    if len(data) >= 2:
         start = data[0]
         end = data[1]
     precision = None
@@ -104,7 +107,8 @@ def _any_is_float(data):
 
 def float_range(start, stop, step, precision=None):
     """
-    Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are stored
+    Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
+    stored
     """
     # attempt to defeat some rounding errors prevalent in python
     if precision:

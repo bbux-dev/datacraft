@@ -7,6 +7,8 @@ Data Spec Repository
 1. [Overview](#Overview)
 1. [Build](#Build)
 1. [Usage](#Usage)
+   1. [Example Usage](#ExampleUsage)
+   1. [Useful Flags](#UsefulFlags)
 1. [Examples](#Examples)
 1. [Core Concepts](#Core_Concepts)
     1. [Data Spec](#Data_Spec)
@@ -53,9 +55,8 @@ executable on the path.
 ## <a name="Usage"></a>Usage
 
 ```
-usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION]
-                [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT]
-                [--strict] [--apply-raw] [--debug-spec] [-x]
+usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]]
+                [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT] [--strict] [--apply-raw] [--debug-spec] [--debug-defaults] [-x] [--sample-lists] [--defaults DEFAULTS]
 
 Run dataspec.
 
@@ -85,15 +86,18 @@ optional arguments:
   --strict              Enforce schema validation for all registered field specs
   --apply-raw           Data from -s argument should be applied to the template with out treating as a Data Spec
   --debug-spec          Debug spec after internal reformatting
+  --debug-defaults      List default values from registry after any external code loading
   -x, --exclude-internal
                         Do not include non data fields in output records
+  --sample-lists        Turns on sampling for all list backed types
+  --defaults DEFAULTS   Path to defaults overrides
 
 input:
   -s SPEC, --spec SPEC  Spec to Use
   --inline INLINE       Spec as string
 ```
 
-### Example Usage
+### <a name="ExampleUsage"></a>Example Usage
 
 The most common way to use `dataspec` is to define the field specifications in a JSON or YAML file and to specify this file with
 the --spec command line argument:
@@ -126,11 +130,11 @@ INFO [12-Mar-2050 06:24:58 PM] Finished Processing
 
 This can be useful for troubleshooting or experimenting
 
-### Useful Flags
+### <a name="UsefulFlags"></a>Useful Flags
 
 #### Inline JSON/YAML
-The default is to output the generated values to the console. Use the `-k` or `--printkey` arg to print out the key
-along with the value:
+
+To test small spec fragments, you can use the `--inline <spec>` flag. Example:
 
 ```shell
 dataspec --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
@@ -179,6 +183,13 @@ dataspec --inline '{"id:uuid": {}, "handle": { "type": "cc-word", "config": {"mi
 d97e8dad-8dfd-49f1-b25e-eaaf2d6953fd,@IYn
 ```
 
+#### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
+
+The `--apply-raw` command line flag will treat the argument of the `-s` flag as the raw-data that should be applied to
+the template. This can be helpful when working on adjusting the template that is being generated. You can dump the
+generated data from N iterations using the `--format json` or `--format json-pretty` then use this as raw input to the
+template file.
+
 #### Debugging Specifications
 
 There are a bunch of shorthand formats for creating specifications.  These ultimately get turned into a full spec format.
@@ -201,9 +212,10 @@ dataspec --inline 'geo:geo.pair?start_lat=-99.0: {}' \
 
 #### Schema Level Validation
 
-Most of the default supported field spec types have JSON based schemas defined for them. Schema based validation is
-turned off by default.  Use the `--strict` command line flag to turn on the strict schema based checks for types that
-have schemas defined.  Example:
+Most of the default supported field spec types have JSON based schemas defined
+for them. Schema based validation is turned off by default. Use the `--strict`
+command line flag to turn on the strict schema based checks for types that have
+schemas defined. Example:
 
 ```shell
 dataspec --inline 'geo: {type: geo.pair, config: {start_lat: -99.0}}' \
@@ -217,20 +229,72 @@ WARNING [12-Mar-2050 07:24:11 PM] -99.0 is less than the minimum of -90
 ERROR [12-Mar-2050 07:24:11 PM] Failed to validate spec type: geo.pair with spec: {'type': 'geo.pair', 'config': {'start_lat': -99.0}}
 ```
 
+#### Default Values
+
+There are some default values used when a given spec does not provide them.
+These defaults can be viewed using the `--debug-defaults` flag.
+
+```shell
+dataspec --debug-defaults -l off
+{
+    "sample_mode": false,
+    "combine_join_with": "",
+    "char_class_join_with": "",
+    "geo_as_list": false,
+    "combine_as_list": false,
+    "geo_lat_first": false,
+    "geo_join_with": ",",
+    "date_stddev_days": 15,
+    "date_format": "%d-%m-%Y",
+    "geo_precision": 4,
+    "json_indent": 4
+}
+```
+
+The general convention is to use the type as a prefix for the key that it
+effects. You can save this information to disk by specifying the `-o`
+or `--outdir` flag. In the output above the default `join_with` config param is
+a comma for the `geo` type, but is an empty string for the `combine`
+and `char_class` types.
+
+#### Override Defaults
+
+To override the default values, use the `--defaults` /path/to/custom_defaults.json
+
+```shell
+dataspec --debug-defaults -l off --defaults /path/to/custom_defaults.json
+{
+    "sample_mode": true,
+    "combine_join_with": ";",
+    "char_class_join_with": "-",
+    "geo_as_list": true,
+    "combine_as_list": false,
+    "geo_lat_first": false,
+    "geo_join_with": ",",
+    "date_stddev_days": 42,
+    "date_format": "%Y-%m-%d",
+    "geo_precision": 5,
+    "json_indent": 2,
+    "custom_thing": "foo"
+}
+```
+
 ## <a name="Examples"></a>Examples
 
-See [examples](docs/EXAMPLES.md) to dive into detailed examples and practical use cases.
+See [examples](docs/EXAMPLES.md) to dive into detailed example and practical use case.
 
 ## <a name="Core_Concepts"></a>Core Concepts
 
 ### <a name="Data_Spec"></a>Data Spec
 
-A Data Spec is a Dictionary where the keys are the names of the fields to generate and each value is
-a [Field Spec](docs/FIELDSPECS.md)
-that describes how the values for that field are to be generated. There is one reserved key in the root of the Data
-Spec: refs. The refs is a special section of the Data Spec where Field Specs are defined but not tied to any specific
-field. These refs can then be used or referenced by other Specs. An example would be a combine Spec which points to two
-references that should be joined. Below is an example Data Spec for creating email addresses.
+A Data Spec is a Dictionary where the keys are the names of the fields to
+generate and each value is a [Field Spec](docs/FIELDSPECS.md)
+that describes how the values for that field are to be generated. There is one
+reserved key in the root of the Data Spec: refs. The refs is a special section
+of the Data Spec where Field Specs are defined but not tied to any specific
+field. These refs can then be used or referenced by other Specs. An example
+would be a combine Spec which points to two references that should be joined.
+Below is an example Data Spec for creating email addresses.
 
 ```json
 {
@@ -577,13 +641,6 @@ Then we could update our spec to contain a `num_users` field:
 In the above spec the number of users created will be weighted so that half the time there are two, and the other half
 there are three or four. NOTE: It is important to make sure that the `count` param is equal to the maximum number that
 will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
-
-#### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
-
-The `--apply-raw` command line flag will treat the argument of the `-s` flag as the raw-data that should be applied to
-the template. This can be helpful when working on adjusting the template that is being generated. You can dump the
-generated data from N iterations using the `--format json` or `--format json-pretty` then use this as raw input to the
-template file.
 
 ### <a name="Custom_Code_Loading"></a>Custom Code Loading and Schemas
 

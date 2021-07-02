@@ -116,78 +116,78 @@
       "json": "{\n  \"dates:date\": {}\n}",
       "yaml": "dates:date: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "02-05-2021\n15-05-2021"
+      "command": "dataspec --inline '{\"dates:date\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "02-07-2021\n01-08-2021"
     },
     "uniform_date_example_two": {
       "json": "{\n  \"dates:date?offset=1\": {}\n}",
       "yaml": "dates:date?offset=1: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?offset=1\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?offset=1\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "30-04-2021\n18-05-2021"
+      "command": "dataspec --inline '{\"dates:date?offset=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "01-07-2021\n31-07-2021"
     },
     "uniform_date_example_three": {
       "json": "{\n  \"dates:date?duration_days=1\": {}\n}",
       "yaml": "dates:date?duration_days=1: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?duration_days=1\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "28-04-2021\n29-04-2021"
+      "command": "dataspec --inline '{\"dates:date?duration_days=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "02-07-2021\n03-07-2021"
     },
     "uniform_date_example_four": {
       "json": "{\n  \"dates:date?duration_days=10\": {}\n}",
       "yaml": "dates:date?duration_days=10: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=10\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?duration_days=10\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "28-04-2021\n06-05-2021"
+      "command": "dataspec --inline '{\"dates:date?duration_days=10\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "02-07-2021\n12-07-2021"
     },
     "uniform_date_example_five": {
       "json": "{\n  \"dates:date?duration_days=1&offset=1\": {}\n}",
       "yaml": "dates:date?duration_days=1&offset=1: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&offset=1\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?duration_days=1&offset=1\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "27-04-2021\n28-04-2021"
+      "command": "dataspec --inline '{\"dates:date?duration_days=1&offset=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "01-07-2021\n02-07-2021"
     },
     "uniform_date_example_six": {
       "json": "{\n  \"dates:date?duration_days=1&offset=-1\": {}\n}",
       "yaml": "dates:date?duration_days=1&offset=-1: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&offset=-1\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?duration_days=1&offset=-1\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "29-04-2021\n29-04-2021"
+      "command": "dataspec --inline '{\"dates:date?duration_days=1&offset=-1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "03-07-2021\n04-07-2021"
     },
     "uniform_date_example_seven": {
       "json": "{\n  \"dates:date?duration_days=1&offset=1&start=15-12-2050\": {}\n}",
       "yaml": "dates:date?duration_days=1&offset=1&start=15-12-2050: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&offset=1&start=15-12-2050\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?duration_days=1&offset=1&start=15-12-2050\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "command": "dataspec --inline '{\"dates:date?duration_days=1&offset=1&start=15-12-2050\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
       "output": "14-12-2050\n14-12-2050"
     },
     "uniform_date_example_eight": {
       "json": "{\n  \"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\": {}\n}",
       "yaml": "dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'",
-      "output": "15-Dec-2050 16:11\n16-Dec-2050 10:53"
+      "command": "dataspec --inline '{\"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'",
+      "output": "15-Dec-2050 12:00\n16-Dec-2050 11:58"
     },
     "centered_date_example_exhaustive": {
       "json": "{\n  \"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\": {}\n}",
       "yaml": "dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\": {}}' --log-level error -i 5 \\\n  | sort -n | uniq | sed -n '1p;$p'",
-      "output": "20500601 15:19\n20500604 17:13"
+      "command": "dataspec --inline '{\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\": {}}' --log-level error -i 1000 \\\n  | sort -n | uniq | sed -n '1p;$p'",
+      "output": "20500525 20:43\n20500607 00:36"
     },
     "centered_date_example_one": {
       "json": "{\n  \"dates:date?stddev_days=1\": {}\n}",
       "yaml": "dates:date?stddev_days=1: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?stddev_days=1\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?stddev_days=1\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "27-04-2021\n28-04-2021"
+      "command": "dataspec --inline '{\"dates:date?stddev_days=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "29-06-2021\n05-07-2021"
     },
     "centered_date_example_two": {
       "json": "{\n  \"dates:date?stddev_days=15\": {}\n}",
       "yaml": "dates:date?stddev_days=15: {}",
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.add_field(\"dates:date?stddev_days=15\", {})\n\nspec = spec_builder.build()",
-      "command": "dataspec --inline '{\"dates:date?stddev_days=15\": {}}' --log-level error -i 5 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "08-04-2021\n09-05-2021"
+      "command": "dataspec --inline '{\"dates:date?stddev_days=15\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
+      "output": "19-05-2021\n16-08-2021"
     },
     "range_spec_example_one": {
       "json": "{\n  \"zero_to_ten\": {\n    \"type\": \"range\",\n    \"data\": [0, 10, 0.5]\n  },\n  \"range_shorthand1:range\": {\n    \"data\": [0, 10, 0.5]\n  },\n  \"range_shorthand2:range\": [0, 10, 0.5]\n}",
@@ -204,11 +204,11 @@
       "output": "1000\n10000\n55000\n2000\n15000"
     },
     "rand_range_spec_example_one": {
-      "json": "{\n  \"population\": {\n    \"type\": \"rand_range\",\n    \"data\": [100, 1000],\n    \"config\": {\n      \"cast\": \"int\"\n    }\n  }\n}",
-      "yaml": "population:\n  type: rand_range\n  data: [100, 1000]\n  config:\n    cast: int",
-      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.rand_range(\n    key=\"population\",\n    data=[100, 1000],\n    cast=\"int\")\n\nspec = spec_builder.build()",
-      "command": "dataspec -s dataspec.json --log-level error -i 5",
-      "output": "632\n972\n725\n409\n647"
+      "json": "{\n  \"population\": {\n    \"type\": \"rand_range\",\n    \"data\": [100, 1000],\n    \"config\": {\n      \"cast\": \"int\"\n    }\n  },\n  \"pop:rand_range?cast=f\": [200.2, 1222.7, 2]\n}",
+      "yaml": "population:\n  type: rand_range\n  data: [100, 1000]\n  config:\n    cast: int\npop:rand_range?cast=f: [200.2, 1222.7, 2]",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.rand_range(\n    key=\"population\",\n    data=[100, 1000],\n    cast=\"int\")\nspec_builder.add_field(\"pop:rand_range?cast=f\", [200.2, 1222.7, 2])\n\nspec = spec_builder.build()",
+      "command": "dataspec -s dataspec.json --log-level error -i 5  --format json -x",
+      "output": "{\"population\": 828, \"pop\": 630.87}\n{\"population\": 339, \"pop\": 361.01}\n{\"population\": 254, \"pop\": 549.29}\n{\"population\": 509, \"pop\": 261.89}\n{\"population\": 980, \"pop\": 594.94}"
     },
     "uuid_spec_example_one": {
       "json": "{\n  \"id\": {\n    \"type\": \"uuid\"\n  },\n  \"id_shorthand:uuid\": {}\n}",

@@ -18,7 +18,7 @@ def test_outputs_single_field():
     output.handle('key', 'value')
     output.finished_record()
 
-    _verify_ouput('test_single-0.txt', 'key -> value\n')
+    _verify_output('test_single-0.txt', 'key -> value\n')
 
 
 def test_outputs_record_level():
@@ -42,7 +42,7 @@ def test_outputs_record_level():
                            group_name='TEST',
                            exclude_internal=True)
 
-    _verify_ouput('test_record-0.txt', 'A:1, B:2, C:3\n')
+    _verify_output('test_record-0.txt', 'A:1, B:2, C:3\n')
 
 
 def test_format_json():
@@ -60,7 +60,39 @@ def test_format_csv():
     assert as_csv == "value1,value2"
 
 
-def _verify_ouput(fild_name, expected_content):
+def test_single_file_writer(tmpdir):
+    writer = outputs.SingleFileWriter(
+        outdir=tmpdir,
+        outname='foo.bar',
+        overwrite=True
+    )
+
+    writer.write("stuff")
+    with open(os.path.join(tmpdir, 'foo.bar')) as handle:
+        text = handle.read().strip()
+    assert text == 'stuff'
+
+
+def test_single_file_writer_append(tmpdir):
+    writer = outputs.SingleFileWriter(
+        outdir=tmpdir,
+        outname='single_file_append',
+        overwrite=False
+    )
+
+    writer.write("stuff1")
+    writer.write("stuff2")
+    with open(os.path.join(tmpdir, 'single_file_append')) as handle:
+        text = handle.read().strip()
+    assert text == 'stuff1\nstuff2'
+
+
+def test_std_out_writer():
+    # for coverage
+    outputs.StdOutWriter().write("blah")
+
+
+def _verify_output(fild_name, expected_content):
     with open(f'{outdir}/{fild_name}') as handle:
         content = handle.read()
 

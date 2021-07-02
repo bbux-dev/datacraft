@@ -55,7 +55,7 @@ def configure_supplier(spec, _):
         for char_to_exclude in config.get('exclude'):
             data = data.replace(char_to_exclude, '')
     if 'join_with' not in config:
-        config['join_with'] = ''
+        config['join_with'] = dataspec.types.get_default('char_class_join_with')
     if dataspec.utils.any_key_exists(config, ['mean', 'stddev']):
         return dataspec.suppliers.list_stat_sampler(data, config)
     return dataspec.suppliers.list_count_sampler(data, config)

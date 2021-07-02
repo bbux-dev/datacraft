@@ -56,9 +56,9 @@ def configure_geo_pair(field_spec, loader):
     config = dataspec.utils.load_config(field_spec, loader)
     long_supplier = _configure_long_type(field_spec, loader)
     lat_supplier = _configure_lat_type(field_spec, loader)
-    join_with = config.get('join_with', ',')
-    as_list = dataspec.utils.is_affirmative('as_list', config, False)
-    lat_first = dataspec.utils.is_affirmative('lat_first', config)
+    join_with = config.get('join_with', dataspec.types.get_default('geo_join_with'))
+    as_list = dataspec.utils.is_affirmative('as_list', config, dataspec.types.get_default('geo_as_list'))
+    lat_first = dataspec.utils.is_affirmative('lat_first', config, dataspec.types.get_default('geo_lat_first'))
     combine_config = {
         'join_with': join_with,
         'as_list': as_list
@@ -78,7 +78,7 @@ def _configure_lat_type(spec, loader):
 
 def _configure_geo_type(spec, loader, default_start, default_end, suffix):
     config = dataspec.utils.load_config(spec, loader)
-    precision = config.get('precision', 4)
+    precision = config.get('precision', dataspec.types.get_default('geo_precision'))
     if not str(precision).isnumeric():
         raise dataspec.SpecException(f'precision for geo should be valid integer: {json.dumps(spec)}')
     start, end = _get_start_end(config, default_start, default_end, suffix)

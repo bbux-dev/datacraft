@@ -341,7 +341,7 @@ specified weights.
 
 ### <a name="Sample_Mode"></a>Sample Mode
 
-To increase the randomness of the data being generated you can configure a
+To increase the randomness of the data being generated, you can configure a
 FieldSpec that contains a list of values to be sampled instead of iterated
 through incrementally. Normally the spec below would create the repeating
 sequence: `A1 B2 C3`, but since both fields `ONE` and `TWO` are in sample mode,
@@ -351,6 +351,12 @@ sample mode on either use a URL param or config entry with one of `on`,  `yes`,
 or `true`. NOTE: Sample mode is only valid with entries that are lists.
 
 {{ show_example(examples.sample_mode_example_one) }}
+
+#### Sample All
+
+If running from the command line, you cas specify the `--sample-lists` flag to
+make all list backed data to have sampling turned on by default. If using the
+python API, do `dataspec.types.set_default('sample_mode', True)`
 
 ## <a name="Combine"></a>Combine
 
@@ -622,9 +628,9 @@ upper bound and 0 will be the lower.
 
 Example:
 
-Two different population fields. The first generates an integer uniformly
-between 100 and 1000. The second generates a float between 200.2 and 1222.7 with
-two values after the decimal place. Note the abbreviation for cast.
+In this example we have two different population fields. The first generates an
+integer uniformly between 100 and 1000. The second generates a float between
+200.2 and 1222.7 with two values after the decimal place.
 
 {{ show_example(examples.rand_range_spec_example_one) }}
 
@@ -841,21 +847,21 @@ See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
 
 Config Params:
 
-type    |param     |description
---------|----------|---------------------------------------------
-all     |precision |number of decimal places for lat or long, default is 4
-        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
-geo.lat |start_lat |lower bound for latitude
-        |end_lat   |upper bound for latitude
-geo.long|start_long|lower bound for longitude
-        |end_long  |upper bound for longitude
-geo.pair|join_with |delimiter to join long and lat with, default is comma
-        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
-        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
-        |start_lat |lower bound for latitude
-        |end_lat   |upper bound for latitude
-        |start_long|lower bound for longitude
-        |end_long  |upper bound for longitude
+|type    |param     |description
+|--------|----------|---------------------------------------------
+|all     |precision |number of decimal places for lat or long, default is 4
+|        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
+|geo.lat |start_lat |lower bound for latitude
+|        |end_lat   |upper bound for latitude
+|geo.long|start_long|lower bound for longitude
+|        |end_long  |upper bound for longitude
+|geo.pair|join_with |delimiter to join long and lat with, default is comma
+|        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
+|        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
+|        |start_lat |lower bound for latitude
+|        |end_lat   |upper bound for latitude
+|        |start_long|lower bound for longitude
+|        |end_long  |upper bound for longitude
 
 Examples:
 
