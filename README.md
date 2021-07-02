@@ -633,7 +633,7 @@ In the above spec the number of users created will be weighted so that half the 
 there are three or four. NOTE: It is important to make sure that the `count` param is equal to the maximum number that
 will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
-#### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
+### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
 
 The `--apply-raw` command line flag will treat the argument of the `-s` flag as the raw-data that should be applied to
 the template. This can be helpful when working on adjusting the template that is being generated. You can dump the

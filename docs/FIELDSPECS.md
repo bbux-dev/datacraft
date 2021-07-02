@@ -871,7 +871,7 @@ specified weights.
 
 ### <a name="Sample_Mode"></a>Sample Mode
 
-To increase the randomness of the data being generated you can configure a
+To increase the randomness of the data being generated, you can configure a
 FieldSpec that contains a list of values to be sampled instead of iterated
 through incrementally. Normally the spec below would create the repeating
 sequence: `A1 B2 C3`, but since both fields `ONE` and `TWO` are in sample mode,
@@ -928,6 +928,12 @@ spec = spec_builder.build()
 ```
 
 </details>
+
+#### Sample All
+
+If running from the command line, you cas specify the `--sample-lists` flag to
+make all list backed data to have sampling turned on by default. If using the
+python API, do `dataspec.types.set_default('sample_mode', True)`
 
 ## <a name="Combine"></a>Combine
 
