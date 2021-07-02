@@ -7,6 +7,8 @@ Data Spec Repository
 1. [Overview](#Overview)
 1. [Build](#Build)
 1. [Usage](#Usage)
+   1. [Example Usage](#ExampleUsage)
+   1. [Useful Flags](#UsefulFlags)
 1. [Examples](#Examples)
 1. [Core Concepts](#Core_Concepts)
     1. [Data Spec](#Data_Spec)
@@ -95,7 +97,7 @@ input:
   --inline INLINE       Spec as string
 ```
 
-### Example Usage
+### <a name="ExampleUsage"></a>Example Usage
 
 The most common way to use `dataspec` is to define the field specifications in a JSON or YAML file and to specify this file with
 the --spec command line argument:
@@ -128,11 +130,11 @@ INFO [12-Mar-2050 06:24:58 PM] Finished Processing
 
 This can be useful for troubleshooting or experimenting
 
-### Useful Flags
+### <a name="UsefulFlags"></a>Useful Flags
 
 #### Inline JSON/YAML
-The default is to output the generated values to the console. Use the `-k` or `--printkey` arg to print out the key
-along with the value:
+
+To test small spec fragments, you can use the `--inline <spec>` flag. Example:
 
 ```shell
 dataspec --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
@@ -180,6 +182,13 @@ dataspec --inline '{"id:uuid": {}, "handle": { "type": "cc-word", "config": {"mi
 41adb77f-d7b3-4a31-a75b-5faff33d5eb8,@U0gI
 d97e8dad-8dfd-49f1-b25e-eaaf2d6953fd,@IYn
 ```
+
+#### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
+
+The `--apply-raw` command line flag will treat the argument of the `-s` flag as the raw-data that should be applied to
+the template. This can be helpful when working on adjusting the template that is being generated. You can dump the
+generated data from N iterations using the `--format json` or `--format json-pretty` then use this as raw input to the
+template file.
 
 #### Debugging Specifications
 
@@ -632,13 +641,6 @@ Then we could update our spec to contain a `num_users` field:
 In the above spec the number of users created will be weighted so that half the time there are two, and the other half
 there are three or four. NOTE: It is important to make sure that the `count` param is equal to the maximum number that
 will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
-
-### <a name="ApplyRaw"></a>Apply Raw `--apply-raw`
-
-The `--apply-raw` command line flag will treat the argument of the `-s` flag as the raw-data that should be applied to
-the template. This can be helpful when working on adjusting the template that is being generated. You can dump the
-generated data from N iterations using the `--format json` or `--format json-pretty` then use this as raw input to the
-template file.
 
 ### <a name="Custom_Code_Loading"></a>Custom Code Loading and Schemas
 
