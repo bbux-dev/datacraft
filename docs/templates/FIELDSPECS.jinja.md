@@ -622,9 +622,9 @@ upper bound and 0 will be the lower.
 
 Example:
 
-Two different population fields. The first generates an integer uniformly
-between 100 and 1000. The second generates a float between 200.2 and 1222.7 with
-two values after the decimal place. Note the abbreviation for cast.
+In this example we have two different population fields. The first generates an
+integer uniformly between 100 and 1000. The second generates a float between
+200.2 and 1222.7 with two values after the decimal place.
 
 {{ show_example(examples.rand_range_spec_example_one) }}
 

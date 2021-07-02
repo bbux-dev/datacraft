@@ -1327,10 +1327,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-02-05-2021
-15-05-2021
+02-07-2021
+01-08-2021
 ```
 
 </details>
@@ -1373,10 +1373,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?offset=1": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?offset=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-30-04-2021
-18-05-2021
+01-07-2021
+31-07-2021
 ```
 
 </details>
@@ -1419,10 +1419,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-28-04-2021
-29-04-2021
+02-07-2021
+03-07-2021
 ```
 
 </details>
@@ -1465,10 +1465,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-28-04-2021
-06-05-2021
+02-07-2021
+12-07-2021
 ```
 
 </details>
@@ -1511,10 +1511,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-27-04-2021
-28-04-2021
+01-07-2021
+02-07-2021
 ```
 
 </details>
@@ -1557,10 +1557,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-29-04-2021
-29-04-2021
+03-07-2021
+04-07-2021
 ```
 
 </details>
@@ -1603,7 +1603,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 14-12-2050
 14-12-2050
@@ -1649,10 +1649,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
-15-Dec-2050 16:11
-16-Dec-2050 10:53
+15-Dec-2050 12:00
+16-Dec-2050 11:58
 ```
 
 </details>
@@ -1699,10 +1699,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error -i 1000 \
   | sort -n | uniq | sed -n '1p;$p'
-20500601 15:19
-20500604 17:13
+20500525 20:43
+20500607 00:36
 ```
 
 </details>
@@ -1748,10 +1748,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-27-04-2021
-28-04-2021
+29-06-2021
+05-07-2021
 ```
 
 </details>
@@ -1794,10 +1794,10 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error -i 5 \
+dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-08-04-2021
-09-05-2021
+19-05-2021
+16-08-2021
 ```
 
 </details>
@@ -1977,9 +1977,9 @@ upper bound and 0 will be the lower.
 
 Example:
 
-Two different population fields. The first generates an integer uniformly
-between 100 and 1000. The second generates a float between 200.2 and 1222.7 with
-two values after the decimal place. Note the abbreviation for cast.
+In this example we have two different population fields. The first generates an
+integer uniformly between 100 and 1000. The second generates a float between
+200.2 and 1222.7 with two values after the decimal place.
 
 <details open>
   <summary>JSON Spec</summary>
@@ -1992,7 +1992,8 @@ two values after the decimal place. Note the abbreviation for cast.
     "config": {
       "cast": "int"
     }
-  }
+  },
+  "pop:rand_range?cast=f": [200.2, 1222.7, 2]
 }
 ```
 
@@ -2006,6 +2007,7 @@ population:
   data: [100, 1000]
   config:
     cast: int
+pop:rand_range?cast=f: [200.2, 1222.7, 2]
 ```
 
 </details>
@@ -2021,6 +2023,7 @@ spec_builder.rand_range(
     key="population",
     data=[100, 1000],
     cast="int")
+spec_builder.add_field("pop:rand_range?cast=f", [200.2, 1222.7, 2])
 
 spec = spec_builder.build()
 ```
@@ -2031,12 +2034,12 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 5
-632
-972
-725
-409
-647
+dataspec -s dataspec.json --log-level error -i 5  --format json -x
+{"population": 828, "pop": 630.87}
+{"population": 339, "pop": 361.01}
+{"population": 254, "pop": 549.29}
+{"population": 509, "pop": 261.89}
+{"population": 980, "pop": 594.94}
 ```
 
 </details>

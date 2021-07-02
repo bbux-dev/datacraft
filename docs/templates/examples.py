@@ -181,77 +181,77 @@ spec_builder.add_field("dates:date?duration_days=90&start=15-Dec-2050 12:00&form
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_one",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_two",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?offset=1", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_three",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_four",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=10", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_five",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&offset=1", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_six",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&offset=-1", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_seven",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&offset=1&start=15-12-2050", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="uniform_date_example_eight",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="centered_date_example_exhaustive",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2", {})
 """,
         pipes="\\\n  | sort -n | uniq | sed -n '1p;$p'"),
     Example(
         name="centered_date_example_one",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?stddev_days=1", {})
 """,
         pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
     Example(
         name="centered_date_example_two",
-        iterations=5,
+        iterations=1000,
         fragment="""
 spec_builder.add_field("dates:date?stddev_days=15", {})
 """,
@@ -284,7 +284,9 @@ spec_builder.rand_range(
     key="population",
     data=[100, 1000],
     cast="int")
-"""),
+spec_builder.add_field("pop:rand_range?cast=f", [200.2, 1222.7, 2])
+""",
+        pipes=" --format json -x"),
     Example(
         name="uuid_spec_example_one",
         iterations=5,
