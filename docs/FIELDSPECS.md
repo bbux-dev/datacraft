@@ -2475,21 +2475,21 @@ See: [Bounding_Box](https://wiki.openstreetmap.org/wiki/Bounding_Box#)
 
 Config Params:
 
-type    |param     |description
---------|----------|---------------------------------------------
-all     |precision |number of decimal places for lat or long, default is 4
-        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
-geo.lat |start_lat |lower bound for latitude
-        |end_lat   |upper bound for latitude
-geo.long|start_long|lower bound for longitude
-        |end_long  |upper bound for longitude
-geo.pair|join_with |delimiter to join long and lat with, default is comma
-        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
-        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
-        |start_lat |lower bound for latitude
-        |end_lat   |upper bound for latitude
-        |start_long|lower bound for longitude
-        |end_long  |upper bound for longitude
+|type    |param     |description
+|--------|----------|---------------------------------------------
+|all     |precision |number of decimal places for lat or long, default is 4
+|        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
+|geo.lat |start_lat |lower bound for latitude
+|        |end_lat   |upper bound for latitude
+|geo.long|start_long|lower bound for longitude
+|        |end_long  |upper bound for longitude
+|geo.pair|join_with |delimiter to join long and lat with, default is comma
+|        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
+|        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
+|        |start_lat |lower bound for latitude
+|        |end_lat   |upper bound for latitude
+|        |start_long|lower bound for longitude
+|        |end_long  |upper bound for longitude
 
 Examples:
 
