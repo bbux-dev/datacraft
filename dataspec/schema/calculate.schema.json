@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/calculate.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^calculate$"
+    },
+    "config": {
+      "type": "object"
+    },
+    "refs": {
+      "type": "object",
+      "examples": [
+        "{ \"field\": \"a\" }"
+      ]
+    },
+    "fields": {
+      "type": "object",
+      "examples": [
+        "{ \"field\": \"a\" }"
+      ]
+    },
+    "formula": {
+      "type": "string",
+      "examples": [
+        "a * b",
+        "a * 22.34",
+        "(a + b - c) * (d^^2)"
+      ]
+    }
+  },
+  "oneOf": [
+    {"required": ["refs", "formula"]},
+    {"required": ["fields", "formula"]}
+  ]
+}

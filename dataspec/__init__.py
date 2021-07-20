@@ -7,5 +7,6 @@ from .exceptions import SpecException, ResourceError
 from .builder import spec_builder
 from .supplier.core import *
 from .preprocessor import *
+from . import suppliers
 
 __version__ = '0.1.0'

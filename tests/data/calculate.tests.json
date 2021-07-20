@@ -1,0 +1,14 @@
+{
+  "calculate.schema.json": {
+    "valid": [
+      {"instance": {"type": "calculate", "formula": "a + b", "refs": {"one": "a", "two": "b"}}},
+      {"instance": {"type": "calculate", "formula": "a + b", "fields": {"one": "a", "two": "b"}}}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "calcalate"}, "note": "misspelled"},
+      {"instance": {"type": "calculate"}, "note": "no fields or refs"},
+      {"instance": {"type": "calculate", "refs": {"one": "a", "two": "b"}}, "note":  "missing formula"}
+    ]
+  }
+}

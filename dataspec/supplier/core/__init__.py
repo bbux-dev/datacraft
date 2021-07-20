@@ -11,4 +11,6 @@ __all__ = ['char_class',
            'unicode_range',
            'uuid_handler',
            'values',
-           'weighted_refs',]
+           'weighted_refs',
+           'calculate',
+           'refs']

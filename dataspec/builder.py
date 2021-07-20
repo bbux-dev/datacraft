@@ -32,15 +32,6 @@ class FieldInfo:
         return self.builder.build()
 
 
-def spec_builder():
-    """
-    Creates a new DataSpec builder
-
-    :return: the Builder()
-    """
-    return Builder()
-
-
 class Builder:
     """
     Container class for constructing the Data Spec by adding fields, refs, and field_groups
@@ -306,6 +297,22 @@ class Builder:
         else:
             self.add_ref(key, configref(**config))
 
+    def calculate(self, key: str,
+                  refs: Union[List[str], List[FieldInfo]] = None,
+                  fields: Union[List[str], List[FieldInfo]] = None,
+                  formula: str = None,
+                  **config):
+        """
+        creates calculate Field Spec and adds to Data Spec
+
+        :param key: name of ref/field
+        :param refs: refs to combine
+        :param fields: fields to combine
+        :param config: in **kwargs format
+        :return: FieldInfo
+        """
+        return self._add_field_spec(key, calculate(refs, fields, formula, **config))
+
     def _add_field_spec(self, key, spec):
         """ adds the fieldspec and creates a FieldInfo object """
         self.add_field(key, spec)
@@ -460,6 +467,15 @@ class Builder:
         all_list = all(isinstance(entry, list) for entry in self.field_groups)
         if all_list:
             spec['field_groups'] = self.field_groups
+
+
+def spec_builder() -> Builder:
+    """
+    Creates a new DataSpec builder
+
+    :return: the Builder()
+    """
+    return Builder()
 
 
 def single_field(name: str, spec):
@@ -897,6 +913,33 @@ def configref(**config):
     spec = {
         "type": "configref"
     }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def calculate(refs: Union[List[str], List[FieldInfo]] = None,
+              fields: Union[List[str], List[FieldInfo]] = None,
+              formula: str = None,
+              **config):
+    """
+    Constructs a calculate spec
+
+    :param refs: mapping of ref to alias to used in formula
+    :param formula: formula to execute against results of refs/fields
+    :param fields: mapping of field name to alias used in formula
+    :param config: in **kwargs format
+    :return: the calculate spec
+    """
+    spec = {
+        "type": "calculate",
+        "formula": formula
+    }  # type: Dict[str, Any]
+    if refs is not None:
+        spec['refs'] = refs
+    if fields is not None:
+        spec['fields'] = fields
 
     if len(config) > 0:
         spec['config'] = config
