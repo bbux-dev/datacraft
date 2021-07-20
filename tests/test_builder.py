@@ -185,10 +185,9 @@ invalid_spec_build_tests = [
     builder.Builder().geo_pair('name', join_with=":", precision="yes"),  # invalid precision
     builder.Builder().ip('name', base="192.1680"),  # type in base
     builder.Builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
+    builder.Builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),  # ref not defined
     # TODO: when schemas for these are created
     # builder.Builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
-    # builder.Builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
-    # builder.Builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
     # builder.Builder().csv('name', datafile="demo.csv", sample="on"),
     # builder.Builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
     # builder.Builder().nested('name', fields={"one": {"type": "values", "data": 1}}),

@@ -1168,13 +1168,11 @@ start date is today. You can use the `start` parameter to set a specific start
 date for the dates. You can also explicitly specify an `end` date. The `start`
 and `end` parameters should conform to the specified date format, or the default
 if none is provided. The `offset` parameter can be used to shift the dates by a
-specified number of days. A positive
-`offset` will shift the start date back. A negative `offset` will shift the date
-forward. The `duration_days`
-parameter can be used to specify the number of days that should be covered in
-the date range, this parameter can take the place of the `end` parameter to make
-specifying the number of days the dates should cover. This parameter is usually
-specified as an integer constant.
+specified number of days. A positive `offset` will shift the start date back. A
+negative `offset` will shift the date forward. The `duration_days` parameter can
+be used to specify the number of days that should be covered in the date range,
+instead of the default 30 days. This parameter is usually specified as an
+integer constant.
 
 ```
        start                              end (default start + 30 days)
@@ -1662,7 +1660,6 @@ dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%
 ```
 
 </details>
-
 
 </details>
 
