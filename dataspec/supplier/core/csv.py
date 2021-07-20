@@ -69,6 +69,7 @@ class SampleEnabledCsv(CsvDataBase):
     """
     CSV Data that reads whole file into memory. Supports Sampling of columns and counts greater than 1.
     """
+
     def __init__(self, csv_path: str, delimiter: str, quotechar: str, has_headers: bool):
         self.csv_path = csv_path
         self.delimiter = delimiter
@@ -100,6 +101,7 @@ class BufferedCsvData(CsvDataBase):
     CSV Data that buffers in a section of the CSV file at a time. Does NOT support sampling or counts greater than 1 for
     columns.
     """
+
     def __init__(self, csv_path: str, delimiter: str, quotechar: str, has_headers: bool, buffer_size: int):
         self.csv_path = csv_path
         self.delimiter = delimiter
@@ -185,6 +187,9 @@ def configure_csv(field_spec, loader):
     return CsvSupplier(csv_data, field_name, sample, count_supplier)
 
 
+ONE_MB = 1024 * 1024
+
+
 def _load_csv_data(field_spec, config, datadir):
     """
     Creates the CsvData object, caches the object by file path so that we can share this object across fields
@@ -200,7 +205,7 @@ def _load_csv_data(field_spec, config, datadir):
 
     if not os.path.exists(csv_path):
         raise dataspec.SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
-                            + json.dumps(field_spec))
+                                     + json.dumps(field_spec))
     delimiter = config.get('delimiter', ',')
     # in case tab came in as string
     if delimiter == '\\t':
@@ -209,7 +214,8 @@ def _load_csv_data(field_spec, config, datadir):
     has_headers = dataspec.utils.is_affirmative('headers', config)
 
     size_in_bytes = os.stat(csv_path).st_size
-    if size_in_bytes <= SMALL_ENOUGH_THRESHOLD:
+    max_csv_size = int(dataspec.types.get_default('large_csv_size_mb')) * ONE_MB
+    if size_in_bytes <= max_csv_size:
         csv_data = SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
     else:
         csv_data = BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)

@@ -62,6 +62,8 @@ def main():
     parser.add_argument('--sample-lists', dest='sample_lists', action='store_true', default=False,
                         help='Turns on sampling for all list backed types')
     parser.add_argument('--defaults', help='Path to defaults overrides')
+    parser.add_argument("--set-defaults", dest='set_defaults', metavar="KEY=VALUE", nargs='+',
+                        help="Set a number of key-value pairs to override defaults with")
 
     try:
         args = parser.parse_args()
@@ -86,6 +88,15 @@ def main():
             defaults = _load_json_or_yaml(args.defaults)
             for key, value in defaults.items():
                 types.set_default(key, value)
+        # command line takes precedence over config file
+        if args.set_defaults:
+            for setting in args.set_defaults:
+                parts = setting.split('=')
+                if len(parts) != 2:
+                    log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
+                                setting)
+                    continue
+                types.set_default(parts[0], parts[1])
         # command line overrides any configs
         if args.sample_lists:
             types.set_default('sample_mode', True)

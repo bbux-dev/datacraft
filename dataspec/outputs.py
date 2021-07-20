@@ -19,7 +19,7 @@ def format_json(record):
 @dataspec.registry.formats('json-pretty')
 def format_json_pretty(record):
     """ pretty prints the record as json """
-    return json.dumps(record, indent=dataspec.types.get_default('json_indent'))
+    return json.dumps(record, indent=int(dataspec.types.get_default('json_indent')))
 
 
 @dataspec.registry.formats('csv')

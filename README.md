@@ -35,7 +35,8 @@ Data Spec could be used to generate JSON, XML, or a csv file. Each field in the
 Data Spec has its own Field Spec that defines how the values for it should be
 created. There are a variety of core field types that are used to generate the
 data for each field. Where the built-in types are not sufficient, there is an
-easy way to create custom types and handlers for them. The tool supports
+easy way to create custom types and handlers for them
+using [Custom Code Loading](#Custom_Code_Loading). The dataspec tool supports
 templating using the [Jinja2](https://pypi.org/project/Jinja2/) templating
 engine format.
 
@@ -62,8 +63,8 @@ your path. Assumes there is a python executable on the path.
 ## <a name="Usage"></a>Usage
 
 ```
-usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]]
-                [-d DATADIR] [-l LOG_LEVEL] [-f FORMAT] [--strict] [--apply-raw] [--debug-spec] [--debug-defaults] [-x] [--sample-lists] [--defaults DEFAULTS]
+usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL]
+                [-f FORMAT] [--strict] [--apply-raw] [--debug-spec] [--debug-defaults] [-x] [--sample-lists] [--defaults DEFAULTS] [--set-defaults KEY=VALUE [KEY=VALUE ...]]
 
 Run dataspec.
 
@@ -98,6 +99,8 @@ optional arguments:
                         Do not include non data fields in output records
   --sample-lists        Turns on sampling for all list backed types
   --defaults DEFAULTS   Path to defaults overrides
+  --set-defaults KEY=VALUE [KEY=VALUE ...]
+                        Set a number of key-value pairs to override defaults with
 
 input:
   -s SPEC, --spec SPEC  Spec to Use
@@ -122,7 +125,8 @@ the supplied template which will be output to the specified directory. The
 default is to write all outputs to a single file. Use the `-r` or
 `--records-per-file` command line argument to modify this if desired.
 
-An alternative way to specify the data for a spec is by using the `--inline` argument:
+An alternative way to specify the data for a spec is by using the `--inline`
+argument:
 
 ```shell
 dataspec \
@@ -176,14 +180,16 @@ separated value line. Examples:
 dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
     --iterations 2 \
     --log-level off \
-    --format json
+    --format json \
+    --exclude-internal
 {"handle": "@a2oNt"}
 {"handle": "@lLN3i"}
 
 dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
     --iterations 2 \
     --log-level off \
-    --format json-pretty
+    --format json-pretty \
+    --exclude-internal
 {
     "handle": "@ZJeE_f"
 }
@@ -273,7 +279,9 @@ and `char_class` types.
 
 #### Override Defaults
 
-To override the default values, use the `--defaults` /path/to/custom_defaults.json
+To override the default values, use the `--defaults`
+/path/to/custom_defaults.json or specify individual overrides
+with `--set-defaults key=value`.
 
 ```shell
 dataspec --debug-defaults -l off --defaults /path/to/custom_defaults.json
@@ -290,6 +298,22 @@ dataspec --debug-defaults -l off --defaults /path/to/custom_defaults.json
     "geo_precision": 5,
     "json_indent": 2,
     "custom_thing": "foo"
+}
+
+dataspec --debug-defaults -l off --set-defaults date_format="%Y_%m_%d" sample_mode="true"
+{
+    "sample_mode": "true",
+    "combine_join_with": "",
+    "char_class_join_with": "",
+    "geo_as_list": false,
+    "combine_as_list": false,
+    "geo_lat_first": false,
+    "geo_join_with": ",",
+    "date_stddev_days": 15,
+    "date_format": "%Y_%m_%d",
+    "geo_precision": 4,
+    "json_indent": 4,
+    "large_csv_size_mb": 250
 }
 ```
 
@@ -517,7 +541,13 @@ iterations will be equal to the size of the smallest number of lines for all the
 large input CSV file. The current size threshold is set to 250 MB. So, if you
 are using two different csv files as inputs and one is 300 MB with 5 million
 entries and another is 500 MB with 2 million entries, you will be limited to 2
-million iterations before an exception will be raised and processing will cease.
+million iterations before an exception will be raised and processing will
+cease., You can override the default size limit on the command line by using
+the `--set-default` flag. Example:
+
+```shell
+dataspec --set-default large_csv_size_mb=1024 --datadir path/to/large.csv ...
+```
 
 #### More efficient processing using csv_select
 

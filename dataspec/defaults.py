@@ -4,6 +4,9 @@ Module for storing default settings across package
 from . import registry
 
 
+LARGE_CSV_SIZE_MB = 250
+
+
 @registry.defaults('sample_mode')
 def default_list_sample_mode():
     """ By default we do not sample from lists backed types """
@@ -58,3 +61,9 @@ def default_geo_type_precision():
 def default_json_indent():
     """ default spaces to indent when using json-pretty formatter """
     return 4
+
+
+@registry.defaults('large_csv_size_mb')
+def default_large_csv_size():
+    """ default size for what constitutes a large csv file """
+    return LARGE_CSV_SIZE_MB
