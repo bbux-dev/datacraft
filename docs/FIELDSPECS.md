@@ -38,7 +38,8 @@ Field Spec Definitions
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
-    1. [nested](#Nested)
+    1. [Nested](#Nested)
+    1. [Calculate](#Calculate)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -65,6 +66,7 @@ type                         | description                            | config p
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
 [nested](#Nested)            | For nested fields                      |
+[calculate](#Calculate)      | Calculate values from output of other fields or refs|
 
 # <a name="Overview"></a>Overview
 
@@ -3468,24 +3470,199 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 1
+dataspec -s dataspec.json --log-level error -i 1 --format json-pretty -x
 {
-    "id": "327658cd-b3de-477a-a902-742efd03ef89",
+    "id": "02825a62-2bd5-4461-a6be-773df096cfc4",
     "user": {
-        "user_id": "c14c7709-d0f6-4cd8-b9ff-a936960ca63f",
+        "user_id": "bfbab550-024f-4f46-b63a-a3cf1a7e1c9e",
         "geo": {
-            "place_id": "59283706",
+            "place_id": "6138",
             "coordinates": [
-                "-142.8146",
-                " 66.3702"
+                " 75.0154",
+                "-80.9406"
             ]
         }
-    },
-    "_internal": {
-        "_iteration": 0,
-        "_field_group": "ALL"
     }
 }
 ```
 
 </details>
+
+## <a name="Calculate"></a>Calculate
+
+There are times when one field needs the value of another field in order to
+calculate its own value. For example, if you wanted to produce values that
+represented a users' height in inches and in centimeters, you would want them to
+correlate. You could use the `calculate` type to specify a `formula` to do this
+calculation. The spec takes a mapping of field or ref name to an alias that
+takes the place of that value in the formula. Example:
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "height_in": {
+    "type": "values",
+    "data": [60, 70, 80, 90]
+  },
+  "height_cm": {
+    "type": "calculate",
+    "fields": {
+      "height_in": "a"
+    },
+    "formula": "a * 2.54"
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+height_in:
+  type: values
+  data: [60, 70, 80, 90]
+height_cm:
+  type: calculate
+  fields:
+    height_in: a
+  formula: a * 2.54
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('height_in', [60, 70, 80, 90])
+aliases = {'height_in': 'a'}
+formula = 'a * 2.54'
+spec_builder.calculate('height_cm', fields=aliases, formula=formula)
+
+spec = spec_builder.build()
+```
+
+</details>
+
+
+<details>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 5 --format json-pretty -x
+{
+    "height_in": 60,
+    "height_cm": 152.4
+}
+{
+    "height_in": 70,
+    "height_cm": 177.8
+}
+{
+    "height_in": 80,
+    "height_cm": 203.2
+}
+{
+    "height_in": 90,
+    "height_cm": 228.6
+}
+{
+    "height_in": 60,
+    "height_cm": 152.4
+}
+```
+
+</details>
+
+In this example we alias the value output from `height_in` to the variable in
+our formula `a`. It is possible to use multiple variables. In this next example
+we use the Pythagorean theorem to calculate the hypotenuse from two fields.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "a": {
+    "type": "values",
+    "data": [4, 5, 6]
+  },
+  "b": {
+    "type": "values",
+    "data": [3, 6, 9]
+  },
+  "c": {
+    "type": "calculate",
+    "fields": {
+      "a": "a",
+      "b": "b"
+    },
+    "formula": "sqrt(a*a + b*b)"
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+a:
+  type: values
+  data: [4, 5, 6]
+b:
+  type: values
+  data: [3, 6, 9]
+c:
+  type: calculate
+  fields:
+    a: a
+    b: b
+  formula: sqrt(a*a + b*b)
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('a', [4, 5, 6])
+spec_builder.values('b', [3, 6, 9])
+aliases = {'a': 'a', 'b': 'b'}
+formula = 'sqrt(a*a + b*b)'
+spec_builder.calculate('c', fields=aliases, formula=formula)
+
+spec = spec_builder.build()
+```
+
+</details>
+
+
+<details>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 3 --format json -x
+{"a": 4, "b": 3, "c": 5.0}
+{"a": 5, "b": 6, "c": 7.810249675906654}
+{"a": 6, "b": 9, "c": 10.816653826391969}
+```
+
+</details>
+
+We use
+the [asteval](http://newville.github.io/asteval/basics.html)
+package to do formula evaluation. This provides a fairly safe way to do
+evaluation. The package provides a bunch of
+[build-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
+as well.

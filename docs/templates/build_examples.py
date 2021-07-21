@@ -88,7 +88,7 @@ def order_field_spec(field_spec):
         ordered['data'] = NoIndent(field_spec['data'])
     if 'refs' in field_spec:
         refs = field_spec['refs']
-        if isinstance(refs[0], list):
+        if isinstance(refs, list) and isinstance(refs[0], list):
             ordered['refs'] = [NoIndent(ref) for ref in refs]
         else:
             ordered['refs'] = NoIndent(refs)

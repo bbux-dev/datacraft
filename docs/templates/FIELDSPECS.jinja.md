@@ -128,7 +128,8 @@ param | type | description                                  | default | examples
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
-    1. [nested](#Nested)
+    1. [Nested](#Nested)
+    1. [Calculate](#Calculate)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -155,6 +156,7 @@ type                         | description                            | config p
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
 [nested](#Nested)            | For nested fields                      |
+[calculate](#Calculate)      | Calculate values from output of other fields or refs|
 
 # <a name="Overview"></a>Overview
 
@@ -1167,3 +1169,31 @@ data that matches this schema.
 {{ show_example(examples.nested_example_one) }}
 
 {{ show_command_and_output(examples.nested_example_one) }}
+
+## <a name="Calculate"></a>Calculate
+
+There are times when one field needs the value of another field in order to
+calculate its own value. For example, if you wanted to produce values that
+represented a users' height in inches and in centimeters, you would want them to
+correlate. You could use the `calculate` type to specify a `formula` to do this
+calculation. The spec takes a mapping of field or ref name to an alias that
+takes the place of that value in the formula. Example:
+
+{{ show_example(examples.calculate_example_one) }}
+
+{{ show_command_and_output(examples.calculate_example_one) }}
+
+In this example we alias the value output from `height_in` to the variable in
+our formula `a`. It is possible to use multiple variables. In this next example
+we use the Pythagorean theorem to calculate the hypotenuse from two fields.
+
+{{ show_example(examples.calculate_example_two) }}
+
+{{ show_command_and_output(examples.calculate_example_two) }}
+
+We use
+the [asteval](http://newville.github.io/asteval/basics.html)
+package to do formula evaluation. This provides a fairly safe way to do
+evaluation. The package provides a bunch of
+[build-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
+as well.

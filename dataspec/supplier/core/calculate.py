@@ -1,7 +1,13 @@
-""" module for handling calculate types """
+"""
+module for handling calculate types
+"""
 import json
-import dataspec
 import keyword
+import logging
+import asteval
+import dataspec
+
+log = logging.getLogger(__name__)
 
 
 class CalculateSupplier(dataspec.ValueSupplierInterface):
@@ -22,19 +28,26 @@ class CalculateSupplier(dataspec.ValueSupplierInterface):
     i.e.:
 
     >>> formula = "ft * 30.48"
-    >>> suppliers = { "ft": 'a': dataspec.suppliers.values([4, 5, 6]) }
+    >>> suppliers = { "ft": dataspec.suppliers.values([4, 5, 6]) }
     >>> calculate = CalculateSupplier(suppliers=suppliers, formula=formula)
-    >>> asssert calculate.next(0) ==
+    >>> asssert calculate.next(0) == 121.92
     """
 
     def __init__(self, suppliers: dict, formula: str):
         self.suppliers = suppliers
         self.formula = formula
+        self.aeval = asteval.Interpreter()
 
     def next(self, iteration):
+        # make a copy to manipulate
+        formula = str(self.formula)
         for alias, supplier in self.suppliers.items():
-            exec(f'{alias} = {supplier.next(iteration)}')
-        return eval(self.formula)
+            if alias not in formula:
+                continue
+            formula = formula.replace(alias, str(supplier.next(iteration)))
+        if iteration == 0:
+            log.debug(formula)
+        return self.aeval(formula)
 
 
 @dataspec.registry.schemas('calculate')
@@ -50,7 +63,7 @@ def configure_calculate_supplier(field_spec: dict, loader: dataspec.Loader):
         raise dataspec.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
     if 'refs' in field_spec and 'fields' in field_spec:
         raise dataspec.SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
-    if 'formula' not in field_spec:
+    if field_spec.get('formula') is None:
         raise dataspec.SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
     key = 'refs' if 'refs' in field_spec else 'fields'
@@ -62,8 +75,8 @@ def configure_calculate_supplier(field_spec: dict, loader: dataspec.Loader):
     for ref, alias in mappings.items():
         if keyword.iskeyword(alias):
             raise dataspec.SpecException(
-                'Invalid alias for calculate spec: %s is a keyword, try _%s instead', alias, alias)
+                f'Invalid alias for calculate spec: {alias} is a keyword, try _{alias} instead')
         supplier = loader.get(ref)
         suppliers[alias] = supplier
 
-    return CalculateSupplier(suppliers=suppliers, formula=field_spec.get('formula'))
+    return CalculateSupplier(suppliers=suppliers, formula=field_spec.get('formula', ''))

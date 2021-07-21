@@ -313,6 +313,18 @@ class Builder:
         """
         return self._add_field_spec(key, calculate(refs, fields, formula, **config))
 
+    def ref(self, key: str, ref_name: str = None, data: str = None, **config):
+        """
+        creates ref FieldSpec and adds to Data Spec
+
+        :param key: name of ref/field
+        :param ref_name: name of reference to get values from
+        :param data: name of reference to get values from
+        :param config: in **kwargs format
+        :return: FieldInfo
+        """
+        return self._add_field_spec(key, ref(ref_name, data, **config))
+
     def _add_field_spec(self, key, spec):
         """ adds the fieldspec and creates a FieldInfo object """
         self.add_field(key, spec)
@@ -919,8 +931,8 @@ def configref(**config):
     return spec
 
 
-def calculate(refs: Union[List[str], List[FieldInfo]] = None,
-              fields: Union[List[str], List[FieldInfo]] = None,
+def calculate(refs: dict = None,
+              fields: dict = None,
               formula: str = None,
               **config):
     """
@@ -940,6 +952,30 @@ def calculate(refs: Union[List[str], List[FieldInfo]] = None,
         spec['refs'] = refs
     if fields is not None:
         spec['fields'] = fields
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def ref(ref_name: str = None, data: str = None, **config):
+    """
+    Constructs a ref spec
+
+    :param ref_name: name of reference to get values from
+    :param data: name of reference to get values from
+    :param config: in **kwargs format
+    :return: the csv_select spec
+    """
+    spec = {
+        "type": "ref"
+    }  # type: Dict[str, Any]
+
+    if data is not None:
+        spec['data'] = data
+
+    if ref_name is not None:
+        spec['ref'] = ref_name
 
     if len(config) > 0:
         spec['config'] = config
