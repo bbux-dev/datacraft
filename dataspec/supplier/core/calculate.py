@@ -4,7 +4,7 @@ module for handling calculate types
 import json
 import keyword
 import logging
-import asteval
+import asteval  # type: ignore
 import dataspec
 
 log = logging.getLogger(__name__)

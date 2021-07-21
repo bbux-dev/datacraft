@@ -298,8 +298,8 @@ class Builder:
             self.add_ref(key, configref(**config))
 
     def calculate(self, key: str,
-                  refs: Union[List[str], List[FieldInfo]] = None,
-                  fields: Union[List[str], List[FieldInfo]] = None,
+                  refs: dict = None,
+                  fields: dict = None,
                   formula: str = None,
                   **config):
         """
@@ -308,6 +308,7 @@ class Builder:
         :param key: name of ref/field
         :param refs: refs to combine
         :param fields: fields to combine
+        :param formula: formula to do calculations with
         :param config: in **kwargs format
         :return: FieldInfo
         """
