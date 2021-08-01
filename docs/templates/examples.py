@@ -462,22 +462,22 @@ spec_builder.nested("user", user_fields.build())
     ),
     Example(
         name='calculate_example_one',
-        iterations=5,
+        iterations=4,
         fragment="""
 spec_builder.values('height_in', [60, 70, 80, 90])
-aliases = {'height_in': 'a'}
-formula = 'a * 2.54'
-spec_builder.calculate('height_cm', fields=aliases, formula=formula)""",
-        pipes="--format json-pretty -x"
+fields = ['height_in']
+formula = '{{ height_in }} * 2.54'
+spec_builder.calculate('height_cm', fields=fields, formula=formula)""",
+        pipes="--format json -x"
     ),
     Example(
         name='calculate_example_two',
         iterations=3,
         fragment="""
-spec_builder.values('a', [4, 5, 6])
-spec_builder.values('b', [3, 6, 9])
-aliases = {'a': 'a', 'b': 'b'}
-formula = 'sqrt(a*a + b*b)'
+spec_builder.values('long_name_one', [4, 5, 6])
+spec_builder.values('long_name_two', [3, 6, 9])
+aliases = {'long_name_one': 'a', 'long_name_two': 'b'}
+formula = 'sqrt({{a}}*{{a}} + {{b}}*{{b}})'
 spec_builder.calculate('c', fields=aliases, formula=formula)""",
         pipes="--format json -x"
     )

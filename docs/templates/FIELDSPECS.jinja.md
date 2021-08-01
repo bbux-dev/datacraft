@@ -1176,16 +1176,20 @@ There are times when one field needs the value of another field in order to
 calculate its own value. For example, if you wanted to produce values that
 represented a users' height in inches and in centimeters, you would want them to
 correlate. You could use the `calculate` type to specify a `formula` to do this
-calculation. The spec takes a mapping of field or ref name to an alias that
-takes the place of that value in the formula. Example:
+calculation. There are two ways to specify the fields to calculate a value from.
+The first is to use the `fields` and/or the `refs` keys with an array of fields
+or refs to use in the formula.  The second is the use a map where the field
+or ref name to be used is mapped to a string that will be used as an alias for
+it in the formula. See second example below for the mapped alias version.
 
 {{ show_example(examples.calculate_example_one) }}
 
 {{ show_command_and_output(examples.calculate_example_one) }}
 
-In this example we alias the value output from `height_in` to the variable in
+In the example above, we alias the value output from `height_in` to the variable in
 our formula `a`. It is possible to use multiple variables. In this next example
-we use the Pythagorean theorem to calculate the hypotenuse from two fields.
+we use the Pythagorean theorem to calculate the hypotenuse from two fields. Notice
+the use of aliasing in the specified fields.
 
 {{ show_example(examples.calculate_example_two) }}
 
@@ -1195,5 +1199,16 @@ We use
 the [asteval](http://newville.github.io/asteval/basics.html)
 package to do formula evaluation. This provides a fairly safe way to do
 evaluation. The package provides a bunch of
-[build-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
-as well.
+[built-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
+as well. We also use the [Jinja2](https://pypi.org/project/Jinja2/) templating
+engine format for specifying variable names to substitute. In theory, you
+could use any valid jinja2 syntax i.e.:
+
+
+```json{% raw%}
+{
+  "formula": "sqrt({{ value_that_might_be_a_string | int }})"
+}
+```{% endraw %}
+
+The example above is unnecessary and is only there to demonstrate the capability.

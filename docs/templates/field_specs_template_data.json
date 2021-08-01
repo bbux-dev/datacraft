@@ -323,18 +323,18 @@
       "output": "{\n    \"id\": \"02825a62-2bd5-4461-a6be-773df096cfc4\",\n    \"user\": {\n        \"user_id\": \"bfbab550-024f-4f46-b63a-a3cf1a7e1c9e\",\n        \"geo\": {\n            \"place_id\": \"6138\",\n            \"coordinates\": [\n                \" 75.0154\",\n                \"-80.9406\"\n            ]\n        }\n    }\n}"
     },
     "calculate_example_one": {
-      "json": "{\n  \"height_in\": {\n    \"type\": \"values\",\n    \"data\": [60, 70, 80, 90]\n  },\n  \"height_cm\": {\n    \"type\": \"calculate\",\n    \"fields\": {\n      \"height_in\": \"a\"\n    },\n    \"formula\": \"a * 2.54\"\n  }\n}",
-      "yaml": "height_in:\n  type: values\n  data: [60, 70, 80, 90]\nheight_cm:\n  type: calculate\n  fields:\n    height_in: a\n  formula: a * 2.54",
-      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('height_in', [60, 70, 80, 90])\naliases = {'height_in': 'a'}\nformula = 'a * 2.54'\nspec_builder.calculate('height_cm', fields=aliases, formula=formula)\n\nspec = spec_builder.build()",
-      "command": "dataspec -s dataspec.json --log-level error -i 5 --format json-pretty -x",
-      "output": "{\n    \"height_in\": 60,\n    \"height_cm\": 152.4\n}\n{\n    \"height_in\": 70,\n    \"height_cm\": 177.8\n}\n{\n    \"height_in\": 80,\n    \"height_cm\": 203.2\n}\n{\n    \"height_in\": 90,\n    \"height_cm\": 228.6\n}\n{\n    \"height_in\": 60,\n    \"height_cm\": 152.4\n}"
+      "json": "{\n  \"height_in\": {\n    \"type\": \"values\",\n    \"data\": [60, 70, 80, 90]\n  },\n  \"height_cm\": {\n    \"type\": \"calculate\",\n    \"fields\": [\n      \"height_in\"\n    ],\n    \"formula\": \"{{ height_in }} * 2.54\"\n  }\n}",
+      "yaml": "height_in:\n  type: values\n  data: [60, 70, 80, 90]\nheight_cm:\n  type: calculate\n  fields:\n  - height_in\n  formula: '{{ height_in }} * 2.54'",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('height_in', [60, 70, 80, 90])\nfields = ['height_in']\nformula = '{{ height_in }} * 2.54'\nspec_builder.calculate('height_cm', fields=fields, formula=formula)\n\nspec = spec_builder.build()",
+      "command": "dataspec -s dataspec.json --log-level error -i 4 --format json -x",
+      "output": "{\"height_in\": 60, \"height_cm\": 152.4}\n{\"height_in\": 70, \"height_cm\": 177.8}\n{\"height_in\": 80, \"height_cm\": 203.2}\n{\"height_in\": 90, \"height_cm\": 228.6}"
     },
     "calculate_example_two": {
-      "json": "{\n  \"a\": {\n    \"type\": \"values\",\n    \"data\": [4, 5, 6]\n  },\n  \"b\": {\n    \"type\": \"values\",\n    \"data\": [3, 6, 9]\n  },\n  \"c\": {\n    \"type\": \"calculate\",\n    \"fields\": {\n      \"a\": \"a\",\n      \"b\": \"b\"\n    },\n    \"formula\": \"sqrt(a*a + b*b)\"\n  }\n}",
-      "yaml": "a:\n  type: values\n  data: [4, 5, 6]\nb:\n  type: values\n  data: [3, 6, 9]\nc:\n  type: calculate\n  fields:\n    a: a\n    b: b\n  formula: sqrt(a*a + b*b)",
-      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('a', [4, 5, 6])\nspec_builder.values('b', [3, 6, 9])\naliases = {'a': 'a', 'b': 'b'}\nformula = 'sqrt(a*a + b*b)'\nspec_builder.calculate('c', fields=aliases, formula=formula)\n\nspec = spec_builder.build()",
+      "json": "{\n  \"long_name_one\": {\n    \"type\": \"values\",\n    \"data\": [4, 5, 6]\n  },\n  \"long_name_two\": {\n    \"type\": \"values\",\n    \"data\": [3, 6, 9]\n  },\n  \"c\": {\n    \"type\": \"calculate\",\n    \"fields\": {\n      \"long_name_one\": \"a\",\n      \"long_name_two\": \"b\"\n    },\n    \"formula\": \"sqrt({{a}}*{{a}} + {{b}}*{{b}})\"\n  }\n}",
+      "yaml": "long_name_one:\n  type: values\n  data: [4, 5, 6]\nlong_name_two:\n  type: values\n  data: [3, 6, 9]\nc:\n  type: calculate\n  fields:\n    long_name_one: a\n    long_name_two: b\n  formula: sqrt({{a}}*{{a}} + {{b}}*{{b}})",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('long_name_one', [4, 5, 6])\nspec_builder.values('long_name_two', [3, 6, 9])\naliases = {'long_name_one': 'a', 'long_name_two': 'b'}\nformula = 'sqrt({{a}}*{{a}} + {{b}}*{{b}})'\nspec_builder.calculate('c', fields=aliases, formula=formula)\n\nspec = spec_builder.build()",
       "command": "dataspec -s dataspec.json --log-level error -i 3 --format json -x",
-      "output": "{\"a\": 4, \"b\": 3, \"c\": 5.0}\n{\"a\": 5, \"b\": 6, \"c\": 7.810249675906654}\n{\"a\": 6, \"b\": 9, \"c\": 10.816653826391969}"
+      "output": "{\"long_name_one\": 4, \"long_name_two\": 3, \"c\": 5.0}\n{\"long_name_one\": 5, \"long_name_two\": 6, \"c\": 7.810249675906654}\n{\"long_name_one\": 6, \"long_name_two\": 9, \"c\": 10.816653826391969}"
     }
   }
 }

@@ -4,7 +4,7 @@ Handles loading and creating the templating engine
 import os
 from pathlib import Path
 from typing import Union
-from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape  # type: ignore
 
 
 def for_file(template_file: Union[str, Path]):

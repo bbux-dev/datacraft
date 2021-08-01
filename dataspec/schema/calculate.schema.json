@@ -12,28 +12,57 @@
       "type": "object"
     },
     "refs": {
-      "type": "object",
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ],
       "examples": [
-        "{ \"field\": \"a\" }"
+        "{ \"ref_name\": \"alias\" }",
+        "[ \"ref1\", \"ref2\" ]"
       ]
     },
     "fields": {
-      "type": "object",
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ],
       "examples": [
-        "{ \"field\": \"a\" }"
+        "{ \"field_name\": \"alias\" }",
+        "[ \"field1\", \"field2\" ]"
       ]
     },
     "formula": {
       "type": "string",
       "examples": [
-        "a * b",
-        "a * 22.34",
-        "(a + b - c) * (d^^2)"
+        "{{a}} * {{b}}",
+        "{{a}} * 22.34",
+        "({{a}} + {{b}} - {{c}}) * ({{d}}^^2)",
+        "sqrt(exp({{ a }}))"
       ]
     }
   },
-  "oneOf": [
-    {"required": ["refs", "formula"]},
-    {"required": ["fields", "formula"]}
+  "anyOf": [
+    {
+      "oneOf": [
+        {"required": ["refs", "formula"]},
+        {"required": ["fields", "formula"]}
+      ]
+    },
+    {
+      "oneOf": [
+        {"required": ["refs", "fields", "formula"]}
+      ]
+    }
   ]
+
 }

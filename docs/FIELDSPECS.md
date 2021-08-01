@@ -3494,8 +3494,11 @@ There are times when one field needs the value of another field in order to
 calculate its own value. For example, if you wanted to produce values that
 represented a users' height in inches and in centimeters, you would want them to
 correlate. You could use the `calculate` type to specify a `formula` to do this
-calculation. The spec takes a mapping of field or ref name to an alias that
-takes the place of that value in the formula. Example:
+calculation. There are two ways to specify the fields to calculate a value from.
+The first is to use the `fields` and/or the `refs` keys with an array of fields
+or refs to use in the formula.  The second is the use a map where the field
+or ref name to be used is mapped to a string that will be used as an alias for
+it in the formula. See second example below for the mapped alias version.
 
 <details open>
   <summary>JSON Spec</summary>
@@ -3508,10 +3511,10 @@ takes the place of that value in the formula. Example:
   },
   "height_cm": {
     "type": "calculate",
-    "fields": {
-      "height_in": "a"
-    },
-    "formula": "a * 2.54"
+    "fields": [
+      "height_in"
+    ],
+    "formula": "{{ height_in }} * 2.54"
   }
 }
 ```
@@ -3527,8 +3530,8 @@ height_in:
 height_cm:
   type: calculate
   fields:
-    height_in: a
-  formula: a * 2.54
+  - height_in
+  formula: '{{ height_in }} * 2.54'
 ```
 
 </details>
@@ -3541,9 +3544,9 @@ import dataspec
 spec_builder = dataspec.spec_builder()
 
 spec_builder.values('height_in', [60, 70, 80, 90])
-aliases = {'height_in': 'a'}
-formula = 'a * 2.54'
-spec_builder.calculate('height_cm', fields=aliases, formula=formula)
+fields = ['height_in']
+formula = '{{ height_in }} * 2.54'
+spec_builder.calculate('height_cm', fields=fields, formula=formula)
 
 spec = spec_builder.build()
 ```
@@ -3555,55 +3558,40 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 5 --format json-pretty -x
-{
-    "height_in": 60,
-    "height_cm": 152.4
-}
-{
-    "height_in": 70,
-    "height_cm": 177.8
-}
-{
-    "height_in": 80,
-    "height_cm": 203.2
-}
-{
-    "height_in": 90,
-    "height_cm": 228.6
-}
-{
-    "height_in": 60,
-    "height_cm": 152.4
-}
+dataspec -s dataspec.json --log-level error -i 4 --format json -x
+{"height_in": 60, "height_cm": 152.4}
+{"height_in": 70, "height_cm": 177.8}
+{"height_in": 80, "height_cm": 203.2}
+{"height_in": 90, "height_cm": 228.6}
 ```
 
 </details>
 
-In this example we alias the value output from `height_in` to the variable in
+In the example above, we alias the value output from `height_in` to the variable in
 our formula `a`. It is possible to use multiple variables. In this next example
-we use the Pythagorean theorem to calculate the hypotenuse from two fields.
+we use the Pythagorean theorem to calculate the hypotenuse from two fields. Notice
+the use of aliasing in the specified fields.
 
 <details open>
   <summary>JSON Spec</summary>
 
 ```json
 {
-  "a": {
+  "long_name_one": {
     "type": "values",
     "data": [4, 5, 6]
   },
-  "b": {
+  "long_name_two": {
     "type": "values",
     "data": [3, 6, 9]
   },
   "c": {
     "type": "calculate",
     "fields": {
-      "a": "a",
-      "b": "b"
+      "long_name_one": "a",
+      "long_name_two": "b"
     },
-    "formula": "sqrt(a*a + b*b)"
+    "formula": "sqrt({{a}}*{{a}} + {{b}}*{{b}})"
   }
 }
 ```
@@ -3613,18 +3601,18 @@ we use the Pythagorean theorem to calculate the hypotenuse from two fields.
   <summary>YAML Spec</summary>
 
 ```yaml
-a:
+long_name_one:
   type: values
   data: [4, 5, 6]
-b:
+long_name_two:
   type: values
   data: [3, 6, 9]
 c:
   type: calculate
   fields:
-    a: a
-    b: b
-  formula: sqrt(a*a + b*b)
+    long_name_one: a
+    long_name_two: b
+  formula: sqrt({{a}}*{{a}} + {{b}}*{{b}})
 ```
 
 </details>
@@ -3636,10 +3624,10 @@ import dataspec
 
 spec_builder = dataspec.spec_builder()
 
-spec_builder.values('a', [4, 5, 6])
-spec_builder.values('b', [3, 6, 9])
-aliases = {'a': 'a', 'b': 'b'}
-formula = 'sqrt(a*a + b*b)'
+spec_builder.values('long_name_one', [4, 5, 6])
+spec_builder.values('long_name_two', [3, 6, 9])
+aliases = {'long_name_one': 'a', 'long_name_two': 'b'}
+formula = 'sqrt({{a}}*{{a}} + {{b}}*{{b}})'
 spec_builder.calculate('c', fields=aliases, formula=formula)
 
 spec = spec_builder.build()
@@ -3653,9 +3641,9 @@ spec = spec_builder.build()
 
 ```shell
 dataspec -s dataspec.json --log-level error -i 3 --format json -x
-{"a": 4, "b": 3, "c": 5.0}
-{"a": 5, "b": 6, "c": 7.810249675906654}
-{"a": 6, "b": 9, "c": 10.816653826391969}
+{"long_name_one": 4, "long_name_two": 3, "c": 5.0}
+{"long_name_one": 5, "long_name_two": 6, "c": 7.810249675906654}
+{"long_name_one": 6, "long_name_two": 9, "c": 10.816653826391969}
 ```
 
 </details>
@@ -3664,5 +3652,16 @@ We use
 the [asteval](http://newville.github.io/asteval/basics.html)
 package to do formula evaluation. This provides a fairly safe way to do
 evaluation. The package provides a bunch of
-[build-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
-as well.
+[built-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
+as well. We also use the [Jinja2](https://pypi.org/project/Jinja2/) templating
+engine format for specifying variable names to substitute. In theory, you
+could use any valid jinja2 syntax i.e.:
+
+
+```json
+{
+  "formula": "sqrt({{ value_that_might_be_a_string | int }})"
+}
+```
+
+The example above is unnecessary and is only there to demonstrate the capability.

@@ -8,5 +8,6 @@ from .builder import spec_builder
 from .supplier.core import *
 from .preprocessor import *
 from . import suppliers
+from . import template_engines
 
 __version__ = '0.1.0'

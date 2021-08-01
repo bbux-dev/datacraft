@@ -33,25 +33,22 @@ class CalculateSupplier(dataspec.ValueSupplierInterface):
     >>> asssert calculate.next(0) == 121.92
     """
 
-    def __init__(self, suppliers: dict, formula: str):
+    def __init__(self, suppliers: dict, engine: dataspec.template_engines.Jinja2Engine):
         self.suppliers = suppliers
-        self.formula = formula
+        self.engine = engine
         self.aeval = asteval.Interpreter()
 
     def next(self, iteration):
         # make a copy to manipulate
-        formula = str(self.formula)
+        values = {}
         for alias, supplier in self.suppliers.items():
-            if alias not in formula:
-                continue
-            formula = formula.replace(alias, str(supplier.next(iteration)))
-        if iteration == 0:
-            log.debug(formula)
+            values[alias] = supplier.next(iteration)
+        formula = self.engine.process(values)
         return self.aeval(formula)
 
 
 @dataspec.registry.schemas('calculate')
-def get_combine_list_schema():
+def calculate_schema():
     """ get the schema for the calculate type """
     return dataspec.schemas.load('calculate')
 
@@ -66,17 +63,25 @@ def configure_calculate_supplier(field_spec: dict, loader: dataspec.Loader):
     if field_spec.get('formula') is None:
         raise dataspec.SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
-    key = 'refs' if 'refs' in field_spec else 'fields'
-    mappings = field_spec[key]
-    if len(mappings) < 1 or not isinstance(mappings, dict):
-        raise dataspec.SpecException('mapping pointer must be dictionary. %s' % json.dumps(field_spec))
+    mappings = _get_mappings(field_spec, 'refs')
+    mappings.update(_get_mappings(field_spec, 'fields'))
+
+    if len(mappings) < 1:
+        raise dataspec.SpecException('fields or refs empty: %s' % json.dumps(field_spec))
 
     suppliers = {}
-    for ref, alias in mappings.items():
-        if keyword.iskeyword(alias):
-            raise dataspec.SpecException(
-                f'Invalid alias for calculate spec: {alias} is a keyword, try _{alias} instead')
-        supplier = loader.get(ref)
+    for field_or_ref, alias in mappings.items():
+        supplier = loader.get(field_or_ref)
         suppliers[alias] = supplier
 
-    return CalculateSupplier(suppliers=suppliers, formula=field_spec.get('formula', ''))
+    template = field_spec.get('formula')
+    engine = dataspec.template_engines.string(template)
+    return CalculateSupplier(suppliers=suppliers, engine=engine)
+
+
+def _get_mappings(field_spec, key):
+    """ retrieve the field aliasing for the given key, refs or fields """
+    mappings = field_spec.get(key, [])
+    if isinstance(mappings, list):
+        mappings = {key: key for key in mappings}
+    return mappings
