@@ -1,14 +1,14 @@
 """
 Module for building Data Specs programmatically
 """
-from pathlib import Path
-from typing import Any, Union, Dict, List
 import json
 import logging
-from .model import DataSpec
-from .loader import Loader
-from . import utils, template_engines, key_providers
+from pathlib import Path
+from typing import Any, Union, Dict, List
 
+from . import utils, template_engines, key_providers, types
+from .loader import Loader
+from .model import DataSpec
 
 log = logging.getLogger(__name__)
 
@@ -316,7 +316,7 @@ class Builder:
 
     def ref(self, key: str, ref_name: str = None, data: str = None, **config):
         """
-        creates ref FieldSpec and adds to Data Spec
+        creates ref FieldSpec and adds to the DataSpec
 
         :param key: name of ref/field
         :param ref_name: name of reference to get values from
@@ -325,6 +325,16 @@ class Builder:
         :return: FieldInfo
         """
         return self._add_field_spec(key, ref(ref_name, data, **config))
+
+    def weighted_csv(self, key: str, **config):
+        """
+        Creates a weighted_csv spec and adds to the DataSpec
+
+        :param key: name for weighted_csv
+        :param config: for weighted_csv
+        :return: FieldInfo
+        """
+        return self._add_field_spec(key, weighted_csv(**config))
 
     def _add_field_spec(self, key, spec):
         """ adds the fieldspec and creates a FieldInfo object """
@@ -983,6 +993,22 @@ def ref(ref_name: str = None, data: str = None, **config):
     return spec
 
 
+def weighted_csv(**config):
+    """
+    Constructs a weighted_csv spec
+
+    :param config: in **kwargs format
+    :return: the weighted_csv spec
+    """
+    spec = {
+        "type": "weighted_csv"
+    }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
 def _create_key_list(entries):
     """
     Checks if entries are from FieldInfo objects and extracts keys
@@ -1017,7 +1043,7 @@ class DataSpecImpl(DataSpec):
 
     def generator(self, iterations: int, **kwargs):
         template = kwargs.get('template')
-        data_dir = kwargs.get('data_dir', '.')
+        data_dir = kwargs.get('data_dir', types.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output = kwargs.get('output', None)
