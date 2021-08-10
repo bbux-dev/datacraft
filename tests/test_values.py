@@ -31,6 +31,18 @@ def test_weighted_values():
     assert 'bar' in most_common_keys
 
 
+def test_weighted_values_invalid_type():
+    spec = {'foo': '0.5', 'bar': '0.4', 'baz': '0.1'}
+    with pytest.raises(SpecException):
+        suppliers.weighted_values(spec)
+
+
+def test_weighted_values_empty():
+    spec = {}
+    with pytest.raises(SpecException):
+        suppliers.weighted_values(spec)
+
+
 def test_weighted_values_non_zero_count():
     spec = builder.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1}, count=2)
     supplier = suppliers.values(spec)

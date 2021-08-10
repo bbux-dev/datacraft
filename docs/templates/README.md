@@ -35,7 +35,7 @@ file.
 Or just update the existing data with the new info
 
 ```bash
-./build_examples.py | tail -20
+./build_examples.py -k new_example_to_print
 ```
 
 ### Apply Updates to the FIELDSPEC.md file

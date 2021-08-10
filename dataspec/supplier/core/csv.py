@@ -1,11 +1,11 @@
 """
 Module for handling csv related data, deals with data typed as 'csv'
 """
-from typing import Dict
 import csv
 import json
 import os
 import random
+from typing import Dict
 from typing import Union
 
 import dataspec
@@ -187,6 +187,76 @@ def configure_csv(field_spec, loader):
     return CsvSupplier(csv_data, field_name, sample, count_supplier)
 
 
+@dataspec.registry.schemas('csv')
+def get_csv_schema():
+    """ get the schema for the csv type """
+    return dataspec.schemas.load('csv')
+
+
+@dataspec.registry.types('weighted_csv')
+def configure_weighted_csv(field_spec, loader):
+    """ Configures the weighted_csv value supplier for this field """
+
+    config = dataspec.utils.load_config(field_spec, loader)
+
+    field_name = config.get('column', 1)
+    weight_column = config.get('weight_column', 2)
+    count_supplier = dataspec.suppliers.count_supplier_from_data(config.get('count', 1))
+
+    datafile = config.get('datafile', dataspec.types.get_default('csv_file'))
+    csv_path = f'{loader.datadir}/{datafile}'
+    has_headers = dataspec.utils.is_affirmative('headers', config)
+    numeric_index = isinstance(field_name, int)
+    if numeric_index and field_name < 1:
+        raise dataspec.SpecException(f'Invalid index {field_name}, one based indexing used for column numbers')
+
+    if has_headers and not numeric_index:
+        choices = _read_named_column(csv_path, field_name)
+        weights = _read_named_column_weights(csv_path, weight_column)
+    else:
+        choices = _read_indexed_column(csv_path, int(field_name), skip_first=numeric_index)
+        weights = _read_indexed_column_weights(csv_path, int(weight_column), skip_first=numeric_index)
+    return dataspec.suppliers.WeightedValueSupplier(choices, weights, count_supplier)
+
+
+@dataspec.registry.schemas('weighted_csv')
+def get_weighted_csv_schema():
+    """ get the schema for the weighted_csv type """
+    return dataspec.schemas.load('weighted_csv')
+
+
+def _read_named_column(csv_path: str, column_name: str):
+    """ reads values from a named column into a list """
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        return [val[column_name] for val in reader]
+
+
+def _read_named_column_weights(csv_path: str, column_name: str):
+    """ reads values for weights for named column into a list """
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        return [float(val[column_name]) for val in reader]
+
+
+def _read_indexed_column(csv_path: str, column_index: int, skip_first: bool):
+    """ reads values from a indexed column into a list """
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        if skip_first:
+            next(reader)
+        return [val[column_index - 1] for val in reader]
+
+
+def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: bool):
+    """ reads values for weights for indexed column into a list """
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        if skip_first:
+            next(reader)
+        return [float(val[column_index - 1]) for val in reader]
+
+
 ONE_MB = 1024 * 1024
 
 
@@ -198,7 +268,7 @@ def _load_csv_data(field_spec, config, datadir):
     :param datadir: where to look for data files
     :return: the configured CsvData object
     """
-    datafile = config.get('datafile', 'data.csv')
+    datafile = config.get('datafile', dataspec.types.get_default('csv_file'))
     csv_path = f'{datadir}/{datafile}'
     if csv_path in _csv_data_cache:
         return _csv_data_cache.get(csv_path)

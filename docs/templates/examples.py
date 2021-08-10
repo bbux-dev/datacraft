@@ -480,5 +480,23 @@ aliases = {'long_name_one': 'a', 'long_name_two': 'b'}
 formula = 'sqrt({{a}}*{{a}} + {{b}}*{{b}})'
 spec_builder.calculate('c', fields=aliases, formula=formula)""",
         pipes="--format json -x"
-    )
+    ),
+    Example(
+        name='weighted_csv_example_one',
+        iterations=4,
+        fragment="""
+spec_builder.values('height_in', [60, 70, 80, 90])
+fields = ['height_in']
+formula = '{{ height_in }} * 2.54'
+spec_builder.calculate('height_cm', fields=fields, formula=formula)""",
+        pipes="--format json -x"
+    ),
+    Example(
+        name="weighted_csv_spec_example_one",
+        iterations=100,
+        fragment="""
+spec_builder.weighted_csv(
+    key="cities",
+    datafile="weighted_cities.csv")""",
+        pipes="--datadir ./data | sort | uniq -c | sort -n"),
 ]

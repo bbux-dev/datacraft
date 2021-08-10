@@ -5,12 +5,13 @@ delegating the handling of various data types.
 
 import json
 from typing import Union, Dict
+
 from . import suppliers
 from . import utils
-from .model import DataSpec
-from .types import lookup_type, lookup_schema, registry
-from .schemas import validate_schema_for_spec
 from .exceptions import SpecException
+from .model import DataSpec
+from .schemas import validate_schema_for_spec
+from .types import lookup_type, lookup_schema, registry
 
 
 class Refs:

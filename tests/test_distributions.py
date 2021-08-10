@@ -16,7 +16,7 @@ def test_normal_distribution():
     distribution = dist_func(mean=5, stddev=1)
 
     values = set([int(distribution.next_value()) for _ in range(100)])
-    assert len(values) >= 5
+    assert 4 <= len(values) >= 5
 
 
 def test_bounded_normal_distribution():
