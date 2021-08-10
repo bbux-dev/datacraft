@@ -187,6 +187,12 @@ def configure_csv(field_spec, loader):
     return CsvSupplier(csv_data, field_name, sample, count_supplier)
 
 
+@dataspec.registry.schemas('csv')
+def get_csv_schema():
+    """ get the schema for the combine type """
+    return dataspec.schemas.load('csv')
+
+
 @dataspec.registry.types('weighted_csv')
 def configure_weighted_csv(field_spec, loader):
     """ Configures the weighted_csv value supplier for this field """
@@ -240,7 +246,7 @@ def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: b
         reader = csv.reader(csvfile)
         if skip_first:
             next(reader)
-        return [float(val[column_index-1]) for val in reader]
+        return [float(val[column_index - 1]) for val in reader]
 
 
 ONE_MB = 1024 * 1024

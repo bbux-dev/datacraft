@@ -75,6 +75,10 @@ def test_calculate():
     _test_run_validation("calculate.tests.json")
 
 
+def test_csv():
+    _test_run_validation("csv.tests.json")
+
+
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)
