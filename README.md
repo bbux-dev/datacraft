@@ -53,7 +53,7 @@ lines of a csv file.
 
 To Install:
 
-```shell script
+```shell
 pip install git+https://github.com/bbux-dev/dataspec.git
 ```
 
@@ -375,7 +375,7 @@ Specs used in this example.
 
 Running dataspec from the command line against this spec:
 
-```shell script
+```shell
 dataspec -s ~/example.json -i 12
 zebra_jump@gmail.com
 hedgehog_launch@yahoo.com
@@ -591,12 +591,12 @@ dataspec --spec csv-select.yaml \
 
 ### <a name="Templating"></a>Templating
 
-To populate a template file with the generated values for each iteration, pass
-the -t /path/to/template arg to the dataspec command. We use
-the [Jinja2](https://pypi.org/project/Jinja2/) templating engine under the hood.
-The basic format is to put the field names in {{ field name }} notation wherever
-they should be substituted. For example the following is a template for bulk
-indexing data into Elasticsearch.
+To populate a template file or string with the generated values for each
+iteration, pass the -t /path/to/template (or template string) arg to the
+dataspec command. We use the [Jinja2](https://pypi.org/project/Jinja2/)
+templating engine under the hood. The basic format is to put the field names in
+{{ field name }} notation wherever they should be substituted. For example the
+following is a template for bulk indexing data into Elasticsearch.
 
 ```json
 {"index": {"_index": "test", "_id": "{{ id }}"}}
@@ -617,7 +617,7 @@ Such as:
 
 When we run the tool we get the data populated for the template:
 
-```shell script
+```shell
 dataspec -s es-spec.json -t template.json -i 10 --log-level off -x
 { "index" : { "_index" : "test", "_id" : "1" } }
 { "doc" : {"name" : "bob", "age": "22", "gender": "F" } }
@@ -627,6 +627,17 @@ dataspec -s es-spec.json -t template.json -i 10 --log-level off -x
 { "doc" : {"name" : "bobby", "age": "26", "gender": "F" } }
 { "index" : { "_index" : "test", "_id" : "4" } }
 ...
+```
+
+It is also possible to do templating inline from the command line:
+
+```shell
+dataspec -s es-spec.json --format json -i 5  --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
+bob: (22, F)
+rob: (24, M)
+bobby: (26, M)
+bobo: (28, M)
+robert: (30, F)
 ```
 
 #### <a name="Templating_Loops"></a>Loops in Templates
@@ -787,7 +798,7 @@ otherwise you will have to perform your own validation in your code.
 To supply custom code to the tool use the -c or --code arguments. One or more
 module files can be imported.
 
-```shell script
+```shell
 .dataspec -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
 arbez
 gohegdeh
