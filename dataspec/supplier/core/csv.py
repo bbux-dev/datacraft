@@ -207,6 +207,8 @@ def configure_weighted_csv(field_spec, loader):
     csv_path = f'{loader.datadir}/{datafile}'
     has_headers = dataspec.utils.is_affirmative('headers', config)
     numeric_index = isinstance(field_name, int)
+    if numeric_index and field_name < 1:
+        raise dataspec.SpecException(f'Invalid index {field_name}, one based indexing used for column numbers')
 
     if has_headers and not numeric_index:
         choices = _read_named_column(csv_path, field_name)
@@ -243,7 +245,7 @@ def _read_indexed_column(csv_path: str, column_index: int, skip_first: bool):
         reader = csv.reader(csvfile)
         if skip_first:
             next(reader)
-        return [val[column_index] for val in reader]
+        return [val[column_index - 1] for val in reader]
 
 
 def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: bool):

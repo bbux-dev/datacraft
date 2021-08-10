@@ -335,6 +335,13 @@
       "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.values('long_name_one', [4, 5, 6])\nspec_builder.values('long_name_two', [3, 6, 9])\naliases = {'long_name_one': 'a', 'long_name_two': 'b'}\nformula = 'sqrt({{a}}*{{a}} + {{b}}*{{b}})'\nspec_builder.calculate('c', fields=aliases, formula=formula)\n\nspec = spec_builder.build()",
       "command": "dataspec -s dataspec.json --log-level error -i 3 --format json -x",
       "output": "{\"long_name_one\": 4, \"long_name_two\": 3, \"c\": 5.0}\n{\"long_name_one\": 5, \"long_name_two\": 6, \"c\": 7.810249675906654}\n{\"long_name_one\": 6, \"long_name_two\": 9, \"c\": 10.816653826391969}"
+    },
+    "weighted_csv_spec_example_one": {
+      "json": "{\n  \"cities\": {\n    \"type\": \"weighted_csv\",\n    \"config\": {\n      \"datafile\": \"weighted_cities.csv\"\n    }\n  }\n}",
+      "yaml": "cities:\n  type: weighted_csv\n  config:\n    datafile: weighted_cities.csv",
+      "api": "import dataspec\n\nspec_builder = dataspec.spec_builder()\n\nspec_builder.weighted_csv(\n    key=\"cities\",\n    datafile=\"weighted_cities.csv\")\n\nspec = spec_builder.build()",
+      "command": "dataspec -s dataspec.json --log-level error -i 100 --datadir ./data | sort | uniq -c | sort -n",
+      "output": "      8 London\n      8 New York\n      9 Oxford\n     18 Cambridge\n     20 Seattle\n     37 San Diego"
     }
   }
 }
