@@ -71,6 +71,18 @@ def test_select_list_subset():
     _test_run_validation("select_list_subset.tests.json")
 
 
+def test_calculate():
+    _test_run_validation("calculate.tests.json")
+
+
+def test_csv():
+    _test_run_validation("csv.tests.json")
+
+
+def test_weighted_csv():
+    _test_run_validation("weighted_csv.tests.json")
+
+
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)

@@ -1,0 +1,20 @@
+{
+  "calculate.schema.json": {
+    "valid": [
+      {"instance": {"type": "calculate", "formula": "{{a}} + {{b}}", "refs": {"one": "a", "two": "b"}}},
+      {"instance": {"type": "calculate", "formula": "{{a}} + {{b}}", "fields": {"one": "a", "two": "b"}}},
+      {"instance": {"type": "calculate", "formula": "{{one}} + {{two}}", "refs": ["one", "two"]}},
+      {"instance": {"type": "calculate", "formula": "{{one}} + {{two}}", "fields": ["one", "two"]}},
+      {"instance": {"type": "calculate", "formula": "{{one}} + {{two}}", "fields": ["one"], "refs": ["two"]}}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "calcalate"}, "note": "misspelled"},
+      {"instance": {"type": "calculate"}, "note": "no fields or refs"},
+      {"instance": {"type": "calculate", "refs": {"one": "a", "two": "b"}}, "note":  "missing formula"},
+      {"instance": {"type": "calculate", "fields": {"one": "a", "two": "b"}}, "note":  "missing formula"},
+      {"instance": {"type": "calculate", "refs": ["one", "two"]}},
+      {"instance": {"type": "calculate", "fields": ["one", "two"]}}
+    ]
+  }
+}

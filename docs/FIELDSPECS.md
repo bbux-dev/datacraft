@@ -38,7 +38,9 @@ Field Spec Definitions
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
-    1. [nested](#Nested)
+    1. [Weighted CSV](#WeightedCSV)
+    1. [Nested](#Nested)
+    1. [Calculate](#Calculate)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -64,7 +66,9 @@ type                         | description                            | config p
 [select_list_subset](#Select_List_Subset) | selects subset of fields that are</br> combined to create the value for the field | join_with
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
+[weighted_csv](#WeightedCSV) | Externalized values and weights into csv file| many see details below
 [nested](#Nested)            | For nested fields                      |
+[calculate](#Calculate)      | Calculate values from output of other fields or refs|
 
 # <a name="Overview"></a>Overview
 
@@ -3070,17 +3074,24 @@ The `csv` Field Spec structure is:
 }
 ```
 
-#### Params
+### Parameters
 
-|param      |required?|default |description|
-|-----------|---------|--------|-----------|
-|datafile   |no       |data.csv|filename in datandir to use|
-|headers    |no       |false   |yes, on, true for affirmative|
-|column     |no       |1       |1 based column number or field name if headers</br> are present|
-|delimiter  |no       |,       |how values are separated|
-|quotechar  |no       |"       |how values are quoted, default is double quote|
-|sample     |no       |False   |If the values should be selected at random|
-|count      |no       |1       |Number of values in column to use for value|
+<details>
+
+<summary>Parameter Details</summary>
+
+param | type | description                                  | default | examples
+------|------|----------------------------------------------|---------|--------- 
+datafile|string |Name of file in data directory that</br>contains the data for this field | |example.csv</br>subdir/example2.csv</br> 
+configref|string |Name of configref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
+headers| |If the csv file has headers |False | 
+column|['number', 'string'] |1 based column number or field name if</br>headers are present |1 |1</br>col_2</br>name</br> 
+delimiter|string |how values are separated in the csv</br>file, default is comma |, |,</br>	</br>;</br> </br> 
+quotechar|string |how values are quoted, default is double</br>quote |" |,</br>	</br>;</br> </br> 
+sample| |If the values for the field should be</br>selected at random from the values in</br>the column, default is false |False | 
+join_with|string |String or character to join multiple</br>values together with|None |,</br>@</br> OR </br> && </br> 
+as_list| |If the values should be returned as a</br>list. Either true, false, 'on', 'off',</br>'yes', 'no', 'true', 'false', case</br>insensitive| |
+</details>
 
 #### Examples
 
@@ -3341,6 +3352,103 @@ spec = spec_builder.build()
 
 </details>
 
+## <a name="WeightedCSV"></a>Weighted CSV
+
+A `weighted_csv` spec is used to externalize values and their weights into a csv
+file. The default is to assume a comma separated file where the first column is
+the value to use, and the second is the weight for it. i.e.:
+
+```
+Tokyo,0.1
+London,0.2
+New York,0.1
+Cambridge,0.3
+Oxford,0.3
+Seattle,0.3
+San Diego,0.4
+Springfield,0.01
+```
+### Parameters
+
+<details>
+
+<summary>Parameter Details</summary>
+
+param | type | description                                  | default | examples
+------|------|----------------------------------------------|---------|--------- 
+datafile|string |Name of file in data directory that</br>contains the data for this field | |example.csv</br>subdir/example2.csv</br> 
+configref|string |Name of configref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
+headers| |If the csv file has headers |False | 
+column|['number', 'string'] |1 based column number or field name if</br>headers are present |1 |1</br>col_2</br>name</br> 
+weight_column|['number', 'string'] |1 based column number or field name if</br>headers are present where weights are</br>defined |2 |1</br>col_2</br>name</br> 
+delimiter|string |how values are separated in the csv</br>file, default is comma |, |,</br>	</br>;</br> </br> 
+quotechar|string |how values are quoted, default is double</br>quote |" |,</br>	</br>;</br> </br> 
+join_with|string |String or character to join multiple</br>values together with|None |,</br>@</br> OR </br> && </br> 
+as_list| |If the values should be returned as a</br>list. Either true, false, 'on', 'off',</br>'yes', 'no', 'true', 'false', case</br>insensitive| |
+</details>
+
+### Example
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "cities": {
+    "type": "weighted_csv",
+    "config": {
+      "datafile": "weighted_cities.csv"
+    }
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+cities:
+  type: weighted_csv
+  config:
+    datafile: weighted_cities.csv
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.weighted_csv(
+    key="cities",
+    datafile="weighted_cities.csv")
+
+spec = spec_builder.build()
+```
+
+</details>
+
+
+<details>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 100 --datadir ./data | sort | uniq -c | sort -n
+      8 London
+      8 New York
+      9 Oxford
+     18 Cambridge
+     20 Seattle
+     37 San Diego
+```
+
+</details>
+
+
 ## <a name="nested"></a>Nested Fields
 
 Nested types are used to create fields that contain subfields. Nested types can
@@ -3468,24 +3576,198 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 1
+dataspec -s dataspec.json --log-level error -i 1 --format json-pretty -x
 {
-    "id": "327658cd-b3de-477a-a902-742efd03ef89",
+    "id": "02825a62-2bd5-4461-a6be-773df096cfc4",
     "user": {
-        "user_id": "c14c7709-d0f6-4cd8-b9ff-a936960ca63f",
+        "user_id": "bfbab550-024f-4f46-b63a-a3cf1a7e1c9e",
         "geo": {
-            "place_id": "59283706",
+            "place_id": "6138",
             "coordinates": [
-                "-142.8146",
-                " 66.3702"
+                " 75.0154",
+                "-80.9406"
             ]
         }
-    },
-    "_internal": {
-        "_iteration": 0,
-        "_field_group": "ALL"
     }
 }
 ```
 
 </details>
+
+## <a name="Calculate"></a>Calculate
+
+There are times when one field needs the value of another field in order to
+calculate its own value. For example, if you wanted to produce values that
+represented a users' height in inches and in centimeters, you would want them to
+correlate. You could use the `calculate` type to specify a `formula` to do this
+calculation. There are two ways to specify the fields to calculate a value from.
+The first is to use the `fields` and/or the `refs` keys with an array of fields
+or refs to use in the formula.  The second is the use a map where the field
+or ref name to be used is mapped to a string that will be used as an alias for
+it in the formula. See second example below for the mapped alias version.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "height_in": {
+    "type": "values",
+    "data": [60, 70, 80, 90]
+  },
+  "height_cm": {
+    "type": "calculate",
+    "fields": [
+      "height_in"
+    ],
+    "formula": "{{ height_in }} * 2.54"
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+height_in:
+  type: values
+  data: [60, 70, 80, 90]
+height_cm:
+  type: calculate
+  fields:
+  - height_in
+  formula: '{{ height_in }} * 2.54'
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('height_in', [60, 70, 80, 90])
+fields = ['height_in']
+formula = '{{ height_in }} * 2.54'
+spec_builder.calculate('height_cm', fields=fields, formula=formula)
+
+spec = spec_builder.build()
+```
+
+</details>
+
+
+<details>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 4 --format json -x
+{"height_in": 60, "height_cm": 152.4}
+{"height_in": 70, "height_cm": 177.8}
+{"height_in": 80, "height_cm": 203.2}
+{"height_in": 90, "height_cm": 228.6}
+```
+
+</details>
+
+In the example above, we alias the value output from `height_in` to the variable in
+our formula `a`. It is possible to use multiple variables. In this next example
+we use the Pythagorean theorem to calculate the hypotenuse from two fields. Notice
+the use of aliasing in the specified fields.
+
+<details open>
+  <summary>JSON Spec</summary>
+
+```json
+{
+  "long_name_one": {
+    "type": "values",
+    "data": [4, 5, 6]
+  },
+  "long_name_two": {
+    "type": "values",
+    "data": [3, 6, 9]
+  },
+  "c": {
+    "type": "calculate",
+    "fields": {
+      "long_name_one": "a",
+      "long_name_two": "b"
+    },
+    "formula": "sqrt({{a}}*{{a}} + {{b}}*{{b}})"
+  }
+}
+```
+
+</details>
+<details>
+  <summary>YAML Spec</summary>
+
+```yaml
+long_name_one:
+  type: values
+  data: [4, 5, 6]
+long_name_two:
+  type: values
+  data: [3, 6, 9]
+c:
+  type: calculate
+  fields:
+    long_name_one: a
+    long_name_two: b
+  formula: sqrt({{a}}*{{a}} + {{b}}*{{b}})
+```
+
+</details>
+<details>
+  <summary>API Example</summary>
+
+```python
+import dataspec
+
+spec_builder = dataspec.spec_builder()
+
+spec_builder.values('long_name_one', [4, 5, 6])
+spec_builder.values('long_name_two', [3, 6, 9])
+aliases = {'long_name_one': 'a', 'long_name_two': 'b'}
+formula = 'sqrt({{a}}*{{a}} + {{b}}*{{b}})'
+spec_builder.calculate('c', fields=aliases, formula=formula)
+
+spec = spec_builder.build()
+```
+
+</details>
+
+
+<details>
+  <summary>Example Command and Output</summary>
+
+```shell
+dataspec -s dataspec.json --log-level error -i 3 --format json -x
+{"long_name_one": 4, "long_name_two": 3, "c": 5.0}
+{"long_name_one": 5, "long_name_two": 6, "c": 7.810249675906654}
+{"long_name_one": 6, "long_name_two": 9, "c": 10.816653826391969}
+```
+
+</details>
+
+We use
+the [asteval](http://newville.github.io/asteval/basics.html)
+package to do formula evaluation. This provides a fairly safe way to do
+evaluation. The package provides a bunch of
+[built-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
+as well. We also use the [Jinja2](https://pypi.org/project/Jinja2/) templating
+engine format for specifying variable names to substitute. In theory, you
+could use any valid jinja2 syntax i.e.:
+
+
+```json
+{
+  "formula": "sqrt({{ value_that_might_be_a_string | int }})"
+}
+```
+
+The example above is unnecessary and is only there to demonstrate the capability.

@@ -1,0 +1,21 @@
+{
+  "weighted_csv.schema.json": {
+    "valid": [
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "test.csv"}}, "note": "minimum config 1"},
+      {"instance": {"type": "weighted_csv", "config": {"configref": "has_the_info", "column": 1}}, "note": "minimum config 2"},
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "tabs.csv", "delimiter": "\t", "headers": "true"}}},
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "test.csv", "column": "status", "weight_column": "weight"}}},
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "test.csv", "quotechar": "'"}}},
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "test.csv", "count": 2}}},
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "test.csv", "count": [1, 1, 2], "join_with": " "}}}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "wayted_csv"}, "note": "misspelled"},
+      {"instance": {"type": "weighted_csv"}, "note": "no config"},
+      {"instance": {"type": "weighted_csv", "config": {}}, "note": "empty config"},
+      {"instance": {"type": "weighted_csv", "config": {"datafile": "test.csv", "headers": "missing"}}, "note": "invalid headers"},
+      {"instance": {"type": "weighted_csv", "config": {"configref": "pointer"}}, "note": "config ref, no column, gives misleading error"}
+    ]
+  }
+}

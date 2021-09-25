@@ -128,7 +128,8 @@ param | type | description                                  | default | examples
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
-    1. [nested](#Nested)
+    1. [Nested](#Nested)
+    1. [Calculate](#Calculate)
 
 # <a name="Quick_Reference"></a>Quick Reference
 
@@ -155,6 +156,7 @@ type                         | description                            | config p
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
 [nested](#Nested)            | For nested fields                      |
+[calculate](#Calculate)      | Calculate values from output of other fields or refs|
 
 # <a name="Overview"></a>Overview
 
@@ -1029,17 +1031,7 @@ The `csv` Field Spec structure is:
 }
 ```
 
-#### Params
-
-|param      |required?|default |description|
-|-----------|---------|--------|-----------|
-|datafile   |no       |data.csv|filename in datandir to use|
-|headers    |no       |false   |yes, on, true for affirmative|
-|column     |no       |1       |1 based column number or field name if headers</br> are present|
-|delimiter  |no       |,       |how values are separated|
-|quotechar  |no       |"       |how values are quoted, default is double quote|
-|sample     |no       |False   |If the values should be selected at random|
-|count      |no       |1       |Number of values in column to use for value|
+{{ show_params(schemas.csv, definitions) }}
 
 #### Examples
 
@@ -1112,6 +1104,31 @@ Our example doesn't have headers, so we are using the 1 based indexes.
 
 {{ show_example(examples.csv_select_example_one) }}
 
+## <a name="WeightedCSV"></a>Weighted CSV
+
+A `weighted_csv` spec is used to externalize values and their weights into a csv
+file. The default is to assume a comma separated file where the first column is
+the value to use, and the second is the weight for it. i.e.:
+
+```
+Tokyo,0.1
+London,0.2
+New York,0.1
+Cambridge,0.3
+Oxford,0.3
+Seattle,0.3
+San Diego,0.4
+Springfield,0.01
+```
+{{ show_params(schemas.weighted_csv, definitions) }}
+
+### Example
+
+{{ show_example(examples.weighted_csv_spec_example_one) }}
+
+{{ show_command_and_output(examples.weighted_csv_spec_example_one) }}
+
+
 ## <a name="nested"></a>Nested Fields
 
 Nested types are used to create fields that contain subfields. Nested types can
@@ -1167,3 +1184,46 @@ data that matches this schema.
 {{ show_example(examples.nested_example_one) }}
 
 {{ show_command_and_output(examples.nested_example_one) }}
+
+## <a name="Calculate"></a>Calculate
+
+There are times when one field needs the value of another field in order to
+calculate its own value. For example, if you wanted to produce values that
+represented a users' height in inches and in centimeters, you would want them to
+correlate. You could use the `calculate` type to specify a `formula` to do this
+calculation. There are two ways to specify the fields to calculate a value from.
+The first is to use the `fields` and/or the `refs` keys with an array of fields
+or refs to use in the formula.  The second is the use a map where the field
+or ref name to be used is mapped to a string that will be used as an alias for
+it in the formula. See second example below for the mapped alias version.
+
+{{ show_example(examples.calculate_example_one) }}
+
+{{ show_command_and_output(examples.calculate_example_one) }}
+
+In the example above, we alias the value output from `height_in` to the variable in
+our formula `a`. It is possible to use multiple variables. In this next example
+we use the Pythagorean theorem to calculate the hypotenuse from two fields. Notice
+the use of aliasing in the specified fields.
+
+{{ show_example(examples.calculate_example_two) }}
+
+{{ show_command_and_output(examples.calculate_example_two) }}
+
+We use
+the [asteval](http://newville.github.io/asteval/basics.html)
+package to do formula evaluation. This provides a fairly safe way to do
+evaluation. The package provides a bunch of
+[built-in-functions](http://newville.github.io/asteval/basics.html#built-in-functions)
+as well. We also use the [Jinja2](https://pypi.org/project/Jinja2/) templating
+engine format for specifying variable names to substitute. In theory, you
+could use any valid jinja2 syntax i.e.:
+
+
+```json{% raw%}
+{
+  "formula": "sqrt({{ value_that_might_be_a_string | int }})"
+}
+```{% endraw %}
+
+The example above is unnecessary and is only there to demonstrate the capability.

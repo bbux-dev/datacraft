@@ -1,8 +1,6 @@
 """
 Module to hold models for core data structures and classes
 """
-from pathlib import Path
-from typing import Union
 
 
 class DataSpec(dict):

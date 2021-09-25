@@ -206,7 +206,13 @@ def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
     :param config: optional config
     :return: the supplier
     """
-    return WeightedValueSupplier(data, count_supplier_from_config(config))
+    if len(data) == 0:
+        raise SpecException('Invalid Weights, no values defined')
+    choices = list(data.keys())
+    weights = list(data.values())
+    if not isinstance(weights[0], float):
+        raise SpecException('Invalid type for weights: ' + str(type(weights[0])))
+    return WeightedValueSupplier(choices, weights, count_supplier_from_config(config))
 
 
 def combine(suppliers, config=None):
