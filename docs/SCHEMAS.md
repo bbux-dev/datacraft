@@ -3,18 +3,23 @@ Built in Field Spec Type Schemas
 
 
 1. [Definitions](#definitions)
+1. [calculate](#calculate)
 1. [char_class](#char_class)
 1. [combine-list](#combine-list)
 1. [combine](#combine)
+1. [configref](#configref)
+1. [csv](#csv)
 1. [Date types (data, date.iso, date.iso.us)](#date)
 1. [geo.lat](#geo.lat)
 1. [geo.long](#geo.long)
 1. [geo.pair](#geo.pair)
 1. [IP types (ip, ipv4)](#ip)
 1. [Range types (range, rand_range)](#range)
+1. [select_list_subset](#select_list_subset)
 1. [unicode_range](#unicode_range)
 1. [uuid](#uuid)
 1. [values](#values)
+1. [weighted_csv](#weighted_csv)
 
 
 # <a name="definitions"></a>Definitions
@@ -27,10 +32,30 @@ Built in Field Spec Type Schemas
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/bbux-dev/dataspec/schemas/definitions.json",
   "definitions": {
-    "prefix": {"type": "string"},
-    "suffix": {"type": "string"},
-    "quote": {"type": "string"},
-    "join_with": {"type": "string"},
+    "prefix": {
+      "type": "string",
+      "description": "Prefix string pre-pended to all values for field",
+      "default": null,
+      "examples": ["@", "www.", "<h1>", "#"]
+    },
+    "suffix": {
+      "type": "string",
+      "description": "Suffix string appended to all values for field",
+      "default": null,
+      "examples": [".com", "</h1>", "@"]
+    },
+    "quote": {
+      "type": "string",
+      "description": "String to surround all values for field with",
+      "default": null,
+      "examples": ["\"", "'", "||"]
+    },
+    "join_with": {
+      "type": "string",
+      "description": "String or character to join multiple values together with",
+      "default": null,
+      "examples": [",", "@", " OR ", " && "]
+    },
     "affirmative_check": {
       "description": "Either true, false, 'on', 'off', 'yes', 'no', 'true', 'false', case insensitive",
       "oneOf": [
@@ -38,9 +63,18 @@ Built in Field Spec Type Schemas
         {"type": "string", "pattern": "[t|T][r|R][u|U][e|E]|[f|F][a|A][l|L][s|S][e|E]|[y|Y][e|E][s|S]|[n|N][o|O]|[o|O][n|N]|[o|O][f|F][f|F]"}
       ]
     },
-    "as_list": {"$ref": "#/definitions/affirmative_check"},
-    "cast": {"type": "string", "enum": ["i", "int", "f", "float", "s", "string", "string", "h", "hex"]},
+    "as_list": {
+      "description": "If the values should be returned as a list. Either true, false, 'on', 'off', 'yes', 'no', 'true', 'false', case insensitive",
+      "$ref": "#/definitions/affirmative_check"
+    },
+    "cast": {
+      "type": "string",
+      "description": "Type to cast values to for field",
+      "examples": ["i", "int", "f", "float", "s", "str", "string", "h", "hex"],
+      "enum": ["i", "int", "f", "float", "s", "str", "string", "h", "hex"]
+    },
     "count": {
+      "description": "Number of values to include, constant, list, or weighted values spec",
       "oneOf": [
         {"type": "integer"},
         {
@@ -59,14 +93,17 @@ Built in Field Spec Type Schemas
         }
       ]
     },
-    "min": {"type": "number"},
-    "max": {"type": "number"},
-    "mean": {"type": "number"},
-    "stddev": {"type": "number"},
-    "precision": {"type": "integer"},
+    "precision": {
+      "type": "integer",
+      "description": "How many digits after decimal point to include in values",
+      "default": null,
+      "examples": [0, 2, 7, 12],
+      "minimum": 0
+    },
     "bbox": {
-      "description": "Bounding box for geo related points, describes lower left and upper right coordinates with longitude first",
       "type": "array",
+      "description": "Bounding box for geo related points, describes lower left and upper right coordinates with longitude first",
+      "default": null,
       "minItems": 4,
       "maxItems": 4,
       "items":[
@@ -77,6 +114,85 @@ Built in Field Spec Type Schemas
       ]
     }
   }
+}
+```
+</details>
+
+# <a name="calculate"></a>calculate
+
+Types covered by schema: `calculate`
+
+<details>
+  <summary>JSON Schema</summary>
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/calculate.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^calculate$"
+    },
+    "config": {
+      "type": "object"
+    },
+    "refs": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ],
+      "examples": [
+        "{ \"ref_name\": \"alias\" }",
+        "[ \"ref1\", \"ref2\" ]"
+      ]
+    },
+    "fields": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ],
+      "examples": [
+        "{ \"field_name\": \"alias\" }",
+        "[ \"field1\", \"field2\" ]"
+      ]
+    },
+    "formula": {
+      "type": "string",
+      "examples": [
+        "{{a}} * {{b}}",
+        "{{a}} * 22.34",
+        "({{a}} + {{b}} - {{c}}) * ({{d}}^^2)",
+        "sqrt(exp({{ a }}))"
+      ]
+    }
+  },
+  "anyOf": [
+    {
+      "oneOf": [
+        {"required": ["refs", "formula"]},
+        {"required": ["fields", "formula"]}
+      ]
+    },
+    {
+      "oneOf": [
+        {"required": ["refs", "fields", "formula"]}
+      ]
+    }
+  ]
+
 }
 ```
 </details>
@@ -103,10 +219,32 @@ Types covered by schema: `char_class`
         "suffix": {"$ref": "#/definitions/suffix"},
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
-        "min": {"$ref": "#/definitions/min"},
-        "max": {"$ref": "#/definitions/max"},
-        "mean": {"$ref": "#/definitions/mean"},
-        "stddev": {"$ref": "#/definitions/stddev"}
+        "min": {
+          "type": "integer",
+          "description": "minimum number of characters in string",
+          "default": null,
+          "examples": [1, 7, 2255],
+          "minimum": 1
+        },
+        "max": {
+          "type": "integer",
+          "description": "maximum number of characters in string",
+          "default": null,
+          "examples": [1, 7, 2255],
+          "minimum": 1
+        },
+        "mean": {
+          "type": "number",
+          "description": "mean number of characters in string",
+          "default": null,
+          "examples": [3, 5, 7.5]
+        },
+        "stddev": {
+          "type": "number",
+          "description": "standard deviation from mean for number of characters in string",
+          "default": null,
+          "examples": [0.5, 3, 7]
+        }
       },
       "not": {
         "description": "count should not be present if min max or mean are present",
@@ -236,6 +374,119 @@ Types covered by schema: `combine`
 ```
 </details>
 
+# <a name="configref"></a>configref
+
+Types covered by schema: `configref`
+
+<details>
+  <summary>JSON Schema</summary>
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/configref.schema.json",
+  "type": "object",
+  "description": "Type used to store configurations that are used across multiple fields",
+  "required": ["type", "config"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^configref$"
+    },
+    "config": {
+      "type": "object"
+    }
+  }
+}
+```
+</details>
+
+# <a name="csv"></a>csv
+
+Types covered by schema: `csv`
+
+<details>
+  <summary>JSON Schema</summary>
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/csv.schema.json",
+  "type": "object",
+  "required": ["type", "config"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^csv$"},
+    "config": {
+      "type": "object",
+      "anyOf": [
+        {"required": ["datafile"]},
+        {"required": ["configref", "column"]}
+      ],
+      "properties": {
+        "datafile": {
+          "type": "string",
+          "description": "Name of file in data directory that contains the data for this field",
+          "examples": [
+            "example.csv",
+            "subdir/example2.csv"
+          ]
+        },
+        "configref": {
+          "type": "string",
+          "description": "Name of configref to use to populate config for this field",
+          "examples": ["tabs_config", "common_csv_config"]
+        },
+        "headers": {
+          "description": "If the csv file has headers",
+          "default": false,
+          "$ref": "#/definitions/affirmative_check"
+        },
+        "column": {
+          "type": ["number", "string"],
+          "description": "1 based column number or field name if headers are present",
+          "default": 1,
+          "minimum": 1,
+          "examples": [
+            1,
+            "col_2",
+            "name"
+          ]
+        },
+        "delimiter": {
+          "type": "string",
+          "description": "how values are separated in the csv file, default is comma",
+          "default": ",",
+          "examples": [
+            ",", "\t", ";", " "
+          ]
+        },
+        "quotechar": {
+          "type": "string",
+          "description": "how values are quoted, default is double quote",
+          "default": "\"",
+          "examples": [
+            ",", "\t", ";", " "
+          ]
+        },
+        "sample": {
+          "description": "If the values for the field should be selected at random from the values in the column, default is false",
+          "default": false,
+          "$ref": "#/definitions/affirmative_check"
+        },
+        "count": {
+          "$ref": "#/definitions/count",
+          "description": "Number of values in column to use for field",
+          "default": 1
+        },
+        "join_with": {"$ref": "#/definitions/join_with"},
+        "as_list": {"$ref": "#/definitions/as_list"}
+      }
+    }
+  }
+}
+```
+</details>
+
 # <a name="date"></a>Date types (data, date.iso, date.iso.us)
 
 Types covered by schema: `date, date.iso, date.iso.us`
@@ -259,22 +510,92 @@ Types covered by schema: `date, date.iso, date.iso.us`
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
         "format": {
-          "description": "Valid date format string",
+          "description": "Valid datetime format string",
+          "default": "%d-%m-%Y",
+          "examples": [
+            "%Y%m%d",
+            "%m/%d/%Y",
+            "%H:%M:%S"
+          ],
           "type": "string"
         },
         "duration_days": {
+          "description": "The number of days from the start date to create date strings for",
+          "default": 30,
+          "examples": [
+            1, 30, 90, 9999
+          ],
           "oneOf": [
-            {"type": "integer"},
             {
-              "type": "array",
-              "minItems": 2,
-              "maxItems": 2,
-              "items": { "type": "integer" }
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "[1-9][0-9]*"
             }
           ]
         },
-        "start": {"type": "string"},
-        "offset": {"type": "integer"}
+        "start": {
+          "type": "string",
+          "default": null,
+          "description": "date string matching format or default format to use for start date",
+          "examples": [
+            "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
+          ]
+        },
+        "end": {
+          "type": "string",
+          "default": null,
+          "description": "date string matching format or default format to use for end date",
+          "examples": [
+            "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "description": "number of days to shift base date by, positive means shift backwards, negative means forward",
+          "default": 0,
+          "examples": [
+            30, -30, 365, 730
+          ]
+        },
+        "center_date": {
+          "type": "string",
+          "default": null,
+          "description": "date string matching format or default format to use for center date",
+          "examples": [
+            "22-02-2022", "02/22/1972", "2009-09-01T08:08.000Z"
+          ]
+        },
+        "stddev_days": {
+          "description": "The standard deviation in days from the center date that dates should be distributed",
+          "default": 15,
+          "examples": [
+            1, 12, 720
+          ],
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "[1-9][0-9]*"
+            }
+          ]
+        }
+      },
+      "not": {
+        "description": "center_date and stddev_days should not appear with start, end, or duration_days",
+        "anyOf": [
+          {"required": ["center_date", "start"]},
+          {"required": ["center_date", "end"]},
+          {"required": ["center_date", "duration_days"]},
+          {"required": ["stddev_days", "start"]},
+          {"required": ["stddev_days", "end"]},
+          {"required": ["stddev_days", "duration_days"]}
+        ]
       }
     },
     "additionalProperties": false
@@ -463,7 +784,8 @@ Types covered by schema: `range, rand_range`
         "suffix": {"$ref": "#/definitions/suffix"},
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
-        "cast": {"$ref": "#/definitions/cast"}
+        "cast": {"$ref": "#/definitions/cast"},
+        "precision": {"$ref": "#/definitions/precision"}
       }
     },
     "data": {
@@ -493,6 +815,92 @@ Types covered by schema: `range, rand_range`
 ```
 </details>
 
+# <a name="select_list_subset"></a>select_list_subset
+
+Types covered by schema: `select_list_subset`
+
+<details>
+  <summary>JSON Schema</summary>
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/select_list_subset.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "oneOf": [
+    {"required": ["ref"]},
+    {"required": ["data"]}
+  ],
+  "properties": {
+    "type": {"type": "string", "pattern": "^select_list_subset$"},
+    "config": {
+      "type": "object",
+      "oneOf": [
+        {"required": ["count"]},
+        {"required": ["mean"]}
+      ],
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "min": {
+          "type": "integer",
+          "description": "minimum number of items to select from list",
+          "default": null,
+          "examples": [1, 7, 2255],
+          "minimum": 1
+        },
+        "max": {
+          "type": "integer",
+          "description": "maximum number of items to select from list",
+          "default": null,
+          "examples": [1, 7, 2255],
+          "minimum": 1
+        },
+        "mean": {
+          "type": "number",
+          "description": "mean number of items to select from list",
+          "default": null,
+          "examples": [3, 5, 7.5]
+        },
+        "stddev": {
+          "type": "number",
+          "description": "standard deviation from mean for number of items to select from list",
+          "default": null,
+          "examples": [0.5, 3, 7]
+        },
+        "count": {
+          "type": "number",
+          "description": "exact number of items to select from list",
+          "default": null,
+          "minimum": 1,
+          "examples": [3, 5, 7]
+        }
+      },
+      "not": {
+        "description": "count should not be present if min max or mean are present",
+        "anyOf": [
+          {"required": ["count", "min"]},
+          {"required": ["count", "max"]},
+          {"required": ["count", "mean"]}
+        ]
+      }
+    },
+    "ref": {
+      "type": "string",
+      "description": "The valid name of a spec from the ref section the contains a list as the data element"
+    },
+    "data": {
+      "type": "array",
+      "description": "The data to select from",
+      "minItems": 1
+    }
+  }
+}
+```
+</details>
+
 # <a name="unicode_range"></a>unicode_range
 
 Types covered by schema: `unicode_range`
@@ -515,10 +923,32 @@ Types covered by schema: `unicode_range`
         "suffix": {"$ref": "#/definitions/suffix"},
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
-        "min": {"$ref": "#/definitions/min"},
-        "max": {"$ref": "#/definitions/max"},
-        "mean": {"$ref": "#/definitions/mean"},
-        "stddev": {"$ref": "#/definitions/stddev"}
+        "min": {
+          "type": "integer",
+          "description": "minimum number of characters in string",
+          "default": null,
+          "examples": [1, 7, 2255],
+          "minimum": 1
+        },
+        "max": {
+          "type": "integer",
+          "description": "maximum number of characters in string",
+          "default": null,
+          "examples": [1, 7, 2255],
+          "minimum": 1
+        },
+        "mean": {
+          "type": "number",
+          "description": "mean number of characters in string",
+          "default": null,
+          "examples": [3, 5, 7.5]
+        },
+        "stddev": {
+          "type": "number",
+          "description": "standard deviation from mean for number of characters in string",
+          "default": null,
+          "examples": [0.5, 3, 7]
+        }
       },
       "not": {
         "description": "count should not be present if min max or mean are present",
@@ -636,6 +1066,98 @@ Types covered by schema: `values`
           "additionalProperties": { "type": "number" }
         }
       ]
+    }
+  }
+}
+```
+</details>
+
+# <a name="weighted_csv"></a>weighted_csv
+
+Types covered by schema: `weighted_csv`
+
+<details>
+  <summary>JSON Schema</summary>
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/dataspec/schemas/weighted_csv.schema.json",
+  "type": "object",
+  "required": ["type", "config"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^weighted_csv$"},
+    "config": {
+      "type": "object",
+      "anyOf": [
+        {"required": ["datafile"]},
+        {"required": ["configref", "column"]}
+      ],
+      "properties": {
+        "datafile": {
+          "type": "string",
+          "description": "Name of file in data directory that contains the data for this field",
+          "examples": [
+            "example.csv",
+            "subdir/example2.csv"
+          ]
+        },
+        "configref": {
+          "type": "string",
+          "description": "Name of configref to use to populate config for this field",
+          "examples": ["tabs_config", "common_csv_config"]
+        },
+        "headers": {
+          "description": "If the csv file has headers",
+          "default": false,
+          "$ref": "#/definitions/affirmative_check"
+        },
+        "column": {
+          "type": ["number", "string"],
+          "description": "1 based column number or field name if headers are present",
+          "default": 1,
+          "minimum": 1,
+          "examples": [
+            1,
+            "col_2",
+            "name"
+          ]
+        },
+        "weight_column": {
+          "type": ["number", "string"],
+          "description": "1 based column number or field name if headers are present where weights are defined",
+          "default": 2,
+          "minimum": 1,
+          "examples": [
+            1,
+            "col_2",
+            "name"
+          ]
+        },
+        "delimiter": {
+          "type": "string",
+          "description": "how values are separated in the csv file, default is comma",
+          "default": ",",
+          "examples": [
+            ",", "\t", ";", " "
+          ]
+        },
+        "quotechar": {
+          "type": "string",
+          "description": "how values are quoted, default is double quote",
+          "default": "\"",
+          "examples": [
+            ",", "\t", ";", " "
+          ]
+        },
+        "count": {
+          "$ref": "#/definitions/count",
+          "description": "Number of values in column to use for field",
+          "default": 1
+        },
+        "join_with": {"$ref": "#/definitions/join_with"},
+        "as_list": {"$ref": "#/definitions/as_list"}
+      }
     }
   }
 }

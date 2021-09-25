@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Utiltity to build data structures for SCHEMAS.md
+Utility to build data structures for SCHEMAS.md
 """
 import os
 import glob
@@ -39,7 +39,6 @@ def main():
             'type_names': type_names,
             'schema': schema
         })
-
 
     env = Environment(
         loader=FileSystemLoader('.'),
