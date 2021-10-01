@@ -148,11 +148,11 @@ type                         | description                            | config p
 [unicode_range](#UnicodeRange)| generates strings from unicode ranges | many see details below
 [geo.lat](#Geo)              | generates decimal latitude             | start_lat,end_lat,precision
 [geo.long](#Geo)             | generates decimal longitude            | start_long,end_long,precision
-[geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,</br>start_long,end_long,precision
+[geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision
 [ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | base, cidr /8,/16,/24 only
 [ip.precise](#IP_Addresses)  | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/14
 [weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |
-[select_list_subset](#Select_List_Subset) | selects subset of fields that are</br> combined to create the value for the field | join_with
+[select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
 [nested](#Nested)            | For nested fields                      |
@@ -201,7 +201,7 @@ Below is the general structure.
   "type": "<the type>",
   "config": {
     "key1": "value1",
-    ...</br>
+    ...
     "keyN": "valueN"
   },
   "data": ["the data"],
@@ -260,12 +260,12 @@ types. These are listed below
 
 key      | argument  |effect 
 ---------|-----------|-------
-prefix   | string    |Prepends the value to all results 
-suffix   | string    |Appends the value to all results  
-quote    | string    |Wraps the resulting value on both sides with the</br> provided string 
-cast     | i,int,f,float,s,str,string|For numeric types, will cast results</br> the provided type
-join_with|string     |For types that produce multiple values, use this</br> string to join them   
-as_list  |yes,true,on|For types that produce multiple values, return as</br> list without joining 
+prefix   | string    |Prepends the value to all results
+suffix   | string    |Appends the value to all results
+quote    | string    |Wraps the resulting value on both sides with the provided string
+cast     | i,int,f,float,s,str,string|For numeric types, will cast results the provided type
+join_with|string     |For types that produce multiple values, use this string to join them
+as_list  |yes,true,on|For types that produce multiple values, return as list without joining
 
 Example:
 
@@ -293,9 +293,9 @@ parameters explicitly named.  See the table below.
 
 distribution|required arguments|optional args|examples
 ------------|------------------|-------------|---
-uniform     |start</br>end     |             |"uniform(start=10, end=30)"
+uniform     |start,end         |             |"uniform(start=10, end=30)"
 </i>        |                  |             |"uniform(start=1, end=3)"
-guass       |mean</br>stddev   |min</br>max  |"gauss(mean=2, stddev=1)"
+guass       |mean,stddev       |min,max      |"gauss(mean=2, stddev=1)"
 guassian    |                  |             |"guassian(mean=7, stddev=1, min=4)"
 normal      |                  |             |"normal(mean=25, stddev=10, max=40)"
 
@@ -849,14 +849,14 @@ Config Params:
 |type    |param     |description
 |--------|----------|---------------------------------------------
 |all     |precision |number of decimal places for lat or long, default is 4
-|        |bbox      |array of \[min Longitude, min Latitude, max Longitude,</br> max Latitude\]
+|        |bbox      |array of \[min Longitude, min Latitude, max Longitude, max Latitude\]
 |geo.lat |start_lat |lower bound for latitude
 |        |end_lat   |upper bound for latitude
 |geo.long|start_long|lower bound for longitude
 |        |end_long  |upper bound for longitude
 |geo.pair|join_with |delimiter to join long and lat with, default is comma
-|        |as_list   |One of yes, true, or on if the pair should be returned</br> as a list instead of as a joined string|
-|        |lat_first |if latitude should be first in the generated pair,</br> default is longitude first|
+|        |as_list   |One of yes, true, or on if the pair should be returned as a list instead of as a joined string|
+|        |lat_first |if latitude should be first in the generated pair, default is longitude first|
 |        |start_lat |lower bound for latitude
 |        |end_lat   |upper bound for latitude
 |        |start_long|lower bound for longitude
