@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/configref.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/configref.schema.json",
   "type": "object",
   "description": "Type used to store configurations that are used across multiple fields",
   "required": ["type", "config"],

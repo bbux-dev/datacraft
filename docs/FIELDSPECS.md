@@ -124,9 +124,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 one = refs.values('ONE', ["A", "B", "C"])
@@ -143,7 +143,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 7
+datagen -s dataspec.json --log-level error -i 7
 A1
 B2
 C3
@@ -201,9 +201,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 one = refs.values('ONE', ["A", "B", "C"])
@@ -220,7 +220,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 12 \
+datagen -s dataspec.json --log-level error -i 12 \
   | sort
 A1
 A2
@@ -295,9 +295,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 one = refs.values('ONE', ["A", "B", "C"], sample=True)
@@ -383,9 +383,9 @@ field3:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field('field1', dataspec.builder.values([1, 2, 3, 4, 5]))
 spec_builder.add_field('field2', dataspec.builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
@@ -431,9 +431,9 @@ field3: CONSTANT
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field('field1', [1, 2, 3, 4, 5])
 spec_builder.add_field('field2', {"A": 0.5, "B": 0.3, "C": 0.2})
@@ -483,9 +483,9 @@ network:ipv4?cidr=192.168.0.0/16: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("network:ipv4?cidr=192.168.0.0/16", {})
 
@@ -544,9 +544,9 @@ TWO?prefix=TEST&suffix=@DEMO:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('ONE', [1, 2, 3], prefix='TEST', suffix='@DEMO')
 spec_builder.values('TWO?prefix=TEST&suffix=@DEMO', [1, 2, 3])
@@ -604,9 +604,9 @@ field:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('field', 
                     ["world", "beautiful", "destiny"], 
@@ -682,9 +682,9 @@ field:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.char_class(key='field',
                         data='visible',
@@ -738,9 +738,9 @@ shorthand_constant: This is simulated data and should not be used for nefarious 
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('constant1', 42)
 spec_builder.add_field('shorthand_constant', "This is simulated data and should not be used for nefarious purposes")
@@ -788,9 +788,9 @@ random_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('list1', [200, 202, 303, 400, 404, 500])
 spec_builder.add_field("shorthand_list",  [200, 202, 303, 400, 404, 500])
@@ -849,9 +849,9 @@ shorthand_weighted:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('weighted1', {
         "200": 0.4, "202": 0.3, "303": 0.1,
@@ -916,9 +916,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 refs.add_field('ONE?sample=true', ["A", "B", "C"])
@@ -1009,9 +1009,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 first = refs.values(key="first",
@@ -1121,9 +1121,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 first = refs.values(
@@ -1269,9 +1269,9 @@ dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
 
@@ -1284,7 +1284,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 1000 \
+datagen -s dataspec.json --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 15-Dec-2050 13:41
 31-Jan-2051 23:32
@@ -1318,9 +1318,9 @@ dates:date: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date", {})
 
@@ -1333,7 +1333,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 02-07-2021
 01-08-2021
@@ -1364,9 +1364,9 @@ dates:date?offset=1: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?offset=1", {})
 
@@ -1379,7 +1379,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?offset=1": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?offset=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 01-07-2021
 31-07-2021
@@ -1410,9 +1410,9 @@ dates:date?duration_days=1: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=1", {})
 
@@ -1425,7 +1425,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?duration_days=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 02-07-2021
 03-07-2021
@@ -1456,9 +1456,9 @@ dates:date?duration_days=10: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=10", {})
 
@@ -1471,7 +1471,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=10": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?duration_days=10": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 02-07-2021
 12-07-2021
@@ -1502,9 +1502,9 @@ dates:date?duration_days=1&offset=1: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=1&offset=1", {})
 
@@ -1517,7 +1517,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 01-07-2021
 02-07-2021
@@ -1548,9 +1548,9 @@ dates:date?duration_days=1&offset=-1: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=1&offset=-1", {})
 
@@ -1563,7 +1563,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 03-07-2021
 04-07-2021
@@ -1594,9 +1594,9 @@ dates:date?duration_days=1&offset=1&start=15-12-2050: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=1&offset=1&start=15-12-2050", {})
 
@@ -1609,7 +1609,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 14-12-2050
 14-12-2050
@@ -1640,9 +1640,9 @@ dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
 
@@ -1655,7 +1655,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
 15-Dec-2050 12:00
 16-Dec-2050 11:58
@@ -1689,9 +1689,9 @@ dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2", {})
 
@@ -1704,7 +1704,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error -i 1000 \
   | sort -n | uniq | sed -n '1p;$p'
 20500525 20:43
 20500607 00:36
@@ -1738,9 +1738,9 @@ dates:date?stddev_days=1: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?stddev_days=1", {})
 
@@ -1753,7 +1753,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?stddev_days=1": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?stddev_days=1": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 29-06-2021
 05-07-2021
@@ -1784,9 +1784,9 @@ dates:date?stddev_days=15: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("dates:date?stddev_days=15", {})
 
@@ -1799,7 +1799,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec --inline '{"dates:date?stddev_days=15": {}}' --log-level error -i 1000 \
+datagen --inline '{"dates:date?stddev_days=15": {}}' --log-level error -i 1000 \
   | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
 19-05-2021
 16-08-2021
@@ -1887,9 +1887,9 @@ range_shorthand2:range: [0, 10, 0.5]
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.range_spec(key="zero_to_ten", data=[0, 10, 0.5])
 spec_builder.add_field(key="range_shorthand1:range", spec={"data": [0, 10, 0.5]})
@@ -1929,9 +1929,9 @@ salaries:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.range_spec(
     key="salaries",
@@ -2020,9 +2020,9 @@ pop:rand_range?cast=f: [200.2, 1222.7, 2]
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.rand_range(
     key="population",
@@ -2039,7 +2039,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 5  --format json -x
+datagen -s dataspec.json --log-level error -i 5  --format json -x
 {"population": 828, "pop": 630.87}
 {"population": 339, "pop": 361.01}
 {"population": 254, "pop": 549.29}
@@ -2092,9 +2092,9 @@ id_shorthand:uuid: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.uuid(key="id")
 spec_builder.add_field("id_shorthand:uuid", {})
@@ -2214,9 +2214,9 @@ one_to_five_digits:cc-digits?min=1&max=5: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("one_to_five_digits:cc-digits?min=1&max=5", {})
 
@@ -2277,9 +2277,9 @@ password:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.char_class(
     key="password",
@@ -2305,7 +2305,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 10
+datagen -s dataspec.json --log-level error -i 10
 c3cFwpv!7c>(
 @qf`4;3yF7d#DM
 ;'&5]$8pu3_7,E?
@@ -2404,9 +2404,9 @@ text:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.unicode_range("text", ["3040", "309f"], mean=5)
 
@@ -2420,7 +2420,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 10
+datagen -s dataspec.json --log-level error -i 10
 じ
 んじ
 むぬ
@@ -2545,9 +2545,9 @@ egypt:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.geo_pair("egypt", bbox=[31.33134, 22.03795, 34.19295, 25.00562], precision=3)
 
@@ -2629,9 +2629,9 @@ network_with_base:ip?base=192.168.0: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.ipv4(key="network", cidr="2.22.222.0/16")
 spec_builder.add_field("network_shorthand:ip?cidr=2.22.222.0/16", {})
@@ -2681,9 +2681,9 @@ network:ip.precise?cidr=10.0.0.0/8: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("network:ip.precise?cidr=10.0.0.0/8", {})
 
@@ -2717,9 +2717,9 @@ network:ip.precise?cidr=192.168.0.0/14&sample=true: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("network:ip.precise?cidr=192.168.0.0/14&sample=true", {})
 
@@ -2752,9 +2752,9 @@ network:ip.precise?cidr=2.22.0.0/22: {}
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.add_field("network:ip.precise?cidr=2.22.0.0/22", {})
 
@@ -2834,9 +2834,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 refs = spec_builder.refs()
 refs.add_field('GOOD_CODES', {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1})
@@ -2923,9 +2923,9 @@ ingredients:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.select_list_subset(
     key="ingredients",
@@ -2946,7 +2946,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 5
+datagen -s dataspec.json --log-level error -i 5
 mushrooms, garlic
 carrots, potatoes
 garlic, onions
@@ -3006,9 +3006,9 @@ ingredients:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.select_list_subset(
     key="ingredients",
@@ -3030,7 +3030,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 5
+datagen -s dataspec.json --log-level error -i 5
 "onions", "bell peppers"
 "carrots", "spinach"
 "mushrooms", "bell peppers", "carrots"
@@ -3135,9 +3135,9 @@ cities:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.csv(
     key="cities",
@@ -3242,9 +3242,9 @@ refs:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.configref(
     key="tabs_config",
@@ -3327,9 +3327,9 @@ placeholder:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.csv_select(
     key="placeholder",
@@ -3417,9 +3417,9 @@ cities:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.weighted_csv(
     key="cities",
@@ -3435,7 +3435,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 100 --datadir ./data | sort | uniq -c | sort -n
+datagen -s dataspec.json --log-level error -i 100 --datadir ./data | sort | uniq -c | sort -n
       8 London
       8 New York
       9 Oxford
@@ -3549,15 +3549,15 @@ user:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
-geo_fields = dataspec.spec_builder()
+geo_fields = datagen.spec_builder()
 geo_fields.add_field("place_id:cc-digits?mean=5", {})
 geo_fields.add_field("coordinates:geo.pair?as_list=true", {})
 
-user_fields = dataspec.spec_builder()
+user_fields = datagen.spec_builder()
 user_fields.uuid("user_id")
 user_fields.nested("geo", geo_fields.build())
 
@@ -3574,7 +3574,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 1 --format json-pretty -x
+datagen -s dataspec.json --log-level error -i 1 --format json-pretty -x
 {
     "id": "02825a62-2bd5-4461-a6be-773df096cfc4",
     "user": {
@@ -3643,9 +3643,9 @@ height_cm:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('height_in', [60, 70, 80, 90])
 fields = ['height_in']
@@ -3662,7 +3662,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 4 --format json -x
+datagen -s dataspec.json --log-level error -i 4 --format json -x
 {"height_in": 60, "height_cm": 152.4}
 {"height_in": 70, "height_cm": 177.8}
 {"height_in": 80, "height_cm": 203.2}
@@ -3724,9 +3724,9 @@ c:
   <summary>API Example</summary>
 
 ```python
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 spec_builder.values('long_name_one', [4, 5, 6])
 spec_builder.values('long_name_two', [3, 6, 9])
@@ -3744,7 +3744,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-dataspec -s dataspec.json --log-level error -i 3 --format json -x
+datagen -s dataspec.json --log-level error -i 3 --format json -x
 {"long_name_one": 4, "long_name_two": 3, "c": 5.0}
 {"long_name_one": 5, "long_name_two": 6, "c": 7.810249675906654}
 {"long_name_one": 6, "long_name_two": 9, "c": 10.816653826391969}

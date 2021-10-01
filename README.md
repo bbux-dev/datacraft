@@ -114,7 +114,7 @@ JSON or YAML file and to specify this file with the --spec command line
 argument:
 
 ```shell
-datagen --spec /path/to/datagen.json \
+datagen --spec /path/to/dataspec.json \
   --template /path/to/template.jinja
   --iterations 1000 \
   --output /path/to/output
