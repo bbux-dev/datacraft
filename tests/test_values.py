@@ -1,8 +1,8 @@
-from dataspec import Loader
-import dataspec.suppliers as suppliers
-from dataspec.loader import preprocess_spec
-from dataspec.exceptions import SpecException
-import dataspec.builder as builder
+from datagen import Loader
+import datagen.suppliers as suppliers
+from datagen.loader import preprocess_spec
+from datagen.exceptions import SpecException
+import datagen.builder as builder
 from collections import Counter
 import pytest
 

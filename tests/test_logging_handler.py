@@ -1,4 +1,4 @@
-from dataspec import logging_handler
+from datagen import logging_handler
 
 
 def test_logging_handler():

@@ -1,5 +1,5 @@
 import decimal
-import dataspec.suppliers as suppliers
+import datagen.suppliers as suppliers
 
 
 def test_random_range():

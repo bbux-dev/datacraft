@@ -13,9 +13,9 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('example')
 
 template = """
-import dataspec
+import datagen
 
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 
 FRAGMENT
 
@@ -27,11 +27,11 @@ def build_example(name, spec, iterations=5, pipes=""):
     if pipes is None:
         pipes = ""
     spec_string = json.dumps(spec.raw_spec)
-    cmd = f"dataspec --inline '{spec_string}' --log-level error -i {iterations} {pipes}"
+    cmd = f"datagen --inline '{spec_string}' --log-level error -i {iterations} {pipes}"
     out = subprocess.check_output(cmd, shell=True)
     cmd_display = cmd
     if len(spec_string) > 80:
-        cmd_display = f"dataspec -s dataspec.json --log-level error -i {iterations} {pipes}"
+        cmd_display = f"datagen -s datagen.json --log-level error -i {iterations} {pipes}"
     ordered = order_spec(spec.raw_spec)
     dirty_yaml = yaml.dump(ordered, sort_keys=False, width=4096).strip()
     cleaned_yaml = clean_semi_formatted_yaml(dirty_yaml)

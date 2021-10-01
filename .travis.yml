@@ -1,6 +1,7 @@
 language: python
 # most of this from https://blog.travis-ci.com/2019-08-07-extensive-python-testing-on-travis-ci
 python:
+  - "3.6"
   - "3.7"
   - "3.8"
   - "3.9"
@@ -14,7 +15,7 @@ install:
   - pip install -r requirements.txt
   - pip install .
 script:
-  - pytest --cov=dataspec
-  - mypy --show-error-codes dataspec/
+  - pytest --cov=datagen
+  - mypy --show-error-codes datagen/
 after_success:
   - codecov # submit coverage

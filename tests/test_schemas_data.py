@@ -15,7 +15,7 @@ INSTANCE = "instance"
 MESSAGE = "note"
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
-schema_dir = os.path.realpath(os.sep.join([root_dir, '..', 'dataspec', 'schema']))
+schema_dir = os.path.realpath(os.sep.join([root_dir, '..', 'datagen', 'schema']))
 tests_dir = os.sep.join([root_dir, 'data'])
 
 

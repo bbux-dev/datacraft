@@ -358,7 +358,7 @@ or `true`. NOTE: Sample mode is only valid with entries that are lists.
 
 If running from the command line, you cas specify the `--sample-lists` flag to
 make all list backed data to have sampling turned on by default. If using the
-python API, do `dataspec.types.set_default('sample_mode', True)`
+python API, do `datagen.types.set_default('sample_mode', True)`
 
 ## <a name="Combine"></a>Combine
 
@@ -750,7 +750,7 @@ tend to stack on the edges of the allowed size range.
 
 ```shell
 # no stddev specified
-for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
+for p in $(datagen -l off -x --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -765,7 +765,7 @@ done | sort | uniq -c | sort -n -k2,2
      71 8
     220 9
 # with stddev of 3 specified
-for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
+for p in $(datagen -l off -x --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -1046,7 +1046,7 @@ by creating directories that have smaller input files.
 {{ show_example(examples.csv_spec_example_one) }}
 
 ```shell
-dataspec --spec cities.json --datadir ./data -i 5
+datagen --spec cities.json --datadir ./data -i 5
 Tokyo
 Los Angeles
 New York
@@ -1082,7 +1082,7 @@ configurations across multiple fields. If we use the following template {% raw
 spec we will get output similar to:
 
 ```shell
-dataspec --spec tabs.yaml --datadir ./data -t template.jinja -i 5
+datagen --spec tabs.yaml --datadir ./data -t template.jinja -i 5
 100,Continue,Informational
 101,Switching Protocols,Informational
 200,OK,Successful
@@ -1135,7 +1135,7 @@ Nested types are used to create fields that contain subfields. Nested types can
 also contain nested fields to allow multiple levels of nesting. Use the `nested`
 type to generate a field that contains subfields. The subfields are defined in
 the `fields` element of the nested spec. The `fields` element will be treated
-like a top level dataspec and has access to the `refs` and other elements of the
+like a top level datagen and has access to the `refs` and other elements of the
 root.
 
 The `nested` Field Spec structure is:

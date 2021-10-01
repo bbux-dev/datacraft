@@ -38,7 +38,6 @@ Field Spec Definitions
         1. [Quoting Sublist Elements](#quoting_sublist)
     1. [CSV Data](#CSV_Data)
     1. [CSV Select](#CSV_Select)
-    1. [Weighted CSV](#WeightedCSV)
     1. [Nested](#Nested)
     1. [Calculate](#Calculate)
 
@@ -66,7 +65,6 @@ type                         | description                            | config p
 [select_list_subset](#Select_List_Subset) | selects subset of fields that are</br> combined to create the value for the field | join_with
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
-[weighted_csv](#WeightedCSV) | Externalized values and weights into csv file| many see details below
 [nested](#Nested)            | For nested fields                      |
 [calculate](#Calculate)      | Calculate values from output of other fields or refs|
 
@@ -937,7 +935,7 @@ spec = spec_builder.build()
 
 If running from the command line, you cas specify the `--sample-lists` flag to
 make all list backed data to have sampling turned on by default. If using the
-python API, do `dataspec.types.set_default('sample_mode', True)`
+python API, do `datagen.types.set_default('sample_mode', True)`
 
 ## <a name="Combine"></a>Combine
 
@@ -2330,7 +2328,7 @@ tend to stack on the edges of the allowed size range.
 
 ```shell
 # no stddev specified
-for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
+for p in $(datagen -l off -x --inline "password:cc-word?mean=5&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -2345,7 +2343,7 @@ done | sort | uniq -c | sort -n -k2,2
      71 8
     220 9
 # with stddev of 3 specified
-for p in $(dataspec -l off -x --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
+for p in $(datagen -l off -x --inline "password:cc-word?mean=5&stddev=3&min=1&max=9: {}" -i 1000);
 do
   echo $p | tr -d '\n' | wc -m
 done | sort | uniq -c | sort -n -k2,2
@@ -3153,7 +3151,7 @@ spec = spec_builder.build()
 </details>
 
 ```shell
-dataspec --spec cities.json --datadir ./data -i 5
+datagen --spec cities.json --datadir ./data -i 5
 Tokyo
 Los Angeles
 New York
@@ -3273,7 +3271,7 @@ configurations across multiple fields. If we use the following template `{{ stat
 spec we will get output similar to:
 
 ```shell
-dataspec --spec tabs.yaml --datadir ./data -t template.jinja -i 5
+datagen --spec tabs.yaml --datadir ./data -t template.jinja -i 5
 100,Continue,Informational
 101,Switching Protocols,Informational
 200,OK,Successful
@@ -3455,7 +3453,7 @@ Nested types are used to create fields that contain subfields. Nested types can
 also contain nested fields to allow multiple levels of nesting. Use the `nested`
 type to generate a field that contains subfields. The subfields are defined in
 the `fields` element of the nested spec. The `fields` element will be treated
-like a top level dataspec and has access to the `refs` and other elements of the
+like a top level datagen and has access to the `refs` and other elements of the
 root.
 
 The `nested` Field Spec structure is:

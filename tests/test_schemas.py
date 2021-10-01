@@ -1,9 +1,9 @@
 import pytest
-from dataspec import ResourceError, SpecException
-from dataspec.schemas import load, validate_schema_for_spec
-from dataspec.supplier.core import range_suppliers
-from dataspec.supplier.core import values
-import dataspec.types as types
+from datagen import ResourceError, SpecException
+from datagen.schemas import load, validate_schema_for_spec
+from datagen.supplier.core import range_suppliers
+from datagen.supplier.core import values
+import datagen.types as types
 
 
 def test_load_unknown_key():

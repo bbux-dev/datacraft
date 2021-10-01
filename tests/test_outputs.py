@@ -1,6 +1,6 @@
 import os
-from dataspec import outputs
-from dataspec import template_engines as engines
+from datagen import outputs
+from datagen import template_engines as engines
 
 test_dir = f'{os.path.dirname(os.path.realpath(__file__))}'
 outdir = f'{test_dir}/../build'

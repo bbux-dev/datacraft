@@ -1,5 +1,5 @@
-from dataspec import builder, suppliers, Loader, SpecException
-from dataspec.supplier.core.weighted_refs import WeightedRefsSupplier
+from datagen import builder, suppliers, Loader, SpecException
+from datagen.supplier.core.weighted_refs import WeightedRefsSupplier
 import pytest
 
 

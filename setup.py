@@ -26,13 +26,13 @@ def requires():
 
 
 def version():
-    with open('dataspec/__init__.py') as f:
+    with open('datagen/__init__.py') as f:
         match = re.search(r"__version__ = '([\d\.]+)'", f.read())
         return match.group(1)
 
 
 setup(
-    name='dataspec',
+    name='datagen',
     version=version(),
     description='Data Generation Through Specification',
     long_description=long_description(),
@@ -43,9 +43,9 @@ setup(
     packages=find_packages(),
     keywords=['data', 'synthetic', 'generator', 'specification', 'spec', 'data spec'],
     install_requires=requires(),
-    scripts=['bin/dataspec'],
+    scripts=['bin/datagen'],
     package_data={
-        "dataspec": ["schema/*.schema.json", "schema/definitions.json"]
+        "datagen": ["schema/*.schema.json", "schema/definitions.json"]
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

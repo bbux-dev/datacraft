@@ -3,11 +3,11 @@ import re
 
 import pytest
 
-import dataspec
-from dataspec.loader import Loader
-from dataspec import builder
+import datagen
+from datagen.loader import Loader
+from datagen import builder
 # need this to trigger type handler registration
-from dataspec.supplier.core import date
+from datagen.supplier.core import date
 
 
 def test_basic_spec():
@@ -66,7 +66,7 @@ def test_date_start_format_iso_microseconds():
 def test_date_end_before_start():
     config = {"start": "15-Feb-2050", "end": "01-Feb-2050", "format": "%d-%b-%Y"}
     spec = _date_spec(**config)
-    with pytest.raises(dataspec.SpecException):
+    with pytest.raises(datagen.SpecException):
         next(spec.generator(1))
 
 

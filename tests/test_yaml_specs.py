@@ -1,9 +1,9 @@
 import yaml
 import json
 
-from dataspec.loader import Loader
+from datagen.loader import Loader
 # to trigger registration
-from dataspec.supplier.core import combine
+from datagen.supplier.core import combine
 
 
 yaml_spec = '''

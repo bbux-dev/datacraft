@@ -1,6 +1,6 @@
 import pytest
-import dataspec.builder as builder
-from dataspec import distributions, DataSpec, SpecException
+import datagen.builder as builder
+from datagen import distributions, DataSpec, SpecException
 
 
 def test_api_builder():

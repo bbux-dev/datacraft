@@ -1,8 +1,8 @@
 import pytest
-from dataspec.loader import Loader
-from dataspec import builder, suppliers, SpecException
+from datagen.loader import Loader
+from datagen import builder, suppliers, SpecException
 # to engage registration
-from dataspec.supplier.core import select_list_subset
+from datagen.supplier.core import select_list_subset
 
 
 def test_invalid_when_no_config():

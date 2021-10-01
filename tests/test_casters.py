@@ -1,6 +1,6 @@
 import pytest
-from dataspec import SpecException
-from dataspec.utils import get_caster
+from datagen import SpecException
+from datagen.utils import get_caster
 
 
 def test_valid_key_forms():

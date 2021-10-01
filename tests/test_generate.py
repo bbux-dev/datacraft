@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from dataspec import builder
+from datagen import builder
 
 
 def test_generator_string_template():

@@ -30,7 +30,7 @@ Built in Field Spec Type Schemas
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/definitions.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/definitions.json",
   "definitions": {
     "prefix": {
       "type": "string",
@@ -128,7 +128,7 @@ Types covered by schema: `calculate`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/calculate.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/calculate.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -207,7 +207,7 @@ Types covered by schema: `char_class`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/char_class.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/char_class.schema.json",
   "type": "object",
   "required": ["type", "data"],
   "properties": {
@@ -284,7 +284,7 @@ Types covered by schema: `combine-list`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/combine.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/combine.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -337,7 +337,7 @@ Types covered by schema: `combine`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/combine.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/combine.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -384,7 +384,7 @@ Types covered by schema: `configref`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/configref.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/configref.schema.json",
   "type": "object",
   "description": "Type used to store configurations that are used across multiple fields",
   "required": ["type", "config"],
@@ -411,7 +411,7 @@ Types covered by schema: `csv`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/csv.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/csv.schema.json",
   "type": "object",
   "required": ["type", "config"],
   "properties": {
@@ -497,7 +497,7 @@ Types covered by schema: `date, date.iso, date.iso.us`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/date.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/date.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -614,7 +614,7 @@ Types covered by schema: `geo.lat`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/geo.lat.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/geo.lat.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -649,7 +649,7 @@ Types covered by schema: `geo.long`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/geo.lat.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/geo.lat.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -684,7 +684,7 @@ Types covered by schema: `geo.pair`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/geo.lat.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/geo.lat.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -724,7 +724,7 @@ Types covered by schema: `ip, ipv4`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/date.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/date.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -772,7 +772,7 @@ Types covered by schema: `range, rand_range`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/range.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/range.schema.json",
   "type": "object",
   "required": ["type", "data"],
   "properties": {
@@ -825,7 +825,7 @@ Types covered by schema: `select_list_subset`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/select_list_subset.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/select_list_subset.schema.json",
   "type": "object",
   "required": ["type"],
   "oneOf": [
@@ -911,7 +911,7 @@ Types covered by schema: `unicode_range`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/char_class.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/char_class.schema.json",
   "type": "object",
   "required": ["type", "data"],
   "properties": {
@@ -1006,7 +1006,7 @@ Types covered by schema: `uuid`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/uuid.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/uuid.schema.json",
   "type": "object",
   "required": ["type"],
   "properties": {
@@ -1036,7 +1036,7 @@ Types covered by schema: `values`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/values.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/values.schema.json",
   "type": "object",
   "required": ["data"],
   "properties": {
@@ -1082,7 +1082,7 @@ Types covered by schema: `weighted_csv`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/dataspec/schemas/weighted_csv.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/weighted_csv.schema.json",
   "type": "object",
   "required": ["type", "config"],
   "properties": {

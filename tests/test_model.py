@@ -1,4 +1,4 @@
-import dataspec
+import datagen
 
 
 def test_spec_acts_like_dictionary():
@@ -6,7 +6,7 @@ def test_spec_acts_like_dictionary():
         "field": {"type": "uuid"}
     }
 
-    spec = dataspec.DataSpec(raw)
+    spec = datagen.DataSpec(raw)
 
     spec['key'] = ['a', 'b', 'c']
     assert 'key' in spec
