@@ -1,6 +1,6 @@
-from dataspec.preprocessor import preprocess_spec, preprocess_csv_select, preprocess_nested
-from dataspec.preprocessor import _parse_key, _is_spec_data, _update_no_params
-from dataspec import builder, SpecException
+from datagen.preprocessor import preprocess_spec, preprocess_csv_select, preprocess_nested
+from datagen.preprocessor import _parse_key, _is_spec_data, _update_no_params
+from datagen import builder, SpecException
 import pytest
 
 parse_key_tests = [

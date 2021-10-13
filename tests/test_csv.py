@@ -1,9 +1,9 @@
 import os
 import pytest
-from dataspec.loader import Loader
-from dataspec import builder, SpecException
+from datagen.loader import Loader
+from datagen import builder, SpecException
 # need this to trigger registration
-from dataspec.supplier.core import csv
+from datagen.supplier.core import csv
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 

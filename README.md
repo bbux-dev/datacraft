@@ -1,7 +1,7 @@
-Data Spec Repository
+Datagen Repository
 ========================
-[![Build Status](https://travis-ci.com/bbux-dev/dataspec.svg?branch=main)](https://travis-ci.com/bbux-dev/dataspec)
-[![codecov](https://codecov.io/gh/bbux-dev/dataspec/branch/main/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/dataspec)
+[![Build Status](https://travis-ci.com/bbux-dev/datagen.svg?branch=main)](https://travis-ci.com/bbux-dev/datagen)
+[![codecov](https://codecov.io/gh/bbux-dev/datagen/branch/main/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/datagen)
 
 
 1. [Overview](#Overview)
@@ -36,7 +36,7 @@ Data Spec has its own Field Spec that defines how the values for it should be
 created. There are a variety of core field types that are used to generate the
 data for each field. Where the built-in types are not sufficient, there is an
 easy way to create custom types and handlers for them
-using [Custom Code Loading](#Custom_Code_Loading). The dataspec tool supports
+using [Custom Code Loading](#Custom_Code_Loading). The datagen tool supports
 templating using the [Jinja2](https://pypi.org/project/Jinja2/) templating
 engine format.
 
@@ -54,19 +54,19 @@ lines of a csv file.
 To Install:
 
 ```shell
-pip install git+https://github.com/bbux-dev/dataspec.git
+pip install git+https://github.com/bbux-dev/datagen.git
 ```
 
-This will install the `dataspec` command line utility which should now be on
+This will install the `datagen` command line utility which should now be on
 your path. Assumes there is a python executable on the path.
 
 ## <a name="Usage"></a>Usage
 
 ```
-usage: dataspec [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL]
+usage: datagen [-h] [-s SPEC] [--inline INLINE] [-i ITERATIONS] [-o OUTDIR] [-p OUTFILEPREFIX] [-e EXTENSION] [-t TEMPLATE] [-r RECORDSPERFILE] [-k] [-c CODE [CODE ...]] [-d DATADIR] [-l LOG_LEVEL]
                 [-f FORMAT] [--strict] [--apply-raw] [--debug-spec] [--debug-defaults] [-x] [--sample-lists] [--defaults DEFAULTS] [--set-defaults KEY=VALUE [KEY=VALUE ...]]
 
-Run dataspec.
+Run datagen.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -109,12 +109,12 @@ input:
 
 ### <a name="ExampleUsage"></a>Example Usage
 
-The most common way to use `dataspec` is to define the field specifications in a
+The most common way to use `datagen` is to define the field specifications in a
 JSON or YAML file and to specify this file with the --spec command line
 argument:
 
 ```shell
-dataspec --spec /path/to/dataspec.json \
+datagen --spec /path/to/dataspec.json \
   --template /path/to/template.jinja
   --iterations 1000 \
   --output /path/to/output
@@ -129,7 +129,7 @@ An alternative way to specify the data for a spec is by using the `--inline`
 argument:
 
 ```shell
-dataspec \
+datagen \
   --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
   --iterations 5
 INFO [12-Mar-2050 06:24:58 PM] Starting Loading Configurations...
@@ -150,7 +150,7 @@ This can be useful for troubleshooting or experimenting
 To test small spec fragments, you can use the `--inline <spec>` flag. Example:
 
 ```shell
-dataspec --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
+datagen --inline '{ "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } } }' \
   --iterations 5 \
   --printkey \
   --log-level off
@@ -177,7 +177,7 @@ separated value line. Examples:
 
 ```shell
 # NOTE: This inline spec is in YAML
-dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
+datagen --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
     --iterations 2 \
     --log-level off \
     --format json \
@@ -185,7 +185,7 @@ dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@
 {"handle": "@a2oNt"}
 {"handle": "@lLN3i"}
 
-dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
+datagen --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@" } }' \
     --iterations 2 \
     --log-level off \
     --format json-pretty \
@@ -196,7 +196,7 @@ dataspec --inline 'handle: { type: cc-word, config: {min: 3, mean: 5, prefix: "@
 {
     "handle": "@XmJ"
 }
-dataspec --inline '{"id:uuid": {}, "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } }' \
+datagen --inline '{"id:uuid": {}, "handle": { "type": "cc-word", "config": {"min": 3, "mean": 5, "prefix": "@" } }' \
 41adb77f-d7b3-4a31-a75b-5faff33d5eb8,@U0gI
 d97e8dad-8dfd-49f1-b25e-eaaf2d6953fd,@IYn
 ```
@@ -217,7 +217,7 @@ full spec looks like after all the transformations have taken place. Use the
 `--debug-spec` to dump the internal form of the specification for inspection.
 
 ```shell
-dataspec --inline 'geo:geo.pair?start_lat=-99.0: {}' \
+datagen --inline 'geo:geo.pair?start_lat=-99.0: {}' \
   --log-level off \
   --debug-spec
 {
@@ -238,7 +238,7 @@ command line flag to turn on the strict schema based checks for types that have
 schemas defined. Example:
 
 ```shell
-dataspec --inline 'geo: {type: geo.pair, config: {start_lat: -99.0}}' \
+datagen --inline 'geo: {type: geo.pair, config: {start_lat: -99.0}}' \
     --iterations 2 \
     --log-level info \
     --format json \
@@ -255,7 +255,7 @@ There are some default values used when a given spec does not provide them.
 These defaults can be viewed using the `--debug-defaults` flag.
 
 ```shell
-dataspec --debug-defaults -l off
+datagen --debug-defaults -l off
 {
     "sample_mode": false,
     "combine_join_with": "",
@@ -284,7 +284,7 @@ To override the default values, use the `--defaults`
 with `--set-defaults key=value`.
 
 ```shell
-dataspec --debug-defaults -l off --defaults /path/to/custom_defaults.json
+datagen --debug-defaults -l off --defaults /path/to/custom_defaults.json
 {
     "sample_mode": true,
     "combine_join_with": ";",
@@ -300,7 +300,7 @@ dataspec --debug-defaults -l off --defaults /path/to/custom_defaults.json
     "custom_thing": "foo"
 }
 
-dataspec --debug-defaults -l off --set-defaults date_format="%Y_%m_%d" sample_mode="true"
+datagen --debug-defaults -l off --set-defaults date_format="%Y_%m_%d" sample_mode="true"
 {
     "sample_mode": "true",
     "combine_join_with": "",
@@ -373,10 +373,10 @@ the ACTIONS one. The email field then combines the HANDLE Ref with the DOMAINS
 one. See [Field Specs](docs/FIELDSPECS.md) for more details on each of the Field
 Specs used in this example.
 
-Running dataspec from the command line against this spec:
+Running datagen from the command line against this spec:
 
 ```shell
-dataspec -s ~/example.json -i 12
+datagen -s ~/example.json -i 12
 zebra_jump@gmail.com
 hedgehog_launch@yahoo.com
 llama_launch@yahoo.com
@@ -499,7 +499,7 @@ and `fields` element underneath are required.
 Running this example:
 
 ```shell
-dataspec -s pets.json -i 10 -l off -x --format json
+datagen -s pets.json -i 10 -l off -x --format json
 {"id": 1, "name": "Fido"}
 {"id": 2, "name": "Fluffy", "tag": "Agreeable"}
 {"id": 3, "name": "Bandit", "tag": "Affectionate"}
@@ -533,7 +533,7 @@ dictionary of name to fields list. i.e.:
 #### Processing Large CSVs
 
 There
-are [Field Specs](https://github.com/bbux-dev/dataspec/blob/main/docs/FIELDSPECS.md#CSV_Data)
+are [Field Specs](https://github.com/bbux-dev/datagen/blob/main/docs/FIELDSPECS.md#CSV_Data)
 that support using csv data to feed the data generation process. If the input
 CSV file is very large, not all features will be supported. You will not be able
 to set sampling to true or use a field count > 1. The maximum number of
@@ -546,7 +546,7 @@ cease., You can override the default size limit on the command line by using
 the `--set-default` flag. Example:
 
 ```shell
-dataspec --set-default large_csv_size_mb=1024 --datadir path/to/large.csv ...
+datagen --set-default large_csv_size_mb=1024 --datadir path/to/large.csv ...
 ```
 
 #### More efficient processing using csv_select
@@ -577,7 +577,7 @@ placeholder:
 Running this spec would produce:
 
 ```shell
-dataspec --spec csv-select.yaml \
+datagen --spec csv-select.yaml \
          --iterations 5  \
          --datadir ./data \
          --format json \
@@ -593,7 +593,7 @@ dataspec --spec csv-select.yaml \
 
 To populate a template file or string with the generated values for each
 iteration, pass the -t /path/to/template (or template string) arg to the
-dataspec command. We use the [Jinja2](https://pypi.org/project/Jinja2/)
+datagen command. We use the [Jinja2](https://pypi.org/project/Jinja2/)
 templating engine under the hood. The basic format is to put the field names in
 {{ field name }} notation wherever they should be substituted. For example the
 following is a template for bulk indexing data into Elasticsearch.
@@ -618,7 +618,7 @@ Such as:
 When we run the tool we get the data populated for the template:
 
 ```shell
-dataspec -s es-spec.json -t template.json -i 10 --log-level off -x
+datagen -s es-spec.json -t template.json -i 10 --log-level off -x
 { "index" : { "_index" : "test", "_id" : "1" } }
 { "doc" : {"name" : "bob", "age": "22", "gender": "F" } }
 { "index" : { "_index" : "test", "_id" : "2" } }
@@ -632,7 +632,7 @@ dataspec -s es-spec.json -t template.json -i 10 --log-level off -x
 It is also possible to do templating inline from the command line:
 
 ```shell
-dataspec -s es-spec.json --format json -i 5  --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
+datagen -s es-spec.json --format json -i 5  --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
 bob: (22, F)
 rob: (24, M)
 bobby: (26, M)
@@ -726,15 +726,15 @@ There are a lot of types of data that are not generated with this tool. Instead
 of adding them all, there is a mechanism to bring your own data suppliers. We
 make use of the handy [catalogue](https://pypi.org/project/catalogue/) package
 to allow auto discovery of custom functions using decorators. Use the
-@dataspec.registry.types('\<type key\>') to register a function that will create
+@datagen.registry.types('\<type key\>') to register a function that will create
 a Value Supplier for the supplied Field Spec. Below is an example of a custom
 class which reverses the output of another supplier. Types that are amazing and
 useful should be nominated for core inclusion. Please put up a PR if you create
 or use one that solves many of your data generation issues.
 
 ```python
-import dataspec
-from dataspec import ValueSupplierInterface
+import datagen
+from datagen import ValueSupplierInterface
 
 
 class ReverseStringSupplier(ValueSupplierInterface):
@@ -748,7 +748,7 @@ class ReverseStringSupplier(ValueSupplierInterface):
         return value[::-1]
 
 
-@dataspec.registry.types('reverse_string')
+@datagen.registry.types('reverse_string')
 def configure_supplier(field_spec, loader):
     # load the supplier for the given ref
     key = field_spec.get('ref')
@@ -757,7 +757,7 @@ def configure_supplier(field_spec, loader):
     return ReverseStringSupplier(wrapped)
 
 
-@dataspec.registry.schemas('reverse_string')
+@datagen.registry.schemas('reverse_string')
 def get_reverse_string_schema():
     return {
         "$schema": "http://json-schema.org/draft-07/schema#",
@@ -799,7 +799,7 @@ To supply custom code to the tool use the -c or --code arguments. One or more
 module files can be imported.
 
 ```shell
-.dataspec -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
+.datagen -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
 arbez
 gohegdeh
 amall
@@ -810,7 +810,7 @@ ognimalf
 
 ## <a name="BuildSpecs"></a>Building Specs
 
-The `dataspec.builder` module contains tools that can be used to
+The `datagen.builder` module contains tools that can be used to
 programmatically generate Data Specs. This may be easier for some who are not as
 familiar with JSON or prefer to manage their structures in code. The core object
 is the `Builder`. You can add fields, refs, and field groups to this. Each of
@@ -820,7 +820,7 @@ it. See example below.
 This is the email address example from above using the `builder` module.
 
 ```python
-import dataspec
+import datagen
 
 animal_names = ['zebra', 'hedgehog', 'llama', 'flamingo']
 action_list = ['fling', 'jump', 'launch', 'dispatch']
@@ -830,7 +830,7 @@ domain_weights = {
     "hotmail.com": 0.1
 }
 # for building the final spec
-spec_builder = dataspec.spec_builder()
+spec_builder = datagen.spec_builder()
 # for building the references, is it self also a Builder, but with no refs
 refs = spec_builder.refs()
 # info for each reference added
@@ -853,10 +853,10 @@ incrementally generate the records from the DataSpec.
 Example:
 
 ```python
-import dataspec
+import datagen
 
 name_list = ['bob', 'bobby', 'robert', 'bobo']
-spec = dataspec.Builder().values('names', name_list).to_spec()
+spec = datagen.Builder().values('names', name_list).to_spec()
 
 template = 'Name: {{ name }}'
 

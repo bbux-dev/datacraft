@@ -1,10 +1,10 @@
-from dataspec.loader import Loader
-from dataspec.exceptions import SpecException
-from dataspec import builder
+from datagen.loader import Loader
+from datagen.exceptions import SpecException
+from datagen import builder
 from collections import Counter
 import pytest
 # to trigger registration
-from dataspec.supplier.core import combine, weighted_refs
+from datagen.supplier.core import combine, weighted_refs
 
 spec = builder.Builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \

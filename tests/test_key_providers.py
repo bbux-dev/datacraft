@@ -1,5 +1,5 @@
 import pytest
-from dataspec import builder, key_providers, SpecException
+from datagen import builder, key_providers, SpecException
 
 
 def test_no_field_groups():

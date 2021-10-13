@@ -111,7 +111,7 @@ refs:
 
 Looking at some of the insults produced
 ```shell script
-dataspec -s ~/scratch/insults.json -i 100 | grep '1,' | tail
+datagen -s ~/scratch/insults.json -i 100 | grep '1,' | tail
 1,You're incredibly ugly
 1,You're a idiot
 1,You are so stupid

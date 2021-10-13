@@ -1,9 +1,9 @@
 import os
 import pytest
-import dataspec
-from dataspec.loader import Loader
-import dataspec.types as types
-from dataspec.utils import load_custom_code
+import datagen
+from datagen.loader import Loader
+import datagen.types as types
+from datagen.utils import load_custom_code
 
 spec = {
     'foo': {
@@ -27,7 +27,7 @@ class ReverseStringSupplier:
         return value[::-1]
 
 
-@dataspec.registry.types('reverse_string')
+@datagen.registry.types('reverse_string')
 def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
     wrapped = loader.get(key)

@@ -1,4 +1,4 @@
-import dataspec
+import datagen
 
 
 class StringReverserSupplier:
@@ -10,7 +10,7 @@ class StringReverserSupplier:
         return value[::-1]
 
 
-@dataspec.registry.types('string_reverser')
+@datagen.registry.types('string_reverser')
 def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
     wrapped = loader.get(key)

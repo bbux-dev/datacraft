@@ -1,8 +1,8 @@
 import pytest
-from dataspec.loader import Loader
-from dataspec import builder, SpecException
+from datagen.loader import Loader
+from datagen import builder, SpecException
 # need this to trigger registration
-from dataspec.supplier.core import ip_addresses
+from datagen.supplier.core import ip_addresses
 
 
 def test_ip_v4_spec():

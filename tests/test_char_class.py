@@ -1,7 +1,7 @@
 import string
 import pytest
-from dataspec import builder, Loader, SpecException
-from dataspec.supplier.core import char_class
+from datagen import builder, Loader, SpecException
+from datagen.supplier.core import char_class
 
 
 def test_char_class_no_data_element():

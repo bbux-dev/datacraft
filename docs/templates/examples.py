@@ -5,7 +5,7 @@ class Example(NamedTuple):
     """
     :param name: of example
     :param iterations: number of iterations to run to capture output
-    :param fragment: code fragment for api example, excludes import dataspec and spec_builder.build()
+    :param fragment: code fragment for api example, excludes import datagen and spec_builder.build()
     :param pipes: extra args or command line pipes i.e. sort | tail -3, to add to command line
     """
     name: str
@@ -52,9 +52,9 @@ spec_builder.combine('combine', refs=[one, two])
         name="values_shorthand_one",
         iterations=5,
         fragment="""
-spec_builder.add_field('field1', dataspec.builder.values([1, 2, 3, 4, 5]))
-spec_builder.add_field('field2', dataspec.builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
-spec_builder.add_field('field3', dataspec.builder.values("CONSTANT"))
+spec_builder.add_field('field1', datagen.builder.values([1, 2, 3, 4, 5]))
+spec_builder.add_field('field2', datagen.builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
+spec_builder.add_field('field3', datagen.builder.values("CONSTANT"))
 """,
     ),
     Example(
@@ -447,11 +447,11 @@ spec_builder.csv_select(
         name="nested_example_one",
         iterations=1,
         fragment="""
-geo_fields = dataspec.spec_builder()
+geo_fields = datagen.spec_builder()
 geo_fields.add_field("place_id:cc-digits?mean=5", {})
 geo_fields.add_field("coordinates:geo.pair?as_list=true", {})
 
-user_fields = dataspec.spec_builder()
+user_fields = datagen.spec_builder()
 user_fields.uuid("user_id")
 user_fields.nested("geo", geo_fields.build())
 

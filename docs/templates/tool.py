@@ -46,14 +46,14 @@ def main():
 
 
 def append_schemas(data):
-    for f in glob.glob(os.sep.join(['..', '..', 'dataspec', 'schema', '*.schema.json'])):
+    for f in glob.glob(os.sep.join(['..', '..', 'datagen', 'schema', '*.schema.json'])):
         with open(f) as handle:
             name = f.split(os.sep)[-1].replace('.schema.json', '')
             schema = json.load(handle)
             schemas = data.get('schemas', {})
             schemas[name] = schema
             data['schemas'] = schemas
-    with open(os.sep.join(['..', '..', 'dataspec', 'schema', 'definitions.json'])) as handle:
+    with open(os.sep.join(['..', '..', 'datagen', 'schema', 'definitions.json'])) as handle:
         definitions = json.load(handle)
         schemas = data.get('schemas', {})
         schemas[name] = schema

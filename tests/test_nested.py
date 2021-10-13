@@ -1,6 +1,6 @@
 import pytest
-from dataspec import builder, Loader
-from dataspec.supplier.core import nested
+from datagen import builder, Loader
+from datagen.supplier.core import nested
 
 
 def test_single_nested():

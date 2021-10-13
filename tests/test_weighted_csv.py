@@ -1,8 +1,8 @@
 import os
 import pytest
-import dataspec
+import datagen
 # need this to trigger registration
-from dataspec.supplier.core import csv
+from datagen.supplier.core import csv
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
@@ -38,7 +38,7 @@ def test_weighted_csv_valid_no_header_indexed_column():
 
 
 def test_weighted_csv_from_builder():
-    spec = dataspec.spec_builder() \
+    spec = datagen.spec_builder() \
         .weighted_csv('status', datafile='weighted.csv', column='status', weight_column='weight', headers=True) \
         .to_spec()
 
@@ -54,6 +54,6 @@ def _build_csv_spec(field_name, **config):
         "datafile": "weighted.csv"
     }
     base.update(config)
-    return dataspec.spec_builder() \
-        .add_field(field_name, dataspec.builder.weighted_csv(**base)) \
+    return datagen.spec_builder() \
+        .add_field(field_name, datagen.builder.weighted_csv(**base)) \
         .build()
