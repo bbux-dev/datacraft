@@ -143,7 +143,7 @@ def main():
             data_dir=args.datadir,
             exclude_internal=args.exclude_internal,
             output=output)
-        for i in range(0, args.iterations):
+        for _ in range(0, args.iterations):
             # Generator will handle using to configured output
             next(generator)
         log.info('Finished Processing')
@@ -185,13 +185,13 @@ def _get_writer(args, outfile: str = None, overwrite: bool = False) -> outputs.W
     if args.outdir:
         log.debug('Creating output file writer for dir: %s', args.outdir)
         if outfile:
-            writer = outputs.SingleFileWriter(
+            writer = outputs.single_file_writer(
                 outdir=args.outdir,
                 outname=outfile,
                 overwrite=overwrite
             )
         else:
-            writer = outputs.FileWriter(
+            writer = outputs.incrementing_file_writer(
                 outdir=args.outdir,
                 outname=args.outfileprefix,
                 extension=args.extension,
@@ -270,7 +270,7 @@ if __name__ == '__main__':
     # this activates the decorators, so they will be discoverable
     from .supplier import *
     from .defaults import *
-    import preprocessor
-    import logging_handler
+    from .preprocessor import *
+    from .logging_handler import *
 
     main()

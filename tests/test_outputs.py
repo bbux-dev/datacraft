@@ -8,7 +8,7 @@ outdir = f'{test_dir}/../build'
 
 def test_outputs_single_field():
     # for coverage
-    writer = outputs.FileWriter(
+    writer = outputs.IncrementingFileWriter(
         outdir=outdir,
         outname='test_single',
         extension='txt',
@@ -23,7 +23,7 @@ def test_outputs_single_field():
 
 def test_outputs_record_level():
     # for coverage
-    writer = outputs.FileWriter(
+    writer = outputs.IncrementingFileWriter(
         outdir=outdir,
         outname='test_record',
         extension='txt',
