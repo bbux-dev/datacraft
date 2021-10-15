@@ -113,6 +113,14 @@ class WriterInterface:
         """
 
 
+def stdout_writer() -> WriterInterface:
+    """
+    Creates a WriterInterface that writes results to stdout
+    :return: WriterInterface
+    """
+    return StdOutWriter()
+
+
 class StdOutWriter(WriterInterface):
     """
     Writes values to stdout
@@ -120,6 +128,18 @@ class StdOutWriter(WriterInterface):
 
     def write(self, value: str):
         print(value)
+
+
+def single_file_writer(outdir: str, outname: str, overwrite: bool) -> WriterInterface:
+    """
+    Creates a Writer for a single output file
+
+    :param outdir: output directory
+    :param outname: output file name
+    :param overwrite: if should overwrite exiting output files
+    :return: Writer for a single file
+    """
+    return SingleFileWriter(outdir, outname, overwrite)
 
 
 class SingleFileWriter(WriterInterface):
@@ -144,9 +164,25 @@ class SingleFileWriter(WriterInterface):
         log.info('Wrote data to %s', outfile)
 
 
-class FileWriter(WriterInterface):
+def incrementing_file_writer(outdir: str,
+                             outname: str,
+                             extension: str = None,
+                             records_per_file: int = 1) -> WriterInterface:
     """
-    Writes processed output to disk
+    Creates a WriterInterface that increments the a count in the file name
+
+    :param outdir: output directory
+    :param outname: output file name
+    :param extension: to append to the file i.e. csv
+    :param records_per_file: number of records to write before a new file is opened
+    :return: a WriterInterface
+    """
+    return IncrementingFileWriter(outdir, outname, extension, records_per_file)
+
+
+class IncrementingFileWriter(WriterInterface):
+    """
+    Writes processed output to disk and increments the file name with a count
     """
 
     def __init__(self, outdir, outname, extension=None, records_per_file=1):

@@ -8,13 +8,8 @@ import json
 import argparse
 import logging
 import yaml
-from datagen import preprocess_spec
-import datagen.template_engines as engines
-import datagen.outputs as outputs
-import datagen.types as types
-import datagen.builder as builder
-from datagen import utils
-from datagen import SpecException
+
+from . import outputs, utils, types, preprocessor, template_engines, builder, SpecException
 
 log = logging.getLogger(__name__)
 
@@ -47,8 +42,9 @@ def main():
                         help='Path to external directory to load external data files such as csvs')
     parser.add_argument('-l', '--log-level', dest='log_level', default=logging.INFO,
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
+    formats = str(types.valid_formats())
     parser.add_argument('-f', '--format', default=None,
-                        help='Formatter for output records, default is none, valid are: ' + str(types.valid_formats()))
+                        help='Formatter for output records, default is none, valid are: ' + formats)
     parser.add_argument('--strict', action='store_true', default=False,
                         help='Enforce schema validation for all registered field specs')
     parser.add_argument('--apply-raw', action='store_true', dest='apply_raw', default=False,
@@ -104,7 +100,7 @@ def main():
         # print out the defaults as currently registered
         if args.debug_defaults:
             writer = _get_writer(args, outfile='dataspec_defaults.json', overwrite=True)
-            defaults = datagen.types.all_defaults()
+            defaults = types.all_defaults()
             writer.write(json.dumps(defaults, indent=4))
             return
 
@@ -124,12 +120,12 @@ def main():
         # Only dump out the reformatted spec
         if args.debug_spec:
             writer = _get_writer(args)
-            writer.write(json.dumps(preprocess_spec(spec), indent=4))
+            writer.write(json.dumps(preprocessor.preprocess_spec(spec), indent=4))
             return
 
         # apply the spec as data to the template
         if args.apply_raw:
-            engine = engines.for_file(args.template)
+            engine = template_engines.for_file(args.template)
             writer = _get_writer(args)
             writer.write(engine.process(spec))
             return
@@ -147,7 +143,7 @@ def main():
             data_dir=args.datadir,
             exclude_internal=args.exclude_internal,
             output=output)
-        for i in range(0, args.iterations):
+        for _ in range(0, args.iterations):
             # Generator will handle using to configured output
             next(generator)
         log.info('Finished Processing')
@@ -166,9 +162,9 @@ def _configure_output(args):
     if args.template:
         log.debug('Using template: %s', args.template)
         if '{{' in args.template:
-            engine = engines.string(args.template)
+            engine = template_engines.string(args.template)
         else:
-            engine = engines.for_file(args.template)
+            engine = template_engines.for_file(args.template)
         return outputs.RecordLevelOutput(engine, writer)
 
     if args.format:
@@ -189,13 +185,13 @@ def _get_writer(args, outfile: str = None, overwrite: bool = False) -> outputs.W
     if args.outdir:
         log.debug('Creating output file writer for dir: %s', args.outdir)
         if outfile:
-            writer = outputs.SingleFileWriter(
+            writer = outputs.single_file_writer(
                 outdir=args.outdir,
                 outname=outfile,
                 overwrite=overwrite
             )
         else:
-            writer = outputs.FileWriter(
+            writer = outputs.incrementing_file_writer(
                 outdir=args.outdir,
                 outname=args.outfileprefix,
                 extension=args.extension,
@@ -245,7 +241,7 @@ def _load_json_or_yaml(data_path):
 
 def _parse_spec_string(inline: str):
     """
-    Attempts to parse the string into a datagen. First tries to interpret as JSON, then as YAML.
+    Attempts to parse the string into a datagen DataSpec. First tries to interpret as JSON, then as YAML.
     :return: the parsed spec as a Dictionary
     """
 
@@ -265,16 +261,16 @@ def _configure_logging(args):
     """
     Use each logging element from the registry to configure logging
     """
-    for name in datagen.registry.logging.get_all():
-        configure_function = datagen.registry.logging.get(name)
+    for name in types.registry.logging.get_all():
+        configure_function = registry.logging.get(name)
         configure_function(args.log_level)
 
 
 if __name__ == '__main__':
     # this activates the decorators, so they will be discoverable
-    from datagen.supplier import *
-    from datagen.defaults import *
-    import datagen.preprocessor
-    import datagen.logging_handler
+    from .supplier import *
+    from .defaults import *
+    from .preprocessor import *
+    from .logging_handler import *
 
     main()

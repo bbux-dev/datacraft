@@ -99,7 +99,7 @@ def test_date_center_date():
 def test_date_center_date_stddev_only():
     config = {"stddev_days": 5, "format": "%d-%b-%Y"}
     spec = _date_spec(**config)
-    _test_date_spec(spec, 'foo', 100, [datetime.datetime.now().strftime(config['format'])])
+    _test_date_spec(spec, 'foo', 1000, [datetime.datetime.now().strftime(config['format'])])
 
 
 def _test_date_spec(spec, key, iterations, expected):
