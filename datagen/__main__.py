@@ -262,7 +262,7 @@ def _configure_logging(args):
     Use each logging element from the registry to configure logging
     """
     for name in types.registry.logging.get_all():
-        configure_function = registry.logging.get(name)
+        configure_function = types.registry.logging.get(name)
         configure_function(args.log_level)
 
 
