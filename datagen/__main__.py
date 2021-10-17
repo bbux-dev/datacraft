@@ -10,11 +10,24 @@ import logging
 import yaml
 
 from . import outputs, utils, types, preprocessor, template_engines, builder, SpecException
+# this activates the decorators, so they will be discoverable
+from .supplier import *
+from .defaults import *
+from .preprocessor import *
+from .logging_handler import *
 
 log = logging.getLogger(__name__)
 
 
-def main():
+def wrap_main():
+    """ wraps main with try except for SpecException """
+    try:
+        main(sys.argv[1:])
+    except SpecException as exc:
+        log.error(str(exc))
+
+
+def main(argv):
     """
     Runs the tool
     """
@@ -61,94 +74,92 @@ def main():
     parser.add_argument("--set-defaults", dest='set_defaults', metavar="KEY=VALUE", nargs='+',
                         help="Set a number of key-value pairs to override defaults with")
 
-    try:
-        args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-        ###################
-        # Set Up
-        ###################
+    ###################
+    # Set Up
+    ###################
 
-        _configure_logging(args)
-        log.info('Starting Loading Configurations...')
-        log.debug('Parsing Args')
+    _configure_logging(args)
+    log.info('Starting Loading Configurations...')
+    log.debug('Parsing Args')
 
-        if args.code:
-            log.debug('Loading custom code from %s', args.code)
-            for code in args.code:
-                utils.load_custom_code(code)
+    if args.code:
+        log.debug('Loading custom code from %s', args.code)
+        for code in args.code:
+            utils.load_custom_code(code)
 
-        ###################
-        # Default Overrides
-        ###################
-        if args.defaults:
-            defaults = _load_json_or_yaml(args.defaults)
-            for key, value in defaults.items():
-                types.set_default(key, value)
-        # command line takes precedence over config file
-        if args.set_defaults:
-            for setting in args.set_defaults:
-                parts = setting.split('=')
-                if len(parts) != 2:
-                    log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
-                                setting)
-                    continue
-                types.set_default(parts[0], parts[1])
-        # command line overrides any configs
-        if args.sample_lists:
-            types.set_default('sample_mode', True)
+    ###################
+    # Default Overrides
+    ###################
+    if args.defaults:
+        defaults = _load_json_or_yaml(args.defaults)
+        for key, value in defaults.items():
+            types.set_default(key, value)
+    # command line takes precedence over config file
+    if args.set_defaults:
+        for setting in args.set_defaults:
+            parts = setting.split('=')
+            if len(parts) != 2:
+                log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
+                            setting)
+                continue
+            types.set_default(parts[0], parts[1])
+    # command line overrides any configs
+    if args.sample_lists:
+        types.set_default('sample_mode', True)
 
-        # print out the defaults as currently registered
-        if args.debug_defaults:
-            writer = _get_writer(args, outfile='dataspec_defaults.json', overwrite=True)
-            defaults = types.all_defaults()
-            writer.write(json.dumps(defaults, indent=4))
-            return
+    # print out the defaults as currently registered
+    if args.debug_defaults:
+        writer = _get_writer(args, outfile='dataspec_defaults.json', overwrite=True)
+        defaults = types.all_defaults()
+        writer.write(json.dumps(defaults, indent=4))
+        return
 
-        ###################
-        # Load Data Spec
-        ###################
+    ###################
+    # Load Data Spec
+    ###################
 
-        log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
-        spec = _load_spec(args)
-        if spec is None:
-            return
+    log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
+    spec = _load_spec(args)
+    if spec is None:
+        return
 
-        ###################
-        # By Pass Arguments
-        ###################
+    ###################
+    # By Pass Arguments
+    ###################
 
-        # Only dump out the reformatted spec
-        if args.debug_spec:
-            writer = _get_writer(args)
-            writer.write(json.dumps(preprocessor.preprocess_spec(spec), indent=4))
-            return
+    # Only dump out the reformatted spec
+    if args.debug_spec:
+        writer = _get_writer(args)
+        writer.write(json.dumps(preprocessor.preprocess_spec(spec), indent=4))
+        return
 
-        # apply the spec as data to the template
-        if args.apply_raw:
-            engine = template_engines.for_file(args.template)
-            writer = _get_writer(args)
-            writer.write(engine.process(spec))
-            return
+    # apply the spec as data to the template
+    if args.apply_raw:
+        engine = template_engines.for_file(args.template)
+        writer = _get_writer(args)
+        writer.write(engine.process(spec))
+        return
 
-        ###################
-        # Regular Flow
-        ##################
-        output = _configure_output(args)
+    ###################
+    # Regular Flow
+    ##################
+    output = _configure_output(args)
 
-        log.info('Starting Processing...')
-        generator = builder.generator(
-            spec,
-            args.iterations,
-            enforce_schema=args.strict,
-            data_dir=args.datadir,
-            exclude_internal=args.exclude_internal,
-            output=output)
-        for _ in range(0, args.iterations):
-            # Generator will handle using to configured output
-            next(generator)
-        log.info('Finished Processing')
-    except SpecException as exc:
-        log.error(str(exc))
+    log.info('Starting Processing...')
+    generator = builder.generator(
+        spec,
+        args.iterations,
+        enforce_schema=args.strict,
+        data_dir=args.datadir,
+        exclude_internal=args.exclude_internal,
+        output=output)
+    for _ in range(0, args.iterations):
+        # Generator will handle using to configured output
+        next(generator)
+    log.info('Finished Processing')
+
 
 
 def _configure_output(args):
@@ -265,12 +276,3 @@ def _configure_logging(args):
         configure_function = types.registry.logging.get(name)
         configure_function(args.log_level)
 
-
-if __name__ == '__main__':
-    # this activates the decorators, so they will be discoverable
-    from .supplier import *
-    from .defaults import *
-    from .preprocessor import *
-    from .logging_handler import *
-
-    main()

@@ -1,0 +1,6 @@
+{
+  "field_name": {
+    "type": "values",
+    "data": [1, 2, 3, 4, 5]
+  }
+}
