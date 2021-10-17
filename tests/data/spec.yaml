@@ -1,0 +1,28 @@
+---
+email:
+  type: combine
+  refs:
+    - HANDLE
+    - DOMAINS
+  config:
+    join_with: "@"
+refs:
+  HANDLE:
+    type: combine
+    refs:
+      - ANIMALS
+      - ACTIONS
+    config:
+      join_with: _
+  ANIMALS:
+    type: values
+    data: [ zebra, hedgehog, llama, flamingo ]
+  ACTIONS?sample=true:
+    type: values
+    data: [ fling, jump, launch, dispatch ]
+  DOMAINS:
+    type: values
+    data:
+      gmail.com: 0.6
+      yahoo.com: 0.3
+      hotmail.com: 0.1

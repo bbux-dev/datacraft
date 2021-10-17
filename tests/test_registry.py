@@ -48,7 +48,7 @@ def test_registry_from_local():
 
 def test_registry_from_file():
     # string_reverser, same as above just different key
-    load_custom_code(f'{test_dir}/custom.py')
+    load_custom_code(os.path.join(test_dir, 'custom.py'))
 
     loader = Loader(spec)
 
