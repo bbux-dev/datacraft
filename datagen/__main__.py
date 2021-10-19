@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 def wrap_main():
-    """ wraps main with try except for SpecException """
+    """wraps main with try except for SpecException """
     try:
         main(sys.argv[1:])
     except SpecException as exc:
@@ -28,9 +28,7 @@ def wrap_main():
 
 
 def main(argv):
-    """
-    Runs the tool
-    """
+    """Runs the tool """
     parser = argparse.ArgumentParser(description='Run datagen.')
     group = parser.add_argument_group('input')
     group.add_argument('-s', '--spec', help='Spec to Use')
@@ -161,7 +159,6 @@ def main(argv):
     log.info('Finished Processing')
 
 
-
 def _configure_output(args):
     """
     Configures the output. Loads templates and applies the specified formatter if any.
@@ -255,17 +252,19 @@ def _parse_spec_string(inline: str):
     Attempts to parse the string into a datagen DataSpec. First tries to interpret as JSON, then as YAML.
     :return: the parsed spec as a Dictionary
     """
-
+    if inline is None or inline.strip() == "":
+        raise SpecException(f'Unable to load spec from empty string: {inline}, Please verify it is valid JSON or YAML')
     try:
         return json.loads(inline)
-    except json.decoder.JSONDecodeError:
-        log.debug('Spec is not Valid JSON')
+    except json.decoder.JSONDecodeError as err:
+        log.debug('Spec is not Valid JSON: %s', str(err))
     # not JSON, try yaml
     log.debug('Attempting to load spec as YAML')
-    spec = yaml.load(inline, Loader=yaml.FullLoader)
-    if not isinstance(spec, dict):
-        raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
-    return spec
+    try:
+        return yaml.load(inline, Loader=yaml.FullLoader)
+    except yaml.parser.ParserError as err:
+        log.debug('Spec is not Valid YAML %s', str(err))
+    raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
 
 
 def _configure_logging(args):
@@ -275,4 +274,3 @@ def _configure_logging(args):
     for name in types.registry.logging.get_all():
         configure_function = types.registry.logging.get(name)
         configure_function(args.log_level)
-

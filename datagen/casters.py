@@ -1,46 +1,72 @@
 """
 Module to handle casting of values to different types
 """
+from typing import Any, Union, List
 from .exceptions import SpecException
 
 
 class CasterInterface:
-    def cast(self, value):
-        """ casts the value according to the specified type """
+    """
+    Interface for Classes that cast objects to different types
+    """
+
+    def cast(self, value: Any) -> Any:
+        """casts the value according to the specified type
+
+        Args:
+            value: to cast
+
+        Returns:
+            the cast form of the value
+
+        Raises:
+            SpecException when unable to cast value
+        """
 
 
 class FloatCaster(CasterInterface):
-    def cast(self, value):
+    """Casts values to floating point numbers if possible """
+
+    def cast(self, value: Any) -> Union[float, List[float]]:
         try:
             if isinstance(value, list):
                 return [float(val) for val in value]
             return float(value)
         except ValueError as err:
-            raise SpecException(str(err))
+            raise SpecException from err
 
 
 class IntCaster(CasterInterface):
-    def cast(self, value):
+    """Casts values to integers if possible """
+
+    def cast(self, value: Any) -> Union[int, List[int]]:
         try:
             if isinstance(value, list):
                 return [int(float(val)) for val in value]
             return int(float(value))
         except ValueError as err:
-            raise SpecException(str(err))
+            raise SpecException from err
 
 
 class StringCaster(CasterInterface):
-    def cast(self, value):
+    """Casts values to strings """
+
+    def cast(self, value: Any) -> Union[str, List[str]]:
         if isinstance(value, list):
             return [str(val) for val in value]
         return str(value)
 
 
 class HexCaster(CasterInterface):
-    def cast(self, value):
-        if isinstance(value, list):
-            return [hex(val) for val in value]
-        return hex(value)
+    """Casts values to hexadecimal strings if possible """
+
+    def cast(self, value: Any) -> Union[str, List[str]]:
+        try:
+            if isinstance(value, list):
+                return [hex(int(val)) for val in value]
+            return hex(int(value))
+        except TypeError as err:
+            raise SpecException from err
 
 
 _CASTOR_MAP = {
@@ -57,6 +83,14 @@ _CASTOR_MAP = {
 
 
 def get(name):
+    """Get the castor for the given name
+
+    Args:
+        name: of caster to get
+
+    Returns:
+        The caster for the name if one exists
+    """
     if name is None:
         return None
     return _CASTOR_MAP.get(name)
