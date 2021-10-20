@@ -6,7 +6,6 @@ from .loader import Loader, preprocess_spec
 from .exceptions import SpecException, ResourceError
 from .builder import spec_builder
 from .supplier.core import *
-from .preprocessor import *
 from . import suppliers
 from . import template_engines
 

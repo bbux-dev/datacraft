@@ -1,6 +1,7 @@
 """
 Module for numeric distributions such as uniform or gaussian
 """
+from typing import Union
 import random
 import inspect
 import datagen
@@ -127,7 +128,7 @@ def _invalid_args_for_func(dist_func, kwargs):
     return sorted(actual_args) != sorted(expected_args)
 
 
-def _convert_to_kwargs(args: str) -> dict:
+def _convert_to_kwargs(args: str) -> Union[dict, None]:
     """converts string of key=val, ..., key=val to dictionary
 
     Args:

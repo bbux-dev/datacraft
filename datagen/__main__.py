@@ -177,7 +177,7 @@ def _configure_output(args):
 
     if args.format:
         log.debug('Using %s formatter for output', args.format)
-        formatter = outputs.FormatProcessor(args.format)
+        formatter = outputs.for_format(args.format)
         return outputs.RecordLevelOutput(formatter, writer)
 
     # default

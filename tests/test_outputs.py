@@ -1,4 +1,8 @@
 import os
+
+import pytest
+
+import datagen
 from datagen import outputs
 from datagen import template_engines as engines
 
@@ -46,18 +50,23 @@ def test_outputs_record_level():
 
 
 def test_format_json():
-    as_json = outputs.format_json({'field': 'value'})
+    as_json = outputs.for_format('json').process({'field': 'value'})
     assert as_json == "{\"field\": \"value\"}"
 
 
 def test_format_json_pretty():
-    as_json = outputs.format_json_pretty({'field': 'value'})
+    as_json = outputs.for_format('json-pretty').process({'field': 'value'})
     assert as_json == "{\n    \"field\": \"value\"\n}"
 
 
 def test_format_csv():
-    as_csv = outputs.format_csv({'field1': 'value1', 'field2': 'value2'})
+    as_csv = outputs.for_format('csv').process({'field1': 'value1', 'field2': 'value2'})
     assert as_csv == "value1,value2"
+
+
+def test_for_unregistered_format():
+    with pytest.raises(datagen.SpecException):
+        outputs.for_format('sparkle').process({'field': 'value'})
 
 
 def test_single_file_writer(tmpdir):

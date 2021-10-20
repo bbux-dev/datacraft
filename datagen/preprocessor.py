@@ -14,11 +14,14 @@ log = logging.getLogger(__name__)
 
 @datagen.registry.preprocessors('default')
 def preprocess_spec(raw_spec):
-    """
-    Preprocesses the spec into a format that is easier to use.
+    """Preprocesses the spec into a format that is easier to use.
     Pushes all url params in keys into config object. Converts shorthand specs into full specs
-    :param raw_spec: to preprocess
-    :return: the reformatted spec
+
+    Args:
+        raw_spec: to preprocess
+
+    Returns:
+        the reformatted spec
     """
     updated_specs = {}
     for key, spec in raw_spec.items():
@@ -38,10 +41,13 @@ def preprocess_spec(raw_spec):
 
 @datagen.registry.preprocessors('csv-select')
 def preprocess_csv_select(raw_spec):
-    """
-    Converts and csv-select elements into standard csv ones
-    :param raw_spec: to process
-    :return: converted spec
+    """Converts and csv-select elements into standard csv ones
+
+    Args:
+        raw_spec: to process
+
+    Returns:
+        converted spec
     """
     updated_specs = {}
     for key, spec in raw_spec.items():
@@ -75,10 +81,13 @@ def preprocess_csv_select(raw_spec):
 
 @datagen.registry.preprocessors('nested')
 def preprocess_nested(raw_spec):
-    """
-    Converts all nested elements
-    :param raw_spec: to process
-    :return: converted spec
+    """Converts all nested elements
+
+    Args:
+        raw_spec: to process
+
+    Returns:
+        converted spec
     """
     updated_specs = {}
     if 'refs' in raw_spec:
@@ -114,12 +123,12 @@ def preprocess_nested(raw_spec):
 
 
 def _update_root_refs(updated_specs, updated):
-    """
-    Updates to root refs if needed by popping the refs from the updated and merging with existing refs or creating
+    """Updates to root refs if needed by popping the refs from the updated and merging with existing refs or creating
     a new refs element
-    :param updated_specs: specs being updated
-    :param updated: current updated spec that may have refs injected into it
-    :return: None
+
+    Args:
+        updated_specs: specs being updated
+        updated: current updated spec that may have refs injected into it
     """
     if 'refs' in updated:
         refs = updated.pop('refs')
@@ -130,8 +139,7 @@ def _update_root_refs(updated_specs, updated):
 
 
 def _update_with_params(key, spec, updated_specs):
-    """
-    handles the case that there are ?param=value portions in the key
+    """handles the case that there are ?param=value portions in the key
     These get stripped out and pushed into the config object
     """
     newkey, spectype, params = _parse_key(key)
@@ -151,8 +159,7 @@ def _update_with_params(key, spec, updated_specs):
 
 
 def _update_no_params(key, spec, updated_specs):
-    """
-    handles the case when there are no ?param=value portions in the key
+    """handles the case when there are no ?param=value portions in the key
     key may have name:type notation that still needs to be handled
     """
     if ':' in key:
@@ -177,7 +184,7 @@ def _update_no_params(key, spec, updated_specs):
 
 
 def _convert_to_values_if_needed(spec, spectype):
-    """ converts to a values spec if this is data only """
+    """converts to a values spec if this is data only"""
     if _is_spec_data(spec, spectype):
         return {
             'type': 'values',
@@ -188,9 +195,10 @@ def _convert_to_values_if_needed(spec, spectype):
 
 
 def _parse_key(field_name):
-    """
-    Expected key to have URL format. Two main forms:
+    """Expected key to have URL format. Two main forms:
+
     1. field:field_type?param1=val&param2=val...
+
     2. field?param1=val...
     """
     parsed_url = urlparse(field_name)
@@ -216,9 +224,14 @@ def _parse_key(field_name):
 
 
 def _is_spec_data(spec, spectype):
-    """
-    Checks to see if the spec is data only
-    :return: true if only data, false if it is a spec
+    """Checks to see if the spec is data only
+
+    Args:
+        spec: to check
+        spectype: if any available
+
+    Returns:
+        true if only data, false if it is a spec
     """
     if spec == 'nested' or spectype == 'nested':
         return False

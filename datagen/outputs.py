@@ -1,9 +1,12 @@
 """
 Module holds output related classes and functions
 """
+from typing import Any
+from abc import ABC, abstractmethod
 import os
 import json
 import logging
+import catalogue  # type: ignore
 import datagen
 from .types import registry
 
@@ -11,53 +14,65 @@ log = logging.getLogger(__name__)
 
 
 @datagen.registry.formats('json')
-def format_json(record):
-    """ formats the record as compressed json """
+def _format_json(record: dict) -> str:
+    """formats the record as compressed json  """
     return json.dumps(record)
 
 
 @datagen.registry.formats('json-pretty')
-def format_json_pretty(record):
-    """ pretty prints the record as json """
+def _format_json_pretty(record: dict) -> str:
+    """pretty prints the record as json  """
     return json.dumps(record, indent=int(datagen.types.get_default('json_indent')))
 
 
 @datagen.registry.formats('csv')
-def format_csv(record):
-    """ formats the values of the record as comma separated valpues """
+def _format_csv(record: dict) -> str:
+    """formats the values of the record as comma separated values  """
     return ','.join([str(val) for val in record.values()])
 
 
-class OutputHandlerInterface:
-    """ Interface four handling generated output values """
+class OutputHandlerInterface(ABC):
+    """Interface four handling generated output values"""
 
-    def handle(self, key, value):
-        """
-        This is called each time a new value is generated for a given field
-        :param key: the field name
-        :param value: the new value for the field
-        :return: None
+    @abstractmethod
+    def handle(self, key: str, value: Any):
+        """This is called each time a new value is generated for a given field
+
+        Args:
+            key: the field name
+            value: the new value for the field
         """
 
+    @abstractmethod
     def finished_record(self,
                         iteration: int,
                         group_name: str,
                         exclude_internal: bool = False):
+        """This is called whenever all of the fields for a record have been generated for one iteration
+
+        Args:
+            iteration: iteration we are on
+            group_name: group this record is apart of
+            exclude_internal: if external fields should be excluded from output record
         """
-        This is called whenever all of the fields for a record have been generated for one iteration
-        :param iteration: iteration we are on
-        :param group_name: group this record is apart of
-        :param exclude_internal: if external fields should be excluded from output record
-        :return: None
+
+
+class WriterInterface(ABC):
+    """Interface for classes that write the generated values out"""
+
+    @abstractmethod
+    def write(self, value):
+        """Write the value to the configured output destination
+
+        Args:
+            value: to write
         """
 
 
 class SingleFieldOutput(OutputHandlerInterface):
-    """
-    Writes each field as it is created
-    """
+    """Writes each field as it is created"""
 
-    def __init__(self, writer, output_key):
+    def __init__(self, writer: WriterInterface, output_key):
         self.writer = writer
         self.output_key = output_key
 
@@ -72,15 +87,9 @@ class SingleFieldOutput(OutputHandlerInterface):
 
 
 class RecordLevelOutput(OutputHandlerInterface):
-    """
-    Class to output after all fields have been generated
-    """
+    """Class to output after all fields have been generated"""
 
     def __init__(self, record_processor, writer):
-        """
-        :param record_processor: turns the record into a string for writing
-        :param writer: to write with
-        """
         self.record_processor = record_processor
         self.writer = writer
         self.current = {}
@@ -100,52 +109,38 @@ class RecordLevelOutput(OutputHandlerInterface):
         self.current.clear()
 
 
-class WriterInterface:
-    """
-    Interface for classes that write the generated values out
-    """
-
-    def write(self, value):
-        """
-        Write the value to the configured output destination
-        :param value: to write
-        :return: None
-        """
-
-
 def stdout_writer() -> WriterInterface:
-    """
-    Creates a WriterInterface that writes results to stdout
-    :return: WriterInterface
+    """Creates a WriterInterface that writes results to stdout
+
+    Returns:
+        writer that writes to stdout
     """
     return StdOutWriter()
 
 
 class StdOutWriter(WriterInterface):
-    """
-    Writes values to stdout
-    """
+    """Writes values to stdout"""
 
     def write(self, value: str):
         print(value)
 
 
 def single_file_writer(outdir: str, outname: str, overwrite: bool) -> WriterInterface:
-    """
-    Creates a Writer for a single output file
+    """Creates a Writer for a single output file
 
-    :param outdir: output directory
-    :param outname: output file name
-    :param overwrite: if should overwrite exiting output files
-    :return: Writer for a single file
+    Args:
+        outdir: output directory
+        outname: output file name
+        overwrite: if should overwrite exiting output files
+
+    Returns:
+        Writer for a single file
     """
     return SingleFileWriter(outdir, outname, overwrite)
 
 
 class SingleFileWriter(WriterInterface):
-    """
-    Writes all values to same file
-    """
+    """Writes all values to same file"""
 
     def __init__(self, outdir: str, outname: str, overwrite: bool):
         self.outdir = outdir
@@ -168,22 +163,22 @@ def incrementing_file_writer(outdir: str,
                              outname: str,
                              extension: str = None,
                              records_per_file: int = 1) -> WriterInterface:
-    """
-    Creates a WriterInterface that increments the a count in the file name
+    """Creates a WriterInterface that increments the a count in the file name
 
-    :param outdir: output directory
-    :param outname: output file name
-    :param extension: to append to the file i.e. csv
-    :param records_per_file: number of records to write before a new file is opened
-    :return: a WriterInterface
+    Args:
+        outdir: output directory
+        outname: output file name
+        extension: to append to the file i.e. csv
+        records_per_file: number of records to write before a new file is opened
+
+    Returns:
+        a Writer that increments the a count in the file name
     """
     return IncrementingFileWriter(outdir, outname, extension, records_per_file)
 
 
 class IncrementingFileWriter(WriterInterface):
-    """
-    Writes processed output to disk and increments the file name with a count
-    """
+    """Writes processed output to disk and increments the file name with a count"""
 
     def __init__(self, outdir, outname, extension=None, records_per_file=1):
         self.outdir = outdir
@@ -214,16 +209,36 @@ class IncrementingFileWriter(WriterInterface):
 
 
 class FormatProcessor:
-    """
-    A simple class that wraps a record formatting function
-    """
+    """A simple class that wraps a record formatting function"""
 
     def __init__(self, key):
         self.format_func = registry.formats.get(key)
 
-    def process(self, record):
+    def process(self, record: dict) -> str:
         """
-        :param record: dictionary of record to format
-        :return: The formatted record
+        Processes the given record into the appropriate output string
+        Args:
+            record: dictionary of record to format
+
+        Returns:
+            The formatted record
         """
         return self.format_func(record)
+
+
+def for_format(key: str) -> FormatProcessor:
+    """
+    Creates FormatProcessor for provided key if one is registered
+    Args:
+        key: for formatter
+
+    Returns:
+        The FormatProcessor for the given key
+
+    Raises:
+        SpecException when key is not registered
+    """
+    try:
+        return FormatProcessor(key)
+    except catalogue.RegistryError as err:
+        raise datagen.SpecException(str(err))
