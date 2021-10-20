@@ -1,10 +1,9 @@
 """
 Factory like module for core supplier related functions.
 """
-from typing import Union, Dict, Any
+from typing import Union, List, Dict, Any
 import json
 
-import datagen
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier, BufferedValueSuppier)
@@ -16,30 +15,27 @@ from .supplier.list_stat_sampler import ListStatSamplerSupplier
 from .supplier.list_count_sampler import ListCountSamplerSupplier
 from .model import Distribution
 from . import types, casters, distributions, ValueSupplierInterface
-from .defaults import *
 
 
-def values(spec, loader=None, **kwargs) -> ValueSupplierInterface:
-    """
-    Based on data, return the appropriate values supplier. data can be a spec, constant, list, or dict.
-
-    >>> import datagen
-    >>> spec = {"type": "values", "data": [1,2,3,5,8,13]}
-    >>> fib_supplier = datagen.suppliers.values(spec)
-
+def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
+    """Based on data, return the appropriate values supplier. data can be a spec, constant, list, or dict.
     or just the raw data
 
-    >>> fib_supplier = datagen.suppliers.values([1,2,3,5,8,13])
+    Args:
+        spec: to load values from, or raw data itself
+        loader: if needed
+        **kwargs: extra kwargs to add to config
 
-    example with weights
+    Returns:
+        the values supplier for the spec
 
-    >>> weights =  {"1": 0.1, "2": 0.2, "3": 0.1, "4": 0.2, "5": 0.1, "6": 0.2, "7": 0.1}
-    >>> mostly_even_supplier = datagen.suppliers.values(weights)
-
-    :param spec: to load values from, or raw data itself
-    :param loader: if needed
-    :param kwargs: extra kwargs to add to config
-    :return: the value supplier for the spec
+    Examples:
+        >>> import datagen
+        >>> spec = {"type": "values", "data": [1,2,3,5,8,13]}
+        >>> fib_supplier = datagen.suppliers.values(spec)
+        >>> fib_supplier = datagen.suppliers.values([1,2,3,5,8,13])
+        >>> weights =  {"1": 0.1, "2": 0.2, "3": 0.1, "4": 0.2, "5": 0.1, "6": 0.2, "7": 0.1}
+        >>> mostly_even_supplier = datagen.suppliers.values(weights)
     """
     # shortcut notations no type, or data, the spec is the data
     if _data_not_in_spec(spec):
@@ -67,21 +63,33 @@ def values(spec, loader=None, **kwargs) -> ValueSupplierInterface:
 
 
 def _data_not_in_spec(spec):
-    """ check to see if the data element is defined for this spec """
+    """check to see if the data element is defined for this spec """
     if isinstance(spec, dict):
         return 'data' not in spec
     return True
 
 
-def count_supplier_from_data(data) -> ValueSupplierInterface:
-    """
-    generates a supplier for the count parameter based on the type of the data
+def count_supplier_from_data(data: Union[int, List[int], Dict[str, float]]) -> ValueSupplierInterface:
+    """generates a supplier for the count parameter based on the type of the data
 
     valid data for counts:
+
      * integer i.e. 1, 7, 99
+
      * list of integers: [1, 7, 99], [1], [1, 2, 1, 2, 3]
+
      * weighted map, where keys are numeric strings: {"1": 0.6, "2": 0.4}
-     * datagen.Distribution i.e. normal, gauess
+
+     * datagen.Distribution i.e. normal, gauss
+
+    Args:
+        data: that specifies how the count should be generated
+
+    Returns:
+        a value supplier for the count
+
+    Raises:
+        SpecException if unable to determine the type of the data
     """
     if isinstance(data, list):
         supplier = _value_list(data, None, False)
@@ -98,9 +106,8 @@ def count_supplier_from_data(data) -> ValueSupplierInterface:
     return supplier
 
 
-def count_supplier_from_config(config: Dict) -> ValueSupplierInterface:
-    """
-    creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
+def count_supplier_from_config(config: dict) -> ValueSupplierInterface:
+    """creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
 
     optionally can specify count or count_dist.
 
@@ -111,12 +118,16 @@ def count_supplier_from_config(config: Dict) -> ValueSupplierInterface:
 
     count_dist will be interpreted as a distribution i.e:
 
-    >>> import datagen
-    >>> config = {"count_dist": "uniform(start=10, end=100)"}
-    >>> count_supplier = datagen.suppliers.count_supplier_from_config(config)
+    Args:
+        config: to use
 
-    :param config: to use
-    :return: a count supplier
+    Returns:
+        a count supplier
+
+    Examples:
+        >>> import datagen
+        >>> config = {"count_dist": "uniform(start=10, end=100)"}
+        >>> count_supplier = datagen.suppliers.count_supplier_from_config(config)
     """
     data = 1  # type: Any
     if config and 'count' in config:
@@ -126,65 +137,78 @@ def count_supplier_from_config(config: Dict) -> ValueSupplierInterface:
     return count_supplier_from_data(data)
 
 
-def single_value(data):
-    """
-    Creates value supplier for the single value
+def single_value(data: Any) -> ValueSupplierInterface:
+    """Creates value supplier for the single value
 
+    Args:
+        data: constant data to return on every iteration
+
+    Returns:
+        value supplier for the single value
     Examples:
-
-    >>> import datagen
-    >>> single_int_supplier = datagen.suppliers.single_value(42)
-    >>> single_str_supplier = datagen.suppliers.single_value("42")
-    >>> single_float_supplier = datagen.suppliers.single_value(42.42)
+        >>> import datagen
+        >>> single_int_supplier = datagen.suppliers.single_value(42)
+        >>> single_str_supplier = datagen.suppliers.single_value("42")
+        >>> single_float_supplier = datagen.suppliers.single_value(42.42)
     """
     return SingleValue(data)
 
 
 def array_supplier(wrapped: ValueSupplierInterface,
                    count_config: dict) -> ValueSupplierInterface:
-    """
-    Wraps an existing supplier and always returns an array/list of elements, uses count config to determine
+    """Wraps an existing supplier and always returns an array/list of elements, uses count config to determine
     number of items in the list
 
-    Example:
+    Args:
+        wrapped: the underlying supplier
+        count_config: how to determine the number of elements to include in the list
 
-    >>> import datagen
-    >>> config = {"count_dist": "normal(mean=2, stddev=1)"}
-    >>> pet_supplier = datagen.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"])
-    >>> returns_mostly_two = datagen.suppliers.array_supplier(pet_supplier, config)
-    >>> pet_array = returns_mostly_two.next(0)
+    Returns:
+        The value supplier
+
+    Examples:
+        >>> import datagen
+        >>> config = {"count_dist": "normal(mean=2, stddev=1)"}
+        >>> pet_supplier = datagen.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"])
+        >>> returns_mostly_two = datagen.suppliers.array_supplier(pet_supplier, config)
+        >>> pet_array = returns_mostly_two.next(0)
     """
     return MultipleValueSupplier(wrapped, count_supplier_from_config(count_config))
 
 
-def from_list_of_suppliers(supplier_list, modulate_iteration: bool = True) -> ValueSupplierInterface:
-    """
-    Returns a supplier that rotates through the provided suppliers incrementally
+def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
+                           modulate_iteration: bool = True) -> ValueSupplierInterface:
+    """Returns a supplier that rotates through the provided suppliers incrementally
 
-    Example:
+    Args:
+        supplier_list: to rotate through
+        modulate_iteration: if the iteration number should be moded by the index of the supplier
 
-    >>> import datagen
-    >>> nice_pet_supplier = datagen.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"])
-    >>> mean_pet_supplier = datagen.suppliers.values(["alligator", "cobra", "mongoose", "killer bee"])
-    >>> pet_supplier = datagen.suppliers.from_list_of_suppliers([nice_pet_supplier, mean_pet_supplier])
+    Returns:
+        a supplier for these suppliers
 
-    :param supplier_list: to rotate through
-    :param modulate_iteration: if the iteration number should be moded by the index of the supplier
-    :return: a supplier for these suppliers
+    Examples:
+        >>> import datagen
+        >>> nice_pet_supplier = datagen.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"])
+        >>> mean_pet_supplier = datagen.suppliers.values(["alligator", "cobra", "mongoose", "killer bee"])
+        >>> pet_supplier = datagen.suppliers.from_list_of_suppliers([nice_pet_supplier, mean_pet_supplier])
     """
     return RotatingSupplierList(supplier_list, modulate_iteration)
 
 
 def _value_list(data: list,
                 config: dict = None,
-                do_sampling=False) -> ValueSupplierInterface:
-    """
-    creates a value list supplier
+                do_sampling: bool = False) -> ValueSupplierInterface:
+    """creates a value list supplier
 
-    :param data: for the supplier
-    :param do_sampling: if the data should be sampled instead of iterated through
-    :param config: config with optional count param
-    :return: the supplier
+    Args:
+        data: for the supplier
+        config: config with optional count param
+        do_sampling: if the data should be sampled instead of iterated through
+
+    Returns:
+        the supplier
+
     """
     if config is None:
         config = {}
@@ -192,19 +216,24 @@ def _value_list(data: list,
 
 
 def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
-    """
-    creates a weighted value supplier
+    """creates a weighted value supplier
 
-    Example:
 
-    >>> import datagen
-    >>> weights = {"dog": 0.5, "cat": 0.2, "bunny": 0.1, "hamster": 0.1, "pig": 0.05, "snake": 0.04, "rat": 0.01}
-    >>> weighted_pet_supplier = datagen.suppliers.weighted_values(weights)
-    >>> most_likely_a_dog = weighted_pet_supplier.next(0)
+    Args:
+        data: for the supplier
+        config: optional config (Default value = None)
 
-    :param data: for the supplier
-    :param config: optional config
-    :return: the supplier
+    Returns:
+        the supplier
+
+    Raises:
+        SpecException if data is empty
+
+    Examples:
+        >>> import datagen
+        >>> weights = {"dog": 0.5, "cat": 0.2, "bunny": 0.1, "hamster": 0.1, "pig": 0.05, "snake": 0.04, "rat": 0.01}
+        >>> weighted_pet_supplier = datagen.suppliers.weighted_values(weights)
+        >>> most_likely_a_dog = weighted_pet_supplier.next(0)
     """
     if len(data) == 0:
         raise SpecException('Invalid Weights, no values defined')
@@ -216,22 +245,24 @@ def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
 
 
 def combine(suppliers, config=None):
-    """
-    Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
+    """Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
     join the values with an empty string. Provide the join_with config param to specify a different string to
     join the values with. Set as_list to true, if the values should be returned as a list and not joined
 
-    Example:
 
-    >>> import datagen
-    >>> pet_supplier = datagen.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"], sample=True)
-    >>> job_supplier = datagen.suppliers.values(["breeder", "trainer", "fighter", "wrestler"], sample=True)
-    >>> interesting_jobs = datagen.suppliers.combine([pet_supplier, job_supplier], {'join_with': ' '})
-    >>> next_career = interesting_jobs.next(0)
+    Args:
+        suppliers: to combine value for
+        config: for the combiner (Default value = None)
 
-    :param suppliers: to combine value for
-    :param config: for the combiner
-    :return: the supplier
+    Returns:
+        the supplier
+
+    Examples:
+        >>> import datagen
+        >>> pet_supplier = datagen.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"], sample=True)
+        >>> job_supplier = datagen.suppliers.values(["breeder", "trainer", "fighter", "wrestler"], sample=True)
+        >>> interesting_jobs = datagen.suppliers.combine([pet_supplier, job_supplier], {'join_with': ' '})
+        >>> next_career = interesting_jobs.next(0)
     """
     return CombineValuesSupplier(suppliers, config)
 
@@ -239,70 +270,73 @@ def combine(suppliers, config=None):
 def random_range(start: Union[int, float],
                  end: Union[int, float],
                  precision: Union[int, float] = None,
-                 count: Union[int, float, list, dict, datagen.Distribution] = 1) -> ValueSupplierInterface:
-    """
-    Creates a random range supplier for the start and end parameters with the given precision (number of decimal places)
+                 count: Union[int, float, list, dict, Distribution] = 1) -> ValueSupplierInterface:
+    """Creates a random range supplier for the start and end parameters with the given precision
+    (number of decimal places)
 
-    Example:
+    Args:
+        start: of range
+        end: of range
+        precision: number of decimal points to keep
+        count: number of elements to return, default is one
 
-    >>> range_supplier = datagen.suppliers.random_range(5, 25, precision=3)
-    >>> # should be between 5 and 25 with 3 decimal places
-    >>> next_value = range_supplier.next(0))
+    Returns:
+        the value supplier for the range
 
-    :param start: of range
-    :param end: of range
-    :param precision: number of decimal points to keep
-    :param count: number of elements to return, default is one
-    :return: the value supplier for the range
+    Examples:
+        >>> range_supplier = datagen.suppliers.random_range(5, 25, precision=3)
+        >>> # should be between 5 and 25 with 3 decimal places
+        >>> next_value = range_supplier.next(0))
     """
     return RandomRangeSupplier(start, end, precision, count_supplier_from_data(count))
 
 
 def list_stat_sampler(data: Union[str, list],
                       config: dict) -> ValueSupplierInterface:
-    """
-    sample from list (or string) with stats based params
+    """sample from list (or string) with stats based params
 
-    Example:
+    Args:
+        data: list to select subset from
+        config: with minimal of mean specified
 
-    >>> import datagen
-    >>> stats_config = {"mean": 2, "stddev": 1}
-    >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
-    >>> pet_supplier = datagen.suppliers.list_stat_sampler(pet_list, stats_config)
-    >>> new_pets = pet_supplier.next(0)
+    Returns:
+        the supplier
 
-    string example
+    Examples:
+        >>> import datagen
+        >>> stats_config = {"mean": 2, "stddev": 1}
+        >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
+        >>> pet_supplier = datagen.suppliers.list_stat_sampler(pet_list, stats_config)
+        >>> new_pets = pet_supplier.next(0)
 
-    >>> char_config = {"min": 2, "mean": 4, "max": 8}
-    >>> char_supplier = datagen.suppliers.list_stat_sampler("#!@#$%^&*()_-~", char_config)
-    >>> two_to_eight_chars = char_supplier.next(0)
-
-    :param data: list to select subset from
-    :param config: with minimal of mean specified
-    :return: the supplier
+        >>> char_config = {"min": 2, "mean": 4, "max": 8}
+        >>> char_supplier = datagen.suppliers.list_stat_sampler("#!@#$%^&*()_-~", char_config)
+        >>> two_to_eight_chars = char_supplier.next(0)
     """
     return ListStatSamplerSupplier(data, config)
 
 
 def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
-    """
-    Samples N elements from data list based on config.  If count is provided,
+    """Samples N elements from data list based on config.  If count is provided,
     each iteration exactly count elements will be returned.  If only min is provided,
     between min and the total number of elements will be provided. If only max is provided,
     between one and max elements will be returned. Specifying both min and max will provide
     a sample containing a number of elements in this range.
 
-    Example:
 
-    >>> import datagen
-    >>> count_config = {"min": 2, "max": 5}
-    >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
-    >>> pet_supplier = datagen.suppliers.list_count_sampler(pet_list, count_config)
-    >>> new_pets = pet_supplier.next(0)
+    Args:
+        data: list to select subset from
+        config: with minimal of count or min and max supplied
 
-    :param data: list to select subset from
-    :param config: with minimal of count or min and max supplied
-    :return: the supplier
+    Returns:
+        the supplier
+
+    Examples:
+        >>> import datagen
+        >>> count_config = {"min": 2, "max": 5}
+        >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
+        >>> pet_supplier = datagen.suppliers.list_count_sampler(pet_list, count_config)
+        >>> new_pets = pet_supplier.next(0)
     """
     if 'count' in config or 'count_dist' in config:
         count_supplier = count_supplier_from_config(config)
@@ -315,22 +349,27 @@ def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
 
 
 def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
-    """
-    creates a ValueSupplier that uses the given distribution to generate values
+    """creates a ValueSupplier that uses the given distribution to generate values
 
-    :param distribution: to use
-    :return: the value supplier
+    Args:
+        distribution: to use
+
+    Returns:
+        the value supplier
     """
     wrapped = DistributionBackedSupplier(distribution)
     # buffer the values
     return buffered(wrapped, {})
 
 
-def is_decorated(field_spec):
-    """
-    is this spec a decorated one
-    :param field_spec: to check
-    :return: true or false
+def is_decorated(field_spec: dict) -> bool:
+    """is this spec a decorated one
+
+    Args:
+        field_spec: to check
+
+    Returns:
+        true or false
     """
     if 'config' not in field_spec:
         return False
@@ -338,21 +377,27 @@ def is_decorated(field_spec):
     return 'prefix' in config or 'suffix' in config or 'quote' in config
 
 
-def decorated(field_spec, supplier):
-    """
-    Creates a decorated supplier around the provided on
-    :param field_spec: the spec
-    :param supplier: the supplier to decorate
-    :return: the decorated supplier
+def decorated(field_spec: dict, supplier: ValueSupplierInterface) -> ValueSupplierInterface:
+    """Creates a decorated supplier around the provided one
+
+    Args:
+        field_spec: the spec
+        supplier: the supplier to decorate
+
+    Returns:
+        the decorated supplier
     """
     return DecoratedSupplier(field_spec.get('config'), supplier)
 
 
-def is_cast(field_spec):
-    """
-    is this spec requires casting
-    :param field_spec: to check
-    :return: true or false
+def is_cast(field_spec: dict) -> bool:
+    """is this spec requires casting
+
+    Args:
+        field_spec: to check
+
+    Returns:
+        true or false
     """
     if not isinstance(field_spec, dict):
         return False
@@ -363,13 +408,15 @@ def is_cast(field_spec):
 def cast_supplier(supplier: ValueSupplierInterface,
                   field_spec: dict = None,
                   cast_to: str = None) -> ValueSupplierInterface:
-    """
-    Provides a cast_supplier either from config or from explicit cast_to
+    """Provides a cast_supplier either from config or from explicit cast_to
 
-    :param supplier: to cast results of
-    :param field_spec: to look up cast config from
-    :param cast_to: explicit cast type to use
-    :return: the casting supplier
+    Args:
+        supplier: to cast results of
+        field_spec: to look up cast config from
+        cast_to: explicit cast type to use
+
+    Returns:
+        the casting supplier
     """
 
     if cast_to:
@@ -383,24 +430,29 @@ def cast_supplier(supplier: ValueSupplierInterface,
     return CastingSupplier(supplier, caster)
 
 
-def is_buffered(field_spec):
-    """
-    Should the values for this spec be buffered
+def is_buffered(field_spec: dict) -> bool:
+    """Should the values for this spec be buffered
 
-    :param field_spec: to check
-    :return: true or false
+    Args:
+        field_spec: to check
+
+    Returns:
+        true or false
+
     """
     config = field_spec.get('config', {})
     return 'buffer_size' in config or is_affirmative('buffer', config)
 
 
-def buffered(wrapped: ValueSupplierInterface, field_spec):
-    """
-    Creates a Value Supplier that buffers the results of the wrapped supplier
+def buffered(wrapped: ValueSupplierInterface, field_spec: dict) -> ValueSupplierInterface:
+    """Creates a Value Supplier that buffers the results of the wrapped supplier allowing the retrieval
 
-    :param wrapped: the Value Supplir to buffer values for
-    :param field_spec: to check
-    :return:
+    Args:
+        wrapped: the Value Supplir to buffer values for
+        field_spec: to check
+
+    Returns:
+        a buffered value supplier
     """
     config = field_spec.get('config', {})
     buffer_size = int(config.get('buffer_size', 10))
