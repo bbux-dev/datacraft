@@ -69,7 +69,7 @@ def _data_not_in_spec(spec):
     return True
 
 
-def count_supplier_from_data(data: Union[int, List[int], Dict[str, float]]) -> ValueSupplierInterface:
+def count_supplier_from_data(data: Union[int, List[int], Dict[str, float], Distribution]) -> ValueSupplierInterface:
     """generates a supplier for the count parameter based on the type of the data
 
     valid data for counts:
@@ -270,7 +270,7 @@ def combine(suppliers, config=None):
 def random_range(start: Union[int, float],
                  end: Union[int, float],
                  precision: Union[int, float] = None,
-                 count: Union[int, float, list, dict, Distribution] = 1) -> ValueSupplierInterface:
+                 count: Union[int, List[int], Dict[str, float], Distribution] = 1) -> ValueSupplierInterface:
     """Creates a random range supplier for the start and end parameters with the given precision
     (number of decimal places)
 
@@ -373,7 +373,7 @@ def is_decorated(field_spec: dict) -> bool:
     """
     if 'config' not in field_spec:
         return False
-    config = field_spec.get('config')
+    config = field_spec['config']
     return 'prefix' in config or 'suffix' in config or 'quote' in config
 
 
