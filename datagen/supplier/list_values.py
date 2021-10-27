@@ -11,10 +11,19 @@ class ListValueSupplier(datagen.ValueSupplierInterface):
     Value Supplier implementation for supplying values from lists
     """
 
-    def __init__(self, data: list, count: datagen.ValueSupplierInterface, do_sampling: bool = False):
+    def __init__(self,
+                 data: list,
+                 count_supplier: datagen.ValueSupplierInterface,
+                 do_sampling: bool = False):
+        """
+        Args:
+            data: to rotate through
+            count_supplier: to supply number of values to return
+            do_sampling: if the list should be sampled from, default is to rotate through in order
+        """
         self.values = data
         self.do_sampling = do_sampling
-        self.count = count
+        self.count = count_supplier
 
     def next(self, iteration):
         cnt = self.count.next(iteration)

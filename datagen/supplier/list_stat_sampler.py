@@ -1,6 +1,7 @@
 """
 Module list stats sampler class
 """
+from typing import Union
 import math
 import random
 
@@ -13,7 +14,14 @@ class ListStatSamplerSupplier(datagen.ValueSupplierInterface):
     and optionally joining them by some delimiter
     """
 
-    def __init__(self, data, config):
+    def __init__(self,
+                 data: Union[str, list],
+                 config: dict):
+        """
+        Args:
+            data: to sample from
+            config: with config values for sampling
+        """
         self.values = data
         self.mean = float(config.get('mean', 1))
         self.min = int(config.get('min', 1))

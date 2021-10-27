@@ -2,14 +2,16 @@
 Module to handle casting of values to different types
 """
 from typing import Any, Union, List
+from abc import ABC, abstractmethod
 from .exceptions import SpecException
 
 
-class CasterInterface:
+class CasterInterface(ABC):
     """
     Interface for Classes that cast objects to different types
     """
 
+    @abstractmethod
     def cast(self, value: Any) -> Any:
         """casts the value according to the specified type
 

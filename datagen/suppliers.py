@@ -267,9 +267,9 @@ def combine(suppliers, config=None):
     return CombineValuesSupplier(suppliers, config)
 
 
-def random_range(start: Union[int, float],
-                 end: Union[int, float],
-                 precision: Union[int, float] = None,
+def random_range(start:Union[str, int, float],
+                 end: Union[str, int, float],
+                 precision: Union[str, int, float] = None,
                  count: Union[int, List[int], Dict[str, float], Distribution] = 1) -> ValueSupplierInterface:
     """Creates a random range supplier for the start and end parameters with the given precision
     (number of decimal places)
@@ -387,7 +387,7 @@ def decorated(field_spec: dict, supplier: ValueSupplierInterface) -> ValueSuppli
     Returns:
         the decorated supplier
     """
-    return DecoratedSupplier(field_spec.get('config'), supplier)
+    return DecoratedSupplier(field_spec.get('config', {}), supplier)
 
 
 def is_cast(field_spec: dict) -> bool:

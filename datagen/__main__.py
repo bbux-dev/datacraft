@@ -13,6 +13,7 @@ from . import outputs, utils, types, preprocessor, template_engines, builder, Sp
 # this activates the decorators, so they will be discoverable
 from .supplier import *
 from .defaults import *
+from .schemas import *
 from .preprocessor import *
 from .logging_handler import *
 
