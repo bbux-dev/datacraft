@@ -76,7 +76,7 @@ def uniform_date_timestamp(
     Creates a uniform distribution for the start and end dates shifted by the offset
 
     Args:
-        start: start data string
+        start: start date string
         end: end date string
         offset: number of days to shift the duration, positive is back negative is forward
         duration: number of days after start
@@ -87,13 +87,19 @@ def uniform_date_timestamp(
     """
     offset_date = datetime.timedelta(days=offset)
     if start:
-        start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
+        try:
+            start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
+        except TypeError as err:
+            raise datagen.SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
     else:
         start_date = datetime.datetime.now() - offset_date
     if end:
         # buffer end date by one to keep inclusive
-        end_date = datetime.datetime.strptime(end, date_format_string) \
-            + datetime.timedelta(days=1) - offset_date
+        try:
+            end_date = datetime.datetime.strptime(end, date_format_string) \
+                + datetime.timedelta(days=1) - offset_date
+        except TypeError as err:
+            raise datagen.SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
     else:
         # start date already include offset, don't include it here
         end_date = start_date + datetime.timedelta(days=abs(int(duration)), seconds=1)
