@@ -24,34 +24,34 @@ class GeoSupplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.schemas(GEO_LAT_KEY)
-def get_geo_lat_schema():
+def _get_geo_lat_schema():
     return datagen.schemas.load(GEO_LAT_KEY)
 
 
 @datagen.registry.schemas(GEO_LONG_KEY)
-def get_geo_long_schema():
+def _get_geo_long_schema():
     return datagen.schemas.load(GEO_LONG_KEY)
 
 
 @datagen.registry.schemas(GEO_PAIR_KEY)
-def get_geo_pair_schema():
+def _get_geo_pair_schema():
     return datagen.schemas.load(GEO_PAIR_KEY)
 
 
 @datagen.registry.types(GEO_LAT_KEY)
-def configure_geo_lat(field_spec, loader):
+def _configure_geo_lat(field_spec, loader):
     """ configures value supplier for geo.lat type """
     return _configure_lat_type(field_spec, loader)
 
 
 @datagen.registry.types(GEO_LONG_KEY)
-def configure_geo_long(field_spec, loader):
+def _configure_geo_long(field_spec, loader):
     """ configures value supplier for geo.long type """
     return _configure_long_type(field_spec, loader)
 
 
 @datagen.registry.types(GEO_PAIR_KEY)
-def configure_geo_pair(field_spec, loader):
+def _configure_geo_pair(field_spec, loader):
     """ configures value supplier for geo.pair type """
     config = datagen.utils.load_config(field_spec, loader)
     long_supplier = _configure_long_type(field_spec, loader)

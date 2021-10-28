@@ -2,16 +2,6 @@
 Combine handler builds a combine value supplier from the provided spec
 
 A combine Field Spec is used to concatenate or append two or more fields or reference to one another.
-The combine field structure is:
-{
-  "<field name>": {
-    "type": "combine",
-    "fields": ["valid field name1", "valid field name2"],
-    OR
-    "refs": ["valid ref1", "valid ref2"],
-    "config": { "join_with": "<optional string to use to join fields or refs, default is none"}
-  }
-}
 """
 from typing import List
 import json
@@ -27,7 +17,14 @@ class CombineValuesSupplier(datagen.ValueSupplierInterface):
     Class for combining the values from the output of two or more value suppliers
     """
 
-    def __init__(self, suppliers: List[datagen.ValueSupplierInterface], config: dict):
+    def __init__(self,
+                 suppliers: List[datagen.ValueSupplierInterface],
+                 config: dict):
+        """
+        Args:
+            suppliers: list of suppliers to combine in order of combination
+            config: with optional as_list and join_with params
+        """
         self.suppliers = suppliers
         self.as_list = config.get('as_list', datagen.types.get_default('combine_as_list'))
         self.joiner = config.get('join_with', datagen.types.get_default('combine_join_with'))
@@ -40,19 +37,19 @@ class CombineValuesSupplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.schemas(COMBINE_KEY)
-def get_combine_schema():
+def _get_combine_schema():
     """ get the schema for the combine type """
     return datagen.schemas.load(COMBINE_KEY)
 
 
 @datagen.registry.schemas(COMBINE_LIST_KEY)
-def get_combine_list_schema():
+def _get_combine_list_schema():
     """ get the schema for the combine_list type """
     return datagen.schemas.load(COMBINE_LIST_KEY)
 
 
 @datagen.registry.types(COMBINE_KEY)
-def configure_combine_supplier(field_spec, loader):
+def _configure_combine_supplier(field_spec, loader):
     """ configures supplier for combine type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise datagen.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
@@ -65,7 +62,7 @@ def configure_combine_supplier(field_spec, loader):
 
 
 @datagen.registry.types(COMBINE_LIST_KEY)
-def configure_combine_list_supplier(field_spec, loader):
+def _configure_combine_list_supplier(field_spec, loader):
     """ configures supplier for combine-list type """
     if 'refs' not in field_spec:
         raise datagen.SpecException('Must define refs for combine-list type. %s' % json.dumps(field_spec))

@@ -1,15 +1,7 @@
 """
 Configures a supplier to provide a range of integers. Range is are inclusive for start and end
-
-Range Spec format:
-
-{
-  "range_field": {
-    "type": "range",
-    "data": [start, stop, optional step]
-  }
-}
 """
+from typing import Union
 import decimal
 import json
 import math
@@ -21,20 +13,20 @@ RAND_RANGE_KEY = 'rand_range'
 
 
 @datagen.registry.schemas(RANGE_KEY)
-def get_range_schema():
+def _get_range_schema():
     """ schema for range type """
     return datagen.schemas.load(RANGE_KEY)
 
 
 @datagen.registry.schemas(RAND_RANGE_KEY)
-def get_rand_range_schema():
+def _get_rand_range_schema():
     """ schema for rand range type """
     # This shares a schema with range
     return datagen.schemas.load(RANGE_KEY)
 
 
 @datagen.registry.types(RANGE_KEY)
-def configure_range_supplier(field_spec, _):
+def _configure_range_supplier(field_spec, _):
     """ configures the range value supplier """
     if 'data' not in field_spec:
         raise datagen.SpecException('No data element defined for: %s' % json.dumps(field_spec))
@@ -74,7 +66,7 @@ def _configure_supplier_for_data(field_spec, data):
 
 
 @datagen.registry.types(RAND_RANGE_KEY)
-def configure_rand_range_supplier(field_spec, loader):
+def _configure_rand_range_supplier(field_spec, loader):
     """ configures the random range value supplier """
     if 'data' not in field_spec:
         raise datagen.SpecException('No data element defined for: %s' % json.dumps(field_spec))
@@ -105,7 +97,10 @@ def _any_is_float(data):
     return False
 
 
-def float_range(start, stop, step, precision=None):
+def float_range(start: float,
+                stop: float,
+                step: float,
+                precision=None):
     """
     Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
     stored

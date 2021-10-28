@@ -11,7 +11,11 @@ UNICODE_RANGE_KEY = 'unicode_range'
 class UnicodeRangeSupplier(datagen.ValueSupplierInterface):
     """ Value Supplier for unicode_range type """
 
-    def __init__(self, wrapped):
+    def __init__(self, wrapped: datagen.ValueSupplierInterface):
+        """
+        Args:
+            wrapped: supplier that supplies unicode code points
+        """
         self.wrapped = wrapped
 
     def next(self, iteration):
@@ -21,12 +25,13 @@ class UnicodeRangeSupplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.schemas(UNICODE_RANGE_KEY)
-def get_unicode_range_schema():
+def _get_unicode_range_schema():
+    """ get the unicode range schema """
     return datagen.schemas.load(UNICODE_RANGE_KEY)
 
 
 @datagen.registry.types(UNICODE_RANGE_KEY)
-def configure_supplier(spec, _):
+def _configure_supplier(spec, _):
     """ configure the supplier for unicode_range types """
     if 'data' not in spec:
         raise datagen.SpecException('data is Required Element for unicode_range specs: ' + json.dumps(spec))
@@ -42,6 +47,7 @@ def configure_supplier(spec, _):
 
 
 def _single_range(data, config):
+    """ creates a unicode supplier for a single unicode range """
     # supplies range of data as floats
     range_data = list(range(_decode_num(data[0]), _decode_num(data[1]) + 1))
     # casts the floats to ints
@@ -55,6 +61,7 @@ def _single_range(data, config):
 
 
 def _decode_num(num):
+    """ decodes the num if hex encoded """
     if isinstance(num, str):
         return int(num, 16)
     return int(num)

@@ -8,6 +8,6 @@ VALUES_KEY = 'values'
 
 
 @datagen.registry.schemas(VALUES_KEY)
-def get_schema():
+def _get_schema():
     """ returns the values schema """
     return datagen.schemas.load(VALUES_KEY)

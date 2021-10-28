@@ -13,7 +13,7 @@ import datagen
 
 
 @datagen.registry.types('ref')
-def configure_ref_supplier(field_spec: dict, loader: datagen.Loader):
+def _configure_ref_supplier(field_spec: dict, loader: datagen.Loader):
     """ configures supplier for ref type """
     key = None
     if 'data' in field_spec:

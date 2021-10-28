@@ -2,15 +2,9 @@
 This module handles the weightedref type.
 
 A weighted ref spec is used to select the values from a set of refs in a weighted fashion.
-
-The weightedref Field Spec structure is:
-{
-  "<field name>": {
-    "type": "weightedref",
-    "data": { "valid_ref_1": 0.N, "valid_ref_2": 0.N, ... }
-  }
-}
 """
+from typing import Dict
+
 import datagen
 
 
@@ -19,7 +13,14 @@ class WeightedRefsSupplier(datagen.ValueSupplierInterface):
     Value supplier that uses a weighted scheme to supply values from different reference value suppliers
     """
 
-    def __init__(self, key_supplier, values_map):
+    def __init__(self,
+                 key_supplier: datagen.ValueSupplierInterface,
+                 values_map: Dict[str, datagen.ValueSupplierInterface]):
+        """
+        Args:
+            key_supplier: supplier for ref keys
+            values_map: mapping of ref name to supplier for ref
+        """
         self.key_supplier = key_supplier
         self.values_map = values_map
 
@@ -32,7 +33,7 @@ class WeightedRefsSupplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.types('weightedref')
-def configure_supplier(parent_field_spec, loader):
+def _configure_supplier(parent_field_spec, loader):
     """ configures supplier for weighted ref specs """
     config = datagen.utils.load_config(parent_field_spec, loader)
     data = parent_field_spec['data']

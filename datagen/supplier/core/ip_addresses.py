@@ -1,6 +1,7 @@
 """
 Module for handling ip types
 """
+from typing import Dict
 import ipaddress
 import json
 import random
@@ -16,7 +17,11 @@ class IpV4Supplier(datagen.ValueSupplierInterface):
     Default implementation for generating ip values, uses separate suppliers for each octet of the ip
     """
 
-    def __init__(self, octet_supplier_map):
+    def __init__(self, octet_supplier_map: Dict[str, datagen.ValueSupplierInterface]):
+        """
+        Args:
+            octet_supplier_map: dictionary mapping each octet to a ValueSupplier
+        """
         self.first = octet_supplier_map['first']
         self.second = octet_supplier_map['second']
         self.third = octet_supplier_map['third']
@@ -31,24 +36,26 @@ class IpV4Supplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.schemas(IP_KEY)
-def get_ip_schema():
+def _get_ip_schema():
+    """ returns the schema for the ip types """
     return datagen.schemas.load(IP_KEY)
 
 
 @datagen.registry.schemas(IPV4_KEY)
-def get_ipv4_schema():
+def _get_ipv4_schema():
+    """ returns the schema for the ipv4 types """
     # shares schema with ip
     return datagen.schemas.load(IP_KEY)
 
 
 @datagen.registry.types(IPV4_KEY)
-def configure_ipv4(field_spec, _):
+def _configure_ipv4(field_spec, _):
     """ configures value supplier for ipv4 type """
-    return configure_ip(field_spec, _)
+    return _configure_ip(field_spec, _)
 
 
 @datagen.registry.types(IP_KEY)
-def configure_ip(field_spec, loader):
+def _configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = datagen.utils.load_config(field_spec, loader)
     if 'base' in config and 'cidr' in config:
@@ -110,7 +117,8 @@ def _create_octet_supplier(parts, index, sample):
         if not octet.isdigit():
             raise datagen.SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
         if not 0 <= int(octet) <= 255:
-            raise datagen.SpecException(f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
+            raise datagen.SpecException(
+                f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
         return datagen.suppliers.values(octet)
     # need octet range at this point
     octet_range = list(range(0, 255))
@@ -123,7 +131,12 @@ class IpV4PreciseSupplier(datagen.ValueSupplierInterface):
     Class that supports precise ip address generation by specifying cidr values, much slower for large ip ranges
     """
 
-    def __init__(self, cidr, sample):
+    def __init__(self, cidr: str, sample: bool):
+        """
+        Args:
+            cidr: notation specifying ip range
+            sample: if the ip addresses should be sampled from the available set
+        """
         self.net = ipaddress.ip_network(cidr)
         self.sample = sample
         cnt = 0
@@ -140,7 +153,7 @@ class IpV4PreciseSupplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.types('ip.precise')
-def configure_precise_ip(field_spec, _):
+def _configure_precise_ip(field_spec, _):
     """ configures value supplier for ip.precise type """
     config = field_spec.get('config')
     if config is None:

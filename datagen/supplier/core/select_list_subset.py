@@ -3,24 +3,6 @@ select_list_subset handler builds a select_list_subset supplier from the provide
 
 A select list subset spec is used to select multiple values from a list to use as the value for a field.
 
-The select_list_subset Field Spec structure is:
-```json
-{
-  "<field name>": {
-    "type": "select_list_subset",
-    "config": {
-      "mean": N,
-      "stddev": N,
-      "min": N,
-      "max": N,
-      "join_with": "<delimiter to join with>"
-     },
-    "data": ["data", "to", "secect", "from"],
-    OR
-    "ref": "REF_WITH_DATA_AS_LIST"
-  }
-}
-```
 """
 import json
 
@@ -28,7 +10,7 @@ import datagen
 
 
 @datagen.registry.types('select_list_subset')
-def configure_supplier(field_spec, loader):
+def _configure_supplier(field_spec, loader):
     """ configures supplier for select_list_subset type """
     config = datagen.utils.load_config(field_spec, loader)
     if config is None or ('mean' not in config and 'count' not in config):

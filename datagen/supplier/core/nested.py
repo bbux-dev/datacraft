@@ -16,6 +16,12 @@ class NestedSupplier(datagen.model.ValueSupplierInterface):
                  field_supplier_map: Dict[str, datagen.model.ValueSupplierInterface],
                  count_supplier: datagen.model.ValueSupplierInterface,
                  as_list: bool):
+        """
+        Args:
+            field_supplier_map: mapping of nested field name to value supplier for it
+            count_supplier: number of nested objects to create
+            as_list: for counts of one, if the result should be a list instead of an object
+        """
         self.field_supplier_map = field_supplier_map
         self.count_supplier = count_supplier
         self.as_list = as_list
@@ -40,7 +46,7 @@ class NestedSupplier(datagen.model.ValueSupplierInterface):
 
 
 @datagen.registry.types('nested')
-def configure_nested_supplier(spec, loader):
+def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
     keys = [key for key in fields.keys() if key not in loader.RESERVED]
@@ -53,7 +59,7 @@ def configure_nested_supplier(spec, loader):
     for key in keys:
         nested_spec = fields[key]
         if 'type' in nested_spec and nested_spec.get('type') == 'nested':
-            supplier = configure_nested_supplier(nested_spec, loader)
+            supplier = _configure_nested_supplier(nested_spec, loader)
         else:
             supplier = loader.get_from_spec(nested_spec)
         field_supplier_map[key] = supplier

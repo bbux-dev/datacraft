@@ -23,6 +23,10 @@ class CsvDataBase:
     """
 
     def __init__(self, has_headers: bool):
+        """
+        Args:
+            has_headers: if there are headers in the CSV files
+        """
         self.data = self._load_data()
         if has_headers:
             first_row = self.data.pop(0)
@@ -36,25 +40,33 @@ class CsvDataBase:
     def next(self, field: Union[int, str], iteration: int, sample: bool, count: int):
         """
         Obtains the next value(s) for the field for the given iteration
-        :param field: key or one based index number
-        :param iteration: current iteration
-        :param sample: if sampling should be used
-        :param count: number of values to return
-        :return: array of values if count > 1 else the next value
+
+        Args:
+            field: key or one based index number
+            iteration: current iteration
+            sample: if sampling should be used
+            count: number of values to return
+
+        Returns:
+            array of values if count > 1 else the next value
         """
 
     def _load_data(self) -> list:
         """
         Method for subclass to load initial data
-        :return: the loaded data
+            the loaded data
         """
         raise NotImplementedError()
 
     def _get_column_index(self, field: Union[int, str]):
         """
         Resolve the column index
-        :param field: key or one based index number
-        :return: the column index for the field
+
+        Args:
+            field: key or one based index number
+
+        Returns:
+            the column index for the field
         """
         # if we had headers we can use that name, otherwise field should be one based index
         colidx = self.mapping.get(field)
@@ -117,11 +129,12 @@ class BufferedCsvData(CsvDataBase):
         self.fill_buffer(0)
         return self.data
 
-    def fill_buffer(self, iteration: int) -> None:
+    def fill_buffer(self, iteration: int):
         """
         Fills the buffer of data for this iteration
-        :param iteration: current record number being processed
-        :return: None
+
+        Args:
+            iteration: current record number being processed
         """
         new_increment = int(iteration / self.size)
         if new_increment == self.increment:
@@ -175,7 +188,7 @@ _csv_data_cache: Dict[str, CsvDataBase] = {}
 
 
 @datagen.registry.types('csv')
-def configure_csv(field_spec, loader):
+def _configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
     config = datagen.utils.load_config(field_spec, loader)
 
@@ -188,13 +201,13 @@ def configure_csv(field_spec, loader):
 
 
 @datagen.registry.schemas('csv')
-def get_csv_schema():
+def _get_csv_schema():
     """ get the schema for the csv type """
     return datagen.schemas.load('csv')
 
 
 @datagen.registry.types('weighted_csv')
-def configure_weighted_csv(field_spec, loader):
+def _configure_weighted_csv(field_spec, loader):
     """ Configures the weighted_csv value supplier for this field """
 
     config = datagen.utils.load_config(field_spec, loader)
@@ -263,10 +276,14 @@ ONE_MB = 1024 * 1024
 def _load_csv_data(field_spec, config, datadir):
     """
     Creates the CsvData object, caches the object by file path so that we can share this object across fields
-    :param field_spec: that triggered the creation
-    :param config: to use to do the creation
-    :param datadir: where to look for data files
-    :return: the configured CsvData object
+
+    Args:
+        field_spec: that triggered the creation
+        config: to use to do the creation
+        datadir: where to look for data files
+
+    Returns:
+        the configured CsvData object
     """
     datafile = config.get('datafile', datagen.types.get_default('csv_file'))
     csv_path = f'{datadir}/{datafile}'
