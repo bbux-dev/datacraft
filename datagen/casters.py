@@ -65,9 +65,9 @@ class HexCaster(CasterInterface):
     def cast(self, value: Any) -> Union[str, List[str]]:
         try:
             if isinstance(value, list):
-                return [hex(int(val)) for val in value]
-            return hex(int(value))
-        except TypeError as err:
+                return [hex(int(float(val))) for val in value]
+            return hex(int(float(value)))
+        except ValueError as err:
             raise SpecException from err
 
 
