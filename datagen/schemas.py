@@ -12,7 +12,8 @@ log = logging.getLogger(__name__)
 
 
 def load(key: str) -> dict:
-    """ load the internal schema file for the provided key
+    """
+    load the internal schema file for the provided key
 
     Args:
         key: type name for schema
@@ -37,7 +38,8 @@ def _load_resource_as_json(resource_name: str) -> dict:
 
 
 def validate_schema_for_spec(spec_type, field_spec, type_schema):
-    """ performs schema validation for the provided field_spec
+    """
+    performs schema validation for the provided field_spec
 
     Args:
         spec_type: type name for spec

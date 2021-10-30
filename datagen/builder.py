@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 
 
 class FieldInfo:
-    """Class for holding info after adding field or ref to spec. Can be passed to specs that use other specs
+    """
+    Class for holding info after adding field or ref to spec. Can be passed to specs that use other specs
     like combine
     """
 
@@ -24,7 +25,8 @@ class FieldInfo:
         self.builder = builder
 
     def to_spec(self) -> DataSpec:
-        """Builds the Data Spec from the underlying builder
+        """
+        Builds the Data Spec from the underlying builder
 
         Returns:
             the Data Spec
@@ -33,7 +35,8 @@ class FieldInfo:
 
 
 class Builder:
-    """Container class for constructing the Data Spec by adding fields, refs, and field_groups
+    """
+    Container class for constructing the Data Spec by adding fields, refs, and field_groups
 
     Examples:
         >>> builder = datagen.Builder()
@@ -52,7 +55,8 @@ class Builder:
         self.keys = set()
 
     def refs(self):
-        """Get Refs object for this builder
+        """
+        Get Refs object for this builder
 
         Returns:
             the refs builder which is itself also a builder
@@ -62,7 +66,8 @@ class Builder:
     def values(self, key: str,
                data: Union[int, float, str, bool, List, Dict[str, float]],
                **config) -> FieldInfo:
-        """creates values Field Spec and adds to Data Spec
+        """
+        creates values Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -78,7 +83,8 @@ class Builder:
                 refs: Union[List[str], List[FieldInfo]] = None,
                 fields: Union[List[str], List[FieldInfo]] = None,
                 **config) -> FieldInfo:
-        """creates combine Field Spec and adds to Data Spec
+        """
+        creates combine Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -94,7 +100,8 @@ class Builder:
     def combine_list(self, key: str,
                      refs: List[Union[List[str], List[FieldInfo]]] = None,
                      **config) -> FieldInfo:
-        """creates combine-list Field Spec and adds to Data Spec
+        """
+        creates combine-list Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -107,7 +114,8 @@ class Builder:
         return self._add_field_spec(key, combine_list(refs, **config))
 
     def range_spec(self, key: str, data: list, **config) -> FieldInfo:
-        """creates range Field Spec and adds to Data Spec
+        """
+        creates range Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -120,7 +128,8 @@ class Builder:
         return self._add_field_spec(key, range_spec(data, **config))
 
     def rand_range(self, key: str, data: list, **config) -> FieldInfo:
-        """creates rand_range Field Spec and adds to Data Spec
+        """
+        creates rand_range Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -133,7 +142,8 @@ class Builder:
         return self._add_field_spec(key, rand_range(data, **config))
 
     def date(self, key: str, **config) -> FieldInfo:
-        """creates date Field Spec and adds to Data Spec
+        """
+        creates date Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -145,7 +155,8 @@ class Builder:
         return self._add_field_spec(key, date(**config))
 
     def date_iso(self, key: str, **config) -> FieldInfo:
-        """creates date.iso Field Spec and adds to Data Spec
+        """
+        creates date.iso Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -157,7 +168,8 @@ class Builder:
         return self._add_field_spec(key, date_iso(**config))
 
     def date_iso_us(self, key: str, **config) -> FieldInfo:
-        """creates date.iso.us Field Spec and adds to Data Spec
+        """
+        creates date.iso.us Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -169,7 +181,8 @@ class Builder:
         return self._add_field_spec(key, date_iso_us(**config))
 
     def uuid(self, key: str, **config) -> FieldInfo:
-        """creates uuid Field Spec and adds to Data Spec
+        """
+        creates uuid Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -181,7 +194,8 @@ class Builder:
         return self._add_field_spec(key, uuid(**config))
 
     def char_class(self, key: str, data: Union[str, List[str]], **config) -> FieldInfo:
-        """creates char_class Field Spec and adds to Data Spec
+        """
+        creates char_class Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -194,7 +208,8 @@ class Builder:
         return self._add_field_spec(key, char_class(data, **config))
 
     def char_class_abbrev(self, key: str, cc_abbrev: str, **config) -> FieldInfo:
-        """creates char_class_abbrev Field Spec and adds to Data Spec
+        """
+        creates char_class_abbrev Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -207,7 +222,8 @@ class Builder:
         return self._add_field_spec(key, char_class_abbrev(cc_abbrev, **config))
 
     def unicode_range(self, key: str, data: Union[List[str], List[List[str]]], **config) -> FieldInfo:
-        """creates unicode_range Field Spec and adds to Data Spec
+        """
+        creates unicode_range Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -220,7 +236,8 @@ class Builder:
         return self._add_field_spec(key, unicode_range(data, **config))
 
     def geo_lat(self, key: str, **config) -> FieldInfo:
-        """creates geo.lat Field Spec and adds to Data Spec
+        """
+        creates geo.lat Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -232,7 +249,8 @@ class Builder:
         return self._add_field_spec(key, geo_lat(**config))
 
     def geo_long(self, key: str, **config) -> FieldInfo:
-        """creates geo.long Field Spec and adds to Data Spec
+        """
+        creates geo.long Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -244,7 +262,8 @@ class Builder:
         return self._add_field_spec(key, geo_long(**config))
 
     def geo_pair(self, key: str, **config) -> FieldInfo:
-        """creates geo.pair Field Spec and adds to Data Spec
+        """
+        creates geo.pair Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -256,7 +275,8 @@ class Builder:
         return self._add_field_spec(key, geo_pair(**config))
 
     def ip(self, key: str, **config) -> FieldInfo:
-        """creates ip Field Spec and adds to Data Spec
+        """
+        creates ip Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -268,7 +288,8 @@ class Builder:
         return self._add_field_spec(key, ip(**config))
 
     def ipv4(self, key: str, **config) -> FieldInfo:
-        """creates ipv4 Field Spec and adds to Data Spec
+        """
+        creates ipv4 Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -280,7 +301,8 @@ class Builder:
         return self._add_field_spec(key, ipv4(**config))
 
     def ip_precise(self, key: str, **config) -> FieldInfo:
-        """creates ip.precise Field Spec and adds to Data Spec
+        """
+        creates ip.precise Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -292,7 +314,8 @@ class Builder:
         return self._add_field_spec(key, ip_precise(**config))
 
     def weightedref(self, key: str, data: Dict[str, float], **config) -> FieldInfo:
-        """creates weightedref Field Spec and adds to Data Spec
+        """
+        creates weightedref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -305,7 +328,8 @@ class Builder:
         return self._add_field_spec(key, weightedref(data, **config))
 
     def select_list_subset(self, key: str, data: List[Any] = None, ref: str = None, **config) -> FieldInfo:
-        """creates select_list_subset Field Spec and adds to Data Spec
+        """
+        creates select_list_subset Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -319,7 +343,8 @@ class Builder:
         return self._add_field_spec(key, select_list_subset(data, ref, **config))
 
     def csv(self, key: str, **config) -> FieldInfo:
-        """creates csv Field Spec and adds to Data Spec
+        """
+        creates csv Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -331,7 +356,8 @@ class Builder:
         return self._add_field_spec(key, csv(**config))
 
     def csv_select(self, key: str, data: Dict[str, int] = None, **config) -> FieldInfo:
-        """creates csv_select Field Spec and adds to Data Spec
+        """
+        creates csv_select Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -344,7 +370,8 @@ class Builder:
         return self._add_field_spec(key, csv_select(data, **config))
 
     def nested(self, key: str, fields: Union[Dict[str, Dict], DataSpec], **config) -> FieldInfo:
-        """creates nested Field Spec and adds to Data Spec
+        """
+        creates nested Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -357,7 +384,8 @@ class Builder:
         return self._add_field_spec(key, nested(fields, **config))
 
     def configref(self, key: str, **config) -> FieldInfo:
-        """creates configref Field Spec and adds to Data Spec
+        """
+        creates configref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -377,7 +405,8 @@ class Builder:
                   fields: dict = None,
                   formula: str = None,
                   **config) -> FieldInfo:
-        """creates calculate Field Spec and adds to Data Spec
+        """
+        creates calculate Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -392,7 +421,8 @@ class Builder:
         return self._add_field_spec(key, calculate(refs, fields, formula, **config))
 
     def ref(self, key: str, ref_name: str = None, data: str = None, **config) -> FieldInfo:
-        """creates ref Field Spec and adds to Data Spec
+        """
+        creates ref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -406,7 +436,8 @@ class Builder:
         return self._add_field_spec(key, ref(ref_name, data, **config))
 
     def weighted_csv(self, key: str, **config) -> FieldInfo:
-        """creates weighted_csv Field Spec and adds to Data Spec
+        """
+        creates weighted_csv Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -418,7 +449,8 @@ class Builder:
         return self._add_field_spec(key, weighted_csv(**config))
 
     def _add_field_spec(self, key, spec) -> FieldInfo:
-        """adds the fieldspec and creates a FieldInfo object
+        """
+        adds the fieldspec and creates a FieldInfo object
 
         Args:
             key: key for field
@@ -431,7 +463,8 @@ class Builder:
         return FieldInfo(key, spec['type'], self)
 
     def add_fields(self, **kwargs):
-        """Add all fields to the spec. See examples for formatting.
+        """
+        Add all fields to the spec. See examples for formatting.
 
         Args:
             **kwargs: where key is field name and value is a generated spec
@@ -451,7 +484,8 @@ class Builder:
         return self
 
     def add_field(self, key: Union[str, FieldInfo], spec: dict):
-        """Add single field to the spec.
+        """
+        Add single field to the spec.
 
         Args:
             key: field name
@@ -475,7 +509,8 @@ class Builder:
         return self
 
     def add_refs(self, **kwargs):
-        """Add all refs to the spec. See Examples for format.
+        """
+        Add all refs to the spec. See Examples for format.
 
         Args:
             **kwargs: where key is ref name and value is a generated spec
@@ -494,7 +529,8 @@ class Builder:
         return self
 
     def add_ref(self, key: str, spec: dict):
-        """Add single ref to the spec.
+        """
+        Add single ref to the spec.
 
         Args:
             key: ref name
@@ -515,7 +551,8 @@ class Builder:
         return self
 
     def weighted_field_group(self, key: str, fields: List[str], weight: float):
-        """Creates a weighted field group for a single key and add to Spec
+        """
+        Creates a weighted field group for a single key and add to Spec
 
         Args:
             key: the name of the field group
@@ -535,7 +572,8 @@ class Builder:
         return FieldInfo(key, 'field_group')
 
     def named_field_group(self, key: str, fields: List[str]):
-        """Create a named field group for a single key and add to Spec
+        """
+        Create a named field group for a single key and add to Spec
 
         Args:
             key: the name of the field group
@@ -551,7 +589,8 @@ class Builder:
         return FieldInfo(key, 'field_group')
 
     def add_field_groups(self, field_groups: List[Union[List[str], Dict[str, Dict]]]):
-        """Add a single field group
+        """
+        Add a single field group
 
         Args:
             field_groups: to add
@@ -564,7 +603,8 @@ class Builder:
         return self
 
     def add_field_group(self, field_group: Union[List[str], Dict[str, Dict]]):
-        """Add a single field group
+        """
+        Add a single field group
 
         Args:
             field_group: to add
@@ -576,7 +616,8 @@ class Builder:
         return self
 
     def build(self) -> DataSpec:
-        """Generates the spec from the provided fields, refs, and field_groups
+        """
+        Generates the spec from the provided fields, refs, and field_groups
 
         Returns:
             Built DataSpec
@@ -591,7 +632,8 @@ class Builder:
         return DataSpecImpl(spec)
 
     def _configure_field_groups(self, spec: dict):
-        """Adds the field_groups element to the spec if needed and defined"""
+        """
+        Adds the field_groups element to the spec if needed and defined"""
         all_dict = all(isinstance(entry, dict) for entry in self.field_groups)
         if all_dict:
             flattened = {}
@@ -604,7 +646,8 @@ class Builder:
 
 
 def spec_builder() -> Builder:
-    """Creates a new DataSpec builder
+    """
+    Creates a new DataSpec builder
 
     Returns:
         the Builder()
@@ -613,7 +656,8 @@ def spec_builder() -> Builder:
 
 
 def single_field(name: str, spec: dict) -> Builder:
-    """Creates Builder for single field and spec
+    """
+    Creates Builder for single field and spec
 
     Args:
         name: of field
@@ -626,7 +670,8 @@ def single_field(name: str, spec: dict) -> Builder:
 
 
 def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config) -> dict:
-    """Constructs a values Field Spec
+    """
+    Constructs a values Field Spec
 
     Args:
         data: to use to supply values
@@ -649,7 +694,8 @@ def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config)
 def combine(refs: Union[List[str], List[FieldInfo]] = None,
             fields: Union[List[str], List[FieldInfo]] = None,
             **config) -> dict:
-    """Constructs a combine Field Spec
+    """
+    Constructs a combine Field Spec
 
     Args:
         refs: refs to combine
@@ -674,7 +720,8 @@ def combine(refs: Union[List[str], List[FieldInfo]] = None,
 
 
 def combine_list(refs: List[Union[List[str], List[FieldInfo]]] = None, **config) -> dict:
-    """Constructs a combine-list Field Spec
+    """
+    Constructs a combine-list Field Spec
 
     Args:
         refs: lists of lists of refs to combine
@@ -696,7 +743,8 @@ def combine_list(refs: List[Union[List[str], List[FieldInfo]]] = None, **config)
 
 
 def range_spec(data: list, **config) -> dict:
-    """Constructs a range Field Spec
+    """
+    Constructs a range Field Spec
 
     Args:
         data: with start, end, and optional step
@@ -717,7 +765,8 @@ def range_spec(data: list, **config) -> dict:
 
 
 def rand_range(data: list, **config) -> dict:
-    """Constructs a rand_range Field Spec
+    """
+    Constructs a rand_range Field Spec
 
     Args:
         data: with start and end of ranges
@@ -738,7 +787,8 @@ def rand_range(data: list, **config) -> dict:
 
 
 def date(**config) -> dict:
-    """Constructs a date Field Spec
+    """
+    Constructs a date Field Spec
 
     Args:
         config: in **kwargs format
@@ -757,7 +807,8 @@ def date(**config) -> dict:
 
 
 def date_iso(**config) -> dict:
-    """Constructs a date.iso Field Spec
+    """
+    Constructs a date.iso Field Spec
 
     Args:
         config: in **kwargs format
@@ -776,7 +827,8 @@ def date_iso(**config) -> dict:
 
 
 def date_iso_us(**config) -> dict:
-    """Constructs a date.iso.us Field Spec
+    """
+    Constructs a date.iso.us Field Spec
 
     Args:
         config: in **kwargs format
@@ -795,7 +847,8 @@ def date_iso_us(**config) -> dict:
 
 
 def uuid(**config) -> dict:
-    """Constructs a uuid Field Spec
+    """
+    Constructs a uuid Field Spec
 
     Args:
         config: in **kwargs format
@@ -814,7 +867,8 @@ def uuid(**config) -> dict:
 
 
 def char_class(data: Union[str, List[str]], **config) -> dict:
-    """Constructs a char_class Field Spec
+    """
+    Constructs a char_class Field Spec
 
     Args:
         data: either known character class or set of characters to use for sampling from
@@ -835,7 +889,8 @@ def char_class(data: Union[str, List[str]], **config) -> dict:
 
 
 def char_class_abbrev(cc_abbrev: str, **config) -> dict:
-    """Constructs a char_class_abbrev Field Spec
+    """
+    Constructs a char_class_abbrev Field Spec
 
     Args:
         cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
@@ -859,7 +914,8 @@ def char_class_abbrev(cc_abbrev: str, **config) -> dict:
 
 
 def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
-    """Constructs a unicode_range Field Spec
+    """
+    Constructs a unicode_range Field Spec
 
     Args:
         data: hex start and end unicode ranges or lists of these
@@ -880,7 +936,8 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
 
 
 def geo_lat(**config) -> dict:
-    """Constructs a geo.lat Field Spec
+    """
+    Constructs a geo.lat Field Spec
 
     Args:
         config: in **kwargs format
@@ -899,7 +956,8 @@ def geo_lat(**config) -> dict:
 
 
 def geo_long(**config) -> dict:
-    """Constructs a geo.long Field Spec
+    """
+    Constructs a geo.long Field Spec
 
     Args:
         config: in **kwargs format
@@ -918,7 +976,8 @@ def geo_long(**config) -> dict:
 
 
 def geo_pair(**config) -> dict:
-    """Constructs a geo.pair Field Spec
+    """
+    Constructs a geo.pair Field Spec
 
     Args:
         config: in **kwargs format
@@ -937,7 +996,8 @@ def geo_pair(**config) -> dict:
 
 
 def ip(**config) -> dict:
-    """Constructs a ip Field Spec
+    """
+    Constructs a ip Field Spec
 
     Args:
         config: in **kwargs format
@@ -956,7 +1016,8 @@ def ip(**config) -> dict:
 
 
 def ipv4(**config) -> dict:
-    """Constructs a ipv4 Field Spec
+    """
+    Constructs a ipv4 Field Spec
 
     Args:
         config: in **kwargs format
@@ -975,7 +1036,8 @@ def ipv4(**config) -> dict:
 
 
 def ip_precise(**config) -> dict:
-    """Constructs a ip.precise Field Spec
+    """
+    Constructs a ip.precise Field Spec
 
     Args:
         config: in **kwargs format
@@ -994,7 +1056,8 @@ def ip_precise(**config) -> dict:
 
 
 def weightedref(data: Dict[str, float], **config) -> dict:
-    """Constructs a weightedref Field Spec
+    """
+    Constructs a weightedref Field Spec
 
     Args:
         data: Mapping of ref name to weight
@@ -1015,7 +1078,8 @@ def weightedref(data: Dict[str, float], **config) -> dict:
 
 
 def select_list_subset(data: List[Any] = None, ref: str = None, **config) -> dict:
-    """Constructs a select_list_subset Field Spec
+    """
+    Constructs a select_list_subset Field Spec
 
     Args:
         data: to select from
@@ -1040,7 +1104,8 @@ def select_list_subset(data: List[Any] = None, ref: str = None, **config) -> dic
 
 
 def csv(**config) -> dict:
-    """Constructs a csv Field Spec
+    """
+    Constructs a csv Field Spec
 
     Args:
         config: in **kwargs format
@@ -1059,7 +1124,8 @@ def csv(**config) -> dict:
 
 
 def csv_select(data: Dict[str, int] = None, **config) -> dict:
-    """Constructs a csv_select Field Spec
+    """
+    Constructs a csv_select Field Spec
 
     Args:
         data: Mapping of field name to one based column number
@@ -1081,7 +1147,8 @@ def csv_select(data: Dict[str, int] = None, **config) -> dict:
 
 
 def nested(fields: Union[Dict[str, Dict], DataSpec], **config) -> dict:
-    """Constructs a nested Field Spec
+    """
+    Constructs a nested Field Spec
 
     Args:
         fields: sub field specifications
@@ -1102,7 +1169,8 @@ def nested(fields: Union[Dict[str, Dict], DataSpec], **config) -> dict:
 
 
 def configref(**config) -> dict:
-    """Constructs a configref Field Spec
+    """
+    Constructs a configref Field Spec
 
     Args:
         config: in **kwargs format
@@ -1124,7 +1192,8 @@ def calculate(refs: dict = None,
               fields: dict = None,
               formula: str = None,
               **config) -> dict:
-    """Constructs a calculate Field Spec
+    """
+    Constructs a calculate Field Spec
 
     Args:
         refs: mapping of ref to alias to used in formula
@@ -1151,7 +1220,8 @@ def calculate(refs: dict = None,
 
 
 def ref(ref_name: str = None, data: str = None, **config) -> dict:
-    """Constructs a ref Field Spec
+    """
+    Constructs a ref Field Spec
 
     Args:
         ref_name: name of reference to get values from
@@ -1176,7 +1246,8 @@ def ref(ref_name: str = None, data: str = None, **config) -> dict:
 
 
 def weighted_csv(**config) -> dict:
-    """Constructs a weighted_csv Field Spec
+    """
+    Constructs a weighted_csv Field Spec
 
     Args:
         config: in **kwargs format
@@ -1195,7 +1266,8 @@ def weighted_csv(**config) -> dict:
 
 
 def _create_key_list(entries):
-    """Checks if entries are from FieldInfo objects and extracts keys
+    """
+    Checks if entries are from FieldInfo objects and extracts keys
 
     Args:
         entries: to create key list from
@@ -1212,7 +1284,8 @@ def _create_key_list(entries):
 
 
 def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
-    """Creates a generator for the raw spec for the specified iterations
+    """
+    Creates a generator for the raw spec for the specified iterations
 
     Args:
         raw_spec: to create generator for
@@ -1226,7 +1299,7 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
 
 
 class DataSpecImpl(DataSpec):
-    """Implementation for DataSpec"""
+    """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
         template = kwargs.get('template')

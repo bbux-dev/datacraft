@@ -36,7 +36,8 @@ class OutputHandlerInterface(ABC):
 
     @abstractmethod
     def handle(self, key: str, value: Any):
-        """This is called each time a new value is generated for a given field
+        """
+        This is called each time a new value is generated for a given field
 
         Args:
             key: the field name
@@ -48,7 +49,8 @@ class OutputHandlerInterface(ABC):
                         iteration: int,
                         group_name: str,
                         exclude_internal: bool = False):
-        """This is called whenever all of the fields for a record have been generated for one iteration
+        """
+        This is called whenever all of the fields for a record have been generated for one iteration
 
         Args:
             iteration: iteration we are on

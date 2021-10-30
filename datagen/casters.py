@@ -13,7 +13,8 @@ class CasterInterface(ABC):
 
     @abstractmethod
     def cast(self, value: Any) -> Any:
-        """casts the value according to the specified type
+        """
+        casts the value according to the specified type
 
         Args:
             value: to cast
@@ -27,7 +28,8 @@ class CasterInterface(ABC):
 
 
 class FloatCaster(CasterInterface):
-    """Casts values to floating point numbers if possible """
+    """
+    Casts values to floating point numbers if possible """
 
     def cast(self, value: Any) -> Union[float, List[float]]:
         try:
@@ -85,7 +87,8 @@ _CASTOR_MAP = {
 
 
 def get(name):
-    """Get the castor for the given name
+    """
+    Get the castor for the given name
 
     Args:
         name: of caster to get

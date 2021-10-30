@@ -102,7 +102,9 @@ class RotatingKeyListProvider(KeyProviderInterface):
         """
         Keys should be list of tuples of form:
          [(name1, [key1, key2, ..., keyN]), (name2, [key1, key2, ...keyN), ...]
-        :param keys: to rotate through
+
+        Args:
+            keys: to rotate through
         """
         self.keys = keys
         self.cnt = 0

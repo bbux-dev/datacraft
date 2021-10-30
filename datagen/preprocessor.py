@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 
 @datagen.registry.preprocessors('default')
 def preprocess_spec(raw_spec):
-    """Preprocesses the spec into a format that is easier to use.
+    """
+    Preprocesses the spec into a format that is easier to use.
     Pushes all url params in keys into config object. Converts shorthand specs into full specs
 
     Args:
@@ -41,7 +42,8 @@ def preprocess_spec(raw_spec):
 
 @datagen.registry.preprocessors('csv-select')
 def preprocess_csv_select(raw_spec):
-    """Converts and csv-select elements into standard csv ones
+    """
+    Converts and csv-select elements into standard csv ones
 
     Args:
         raw_spec: to process
@@ -81,7 +83,8 @@ def preprocess_csv_select(raw_spec):
 
 @datagen.registry.preprocessors('nested')
 def preprocess_nested(raw_spec):
-    """Converts all nested elements
+    """
+    Converts all nested elements
 
     Args:
         raw_spec: to process
@@ -123,7 +126,8 @@ def preprocess_nested(raw_spec):
 
 
 def _update_root_refs(updated_specs, updated):
-    """Updates to root refs if needed by popping the refs from the updated and merging with existing refs or creating
+    """
+    Updates to root refs if needed by popping the refs from the updated and merging with existing refs or creating
     a new refs element
 
     Args:
@@ -139,7 +143,8 @@ def _update_root_refs(updated_specs, updated):
 
 
 def _update_with_params(key, spec, updated_specs):
-    """handles the case that there are ?param=value portions in the key
+    """
+    handles the case that there are ?param=value portions in the key
     These get stripped out and pushed into the config object
     """
     newkey, spectype, params = _parse_key(key)
@@ -159,7 +164,8 @@ def _update_with_params(key, spec, updated_specs):
 
 
 def _update_no_params(key, spec, updated_specs):
-    """handles the case when there are no ?param=value portions in the key
+    """
+    handles the case when there are no ?param=value portions in the key
     key may have name:type notation that still needs to be handled
     """
     if ':' in key:
@@ -195,7 +201,8 @@ def _convert_to_values_if_needed(spec, spectype):
 
 
 def _parse_key(field_name):
-    """Expected key to have URL format. Two main forms:
+    """
+    Expected key to have URL format. Two main forms:
 
     1. field:field_type?param1=val&param2=val...
 
@@ -224,7 +231,8 @@ def _parse_key(field_name):
 
 
 def _is_spec_data(spec, spectype):
-    """Checks to see if the spec is data only
+    """
+    Checks to see if the spec is data only
 
     Args:
         spec: to check

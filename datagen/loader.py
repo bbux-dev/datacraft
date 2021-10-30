@@ -24,7 +24,8 @@ class Refs:
             self.refspec = {}
 
     def get(self, key):
-        """get the ref for the key
+        """
+        get the ref for the key
 
         Args:
             key: to use for lookup
@@ -48,7 +49,8 @@ class Loader:
         self.refs = Refs(self.specs.get('refs'))
 
     def get(self, key: str) -> suppliers.ValueSupplierInterface:
-        """Retrieve the value supplier for the given field or ref key
+        """
+        Retrieve the value supplier for the given field or ref key
 
         Args:
             key: key to for field or ref name
@@ -72,7 +74,8 @@ class Loader:
         return supplier
 
     def get_from_spec(self, field_spec: Any) -> suppliers.ValueSupplierInterface:
-        """Retrieve the value supplier for the given field spec
+        """
+        Retrieve the value supplier for the given field spec
 
         Args:
             field_spec: dictionary spec or literal values
@@ -113,7 +116,8 @@ class Loader:
         return supplier
 
     def get_ref_spec(self, key: str) -> dict:
-        """returns the spec for the ref with the provided key
+        """
+        returns the spec for the ref with the provided key
 
         Args:
              key: key to lookup ref by
@@ -133,7 +137,8 @@ def _validate_schema_for_spec(spec_type, field_spec):
 
 
 def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
-    """Uses the registered preprocessors to cumulatively update the spec
+    """
+    Uses the registered preprocessors to cumulatively update the spec
 
     Args:
         data_spec: to preprocess

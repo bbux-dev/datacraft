@@ -126,7 +126,6 @@ def gauss_date_timestamp(
 
     Returns:
         Distribution that gives normally distributed seconds since epoch for the given params
-
     """
     if center_date_str:
         center_date = datetime.datetime.strptime(center_date_str, date_format_string)

@@ -14,7 +14,8 @@ _MAPPING = {
 
 @datagen.registry.logging('default')
 def configure_logging(loglevel: str):
-    """Default Handler for Logging Configuration
+    """
+    Default Handler for Logging Configuration
 
     Args:
         loglevel: loglevel as specified from the command line

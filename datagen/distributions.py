@@ -12,6 +12,11 @@ class UniformDistribution(Distribution):
     """Class that samples values from a uniform distribution between the start and end points """
 
     def __init__(self, start: float, end: float):
+        """
+        Args:
+            start: of range
+            end: end or range
+        """
         self.start = start
         self.end = end
 
@@ -23,6 +28,11 @@ class GaussDistribution(Distribution):
     """Class that samples values from a normal distribution with provided mean and standard deviation """
 
     def __init__(self, mean: float, stddev: float):
+        """
+        Args:
+            mean: of range
+            stddev: of range
+        """
         self.mean = mean
         self.stddev = stddev
 
@@ -37,6 +47,12 @@ class BoundedDistribution(Distribution):
                  distribution: Distribution,
                  min_val: float = 0.0,
                  max_val: float = None):
+        """
+        Args:
+            distribution: to bound
+            min_val: min value to return
+            max_val: max value to return
+        """
         self.distribution = distribution
         self.min = min_val
         self.max = max_val
@@ -83,7 +99,8 @@ def _gaussian_distribution(mean, stddev, **kwargs):
 
 
 def from_string(dist_func_str: str) -> Distribution:
-    """Uses a function form of the distribution to look up and configure it
+    """
+    Uses a function form of the distribution to look up and configure it
 
     Distribution params need to use key=value format
 
@@ -129,7 +146,8 @@ def _invalid_args_for_func(dist_func, kwargs):
 
 
 def _convert_to_kwargs(args: str) -> Union[dict, None]:
-    """converts string of key=val, ..., key=val to dictionary
+    """
+    converts string of key=val, ..., key=val to dictionary
 
     Args:
         args: to convert

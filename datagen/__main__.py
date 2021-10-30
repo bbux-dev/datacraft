@@ -2,20 +2,20 @@
 """
 Entry point for datagen tool
 """
+import argparse
 import os
 import sys
-import json
-import argparse
 import logging
+
 import yaml
 
-from . import outputs, utils, types, preprocessor, template_engines, builder, SpecException
-# this activates the decorators, so they will be discoverable
+from . import outputs, utils, types, preprocessor, template_engines, builder
+from .logging_handler import *
+from .preprocessor import *
 from .supplier import *
 from .defaults import *
+# this activates the decorators, so they will be discoverable
 from .schemas import *
-from .preprocessor import *
-from .logging_handler import *
 
 log = logging.getLogger(__name__)
 
@@ -215,7 +215,8 @@ def _get_writer(args, outfile: str = None, overwrite: bool = False) -> outputs.W
 def _load_spec(args):
     """
     Attempts to load the spec first as JSON then as YAML if JSON fails.
-    :returns: Data Spec as Dictionary if loaded correctly.
+    Returns
+        Data Spec as Dictionary if loaded correctly.
     """
     spec_path = args.spec
     inline = args.inline
@@ -251,7 +252,9 @@ def _load_json_or_yaml(data_path):
 def _parse_spec_string(inline: str):
     """
     Attempts to parse the string into a datagen DataSpec. First tries to interpret as JSON, then as YAML.
-    :return: the parsed spec as a Dictionary
+
+    Returns:
+        the parsed spec as a Dictionary
     """
     if inline is None or inline.strip() == "":
         raise SpecException(f'Unable to load spec from empty string: {inline}, Please verify it is valid JSON or YAML')

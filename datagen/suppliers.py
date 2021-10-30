@@ -18,7 +18,8 @@ from . import types, casters, distributions, ValueSupplierInterface
 
 
 def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
-    """Based on data, return the appropriate values supplier. data can be a spec, constant, list, or dict.
+    """
+    Based on data, return the appropriate values supplier. data can be a spec, constant, list, or dict.
     or just the raw data
 
     Args:
@@ -70,7 +71,8 @@ def _data_not_in_spec(spec):
 
 
 def count_supplier_from_data(data: Union[int, List[int], Dict[str, float], Distribution]) -> ValueSupplierInterface:
-    """generates a supplier for the count parameter based on the type of the data
+    """
+    generates a supplier for the count parameter based on the type of the data
 
     valid data for counts:
 
@@ -107,7 +109,8 @@ def count_supplier_from_data(data: Union[int, List[int], Dict[str, float], Distr
 
 
 def count_supplier_from_config(config: dict) -> ValueSupplierInterface:
-    """creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
+    """
+    creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
 
     optionally can specify count or count_dist.
 
@@ -138,7 +141,8 @@ def count_supplier_from_config(config: dict) -> ValueSupplierInterface:
 
 
 def single_value(data: Any) -> ValueSupplierInterface:
-    """Creates value supplier for the single value
+    """
+    Creates value supplier for the single value
 
     Args:
         data: constant data to return on every iteration
@@ -156,7 +160,8 @@ def single_value(data: Any) -> ValueSupplierInterface:
 
 def array_supplier(wrapped: ValueSupplierInterface,
                    count_config: dict) -> ValueSupplierInterface:
-    """Wraps an existing supplier and always returns an array/list of elements, uses count config to determine
+    """
+    Wraps an existing supplier and always returns an array/list of elements, uses count config to determine
     number of items in the list
 
     Args:
@@ -178,7 +183,8 @@ def array_supplier(wrapped: ValueSupplierInterface,
 
 def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
                            modulate_iteration: bool = True) -> ValueSupplierInterface:
-    """Returns a supplier that rotates through the provided suppliers incrementally
+    """
+    Returns a supplier that rotates through the provided suppliers incrementally
 
     Args:
         supplier_list: to rotate through
@@ -199,7 +205,8 @@ def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
 def _value_list(data: list,
                 config: dict = None,
                 do_sampling: bool = False) -> ValueSupplierInterface:
-    """creates a value list supplier
+    """
+    creates a value list supplier
 
     Args:
         data: for the supplier
@@ -216,7 +223,8 @@ def _value_list(data: list,
 
 
 def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
-    """creates a weighted value supplier
+    """
+    creates a weighted value supplier
 
 
     Args:
@@ -245,7 +253,8 @@ def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
 
 
 def combine(suppliers, config=None):
-    """Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
+    """
+    Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
     join the values with an empty string. Provide the join_with config param to specify a different string to
     join the values with. Set as_list to true, if the values should be returned as a list and not joined
 
@@ -271,7 +280,8 @@ def random_range(start:Union[str, int, float],
                  end: Union[str, int, float],
                  precision: Union[str, int, float] = None,
                  count: Union[int, List[int], Dict[str, float], Distribution] = 1) -> ValueSupplierInterface:
-    """Creates a random range supplier for the start and end parameters with the given precision
+    """
+    Creates a random range supplier for the start and end parameters with the given precision
     (number of decimal places)
 
     Args:
@@ -293,7 +303,8 @@ def random_range(start:Union[str, int, float],
 
 def list_stat_sampler(data: Union[str, list],
                       config: dict) -> ValueSupplierInterface:
-    """sample from list (or string) with stats based params
+    """
+    sample from list (or string) with stats based params
 
     Args:
         data: list to select subset from
@@ -317,7 +328,8 @@ def list_stat_sampler(data: Union[str, list],
 
 
 def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
-    """Samples N elements from data list based on config.  If count is provided,
+    """
+    Samples N elements from data list based on config.  If count is provided,
     each iteration exactly count elements will be returned.  If only min is provided,
     between min and the total number of elements will be provided. If only max is provided,
     between one and max elements will be returned. Specifying both min and max will provide
@@ -349,7 +361,8 @@ def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
 
 
 def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
-    """creates a ValueSupplier that uses the given distribution to generate values
+    """
+    creates a ValueSupplier that uses the given distribution to generate values
 
     Args:
         distribution: to use
@@ -363,7 +376,8 @@ def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
 
 
 def is_decorated(field_spec: dict) -> bool:
-    """is this spec a decorated one
+    """
+    is this spec a decorated one
 
     Args:
         field_spec: to check
@@ -378,7 +392,8 @@ def is_decorated(field_spec: dict) -> bool:
 
 
 def decorated(field_spec: dict, supplier: ValueSupplierInterface) -> ValueSupplierInterface:
-    """Creates a decorated supplier around the provided one
+    """
+    Creates a decorated supplier around the provided one
 
     Args:
         field_spec: the spec
@@ -391,7 +406,8 @@ def decorated(field_spec: dict, supplier: ValueSupplierInterface) -> ValueSuppli
 
 
 def is_cast(field_spec: dict) -> bool:
-    """is this spec requires casting
+    """
+    is this spec requires casting
 
     Args:
         field_spec: to check
@@ -408,7 +424,8 @@ def is_cast(field_spec: dict) -> bool:
 def cast_supplier(supplier: ValueSupplierInterface,
                   field_spec: dict = None,
                   cast_to: str = None) -> ValueSupplierInterface:
-    """Provides a cast_supplier either from config or from explicit cast_to
+    """
+    Provides a cast_supplier either from config or from explicit cast_to
 
     Args:
         supplier: to cast results of
@@ -431,7 +448,8 @@ def cast_supplier(supplier: ValueSupplierInterface,
 
 
 def is_buffered(field_spec: dict) -> bool:
-    """Should the values for this spec be buffered
+    """
+    Should the values for this spec be buffered
 
     Args:
         field_spec: to check
@@ -445,10 +463,11 @@ def is_buffered(field_spec: dict) -> bool:
 
 
 def buffered(wrapped: ValueSupplierInterface, field_spec: dict) -> ValueSupplierInterface:
-    """Creates a Value Supplier that buffers the results of the wrapped supplier allowing the retrieval
+    """
+    Creates a Value Supplier that buffers the results of the wrapped supplier allowing the retrieval
 
     Args:
-        wrapped: the Value Supplir to buffer values for
+        wrapped: the Value Supplier to buffer values for
         field_spec: to check
 
     Returns:
