@@ -1,8 +1,8 @@
 import os
-import pytest
+
 import datagen
+
 # need this to trigger registration
-from datagen.supplier.core import csv
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
@@ -15,6 +15,16 @@ def test_weighted_csv_valid_with_header_indexed_column():
     val = next(gen)
     assert 'status' in val
     assert val['status'].isnumeric()
+
+
+def test_weighted_csv_count_greater_than_one():
+    spec = _build_csv_spec('status', column='status', weight_column='weight', headers='on', count=2)
+
+    gen = spec.generator(3, data_dir=test_dir)
+
+    val = next(gen)
+    assert 'status' in val
+    assert isinstance(val['status'], list)
 
 
 def test_weighted_csv_valid_with_header_named_column():
