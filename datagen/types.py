@@ -31,8 +31,12 @@ class registry:
 def lookup_type(key):
     """
     Looks up the type in the registry
-    :param key: for type to look up
-    :return: the type if found
+
+    Args:
+        key: for type to look up
+
+    Returns:
+        the type if found
     """
     return registry.types.get(key)
 
@@ -40,8 +44,12 @@ def lookup_type(key):
 def lookup_schema(key):
     """
     Looks up the schema in the registry
-    :param key: for schema to look up
-    :return: the schema if found
+
+    Args:
+        key: for schema to look up
+
+    Returns:
+        the schema if found
     """
     all_keys = list(registry.schemas.get_all().keys())
     if key in all_keys:
@@ -59,13 +67,28 @@ def valid_formats():
 
 
 def get_default(key):
-    """ get the default value for the specified key """
+    """
+    get the default value for the specified key
+
+    Args:
+        key: to lookup
+
+    Returns:
+        The default for thekey
+    """
+
     func = registry.defaults.get(key)
     return func()
 
 
 def set_default(key: str, value: Any):
-    """ set the default value for the given key in the registry """
+    """
+    set the default value for the given key in the registry
+
+    Args:
+        key: to set default for
+        value: for the default
+    """
     registry.defaults.register(name=key, func=lambda *_: value)
 
 

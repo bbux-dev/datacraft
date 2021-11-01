@@ -10,8 +10,12 @@ from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape 
 def for_file(template_file: Union[str, Path]):
     """
     Loads the templating engine for the template file specified
-    :param template_file: to fill in, string or Path
-    :return: the templating engine
+
+    Args:
+        template_file: to fill in, string or Path
+
+    Returns:
+        the templating engine
     """
     return Jinja2Engine(template_file)
 
@@ -37,8 +41,12 @@ class Jinja2Engine:
     def process(self, record):
         """
         Render the template using the fields in the provided record
-        :param record: dictionary of field in template to value to populate the field with
-        :return: The rendered template
+
+        Args:
+            record: dictionary of field in template to value to populate the field with
+
+        Returns:
+            The rendered template
         """
         template = self.env.get_template(self.template_name)
         return template.render(record)
@@ -59,8 +67,12 @@ class Jinja2StringEngine:
     def process(self, record):
         """
         Render the template using the fields in the provided record
-        :param record: dictionary of field in template to value to populate the field with
-        :return: The rendered template
+
+        Args:
+            record: dictionary of field in template to value to populate the field with
+
+        Returns:
+            The rendered template
         """
         template = self.env.from_string(self.template)
         return template.render(record)

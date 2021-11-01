@@ -10,16 +10,18 @@ UUID_KEY = 'uuid'
 
 class UuidSupplier(datagen.ValueSupplierInterface):
     """ Value Supplier for uuid type """
+
     def next(self, _):
         return str(uuid.uuid4())
 
 
 @datagen.registry.schemas(UUID_KEY)
-def get_uuid_schema():
+def _get_uuid_schema():
+    """ get the schema for uuid type """
     return datagen.schemas.load(UUID_KEY)
 
 
 @datagen.registry.types(UUID_KEY)
-def configure_supplier(_, __):
+def _configure_supplier(_, __):
     """ configure the supplier for uuid types """
     return UuidSupplier()

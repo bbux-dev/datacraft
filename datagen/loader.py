@@ -4,7 +4,7 @@ delegating the handling of various data types.
 """
 
 import json
-from typing import Union, Dict
+from typing import Any, Dict, Union
 
 from . import suppliers
 from . import utils
@@ -15,9 +15,7 @@ from .types import lookup_type, lookup_schema, registry
 
 
 class Refs:
-    """
-    Holder object for references
-    """
+    """Holder object for references """
 
     def __init__(self, refspec):
         if refspec:
@@ -26,14 +24,20 @@ class Refs:
             self.refspec = {}
 
     def get(self, key):
-        """ get the ref for the key """
+        """
+        get the ref for the key
+
+        Args:
+            key: to use for lookup
+
+        Returns:
+            The ref
+        """
         return self.refspec.get(key)
 
 
 class Loader:
-    """
-    Parent object for loading value suppliers from specs
-    """
+    """Parent object for loading value suppliers from specs """
     RESERVED = ['type', 'data', 'ref', 'refs', 'config']
 
     def __init__(self, data_spec, data_dir='./data', enforce_schema=False):
@@ -44,11 +48,18 @@ class Loader:
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
 
-    def get(self, key):
+    def get(self, key: str) -> suppliers.ValueSupplierInterface:
         """
         Retrieve the value supplier for the given field or ref key
 
-        :param key: key to for field or ref name
+        Args:
+            key: key to for field or ref name
+
+        Returns:
+            the Value Supplier for the given key
+
+        Raises:
+            SpecException if key not found
         """
         if key in self.cache:
             return self.cache[key]
@@ -62,9 +73,18 @@ class Loader:
         self.cache[key] = supplier
         return supplier
 
-    def get_from_spec(self, field_spec):
+    def get_from_spec(self, field_spec: Any) -> suppliers.ValueSupplierInterface:
         """
         Retrieve the value supplier for the given field spec
+
+        Args:
+            field_spec: dictionary spec or literal values
+
+        Returns:
+            the Value Supplier for the given spec
+
+        Raises:
+            SpecException if unable to resolve the spec with appropriate handler for the type
         """
         if isinstance(field_spec, list):
             spec_type = None
@@ -95,12 +115,21 @@ class Loader:
             supplier = suppliers.buffered(supplier, field_spec)
         return supplier
 
-    def get_ref_spec(self, key):
-        """ returns the spec for the ref with the provided key """
+    def get_ref_spec(self, key: str) -> dict:
+        """
+        returns the spec for the ref with the provided key
+
+        Args:
+             key: key to lookup ref by
+
+        Returns:
+            Ref for key
+        """
         return self.refs.get(key)
 
 
 def _validate_schema_for_spec(spec_type, field_spec):
+    """ validates the schema for the given spec type and field spec """
     type_schema = lookup_schema(spec_type)
     if type_schema is None:
         return
@@ -110,8 +139,12 @@ def _validate_schema_for_spec(spec_type, field_spec):
 def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     """
     Uses the registered preprocessors to cumulatively update the spec
-    :param data_spec: to preprocess
-    :return: updated version of the spec after all preprocessors have run on it
+
+    Args:
+        data_spec: to preprocess
+
+    Returns:
+        updated version of the spec after all preprocessors have run on it
     """
     raw_spec = utils.get_raw_spec(data_spec)
     updated = dict(raw_spec)

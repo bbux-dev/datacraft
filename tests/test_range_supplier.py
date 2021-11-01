@@ -6,26 +6,26 @@ from datagen.supplier.core import range_suppliers
 
 def test_range_lists_missing_data():
     with pytest.raises(SpecException):
-        range_suppliers.configure_range_supplier({'type': 'range_list'}, None)
+        range_suppliers._configure_range_supplier({'type': 'range_list'}, None)
 
 
 def test_range_lists_invalid_data_type():
     with pytest.raises(SpecException):
-        range_suppliers.configure_range_supplier({'type': 'range_list', 'data': 42}, None)
+        range_suppliers._configure_range_supplier({'type': 'range_list', 'data': 42}, None)
 
 
 def test_range_lists_end_before_start():
     start = 10
     end = 9
     with pytest.raises(SpecException):
-        range_suppliers.configure_range_supplier({'type': 'range_list', 'data': [start, end]}, None)
+        range_suppliers._configure_range_supplier({'type': 'range_list', 'data': [start, end]}, None)
 
 
 def test_range_lists_valid():
     start = 2
     end = 10
     step = 2
-    supplier = range_suppliers.configure_range_supplier({'type': 'range_list', 'data': [start, end, step]}, None)
+    supplier = range_suppliers._configure_range_supplier({'type': 'range_list', 'data': [start, end, step]}, None)
 
     expected = [2, 4, 6, 8, 10]
     actual = [supplier.next(i) for i in range(5)]
@@ -37,7 +37,7 @@ def test_range_lists_float_step():
     start = 0
     end = 1
     step = .1
-    supplier = range_suppliers.configure_range_supplier({'type': 'range_list', 'data': [start, end, step]}, None)
+    supplier = range_suppliers._configure_range_supplier({'type': 'range_list', 'data': [start, end, step]}, None)
 
     expected = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
     actual = [supplier.next(i) for i in range(11)]
@@ -48,7 +48,7 @@ def test_range_lists_float_step():
 def test_range_lists_float_start_end():
     start = 0.5
     end = 5.5
-    supplier = range_suppliers.configure_range_supplier({'type': 'range_list', 'data': [start, end]}, None)
+    supplier = range_suppliers._configure_range_supplier({'type': 'range_list', 'data': [start, end]}, None)
 
     expected = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5]
     actual = [supplier.next(i) for i in range(6)]

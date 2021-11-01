@@ -3,6 +3,7 @@ Module for holding classes for common supporting Value Suppliers.  These are not
 modify or wrap the functionality of the core suppliers.
 
 """
+from typing import List, Union
 import random
 from collections import deque
 
@@ -15,6 +16,10 @@ class SingleValue(datagen.ValueSupplierInterface):
     """
 
     def __init__(self, data):
+        """
+        Args:
+            data: single value to return every iteration
+        """
         self.data = data
 
     def next(self, _):
@@ -26,7 +31,14 @@ class MultipleValueSupplier(datagen.ValueSupplierInterface):
     Supplier that generates list of values based on count parameter
     """
 
-    def __init__(self, wrapped: datagen.ValueSupplierInterface, count_supplier: datagen.ValueSupplierInterface):
+    def __init__(self,
+                 wrapped: datagen.ValueSupplierInterface,
+                 count_supplier: datagen.ValueSupplierInterface):
+        """
+        Args:
+            wrapped: supplier that provides values
+            count_supplier: supplier that provides the number of values to generate
+        """
         self.wrapped = wrapped
         self.count_supplier = count_supplier
 
@@ -40,10 +52,13 @@ class RotatingSupplierList(datagen.ValueSupplierInterface):
     Class that rotates through a list of suppliers incrementally to provide the next value
     """
 
-    def __init__(self, suppliers, modulate_iteration):
+    def __init__(self,
+                 suppliers: List[datagen.ValueSupplierInterface],
+                 modulate_iteration: bool):
         """
-        :param suppliers: list of suppliers to rotate through
-        :param modulate_iteration: if the iteration should be split evenly across all suppliers
+        Args:
+            suppliers: list of suppliers to rotate through
+            modulate_iteration: if the iteration should be split evenly across all suppliers
         """
         self.suppliers = suppliers
         self.modulate_iteration = modulate_iteration
@@ -62,7 +77,12 @@ class DecoratedSupplier(datagen.ValueSupplierInterface):
     prefix or suffix or to surround the output with quotes
     """
 
-    def __init__(self, config, supplier):
+    def __init__(self, config: dict, supplier: datagen.ValueSupplierInterface):
+        """
+        Args:
+            config: configuration
+            supplier: to decorate
+        """
         self.prefix = config.get('prefix', '')
         self.suffix = config.get('suffix', '')
         self.quote = config.get('quote', '')
@@ -70,7 +90,7 @@ class DecoratedSupplier(datagen.ValueSupplierInterface):
 
     def next(self, iteration):
         value = self.wrapped.next(iteration)
-        # todo: cache mapping for efficiency?
+        # todo: cache for efficiency?
         return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
 
 
@@ -79,7 +99,14 @@ class CastingSupplier(datagen.ValueSupplierInterface):
     Class that just casts the results of other suppliers
     """
 
-    def __init__(self, wrapped, caster):
+    def __init__(self,
+                 wrapped: datagen.ValueSupplierInterface,
+                 caster: datagen.CasterInterface):
+        """
+        Args:
+            wrapped: supplier to get values from
+            caster: to use to cast values
+        """
         self.wrapped = wrapped
         self.caster = caster
 
@@ -92,7 +119,18 @@ class RandomRangeSupplier(datagen.ValueSupplierInterface):
     Class that supplies values uniformly selected from specified bounds
     """
 
-    def __init__(self, start, end, precision, count_supplier: datagen.ValueSupplierInterface):
+    def __init__(self,
+                 start: Union[str, int, float],
+                 end: Union[str, int, float],
+                 precision: Union[str, int, float, None],
+                 count_supplier: datagen.ValueSupplierInterface):
+        """
+        Args:
+            start: of range
+            end: of range
+            precision: decimal places to keep
+            count_supplier: to supply number of values to return
+        """
         self.start = float(start)
         self.end = float(end)
         self.precision = precision
@@ -111,12 +149,16 @@ class RandomRangeSupplier(datagen.ValueSupplierInterface):
 
 class DistributionBackedSupplier(datagen.ValueSupplierInterface):
     """
-    Class that supplies values selected from a distribution such as a Guassian or Uniform distribution.
+    Class that supplies values selected from a distribution such as a Gaussian or Uniform distribution.
 
     @see datagen.distributions
     """
 
     def __init__(self, distribution: datagen.Distribution):
+        """
+        Args:
+            distribution: to use to generate values
+        """
         self.distribution = distribution
 
     def next(self, _):
@@ -130,6 +172,11 @@ class BufferedValueSuppier(datagen.ValueSupplierInterface):
     """
 
     def __init__(self, wrapped: datagen.ValueSupplierInterface, buffer_size: int):
+        """
+        Args:
+            wrapped: supplier to buffer values for
+            buffer_size: size of buffer to use
+        """
         self.wrapped = wrapped
         self.buffer: deque = deque(maxlen=buffer_size)
         self.current = -1

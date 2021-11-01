@@ -18,3 +18,13 @@ def test_uuid_spec():
     assert UUID_REGEX.match(value2)
 
     assert value1 != value2
+
+
+def test_uuid_schema():
+    # for coverage
+    spec = builder.single_field("foo:uuid", {}).build()
+    loader = Loader(spec, enforce_schema=True)
+    supplier = loader.get('foo')
+
+    value1 = supplier.next(0)
+    assert UUID_REGEX.match(value1)

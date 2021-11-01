@@ -12,6 +12,11 @@ def test_valid_key_forms():
         assert caster.cast('1.1') == 1.1
 
 
+def test_none_is_none():
+    caster = get_caster({'cast': None})
+    assert caster is None
+
+
 def test_valid_type_cast_forms1():
     input_value = '42.2'
     type_map = {
@@ -21,7 +26,9 @@ def test_valid_type_cast_forms1():
         'float': 42.2,
         's': input_value,
         'str': input_value,
-        'string': input_value
+        'string': input_value,
+        'h': str(hex(42)),
+        'hex': str(hex(42)),
     }
     _test_valid_type_cast_forms(input_value, type_map)
 
@@ -34,8 +41,8 @@ def test_valid_type_cast_forms2():
         'f': 123.0,
         'float': 123.0,
         's': input_value,
-        'str': input_value,
-        'string': input_value
+        'h': str(hex(123)),
+        'hex': str(hex(123))
     }
     _test_valid_type_cast_forms(input_value, type_map)
 
@@ -58,6 +65,12 @@ def test_valid_type_cast_int_weirdness():
     _test_valid_type_cast_forms(input_value, type_map)
 
 
+def test_hex_cast_value_error():
+    caster = get_caster({'cast': 'hex'})
+    with pytest.raises(SpecException):
+        caster.cast('abc123')
+
+
 def test_castors_handle_lists():
     input_value = [1.1, 2.2, 3.3]
     type_map = {
@@ -68,6 +81,8 @@ def test_castors_handle_lists():
         's': ['1.1', '2.2', '3.3'],
         'str': ['1.1', '2.2', '3.3'],
         'string': ['1.1', '2.2', '3.3'],
+        'h': [str(hex(1)), str(hex(2)), str(hex(3))],
+        'hex': [str(hex(1)), str(hex(2)), str(hex(3))],
     }
     _test_valid_type_cast_forms(input_value, type_map)
 

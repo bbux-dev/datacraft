@@ -6,13 +6,20 @@ import random
 import datagen
 
 
-
 class WeightedValueSupplier(datagen.ValueSupplierInterface):
     """
     Value supplier implementation for weighted values
     """
 
-    def __init__(self, choices: list, weights: list, count_supplier: datagen.ValueSupplierInterface):
+    def __init__(self, choices: list,
+                 weights: list,
+                 count_supplier: datagen.ValueSupplierInterface):
+        """
+        Args:
+            choices: list of choices to sample from
+            weights: list of weights to use for random choice
+            count_supplier: supplies number of values to sample
+        """
         # may be passed raw data or a spec
         self.choices = choices
         self.weights = weights

@@ -1,6 +1,7 @@
 """
 Module to hold models for core data structures and classes
 """
+from abc import ABC, abstractmethod
 
 
 class DataSpec(dict):
@@ -32,50 +33,51 @@ class DataSpec(dict):
     def generator(self, iterations: int, **kwargs):
         """
         Creates a generator that will produce records or render the template for each record
+        Args:
+            iterations: number of iterations to execute
+            **kwargs:
 
-        Usage:
+        Yields:
+            Records or rendered template strings
 
-        >>> import datagen
+        Examples:
 
-        >>> builder = datagen.Builder()
-        >>> builder.values(['bob', 'bobby', 'robert', 'bobo']))
-
-        >>> spec = builder.build()
-
-        >>> template = 'Name: {{ name }}'
-
-        >>> generator = spec.generator(
-        >>>     iterations=4,
-        >>>     template=template)
-
-        >>>  for i in range(5):
-        >>>      try:
-        >>>          record = next(generator)
-        >>>          print(record)
-        >>>      except StopIteration:
-        >>>          pass
-
-        :param iterations: the number of iterations to run
-        :return: record generator
+            >>> import datagen
+            >>> builder = datagen.spec_builder()
+            >>> builder.values(['bob', 'bobby', 'robert', 'bobo']))
+            >>> spec = builder.build()
+            >>> template = 'Name: {{ name }}'
+            >>> generator = spec.generator(
+            ...     iterations=4,
+            ...     template=template)
+            >>> record = next(generator)
+            >>> print(record)
+            Name: bob
         """
 
 
-class Distribution:
+class Distribution(ABC):
     """
     Interface Class for a numeric distribution such as a Uniform or Gaussian distribution
     """
 
+    @abstractmethod
     def next_value(self) -> float:
         """ get the next value for this distribution """
 
 
-class ValueSupplierInterface:
+class ValueSupplierInterface(ABC):
     """
     Interface for Classes that supply values
     """
+
+    @abstractmethod
     def next(self, iteration):
         """
         Produces the next value for the given iteration
-        :param iteration: current iteration
-        :return: the next value
+        Args:
+            iteration: current iteration
+
+        Returns:
+            the next value
         """

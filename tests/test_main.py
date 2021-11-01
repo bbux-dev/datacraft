@@ -55,7 +55,7 @@ def _test_default_is_changed(key, args, expected):
 
 
 def test_parse_debug_spec(tmpdir):
-    args = ['--debug-spec', '-o', str(tmpdir), '--inline', '{}']
+    args = ['--debug-spec', '-o', str(tmpdir), '--inline', '{foo: [1,2,3]}']
     dgmain.main(args)
     assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
 

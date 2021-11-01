@@ -2,25 +2,26 @@
 """
 Entry point for datagen tool
 """
+import argparse
 import os
 import sys
-import json
-import argparse
 import logging
+
 import yaml
 
-from . import outputs, utils, types, preprocessor, template_engines, builder, SpecException
-# this activates the decorators, so they will be discoverable
+from . import outputs, utils, types, preprocessor, template_engines, builder
+from .logging_handler import *
+from .preprocessor import *
 from .supplier import *
 from .defaults import *
-from .preprocessor import *
-from .logging_handler import *
+# this activates the decorators, so they will be discoverable
+from .schemas import *
 
 log = logging.getLogger(__name__)
 
 
 def wrap_main():
-    """ wraps main with try except for SpecException """
+    """wraps main with try except for SpecException """
     try:
         main(sys.argv[1:])
     except SpecException as exc:
@@ -28,9 +29,7 @@ def wrap_main():
 
 
 def main(argv):
-    """
-    Runs the tool
-    """
+    """Runs the tool """
     parser = argparse.ArgumentParser(description='Run datagen.')
     group = parser.add_argument_group('input')
     group.add_argument('-s', '--spec', help='Spec to Use')
@@ -161,7 +160,6 @@ def main(argv):
     log.info('Finished Processing')
 
 
-
 def _configure_output(args):
     """
     Configures the output. Loads templates and applies the specified formatter if any.
@@ -180,7 +178,7 @@ def _configure_output(args):
 
     if args.format:
         log.debug('Using %s formatter for output', args.format)
-        formatter = outputs.FormatProcessor(args.format)
+        formatter = outputs.for_format(args.format)
         return outputs.RecordLevelOutput(formatter, writer)
 
     # default
@@ -217,7 +215,8 @@ def _get_writer(args, outfile: str = None, overwrite: bool = False) -> outputs.W
 def _load_spec(args):
     """
     Attempts to load the spec first as JSON then as YAML if JSON fails.
-    :returns: Data Spec as Dictionary if loaded correctly.
+    Returns
+        Data Spec as Dictionary if loaded correctly.
     """
     spec_path = args.spec
     inline = args.inline
@@ -253,19 +252,23 @@ def _load_json_or_yaml(data_path):
 def _parse_spec_string(inline: str):
     """
     Attempts to parse the string into a datagen DataSpec. First tries to interpret as JSON, then as YAML.
-    :return: the parsed spec as a Dictionary
-    """
 
+    Returns:
+        the parsed spec as a Dictionary
+    """
+    if inline is None or inline.strip() == "":
+        raise SpecException(f'Unable to load spec from empty string: {inline}, Please verify it is valid JSON or YAML')
     try:
         return json.loads(inline)
-    except json.decoder.JSONDecodeError:
-        log.debug('Spec is not Valid JSON')
+    except json.decoder.JSONDecodeError as err:
+        log.debug('Spec is not Valid JSON: %s', str(err))
     # not JSON, try yaml
     log.debug('Attempting to load spec as YAML')
-    spec = yaml.load(inline, Loader=yaml.FullLoader)
-    if not isinstance(spec, dict):
-        raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
-    return spec
+    try:
+        return yaml.load(inline, Loader=yaml.FullLoader)
+    except yaml.parser.ParserError as err:
+        log.debug('Spec is not Valid YAML %s', str(err))
+    raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
 
 
 def _configure_logging(args):
@@ -275,4 +278,3 @@ def _configure_logging(args):
     for name in types.registry.logging.get_all():
         configure_function = types.registry.logging.get(name)
         configure_function(args.log_level)
-

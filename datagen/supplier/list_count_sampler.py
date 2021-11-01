@@ -12,7 +12,13 @@ class ListCountSamplerSupplier(datagen.ValueSupplierInterface):
 
     def __init__(self, data: Union[str, list],
                  count_supplier: datagen.ValueSupplierInterface,
-                 join_with: str = ''):
+                 join_with: Union[str, None] = ''):
+        """
+        Args:
+            data: string or list to sample from
+            count_supplier: to supply number of values to return
+            join_with: how to join the values into a string, None means return as list
+        """
         self.values = data
         self.count_supplier = count_supplier
         self.join_with = join_with

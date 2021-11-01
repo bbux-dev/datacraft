@@ -1,18 +1,22 @@
 """
 Module for numeric distributions such as uniform or gaussian
 """
+from typing import Union
 import random
 import inspect
 import datagen
-from datagen.model import Distribution
+from .model import Distribution
 
 
 class UniformDistribution(Distribution):
-    """
-    Class that samples values from a uniform distribution between the start and end points
-    """
+    """Class that samples values from a uniform distribution between the start and end points """
 
     def __init__(self, start: float, end: float):
+        """
+        Args:
+            start: of range
+            end: end or range
+        """
         self.start = start
         self.end = end
 
@@ -21,11 +25,14 @@ class UniformDistribution(Distribution):
 
 
 class GaussDistribution(Distribution):
-    """
-    Class that samples values from a normal distribution with provided mean and standard deviation
-    """
+    """Class that samples values from a normal distribution with provided mean and standard deviation """
 
     def __init__(self, mean: float, stddev: float):
+        """
+        Args:
+            mean: of range
+            stddev: of range
+        """
         self.mean = mean
         self.stddev = stddev
 
@@ -34,14 +41,18 @@ class GaussDistribution(Distribution):
 
 
 class BoundedDistribution(Distribution):
-    """
-    Class bounds another distribution
-    """
+    """Class bounds another distribution """
 
     def __init__(self,
                  distribution: Distribution,
                  min_val: float = 0.0,
                  max_val: float = None):
+        """
+        Args:
+            distribution: to bound
+            min_val: min value to return
+            max_val: max value to return
+        """
         self.distribution = distribution
         self.min = min_val
         self.max = max_val
@@ -91,11 +102,19 @@ def from_string(dist_func_str: str) -> Distribution:
     """
     Uses a function form of the distribution to look up and configure it
 
-    >>> distribution = datagen.distributions.from_string("uniform(start=10, end=25)")
-
     Distribution params need to use key=value format
-    :param dist_func_str:
-    :return: the specified distribution if registered
+
+    Args:
+        dist_func_str: that specifies the distribution along with its args
+
+    Returns:
+        the specified distribution if registered
+
+    Examples:
+        >>> import datagen
+        >>> distribution = datagen.distributions.from_string("uniform(start=10, end=25)")
+        >>> distribution.next_value()
+        22.87795012038216
     """
     try:
         open_paren = dist_func_str.index('(')
@@ -126,11 +145,15 @@ def _invalid_args_for_func(dist_func, kwargs):
     return sorted(actual_args) != sorted(expected_args)
 
 
-def _convert_to_kwargs(args):
+def _convert_to_kwargs(args: str) -> Union[dict, None]:
     """
     converts string of key=val, ..., key=val to dictionary
-    :param args: to convert
-    :return: dictionary of key values
+
+    Args:
+        args: to convert
+
+    Returns:
+        dictionary of key values
     """
     parts = args.split(',')
     kwargs = {}

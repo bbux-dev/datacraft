@@ -32,48 +32,34 @@
       "params": [
         {
           "name": "refs",
-          "type": "List[List[Union[str, FieldInfo]]] = None",
+          "type": "List[Union[List[str], List[FieldInfo]]] = None",
           "description": "lists of lists of refs to combine"
         }
       ],
+      "custom_logic": "    if refs is None:\n        refs = []",
       "spec_params": [{"name": "refs", "value": "[_create_key_list(ref_list) for ref_list in refs]"}]
     },
     {
       "type_name": "range",
       "params": [
         {
-          "name": "start",
-          "type": "Union[int, float]",
-          "description": "start of range inclusive"
-        },
-        {
-          "name": "end",
-          "type": "Union[int, float]",
-          "description": "end of range inclusive"
-        },
-        {
-          "name": "step",
-          "type": "Union[int, float]",
-          "description": "step for range"
+          "name": "data",
+          "type": "list",
+          "description": "with start, end, and optional step"
         }
       ],
-      "spec_params": [{"name": "data", "value": "[start, end, step]"}]
+      "spec_params": [{"name": "data", "value": "data"}]
     },
     {
       "type_name": "rand_range",
       "params": [
         {
-          "name": "start",
-          "type": "Union[int, float]",
-          "description": "start of range inclusive"
-        },
-        {
-          "name": "end",
-          "type": "Union[int, float]",
-          "description": "end of range inclusive"
+          "name": "data",
+          "type": "list",
+          "description": "with start and end of ranges"
         }
       ],
-      "spec_params": [{"name": "data", "value": "[start, end]"}]
+      "spec_params": [{"name": "data", "value": "data"}]
     },
     {
       "type_name": "date"
@@ -174,7 +160,7 @@
         {
           "name": "data",
           "type": "Dict[str, int] = None",
-          "description": "param data: Mapping of field name to one based column number"
+          "description": "Mapping of field name to one based column number"
         }
       ],
       "custom_logic": "    if data is not None:\n        spec['data'] = data"
@@ -184,11 +170,56 @@
       "params": [
         {
           "name": "fields",
-          "type": "Dict[str, Dict]",
+          "type": "Union[Dict[str, Dict], DataSpec]",
           "description": "sub field specifications"
         }
       ],
-      "spec_params": [{"name": "fields", "value": "fields"}]
+      "spec_params": [{"name": "fields", "value": "utils.get_raw_spec(fields)"}]
+    },
+    {
+      "type_name": "configref",
+      "custom_builder_logic": "    # this must be a refs instance\n        if self.refs_builder is None:\n            return self.add_field(key, configref(**config))\n        else:\n            return self.add_ref(key, configref(**config))"
+    },
+    {
+      "type_name": "calculate",
+      "params": [
+        {
+          "name": "refs",
+          "type": "dict = None",
+          "description": "mapping of ref to alias to used in formula"
+        },
+        {
+          "name": "fields",
+          "type": "dict = None",
+          "description": "mapping of field name to alias used in formula"
+        },
+        {
+          "name": "formula",
+          "type": "str = None",
+          "description": "formula to execute against results of refs/fields"
+        }
+      ],
+      "spec_params": [{"name": "formula", "value": "formula"}],
+      "custom_logic": "    if refs is not None:\n        spec['refs'] = refs\n    if fields is not None:\n        spec['fields'] = fields"
+    },
+    {
+      "type_name": "ref",
+      "params": [
+        {
+          "name": "ref_name",
+          "type": "str = None",
+          "description": "name of reference to get values from"
+        },
+        {
+          "name": "data",
+          "type": "str = None",
+          "description": "name of reference to get values from"
+        }
+      ],
+      "custom_logic": "    if data is not None:\n        spec['data'] = data\n    if ref_name is not None:\n        spec['ref'] = ref_name"
+    },
+    {
+      "type_name": "weighted_csv"
     }
   ]
 }

@@ -19,6 +19,7 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
     i.e:
 
     height_ft = [5, 6, 7]
+
     height_cm = [ft * 30.48 for ft in height_ft]
 
     Takes dictionary of alias -> supplier and a formula
@@ -27,10 +28,12 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
 
     i.e.:
 
-    >>> formula = "ft * 30.48"
-    >>> suppliers = { "ft": datagen.suppliers.values([4, 5, 6]) }
-    >>> calculate = CalculateSupplier(suppliers=suppliers, formula=formula)
-    >>> asssert calculate.next(0) == 121.92
+    Examples:
+        >>> import datagen
+        >>> formula = "ft * 30.48"
+        >>> suppliers = { "ft": datagen.suppliers.values([4, 5, 6]) }
+        >>> calculate = CalculateSupplier(suppliers=suppliers, formula=formula)
+        >>> asssert calculate.next(0) == 121.92
     """
 
     def __init__(self, suppliers: dict, engine: datagen.template_engines.Jinja2Engine):
@@ -48,13 +51,13 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
 
 
 @datagen.registry.schemas('calculate')
-def calculate_schema():
+def _calculate_schema():
     """ get the schema for the calculate type """
     return datagen.schemas.load('calculate')
 
 
 @datagen.registry.types('calculate')
-def configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
+def _configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
     """ configures supplier for calculate type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise datagen.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))

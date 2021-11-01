@@ -13,11 +13,12 @@ _MAPPING = {
 
 
 @datagen.registry.logging('default')
-def configure_logging(loglevel):
+def configure_logging(loglevel: str):
     """
     Default Handler for Logging Configuration
-    :param loglevel: loglevel as specified from the command line
-    :return: None
+
+    Args:
+        loglevel: loglevel as specified from the command line
     """
     if str(loglevel).lower() in ['off', 'stop', 'disable']:
         logging.disable(logging.CRITICAL)
