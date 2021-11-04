@@ -276,7 +276,7 @@ def combine(suppliers, config=None):
     return CombineValuesSupplier(suppliers, config)
 
 
-def random_range(start:Union[str, int, float],
+def random_range(start: Union[str, int, float],
                  end: Union[str, int, float],
                  precision: Union[str, int, float] = None,
                  count: Union[int, List[int], Dict[str, float], Distribution] = 1) -> ValueSupplierInterface:

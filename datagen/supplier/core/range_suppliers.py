@@ -10,6 +10,7 @@ import datagen
 
 RANGE_KEY = 'range'
 RAND_RANGE_KEY = 'rand_range'
+RAND_INT_RANGE_KEY = 'rand_int_range'
 
 
 @datagen.registry.schemas(RANGE_KEY)
@@ -21,6 +22,13 @@ def _get_range_schema():
 @datagen.registry.schemas(RAND_RANGE_KEY)
 def _get_rand_range_schema():
     """ schema for rand range type """
+    # This shares a schema with range
+    return datagen.schemas.load(RANGE_KEY)
+
+
+@datagen.registry.schemas(RAND_INT_RANGE_KEY)
+def _get_rand_int_range_schema():
+    """ schema for rand int range type """
     # This shares a schema with range
     return datagen.schemas.load(RANGE_KEY)
 
@@ -63,6 +71,15 @@ def _configure_supplier_for_data(field_spec, data):
     else:
         range_values = list(range(start, end, step))
     return datagen.suppliers.values(range_values)
+
+
+@datagen.registry.types(RAND_INT_RANGE_KEY)
+def _configure_rand_int_range_supplier(field_spec, loader):
+    """ configures the random int range value supplier """
+    config = datagen.utils.load_config(field_spec, loader)
+    config['cast'] = 'int'
+    field_spec['config'] = config
+    return _configure_rand_range_supplier(field_spec, loader)
 
 
 @datagen.registry.types(RAND_RANGE_KEY)
