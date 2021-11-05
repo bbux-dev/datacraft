@@ -10,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 def main():
     paths = glob.glob('../../datagen/schema/*.schema.json')
     schemas = []
-    with open('../../datagen/schema/definitions.json') as handle:
+    with open('../../../datagen/schema/definitions.json') as handle:
         schema = handle.read()
     schemas.append({
         'tag': 'definitions',

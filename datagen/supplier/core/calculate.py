@@ -26,11 +26,11 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
 
     Formula should contain operations for values returned by aliases suppliers
 
-    i.e.:
+    Variables should be encased in Jinja2 double brace format
 
     Examples:
         >>> import datagen
-        >>> formula = "ft * 30.48"
+        >>> formula = "{{ft}} * 30.48"
         >>> suppliers = { "ft": datagen.suppliers.values([4, 5, 6]) }
         >>> calculate = CalculateSupplier(suppliers=suppliers, formula=formula)
         >>> asssert calculate.next(0) == 121.92

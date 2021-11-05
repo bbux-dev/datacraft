@@ -474,9 +474,7 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_buider()
-            >>> builder.add_fields( \
-            >>>     FIELDNAME1=builder.some_spec(with_args), \
-            >>>     FIELDNAME2=builder.another_spec(with_args)
+            >>> builder.add_fields(FIELDNAME1=builder.some_spec(with_args), FIELDNAME2=builder.another_spec(with_args)
         )
         """
         for key, spec in kwargs.items():
@@ -496,8 +494,8 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_buider()
-            >>> builder.add_field("field1", builder.some_spec(with_args)) \
-            >>>    .add_field("field2", builder.another_spec(with_args))
+            >>> builder.add_field("field1", builder.some_spec(with_args))
+            >>> builder.add_field("field2", builder.another_spec(with_args))
         """
         if key in self.keys:
             log.warning('%s key already defined, overwriting with %s',
@@ -520,9 +518,9 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_buider()
-            >>> builder.add_refs( \
-            >>>     REFNAME1=builder.some_spec(with_args), \
-            >>>     REFNAME2=builder.another_spec(with_args))
+            >>> builder.add_refs(
+            ...     REFNAME1=builder.some_spec(with_args),
+            ...     REFNAME2=builder.another_spec(with_args))
         """
         for key, spec in kwargs.items():
             self.add_ref(key, spec)
@@ -541,8 +539,8 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_builder()
-            >>> builder.add_ref("ref1", builder.some_spec(with_args)) \
-            >>> .add_ref("ref2", builder.another_spec(with_args))
+            >>> builder.add_ref("ref1", builder.some_spec(with_args))
+            >>> builder.add_ref("ref2", builder.another_spec(with_args))
         """
         if key in self.keys:
             log.warning('%s key already defined, overwriting with %s', key, json.dumps(spec))

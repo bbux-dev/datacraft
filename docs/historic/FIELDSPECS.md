@@ -1,9 +1,5 @@
 Field Spec Definitions
 ========================
- 
- 
- 
- 
 
 1. [Quick Reference](#Quick_Reference)
 1. [Overview](#Overview)
