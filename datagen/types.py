@@ -1,8 +1,9 @@
 """
 Module for the datagen registration system
 """
-from typing import Any
 import logging
+from typing import Any
+
 import catalogue  # type: ignore
 
 log = logging.getLogger(__name__)
@@ -11,20 +12,28 @@ log = logging.getLogger(__name__)
 class registry:
     """
     Catalogue registry for types, preprocessors, logging configuration, and others
+
+    Attributes:
+        types (catalogue.Registry): types for field specs
+        schemas (catalogue.Registry): schemas for field spec types
+        preprocessors (catalogue.Registry): functions to modify specs before running
+        logging (catalogue.Registry): custom logging setup
+        formats (catalogue.Registry): registered formats for output
+        distribution (catalogue.Registry): different numeric distributions, normal, uniform, etc
+        defaults (catalogue.Registry): default values
+
+    Examples:
+        >>> import datagen
+        >>> @datagen.registry.types('special')
+        ... def _handle_special_type(field_spec, loader):
+        ...    # return ValueSupplierInterface from spec config
     """
-    # types for field specs
     types = catalogue.create('datagen', 'type')
-    # schemas for field spec types
     schemas = catalogue.create('datagen', 'schemas')
-    # functions to modify specs before running
     preprocessors = catalogue.create('datagen', 'preprocessor')
-    # custom logging setup
     logging = catalogue.create('datagen', 'logging')
-    # registered formats for output
     formats = catalogue.create('datagen', 'format')
-    # different numeric distributions, normal, uniform, etc
     distribution = catalogue.create('datagen', 'distribution')
-    # default values
     defaults = catalogue.create('datagen', 'defaults')
 
 

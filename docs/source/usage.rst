@@ -48,7 +48,7 @@ inline spec out as JSON for easier additions and configuration changes:
     973cc430-7d24-43d1-9fba-5adfdb0ae8d6
 
 Generating Records
-^^^^^^^^^^^^^^^^^^
+------------------
 
 Many times we will want to generate some kind of record with more than one field in it.  A common format for generating
 records is to output them as JSON.  There is a ``--format`` flag that supports multiple output formats.  If we modify

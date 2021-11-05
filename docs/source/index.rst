@@ -16,7 +16,7 @@ how to :ref:`install<installation>` the project.
     :caption: Contents:
 
     usage
-    modules
+    api
 
 Indices and tables
 ==================
