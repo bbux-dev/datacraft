@@ -72,7 +72,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: to use to supply values
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added values field
@@ -90,7 +90,7 @@ class Builder:
             key: name of ref/field
             refs: refs to combine
             fields: fields to combine
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added combine field
@@ -106,7 +106,7 @@ class Builder:
         Args:
             key: name of ref/field
             refs: lists of lists of refs to combine
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added combine-list field
@@ -120,7 +120,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: with start, end, and optional step
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added range field
@@ -134,7 +134,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: with start and end of ranges
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added rand_range field
@@ -147,7 +147,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added date field
@@ -160,7 +160,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added date.iso field
@@ -173,7 +173,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added date.iso.us field
@@ -186,7 +186,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added uuid field
@@ -200,7 +200,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: either known character class or set of characters to use for sampling from
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added char_class field
@@ -214,7 +214,7 @@ class Builder:
         Args:
             key: name of ref/field
             cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added char_class_abbrev field
@@ -228,7 +228,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: hex start and end unicode ranges or lists of these
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added unicode_range field
@@ -241,7 +241,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added geo.lat field
@@ -254,7 +254,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added geo.long field
@@ -267,7 +267,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added geo.pair field
@@ -280,7 +280,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ip field
@@ -293,7 +293,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ipv4 field
@@ -306,7 +306,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ip.precise field
@@ -320,7 +320,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: Mapping of ref name to weight
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added weightedref field
@@ -335,7 +335,7 @@ class Builder:
             key: name of ref/field
             data: to select from
             ref: that contains data to select from
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added select_list_subset field
@@ -348,7 +348,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added csv field
@@ -362,7 +362,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: Mapping of field name to one based column number
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added csv_select field
@@ -376,7 +376,7 @@ class Builder:
         Args:
             key: name of ref/field
             fields: sub field specifications
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added nested field
@@ -389,7 +389,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added configref field
@@ -413,7 +413,7 @@ class Builder:
             refs: mapping of ref to alias to used in formula
             fields: mapping of field name to alias used in formula
             formula: formula to execute against results of refs/fields
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added calculate field
@@ -428,7 +428,7 @@ class Builder:
             key: name of ref/field
             ref_name: name of reference to get values from
             data: name of reference to get values from
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ref field
@@ -441,7 +441,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added weighted_csv field
@@ -673,7 +673,7 @@ def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config)
 
     Args:
         data: to use to supply values
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the values spec
@@ -698,7 +698,7 @@ def combine(refs: Union[List[str], List[FieldInfo]] = None,
     Args:
         refs: refs to combine
         fields: fields to combine
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the combine spec
@@ -723,7 +723,7 @@ def combine_list(refs: List[Union[List[str], List[FieldInfo]]] = None, **config)
 
     Args:
         refs: lists of lists of refs to combine
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the combine-list spec
@@ -746,7 +746,7 @@ def range_spec(data: list, **config) -> dict:
 
     Args:
         data: with start, end, and optional step
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the range spec
@@ -768,7 +768,7 @@ def rand_range(data: list, **config) -> dict:
 
     Args:
         data: with start and end of ranges
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the rand_range spec
@@ -789,7 +789,7 @@ def date(**config) -> dict:
     Constructs a date Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the date spec
@@ -809,7 +809,7 @@ def date_iso(**config) -> dict:
     Constructs a date.iso Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the date.iso spec
@@ -829,7 +829,7 @@ def date_iso_us(**config) -> dict:
     Constructs a date.iso.us Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the date.iso.us spec
@@ -849,7 +849,7 @@ def uuid(**config) -> dict:
     Constructs a uuid Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the uuid spec
@@ -870,7 +870,7 @@ def char_class(data: Union[str, List[str]], **config) -> dict:
 
     Args:
         data: either known character class or set of characters to use for sampling from
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the char_class spec
@@ -892,7 +892,7 @@ def char_class_abbrev(cc_abbrev: str, **config) -> dict:
 
     Args:
         cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the char_class_abbrev spec
@@ -917,7 +917,7 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
 
     Args:
         data: hex start and end unicode ranges or lists of these
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the unicode_range spec
@@ -938,7 +938,7 @@ def geo_lat(**config) -> dict:
     Constructs a geo.lat Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the geo.lat spec
@@ -958,7 +958,7 @@ def geo_long(**config) -> dict:
     Constructs a geo.long Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the geo.long spec
@@ -978,7 +978,7 @@ def geo_pair(**config) -> dict:
     Constructs a geo.pair Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the geo.pair spec
@@ -998,7 +998,7 @@ def ip(**config) -> dict:
     Constructs a ip Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ip spec
@@ -1018,7 +1018,7 @@ def ipv4(**config) -> dict:
     Constructs a ipv4 Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ipv4 spec
@@ -1038,7 +1038,7 @@ def ip_precise(**config) -> dict:
     Constructs a ip.precise Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ip.precise spec
@@ -1059,7 +1059,7 @@ def weightedref(data: Dict[str, float], **config) -> dict:
 
     Args:
         data: Mapping of ref name to weight
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the weightedref spec
@@ -1082,7 +1082,7 @@ def select_list_subset(data: List[Any] = None, ref: str = None, **config) -> dic
     Args:
         data: to select from
         ref: that contains data to select from
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the select_list_subset spec
@@ -1106,7 +1106,7 @@ def csv(**config) -> dict:
     Constructs a csv Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the csv spec
@@ -1127,7 +1127,7 @@ def csv_select(data: Dict[str, int] = None, **config) -> dict:
 
     Args:
         data: Mapping of field name to one based column number
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the csv_select spec
@@ -1150,7 +1150,7 @@ def nested(fields: Union[Dict[str, Dict], DataSpec], **config) -> dict:
 
     Args:
         fields: sub field specifications
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the nested spec
@@ -1171,7 +1171,7 @@ def configref(**config) -> dict:
     Constructs a configref Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the configref spec
@@ -1197,7 +1197,7 @@ def calculate(refs: dict = None,
         refs: mapping of ref to alias to used in formula
         fields: mapping of field name to alias used in formula
         formula: formula to execute against results of refs/fields
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the calculate spec
@@ -1224,7 +1224,7 @@ def ref(ref_name: str = None, data: str = None, **config) -> dict:
     Args:
         ref_name: name of reference to get values from
         data: name of reference to get values from
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ref spec
@@ -1248,7 +1248,7 @@ def weighted_csv(**config) -> dict:
     Constructs a weighted_csv Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the weighted_csv spec

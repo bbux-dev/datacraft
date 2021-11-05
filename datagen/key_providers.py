@@ -39,31 +39,37 @@ def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
     1. List[List[str]] i.e:
 
     .. code-block:: json
-    { "field_groups": [
-        ["one", "two"],
-        ["one", "two", "three"]
-      ]
-    }
+
+        { "field_groups": [
+            ["one", "two"],
+            ["one", "two", "three"]
+          ]
+        }
+
 
     2. Dict[str, Dict[str, ] -> With weight and fields specified i.e.
 
     .. code-block:: json
-    { "field_groups": {
-      "groupA": {
-        "weight": 0.7, "fields": ["one", "two"]
-      },
-      "groupB": {
-        "weight": 0.3, "fields": ["one", "two", "three"]
-      }
-    }
+
+        { "field_groups": {
+          "groupA": {
+            "weight": 0.7, "fields": ["one", "two"]
+          },
+          "groupB": {
+            "weight": 0.3, "fields": ["one", "two", "three"]
+          }
+        }
+
 
     3. Dict[str, List[str]] -> This is called named groups
 
     .. code-block:: json
-    {
-      "groupA": ["one", "two"],
-      "groupB": ["one", "two", "three"], ...
-    }
+
+        {
+          "groupA": ["one", "two"],
+          "groupB": ["one", "two", "three"]
+        }
+
 
     Returns:
         Appropriate KeyProvider
