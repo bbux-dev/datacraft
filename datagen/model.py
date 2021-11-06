@@ -33,6 +33,7 @@ class DataSpec(dict):
     def generator(self, iterations: int, **kwargs):
         """
         Creates a generator that will produce records or render the template for each record
+
         Args:
             iterations: number of iterations to execute
             **kwargs:
@@ -75,6 +76,7 @@ class ValueSupplierInterface(ABC):
     def next(self, iteration):
         """
         Produces the next value for the given iteration
+
         Args:
             iteration: current iteration
 

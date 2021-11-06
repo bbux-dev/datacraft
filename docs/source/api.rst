@@ -54,3 +54,16 @@ Builder Module
 .. automodule:: datagen.builder
    :members:
 
+.. _supplier_module:
+
+Suppliers Module
+----------------
+.. automodule:: datagen.suppliers
+   :members:
+
+.. _template_engines_module:
+
+Template Engines
+----------------
+.. automodule:: datagen.template_engines
+   :members:

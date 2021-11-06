@@ -219,6 +219,7 @@ class FormatProcessor:
     def process(self, record: dict) -> str:
         """
         Processes the given record into the appropriate output string
+
         Args:
             record: dictionary of record to format
 
@@ -231,6 +232,7 @@ class FormatProcessor:
 def for_format(key: str) -> FormatProcessor:
     """
     Creates FormatProcessor for provided key if one is registered
+
     Args:
         key: for formatter
 

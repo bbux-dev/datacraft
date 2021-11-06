@@ -14,19 +14,48 @@ class registry:
     Catalogue registry for types, preprocessors, logging configuration, and others
 
     Attributes:
-        types (catalogue.Registry): types for field specs
-        schemas (catalogue.Registry): schemas for field spec types
-        preprocessors (catalogue.Registry): functions to modify specs before running
-        logging (catalogue.Registry): custom logging setup
-        formats (catalogue.Registry): registered formats for output
-        distribution (catalogue.Registry): different numeric distributions, normal, uniform, etc
-        defaults (catalogue.Registry): default values
+        types: types for field specs
 
-    Examples:
-        >>> import datagen
-        >>> @datagen.registry.types('special')
-        ... def _handle_special_type(field_spec, loader):
-        ...    # return ValueSupplierInterface from spec config
+            >>> @datagen.registry.types('special_sauce')
+            ... def _handle_special_type(field_spec: dict, loader: datagen.Loader):
+            ...    # return ValueSupplierInterface from spec config
+
+        schemas: schemas for field spec types
+
+            >>> @datagen.registry.schemas('special_sauce')
+            ... def _special_sauce_schema():
+            ...    # return JSON schema validating specs with type: special_sauce
+
+        preprocessors: functions to modify specs before running
+
+            >>> @datagen.registry.preprocessors('custom-preprocessing')
+            ... def _preprocess_spec_to_some_end(raw_spec: dict):
+            ...    # return spec with any modification
+
+        logging: custom logging setup
+
+            >>> @datagen.registry.logging('denoise')
+            ... def _customize_logging(loglevel: str):
+            ...     logging.getLogger('too.verbose.module').level = logging.ERROR
+
+        formats: registered formats for output
+
+            >>> @datagen.registry.formats('custom_format')
+            ... def _format_custom(record: dict) -> str:
+            ...     # write to database or some other custom output, return something to write out or print to console
+
+        distribution: different numeric distributions, normal, uniform, etc
+
+            >>> @datagen.registry.distribution('hyperbolic_inverse_haversine')
+            ... def _hyperbolic_inverse_haversine(mean, stddev, **kwargs):
+            ...     # return a datagen.Distribution, args can be custom for the defined distribution
+
+        defaults: default values
+
+            >>> @registry.defaults('special_sauce_ingredient')
+            ... def _default_special_sauce_ingredient():
+            ...     # return the default value (i.e. onions)
+
     """
     types = catalogue.create('datagen', 'type')
     schemas = catalogue.create('datagen', 'schemas')

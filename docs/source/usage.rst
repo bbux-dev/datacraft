@@ -1,6 +1,8 @@
 Usage
 =====
 
+.. _installation:
+
 Installation
 ------------
 
@@ -27,9 +29,10 @@ The Datagen tool uses Data Specs to construct records. If for example, we need a
     a4704ff0-3305-456e-9e51-93327d1459d3
 
 This command uses an inline yaml syntax to specify a single field called ``demo`` that has a type of ``uuid``. We tell
-the datagen tool to turn off logging and to generate 5 records from this inline spec. Inline Data Specs can be useful
-for testing and development. Most Data Specs will be in JSON or YAML files. Use the ``--debug-spec`` flag to dump the
-inline spec out as JSON for easier additions and configuration changes:
+the datagen tool to turn off logging and to generate 5 records from this inline spec. The default is for output to be
+printed to the console. Inline Data Specs can be useful for testing and development. Most Data Specs will be in JSON or
+YAML files. Use the ``--debug-spec`` flag to dump the inline spec out as JSON for easier additions and configuration
+changes:
 
 .. code-block:: console
 
@@ -77,7 +80,7 @@ number between 1 and 100 that is cast to an integer. If we run this spec and spe
     {"id": "f4923efa-28c5-424a-8560-49914dd2b2ac", "timestamp": "2021-11-19T17:28:13", "count": 29}
 
 There are other output formats available and a mechanism to register custom formatters. If a csv file is more suited
-toward your needs:
+for your needs:
 
 .. code-block:: console
 
