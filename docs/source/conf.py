@@ -18,6 +18,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx_copybutton',
+    'sphinx_toolbox.collapse',
     'sphinx_autodoc_typehints',
     'myst_parser'  # for parsing Markdown files
 ]

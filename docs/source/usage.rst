@@ -90,3 +90,161 @@ for your needs:
     11502944-dacb-4812-8d73-e4ba693f2c05,2021-11-24T00:17:55,98
     8370f761-66b1-488e-9327-92a7b8d795b0,2021-11-08T02:55:11,4
     ff3d9f36-6560-4f26-8627-e18dea66e26b,2021-11-15T07:33:42,89
+
+Spec Formats
+------------
+
+A Data Spec can be created in multiple formats.  The most common is the JSON syntax described above. Another format that
+is supported is YAML:
+
+.. code-block:: yaml
+
+    ---
+    id:
+      type: uuid
+    timestamp:
+      type: date.iso
+    count:
+      type: rand_range
+      data: [1,100]
+      config:
+        cast: int
+
+There are also shorthand notations, see :doc:`fieldspecs` for more details.
+
+
+
+Templating
+----------
+
+The datagen tool supports templating using the Jinja2 templating engine format.
+To populate a template file or string with the generated values for each
+iteration, pass the -t /path/to/template (or template string) arg to the
+datagen command. We use the `Jinja2 <https://pypi.org/project/Jinja2/>`_
+templating engine under the hood. The basic format is to put the field names in
+{{ field name }} notation wherever they should be substituted. For example the
+following is a template for bulk indexing data into Elasticsearch.
+
+.. code-block:: json
+
+   {"index": {"_index": "test", "_id": "{{ id }}"}}
+   {"doc": {"name": "{{ name }}", "age": "{{ age }}", "gender": "{{ gender }}"}}
+
+We could then create a spec to populate the id, name, age, and gender fields.
+Such as:
+
+.. code-block:: json
+
+   {
+     "id": {"type": "range", "data": [1, 10]},
+     "gender": {"M": 0.48, "F": 0.52},
+     "name": ["bob", "rob", "bobby", "bobo", "robert", "roberto", "bobby joe", "roby", "robi", "steve"],
+     "age": {"type": "range", "data": [22, 44, 2]}
+   }
+
+When we run the tool we get the data populated for the template:
+
+.. code-block:: shell
+
+   datagen -s es-spec.json -t template.json -i 10 --log-level off -x
+   { "index" : { "_index" : "test", "_id" : "1" } }
+   { "doc" : {"name" : "bob", "age": "22", "gender": "F" } }
+   { "index" : { "_index" : "test", "_id" : "2" } }
+   { "doc" : {"name" : "rob", "age": "24", "gender": "F" } }
+   { "index" : { "_index" : "test", "_id" : "3" } }
+   { "doc" : {"name" : "bobby", "age": "26", "gender": "F" } }
+   { "index" : { "_index" : "test", "_id" : "4" } }
+   ...
+
+It is also possible to do templating inline from the command line:
+
+.. code-block:: shell
+
+   datagen -s es-spec.json --format json -i 5  --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
+   bob: (22, F)
+   rob: (24, M)
+   bobby: (26, M)
+   bobo: (28, M)
+   robert: (30, F)
+
+Loops in Templates
+~~~~~~~~~~~~~~~~~~
+
+`Jinja2 Control Structures <https://jinja.palletsprojects.com/en/2.11.x/templates/#list-of-control-structures>`_
+support looping. To provide multiple values to use in a loop use the ``count``
+parameter. For example modifying the example from the Jinja2 documentation to
+work with our tool:
+
+.. code-block:: html
+
+   <h1>Members</h1>
+   <ul>
+       {% for user in users %}
+       <li>{{ user }}</li>
+       {% endfor %}
+   </ul>
+
+If we use a regular spec such as ``{"users":["bob","bobby","rob"]}`` the
+templating engine will not populate the template correctly since during each
+iteration only a single name is returned as a string for the engine to process.
+
+.. code-block:: html
+
+   <h1>Members</h1>
+   <ul>
+       <li>b</li>
+       <li>o</li>
+       <li>b</li>
+   </ul>
+
+The engine requires collections to iterate over. A small change to our spec will
+address this issue:
+
+.. code-block:: json
+
+   {"users?count=2": ["bob", "bobby", "rob"]}
+
+Now we get
+
+.. code-block:: html
+
+   <h1>Members</h1>
+   <ul>
+       <li>bob</li>
+       <li>bobby</li>
+   </ul>
+
+Dynamic Loop Counters
+~~~~~~~~~~~~~~~~~~~~~
+
+Another mechanism to do loops in Jinja2 is by using the python builtin ``range``
+function. For example if we wanted a variable number of line items we could
+create a template like the following:
+
+.. code-block:: html
+
+   <h1>Members</h1>
+   <ul>
+       {% for i in range(num_users | int) %}
+       <li>{{ users[i] }}</li>
+       {% endfor %}
+   </ul>
+
+Then we could update our spec to contain a ``num_users`` field:
+
+.. code-block:: json
+
+   {
+     "users?count=4?sample=true": ["bob", "bobby", "rob", "roberta", "steve"],
+     "num_users": {
+       "2": 0.5,
+       "3": 0.3,
+       "4": 0.2
+     }
+   }
+
+In the above spec the number of users created will be weighted so that half the
+time there are two, and the other half there are three or four. NOTE: It is
+important to make sure that the ``count`` param is equal to the maximum number
+that will be indexed. If it is less, then there will be empty line items
+whenever the num_users exceeds the count.

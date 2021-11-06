@@ -16,6 +16,7 @@ how to :ref:`install<installation>` the project.
     :caption: Contents:
 
     usage
+    fieldspecs
     api
 
 Indices and tables
