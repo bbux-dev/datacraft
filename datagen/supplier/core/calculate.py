@@ -1,5 +1,37 @@
 """
-module for handling calculate types
+Calculate values from output of other fields or refs
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "calculate",
+        "fields": List[str],
+        or
+        "refs": List[str],
+        "formula": <formula>
+        "config": {
+          "key": Any
+        }
+      }
+    }
+
+    formula (str): The formula to use in calculations
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "height_in": [60, 70, 80, 90],
+      "height_cm": {
+        "type": "calculate",
+        "fields": ["height_in"],
+        "formula": "{{ height_in }} * 2.54"
+      }
+    }
 """
 import json
 import keyword

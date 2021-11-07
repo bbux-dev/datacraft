@@ -1,5 +1,145 @@
 """
-Module for handling csv related data, deals with data typed as 'csv'
+Uses external csv file to supply data
+
+csv
+---
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "csv",
+        "config": {
+          "datafile": "filename in datedir",
+          "headers": "yes, on, true for affirmative",
+          "column": "1 based column number or field name if headers are present",
+          "delimiter": "how values are separated, default is comma",
+          "quotechar": "how values are quoted, default is double quote",
+          "sample": "If the values should be selected at random, default is false",
+          "count": "Number of values in column to use for value"
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "cities": {
+        "type": "csv",
+        "config": {
+          "datafile": "cities.csv",
+          "delimiter": "~",
+          "sample": true
+        }
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "status": {
+        "type": "csv",
+        "config": {
+          "column": 1,
+          "configref": "tabs_config"
+        }
+      },
+      "description": {
+        "type": "csv",
+        "config": {
+          "column": 2,
+          "configref": "tabs_config"
+        }
+      },
+      "status_type:csv?configref=tabs_config&column=3": {},
+      "refs": {
+        "tabs_config": {
+          "type": "configref",
+          "config": {
+            "datafile": "tabs.csv",
+            "delimiter": "\t",
+            "headers": true
+          }
+        }
+      }
+    }
+
+csv-select
+----------
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "csv_select",
+        "data": {"<field_one>": <1 based column index for field 1>, ..., "<field n>": }
+        "config": {
+          "datafile": "filename in datedir",
+          "headers": "yes, on, true for affirmative",
+          "delimiter": "how values are separated, default is comma",
+          "quotechar": "how values are quoted, default is double quote"
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "placeholder": {
+        "type": "csv_select",
+        "data": {"geonameid": 1, "name": 2, "latitude": 5, "longitude": 6, "country_code": 9, "population": 15},
+        "config": {
+          "datafile": "allCountries.txt",
+          "headers": false,
+          "delimiter": "\t"
+        }
+      }
+    }
+
+
+weighted_csv
+------------
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "weighted_csv",
+        "config": {
+          "datafile": "filename in datedir",
+          "headers": "yes, on, true for affirmative",
+          "column": "1 based column number or field name if headers are present",
+          "weight_column": "1 based column number or field name if headers are present where weights are defined"
+          "delimiter": "how values are separated, default is comma",
+          "quotechar": "how values are quoted, default is double quote",
+          "sample": "If the values should be selected at random, default is false",
+          "count": "Number of values in column to use for value"
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "cities": {
+        "type": "weighted_csv",
+        "config": {
+          "datafile": "weighted_cities.csv"
+        }
+      }
+    }
 """
 import csv
 import json

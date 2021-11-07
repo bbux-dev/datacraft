@@ -1,5 +1,57 @@
 """
-Module for handling date related types
+Data strings in various formats
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "date",
+        OR,
+        "type": "date.iso",
+        OR,
+        "type": "date.iso.us",
+        "config": {
+          "format": "Valid datetime format string",
+          "duration_days": "The number of days from the start date to create date strings for",
+          "start": "date string matching format or default format to use for start date",
+          "end": "date string matching format or default  format to use for end date",
+          "offset": "number of days to shift base date by, positive means shift backwards, negative means forward",
+          "center_date": "date string matching format or default format to use for center date",
+          "stddev_days": "The standard deviation in days from the center date that dates should be distributed"
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "dates": {
+        "type": "date",
+        "config": {
+          "duration_days": "90",
+          "start": "15-Dec-2050 12:00",
+          "format": "%d-%b-%Y %H:%M"
+        }
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "dates": {
+        "type": "date",
+        "config": {
+          "center_date": "20500601 12:00",
+          "format": "%Y%m%d %H:%M",
+          "stddev_days": "2"
+        }
+      }
+    }
+
 """
 from typing import Union
 import datetime
