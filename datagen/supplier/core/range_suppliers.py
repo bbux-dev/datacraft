@@ -36,12 +36,18 @@ Examples:
         "type": "range",
         "data": [0, 10, 0.5]
       }
-    },
+    }
+
+.. code-block:: json
+
     {
       "range_shorthand1:range": {
         "data": [0, 10, 0.5]
       }
-    },
+    }
+
+.. code-block:: json
+
     {"range_shorthand2:range": [0, 10, 0.5]},
 
 rand_range
