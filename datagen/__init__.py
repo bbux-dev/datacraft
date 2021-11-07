@@ -9,3 +9,4 @@ from .builder import spec_builder
 from .supplier.core import *
 from . import suppliers
 from . import template_engines
+from . import spec_formatters

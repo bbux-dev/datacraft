@@ -9,7 +9,7 @@ import logging
 
 import yaml
 
-from . import outputs, utils, types, preprocessor, template_engines, builder
+from . import outputs, utils, types, preprocessor, template_engines, builder, spec_formatters
 from .logging_handler import *
 from .preprocessor import *
 from .supplier import *
@@ -63,6 +63,8 @@ def main(argv):
                         help='Data from -s argument should be applied to the template with out treating as a Data Spec')
     parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
                         help='Debug spec after internal reformatting')
+    parser.add_argument('--debug-spec-yaml', dest='debug_spec_yaml', action='store_true', default=False,
+                        help='Debug spec after internal reformatting, write out as yaml')
     parser.add_argument('--debug-defaults', dest='debug_defaults', action='store_true', default=False,
                         help='List default values from registry after any external code loading')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true', default=False,
@@ -131,7 +133,13 @@ def main(argv):
     # Only dump out the reformatted spec
     if args.debug_spec:
         writer = _get_writer(args)
-        writer.write(json.dumps(preprocessor.preprocess_spec(spec), indent=4))
+        raw_spec = preprocessor.preprocess_spec(spec)
+        writer.write(spec_formatters.format_json(raw_spec))
+        return
+    if args.debug_spec_yaml:
+        writer = _get_writer(args)
+        raw_spec = preprocessor.preprocess_spec(spec)
+        writer.write(spec_formatters.format_yaml(raw_spec))
         return
 
     # apply the spec as data to the template
