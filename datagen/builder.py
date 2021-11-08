@@ -1,5 +1,19 @@
 """
 Module for building Data Specs programmatically
+
+Examples:
+    >>> import datagen
+    >>> builder = datagen.spec_builder()
+    >>> builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
+    >>> builder.range_spec('ages', data=[22, 33])
+    {'names': {'type': 'values', 'data': ['amy', 'bob', 'cat', 'dan', 'earl']}, 'ages': {'type': 'range', 'data': [22, 33]}}
+
+    >>> refs = spec_builder.refs()
+    >>> one = refs.values('ONE', ["A", "B", "C"])
+    >>> two = refs.values('TWO', [1, 2, 3])
+    >>> builder.combine('combine', refs=[one, two])
+    >>> builder.build()
+    {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}, 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
 """
 import json
 import logging
@@ -37,11 +51,6 @@ class FieldInfo:
 class Builder:
     """
     Container class for constructing the Data Spec by adding fields, refs, and field_groups
-
-    Examples:
-        >>> builder = datagen.Builder()
-        >>> builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
-        >>> builder.range('ages', start=22, end=33)
         >>> spec = builder.build()
     """
 
@@ -312,6 +321,19 @@ class Builder:
             FieldInfo for the added ip.precise field
         """
         return self._add_field_spec(key, ip_precise(**config))
+
+    def mac(self, key: str, **config) -> FieldInfo:
+        """
+        creates net.mac Field Spec and adds to Data Spec
+
+        Args:
+            key: name of ref/field
+            config: in kwargs format
+
+        Returns:
+            FieldInfo for the added net.mac field
+        """
+        return self._add_field_spec(key, mac(**config))
 
     def weightedref(self, key: str, data: Dict[str, float], **config) -> FieldInfo:
         """
@@ -1046,6 +1068,26 @@ def ip_precise(**config) -> dict:
 
     spec = {
         "type": "ip.precise"
+    }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def mac(**config) -> dict:
+    """
+    Constructs a mac Field Spec
+
+    Args:
+        config: in kwargs format
+
+    Returns:
+        the mac spec
+    """
+
+    spec = {
+        "type": "net.mac"
     }  # type: Dict[str, Any]
 
     if len(config) > 0:

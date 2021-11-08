@@ -1,15 +1,128 @@
 """
-Module for handling ip types
+Network related types
+
+ip/ipv4
+-------
+
+Ip addresses can be generated using CIDR notation or by specifying a base. For example, if you wanted to generate ips in
+the 10.0.0.0 to 10.0.0.255 range, you could either specify a cidr param of 10.0.0.0/24 or a base param of 10.0.0.
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "ipv4",
+        "config": {
+          "cidr": "<cidr value /8 /16 /24 only>",
+          OR
+          "base": "<beginning of ip i.e. 10.0>"
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "network": {
+        "type": "ipv4",
+        "config": {
+          "cidr": "2.22.222.0/16"
+        }
+      },
+      "network_shorthand:ip?cidr=2.22.222.0/16": {},
+      "network_with_base:ip?base=192.168.0": {}
+    }
+
+ip.precise
+----------
+
+The default ip type only supports cidr masks of /8 /16 and /24. If you want more precise ip ranges you need to use the
+``ip.precise`` type. This type requires a cidr as the single config param. The default mode for ``ip.precise`` is to
+increment the ip addresses. Set config param sample to one of true, on, or yes to enable random ip addresses selected
+from the generated ranges.
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "ipv4",
+        "config": {
+          "cidr": "<valid cidr value>",
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "network": {
+        "type": "ip.precise",
+        "config": {
+          "cidr": "192.168.0.0/14",
+          "sample": "true"
+        }
+      }
+    }
+
+net.mac
+-------
+
+For creating MAC addresses
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "net.mac",
+        "config": {
+          "dashes": "If dashes should be used as the separator one of on, yes, 'true', or True"
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "network": {
+        "type": "net.mac"
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "network": {
+        "type": "net.mac",
+        "config": {
+          "dashes": "true"
+        }
+      }
+    }
 """
 from typing import Dict
 import ipaddress
 import json
+import string
 import random
 
 import datagen
 
 IP_KEY = 'ip'
 IPV4_KEY = 'ipv4'
+IP_PRECISE_KEY = 'ip.precise'
+NET_MAC_KEY = 'net.mac'
 
 
 class IpV4Supplier(datagen.ValueSupplierInterface):
@@ -46,6 +159,18 @@ def _get_ipv4_schema():
     """ returns the schema for the ipv4 types """
     # shares schema with ip
     return datagen.schemas.load(IP_KEY)
+
+
+@datagen.registry.schemas(IP_PRECISE_KEY)
+def _get_ip_precise_schema():
+    """ returns the schema for the ip.precise types """
+    return datagen.schemas.load(IP_PRECISE_KEY)
+
+
+@datagen.registry.schemas(NET_MAC_KEY)
+def _get_mac_addr_schema():
+    """ returns the schema for the net.mac types """
+    return datagen.schemas.load(NET_MAC_KEY)
 
 
 @datagen.registry.types(IPV4_KEY)
@@ -152,7 +277,7 @@ class IpV4PreciseSupplier(datagen.ValueSupplierInterface):
         return str(self.net[idx])
 
 
-@datagen.registry.types('ip.precise')
+@datagen.registry.types(IP_PRECISE_KEY)
 def _configure_precise_ip(field_spec, _):
     """ configures value supplier for ip.precise type """
     config = field_spec.get('config')
@@ -163,3 +288,30 @@ def _configure_precise_ip(field_spec, _):
     if cidr is None:
         raise datagen.SpecException('Invalid config for: ' + json.dumps(field_spec) + ', param cidr required')
     return IpV4PreciseSupplier(cidr, sample)
+
+
+class MacAddressSupplier(datagen.ValueSupplierInterface):
+    """ Class for supplying random mac addresses """
+    def __init__(self, delim: str):
+        """
+        Args:
+            delim: how mac address pieces are separated
+        """
+        self.delim = delim
+        self.tokens = string.digits + 'ABCDEF'
+
+    def next(self, iteration):
+        parts = [''.join(random.sample(self.tokens, 2)) for _ in range(6)]
+        return self.delim.join(parts)
+
+
+@datagen.registry.types(NET_MAC_KEY)
+def _configure_mac_address_supplier(field_spec, loader):
+    """ configures value supplier for net.mac type """
+    config = datagen.utils.load_config(field_spec, loader)
+    if datagen.utils.is_affirmative('dashes', config):
+        delim = '-'
+    else:
+        delim = datagen.types.get_default('mac_addr_separator')
+
+    return MacAddressSupplier(delim)

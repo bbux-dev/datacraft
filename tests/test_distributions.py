@@ -15,7 +15,7 @@ def test_normal_distribution():
     dist_func = datagen.registry.distribution.get('normal')
     distribution = dist_func(mean=5, stddev=1)
 
-    values = set([int(distribution.next_value()) for _ in range(100)])
+    values = set([int(distribution.next_value()) for _ in range(1000)])
     assert 4 <= len(values) >= 5
 
 

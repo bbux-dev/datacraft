@@ -68,7 +68,7 @@ Examples:
       }
     }
 
-csv-select
+csv_select
 ----------
 
 Prototype:

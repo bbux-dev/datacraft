@@ -95,7 +95,8 @@ def _configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
         raise datagen.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
     if 'refs' in field_spec and 'fields' in field_spec:
         raise datagen.SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
-    if field_spec.get('formula') is None:
+    template = field_spec.get('formula')
+    if template is None:
         raise datagen.SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
     mappings = _get_mappings(field_spec, 'refs')
@@ -109,7 +110,6 @@ def _configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
         supplier = loader.get(field_or_ref)
         suppliers[alias] = supplier
 
-    template = field_spec.get('formula')
     engine = datagen.template_engines.string(template)
     return CalculateSupplier(suppliers=suppliers, engine=engine)
 

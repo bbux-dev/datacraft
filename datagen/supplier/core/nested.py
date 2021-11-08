@@ -1,5 +1,49 @@
 """
-Module for handling nested types
+For nested fields
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "nested",
+        "config": {
+          "count": "Values Spec for Counts, default is 1"
+        },
+        "fields": {
+          "<sub field one>": { spec definition here },
+          "<sub field two>": { spec definition here },
+          ...
+        }
+      }
+    }
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "id": {
+        "type": "uuid"
+      },
+      "user": {
+        "type": "nested",
+        "fields": {
+          "user_id": {
+            "type": "uuid"
+          },
+          "geo": {
+            "type": "nested",
+            "fields": {
+              "place_id:cc-digits?mean=5": {},
+              "coordinates:geo.pair?as_list=true": {}
+            }
+          }
+        }
+      }
+    }
+
 """
 from typing import Dict, Any
 

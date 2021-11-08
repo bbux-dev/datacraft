@@ -39,9 +39,10 @@ def format_yaml(raw_spec: dict) -> str:
     dirty_yaml = yaml.dump(ordered, sort_keys=False, width=4096).strip()
     cleaned_yaml = _clean_semi_formatted_yaml(dirty_yaml)
     try:
-        if yaml.load(cleaned_yaml) != raw_spec:
+        loaded_yaml = yaml.load(cleaned_yaml, Loader=yaml.FullLoader)
+        if loaded_yaml != raw_spec:
             log.warning('yaml does not match raw')
-            log.warning(json.dumps(yaml.load(cleaned_yaml), indent=4))
+            log.warning(json.dumps(loaded_yaml, indent=4))
             log.warning(json.dumps(raw_spec, indent=4))
     except Exception:
         log.warning('yaml does not load')
@@ -98,7 +99,7 @@ def order_field_spec(field_spec):
 ##################################
 # from https://stackoverflow.com/questions/13249415/how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
 ##################################
-from _ctypes import PyObj_FromPtr
+from _ctypes import PyObj_FromPtr  # type: ignore
 import json
 import re
 

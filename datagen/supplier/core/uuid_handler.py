@@ -1,5 +1,29 @@
 """
-Module for handling uuid types
+A standard uuid
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "uuid"
+      }
+    }
+
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "id": {
+        "type": "uuid"
+      },
+      "id_shorthand:uuid": {}
+    }
+
+
 """
 import uuid
 

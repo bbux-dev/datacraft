@@ -1,0 +1,19 @@
+{
+  "types": [
+    {"name": "values"},
+    {"name": "refs"},
+    {"name": "weighted_refs"},
+    {"name": "range_suppliers"},
+    {"name": "combine"},
+    {"name": "date"},
+    {"name": "csv"},
+    {"name": "configref"},
+    {"name": "uuid_handler"},
+    {"name": "select_list_subset"},
+    {"name": "char_class"},
+    {"name": "unicode_range"},
+    {"name": "geo"},
+    {"name": "ip_addresses"},
+    {"name": "nested"}
+  ]
+}

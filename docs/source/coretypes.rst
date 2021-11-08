@@ -43,8 +43,8 @@ configref
 
 .. automodule:: datagen.supplier.core.configref
 
-uuid_handler
-------------
+uuid
+----
 
 .. automodule:: datagen.supplier.core.uuid_handler
 
@@ -68,14 +68,19 @@ geo
 
 .. automodule:: datagen.supplier.core.geo
 
-ip_addresses
-------------
+network
+-------
 
-.. automodule:: datagen.supplier.core.ip_addresses
+.. automodule:: datagen.supplier.core.network
 
 nested
 ------
 
 .. automodule:: datagen.supplier.core.nested
+
+calculate
+---------
+
+.. automodule:: datagen.supplier.core.calculate
 
 

@@ -78,3 +78,8 @@ def default_data_dir():
 def default_csv_file():
     """ default name for csv files """
     return 'data.csv'
+
+
+@registry.defaults('mac_addr_separator')
+def default_mac_address_separator():
+    return ':'

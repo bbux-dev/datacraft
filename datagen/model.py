@@ -22,7 +22,10 @@ class DataSpec(dict):
         return self.raw_spec.__contains__(key)
 
     def __repr__(self):
-        return f"{type(self.raw_spec).__name__}({super().__repr__()})"
+        return str(self.raw_spec)
+
+    def __str__(self):
+        return str(self.raw_spec)
 
     def pop(self, key):
         return self.raw_spec.pop(key)
