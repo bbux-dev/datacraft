@@ -18,6 +18,7 @@ how to :ref:`install<installation>` the project.
     usage
     fieldspecs
     coretypes
+    cli
     api
 
 Indices and tables

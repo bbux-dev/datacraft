@@ -32,7 +32,7 @@ This command uses an inline yaml syntax to specify a single field called ``demo`
 the datagen tool to turn off logging and to generate 5 records from this inline spec. The default is for output to be
 printed to the console. Inline Data Specs can be useful for testing and development. Most Data Specs will be in JSON or
 YAML files. Use the ``--debug-spec`` flag to dump the inline spec out as JSON for easier additions and configuration
-changes:
+changes. Use the ``--debug-spec-yaml`` flag if you prefer to work with the more compact YAML format.
 
 .. code-block:: console
 
@@ -111,8 +111,6 @@ is supported is YAML:
         cast: int
 
 There are also shorthand notations, see :doc:`fieldspecs` for more details.
-
-
 
 Templating
 ----------
@@ -248,3 +246,8 @@ time there are two, and the other half there are three or four. NOTE: It is
 important to make sure that the ``count`` param is equal to the maximum number
 that will be indexed. If it is less, then there will be empty line items
 whenever the num_users exceeds the count.
+
+Command Line Interface
+----------------------
+
+.. include:: cli.rst
