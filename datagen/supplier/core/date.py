@@ -1,5 +1,5 @@
 """
-Data strings in various formats
+Date strings in various formats
 
 Prototype:
 
