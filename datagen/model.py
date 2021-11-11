@@ -41,6 +41,11 @@ class DataSpec(dict):
             iterations: number of iterations to execute
             **kwargs:
 
+        Keyword Args:
+            template (Union[str, Path]): inline string template or path to template on disk
+            data_dir (str): path the data directory with csv files and such
+            enforce_schema (bool): If schema validation should be applied where possible
+
         Yields:
             Records or rendered template strings
 

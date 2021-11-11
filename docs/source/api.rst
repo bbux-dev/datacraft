@@ -13,8 +13,12 @@ Datagen API
 Core Classes
 ------------
 
+.. _data_spec_class:
+
 .. autoclass:: datagen.DataSpec
    :members:
+
+.. _value_supplier_interface:
 
 .. autoclass:: datagen.ValueSupplierInterface
    :members:

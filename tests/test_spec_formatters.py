@@ -69,3 +69,40 @@ def test_format_json_refs():
 }"""
     formatted_spec = datagen.spec_formatters.format_json(raw_spec)
     assert formatted_spec == expected, f'Mismatch: \n{formatted_spec}\n{expected}'
+
+
+def test_miss_match_logs_error(mocker):
+    mocker.patch('yaml.load', return_value={'not': 'the same'})
+    raw_spec = {"test": {"type": "values", "data": "for spec"}}
+    # for test coverage
+    datagen.spec_formatters.format_yaml(raw_spec)
+
+
+def test_error_logged(mocker):
+    mocker.patch('yaml.load', side_effect=Exception('uh oh'))
+    raw_spec = {"test": {"type": "values", "data": "for spec"}}
+    # for test coverage
+    datagen.spec_formatters.format_yaml(raw_spec)
+
+
+def test_other_format_hits():
+    raw_spec = {
+        "refs": {
+            "ref_one": ["a", "b", "c"],
+            "ref_two": ["d", "e", "f"]
+        },
+        "test": {"type": "combine", "refs": ["ref_one", "ref_two"], "not": "used"},
+    }
+    expected = """{
+  "test": {
+    "type": "combine",
+    "refs": ["ref_one", "ref_two"],
+    "not": "used"
+  },
+  "refs": {
+    "ref_one": ["a", "b", "c"],
+    "ref_two": ["d", "e", "f"]
+  }
+}"""
+    formatted_spec = datagen.spec_formatters.format_json(raw_spec)
+    assert formatted_spec == expected, f'Mismatch: \n{formatted_spec}\n{expected}'

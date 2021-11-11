@@ -51,7 +51,6 @@ class FieldInfo:
 class Builder:
     """
     Container class for constructing the Data Spec by adding fields, refs, and field_groups
-        >>> spec = builder.build()
     """
 
     def __init__(self, has_refs=True):
@@ -1330,7 +1329,11 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
     Args:
         raw_spec: to create generator for
         iterations: number of iterations before max
-        kwargs: args to generator i.e. enforce_schema, etc.
+
+    Keyword Args:
+        template (Union[str, Path]): inline string template or path to template on disk
+        data_dir (str): path the data directory with csv files and such
+        enforce_schema (bool): If schema validation should be applied where possible
 
     Returns:
         the generator for the provided spec
