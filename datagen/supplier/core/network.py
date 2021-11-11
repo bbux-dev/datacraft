@@ -4,8 +4,11 @@ Network related types
 ip/ipv4
 -------
 
-Ip addresses can be generated using CIDR notation or by specifying a base. For example, if you wanted to generate ips in
-the 10.0.0.0 to 10.0.0.255 range, you could either specify a cidr param of 10.0.0.0/24 or a base param of 10.0.0.
+Ip addresses can be generated
+using `CIDR notation <https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing>`_
+or by specifying a base. For example, if you wanted to generate ips in the
+10.0.0.0 to 10.0.0.255 range, you could either specify a ``cidr`` param of
+10.0.0.0/24 or a ``base`` param of 10.0.0.
 
 Prototype:
 

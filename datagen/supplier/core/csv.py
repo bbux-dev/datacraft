@@ -1,5 +1,14 @@
 """
-Uses external csv file to supply data
+If you have an existing large set of data in a tabular format that you want to
+use, it would be burdensome to copy and paste the data into a spec. To make use
+of data already in a tabular format you can use a ``csv`` Field Spec. These specs
+allow you to identify a column from a tabular data file to use to provide the
+values for a field. Another advantage of using a csv spec is that it is easy to
+have fields that are correlated be generated together. All rows will be selected
+incrementally, unless any of the fields are configured to use ``sample`` mode. You
+can use ``sample`` mode on individual columns, or you can use it across all
+columns by creating a ``configref`` spec. See ``csv_select`` for an
+efficient way to select multiple columns from a csv file.
 
 csv
 ---
@@ -61,7 +70,7 @@ Examples:
           "type": "configref",
           "config": {
             "datafile": "tabs.csv",
-            "delimiter": "\t",
+            "delimiter": "\\t",
             "headers": true
           }
         }

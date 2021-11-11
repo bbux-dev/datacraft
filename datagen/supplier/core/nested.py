@@ -1,5 +1,10 @@
 """
-For nested fields
+Nested types are used to create fields that contain subfields. Nested types can
+also contain nested fields to allow multiple levels of nesting. Use the ``nested``
+type to generate a field that contains subfields. The subfields are defined in
+the ``fields`` element of the nested spec. The ``fields`` element will be treated
+like a top level DataSpec and has access to the ``refs`` and other elements of the
+root.
 
 Prototype:
 

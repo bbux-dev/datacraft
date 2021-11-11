@@ -1,5 +1,8 @@
 """
-generates strings from character classes
+A ``char_class`` type is used to create strings that are made up of characters
+from specific character classes. The strings can be of fixed or variable length.
+There are several built in character classes. You can also provide your own set
+of characters to sample from. Below is the list of supported character classes:
 
 Built In Classes
 ----------------

@@ -1,5 +1,6 @@
 """
-Constant, list, or weighted dictionary
+There are three types of values specs: Constants, List, and Weighted. Values specs have a shorthand notation where
+the value of the data element replaces the full spec. See examples below.
 
 Prototype:
 
