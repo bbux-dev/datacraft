@@ -167,9 +167,10 @@ def _configure_geo_type(spec, loader, default_start, default_end, suffix):
     config = datagen.utils.load_config(spec, loader)
     precision = config.get('precision', datagen.types.get_default('geo_precision'))
     if not str(precision).isnumeric():
-        raise datagen.SpecException(f'precision for geo should be valid integer: {json.dumps(spec)}')
+        raise datagen.SpecException(f'precision for geo should be valid integer >= 0: {json.dumps(spec)}')
     start, end = _get_start_end(config, default_start, default_end, suffix)
-    return GeoSupplier(datagen.suppliers.random_range(start, end, precision))
+    range_supplier = datagen.suppliers.random_range(start, end, precision)
+    return GeoSupplier(range_supplier)
 
 
 def _get_start_end(config, default_start, default_end, suffix):

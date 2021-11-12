@@ -9,7 +9,7 @@ import logging
 
 import yaml
 
-from . import outputs, utils, types, preprocessor, template_engines, builder, spec_formatters
+from . import outputs, utils, types, preprocessor, template_engines, builder, spec_formatters, loader
 from .logging_handler import *
 from .preprocessor import *
 from .supplier import *
@@ -133,12 +133,12 @@ def main(argv):
     # Only dump out the reformatted spec
     if args.debug_spec:
         writer = _get_writer(args)
-        raw_spec = preprocessor.preprocess_spec(spec)
+        raw_spec = loader.preprocess_spec(spec)
         writer.write(spec_formatters.format_json(raw_spec))
         return
     if args.debug_spec_yaml:
         writer = _get_writer(args)
-        raw_spec = preprocessor.preprocess_spec(spec)
+        raw_spec = loader.preprocess_spec(spec)
         writer.write(spec_formatters.format_yaml(raw_spec))
         return
 

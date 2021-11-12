@@ -130,10 +130,10 @@ class CombineValuesSupplier(datagen.ValueSupplierInterface):
         self.joiner = config.get('join_with', datagen.types.get_default('combine_join_with'))
 
     def next(self, iteration):
-        values = [str(supplier.next(iteration)) for supplier in self.suppliers]
+        values = [supplier.next(iteration) for supplier in self.suppliers]
         if self.as_list:
             return values
-        return self.joiner.join(values)
+        return self.joiner.join([str(val) for val in values])
 
 
 @datagen.registry.schemas(COMBINE_KEY)

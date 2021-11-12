@@ -141,7 +141,7 @@ class RandomRangeSupplier(datagen.ValueSupplierInterface):
         count = self.count_supplier.next(iteration)
         next_nums = [random.uniform(self.start, self.end) for _ in range(count)]
         if self.precision is not None:
-            next_nums = [self.format_str.format(next_num) for next_num in next_nums]
+            next_nums = [float(self.format_str.format(next_num)) for next_num in next_nums]
         if count == 1:
             return next_nums[0]
         return next_nums
