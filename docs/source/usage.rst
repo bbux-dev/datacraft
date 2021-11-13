@@ -115,13 +115,11 @@ There are also shorthand notations, see :doc:`fieldspecs` for more details.
 Templating
 ----------
 
-The datagen tool supports templating using the Jinja2 templating engine format.
-To populate a template file or string with the generated values for each
-iteration, pass the -t /path/to/template (or template string) arg to the
-datagen command. We use the `Jinja2 <https://pypi.org/project/Jinja2/>`_
-templating engine under the hood. The basic format is to put the field names in
-{{ field name }} notation wherever they should be substituted. For example the
-following is a template for bulk indexing data into Elasticsearch.
+The datagen tool supports templating using the Jinja2 templating engine format. To populate a template file or string
+with the generated values for each iteration, pass the -t /path/to/template (or template string) arg to the datagen
+command. We use the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine under the hood. The basic format
+is to put the field names in {{ field name }} notation wherever they should be substituted. For example the following
+is a template for bulk indexing data into Elasticsearch.
 
 .. code-block:: json
 
@@ -169,9 +167,8 @@ Loops in Templates
 ^^^^^^^^^^^^^^^^^^
 
 `Jinja2 Control Structures <https://jinja.palletsprojects.com/en/2.11.x/templates/#list-of-control-structures>`_
-support looping. To provide multiple values to use in a loop use the ``count``
-parameter. For example modifying the example from the Jinja2 documentation to
-work with our tool:
+support looping. To provide multiple values to use in a loop use the ``count`` parameter. For example modifying the
+example from the Jinja2 documentation to work with our tool:
 
 .. code-block:: html
 
@@ -182,9 +179,8 @@ work with our tool:
        {% endfor %}
    </ul>
 
-If we use a regular spec such as ``{"users":["bob","bobby","rob"]}`` the
-templating engine will not populate the template correctly since during each
-iteration only a single name is returned as a string for the engine to process.
+If we use a regular spec such as ``{"users":["bob","bobby","rob"]}`` the templating engine will not populate the
+template correctly since during each iteration only a single name is returned as a string for the engine to process.
 
 .. code-block:: html
 
@@ -195,8 +191,7 @@ iteration only a single name is returned as a string for the engine to process.
        <li>b</li>
    </ul>
 
-The engine requires collections to iterate over. A small change to our spec will
-address this issue:
+The engine requires collections to iterate over. A small change to our spec will address this issue:
 
 .. code-block:: json
 
@@ -215,9 +210,8 @@ Now we get
 Dynamic Loop Counters
 ^^^^^^^^^^^^^^^^^^^^^
 
-Another mechanism to do loops in Jinja2 is by using the python builtin ``range``
-function. For example if we wanted a variable number of line items we could
-create a template like the following:
+Another mechanism to do loops in Jinja2 is by using the python builtin ``range`` function. For example if we wanted a
+variable number of line items we could create a template like the following:
 
 .. code-block:: html
 
@@ -241,20 +235,17 @@ Then we could update our spec to contain a ``num_users`` field:
      }
    }
 
-In the above spec the number of users created will be weighted so that half the
-time there are two, and the other half there are three or four. NOTE: It is
-important to make sure that the ``count`` param is equal to the maximum number
-that will be indexed. If it is less, then there will be empty line items
-whenever the num_users exceeds the count.
+In the above spec the number of users created will be weighted so that half the time there are two, and the other
+half there are three or four. NOTE: It is important to make sure that the ``count`` param is equal to the maximum number
+that will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
 Field Groups
 ------------
 
-Field groups provide a mechanism to generate different subsets of the defined
-fields together. This can be useful when modeling data that contains field that
-are not present in all records. There are several formats that are supported for
-Field Groups. Field Groups are defined in a root section of the document
-named ``field_groups``. Below is an example spec with no ``field_groups`` defined.
+Field groups provide a mechanism to generate different subsets of the defined fields together. This can be useful
+when modeling data that contains field that are not present in all records. There are several formats that are
+supported for Field Groups. Field Groups are defined in a root section of the document named ``field_groups`` or as
+parte of ``nested`` Field Specs. Below is an example spec with no ``field_groups`` defined.
 
 .. code-block:: json
 
@@ -268,10 +259,9 @@ named ``field_groups``. Below is an example spec with no ``field_groups`` define
      }
    }
 
-If the tag field was only present in 50% of the data, we would want to be able
-to adjust our output to match this. Here is an updated version of the spec with
-the ``field_groups`` specified to give us our 50/50 output. This uses the first
-form of the ``field_groups`` a List of Lists of field names to output together.
+If the tag field was only present in 50% of the data, we would want to be able to adjust our output to match this.
+Here is an updated version of the spec with the ``field_groups`` specified to give us our 50/50 output. This uses the
+first form of the ``field_groups`` a List of Lists of field names to output together.
 
 .. code-block:: json
 
@@ -289,9 +279,8 @@ form of the ``field_groups`` a List of Lists of field names to output together.
      ]
    }
 
-If we need more precise weightings we can use the second format where we specify
-a weight for each field group along with the fields that should be output
-together.
+If we need more precise weightings we can use the second format where we specify a weight for each field group along
+with the fields that should be output together.
 
 .. code-block:: json
 
@@ -311,12 +300,12 @@ together.
      }
    }
 
-The keys of the ``field_groups`` dictionary are arbitrary. The ``weight``
-and ``fields`` element underneath are required.
+The keys of the ``field_groups`` dictionary are arbitrary. The ``weight`` and ``fields`` element underneath are
+required.
 
 Running this example:
 
-.. code-block:: shell
+.. code-block:: console
 
    datagen -s pets.json -i 10 -l off -x --format json
    {"id": 1, "name": "Fido"}
@@ -330,8 +319,7 @@ Running this example:
    {"id": 9, "name": "Fido", "tag": "Aloof"}
    {"id": 10, "name": "Fluffy", "tag": "Affectionate"}
 
-The final form is a variation on form 2. Here the ``field_groups`` value is a
-dictionary of name to fields list. i.e.:
+The final form is a variation on form 2. Here the ``field_groups`` value is a dictionary of name to fields list. i.e.:
 
 .. code-block:: json
 
@@ -399,20 +387,20 @@ Running this spec would produce:
    {"geonameid": "3017832", "name": "Pic de les Abelletes", "latitude": "42.52535", "longitude": "1.73343", "country_code": "AD", "population": "0"}
    {"geonameid": "3017833", "name": "Estany de les Abelletes", "latitude": "42.52915", "longitude": "1.73362", "country_code": "AD", "population": "0"}
 
-
+.. _custom_code:
 
 Custom Code Loading and Schemas
 -------------------------------
 
-There are a lot of types of data that are not generated with this tool. Instead
-of adding them all, there is a mechanism to bring your own data suppliers. We
-make use of the handy `catalogue <https://pypi.org/project/catalogue/>`_ package
-to allow auto discovery of custom functions using decorators. Use the
-``@datagen.registry.types('<type key>')`` to register a function that will create
-a :ref:`Value Supplier<value_supplier_interface>` for the supplied Field Spec. Below is an example of a custom
-class which reverses the output of another supplier. Types that are amazing and
-useful should be nominated for core inclusion. Please put up a PR if you create
-or use one that solves many of your data generation issues.
+There are a lot of types of data that are not generated with this tool. Instead of adding them all, there is a
+mechanism to bring your own data suppliers. We make use of the handy `catalogue <https://pypi
+.org/project/catalogue/>`_ package to allow auto discovery of custom functions using decorators. Use the
+``@datagen.registry.types('<type key>')`` to register a function that will create a
+:ref:`Value Supplier<value_supplier_interface>` for the supplied Field Spec. Below is an example of a custom class
+which reverses the output of another supplier. Types that are amazing and useful should be nominated for core
+inclusion. Please put up a PR if you create or use one that solves many of your data generation issues.
+
+To supply custom code to the tool use the ``-c`` or ``--code`` arguments. One or more module files can be imported.
 
 .. code-block:: python
 
@@ -453,14 +441,12 @@ or use one that solves many of your data generation issues.
            }
        }
 
-Now when we see a type of "reverse_string" like in the example below, we will
-use the given function to configure the supplier for it. The function name for
-the decorated function is arbitrary, but the signature must match. The signature
-for the Value Supplier is required to match the interface and have a
-single ``next(iteration)`` method that returns the next value for the given
-iteration. You can also optionally register a schema for the type. The schema
-will be applied to the spec if the ``--strict`` command line flag is specified,
-otherwise you will have to perform your own validation in your code.
+Now when we see a type of "reverse_string" like in the example below, we will use the given function to configure the
+supplier for it. The function name for the decorated function is arbitrary, but the signature must match. The signature
+for the Value Supplier is required to match the interface and have a single ``next(iteration)`` method that returns
+the next value for the given iteration. You can also optionally register a schema for the type. The schema will be
+applied to the spec if the ``--strict`` command line flag is specified, otherwise you will have to perform your own
+validation in your code.
 
 .. code-block::
 
@@ -477,9 +463,6 @@ otherwise you will have to perform your own validation in your code.
      }
    }
 
-To supply custom code to the tool use the -c or --code arguments. One or more
-module files can be imported.
-
 .. code-block:: shell
 
    .datagen -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
@@ -494,16 +477,13 @@ Programmatic Usage
 Building Specs
 ^^^^^^^^^^^^^^
 
-The :ref:`datagen.builder<builder_module>` module contains tools that can be used to
-programmatically generate Data Specs. This may be easier for some who are not as
-familiar with JSON or prefer to manage their structures in code. The core object
-is the ``Builder``. You can add fields, refs, and field groups to this. Each of
-the core field types has a builder function that will generate a Field Spec for
-it. See example below.
+The :ref:`datagen.builder<builder_module>` module contains tools that can be used to programmatically generate Data
+Specs. This may be easier for some who are not as familiar with JSON or prefer to manage their structures in code.
+The core object is the ``Builder``. You can add fields, refs, and field groups to this. Each of the core field types
+has a builder function that will generate a Field Spec for it. See example below.
 
-These examples can be used to generate email addresses.  The first example uses the
-raw API to build up the spec. The second uses a dictionary that mirrors the JSON
-format.
+These examples can be used to generate email addresses.  The first example uses the raw API to build up the spec. The
+second uses a dictionary that mirrors the JSON format.
 
 .. code-block:: python
 
@@ -569,8 +549,8 @@ An alternative is to have a spec as a dictionary:
 Record Generator
 ^^^^^^^^^^^^^^^^
 
-The :ref:`spec.generator<data_spec_class>` function will create a python generator that can be used to
-incrementally generate the records from the DataSpec.
+The :ref:`spec.generator<data_spec_class>` function will create a python generator that can be used to incrementally
+generate the records from the DataSpec.
 
 Example:
 

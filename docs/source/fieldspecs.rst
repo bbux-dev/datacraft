@@ -4,16 +4,14 @@ Field Specs
 Field Spec Structure
 --------------------
 
-There are several ways to define a Field Spec. There is the full spec format,
-and a variety of short hand notations.
+There are several ways to define a Field Spec. There is the full spec format, and a variety of short hand notations.
 
 The Full Format
 ^^^^^^^^^^^^^^^
 
-Each of the :doc:`core built in types<coretypes>` has a JSON schema.  The full format is what is used
-to validate against this schema. Other shorthand formats are processed into the full
-format. Each Type Handler requires different pieces of information. For most types,
-the key fields are ``type``, ``data``, and ``config``. Below is the general Field
+Each of the :doc:`core built in types<coretypes>` has a JSON schema.  The full format is what is used to validate
+against this schema. Other shorthand formats are processed into the full format. Each Type Handler requires different
+pieces of information. For most types, the key fields are ``type``, ``data``, and ``config``. Below is the general Field
 Spec structure.
 
 .. code-block::
@@ -34,9 +32,8 @@ Spec structure.
 Values Shorthand
 ^^^^^^^^^^^^^^^^
 
-The ``values`` type is very common and so has a shorthand notation. Below is an
-example full Field Spec for some values types fields and the same spec in
-shorthand notation.
+The ``values`` type is very common and so has a shorthand notation. Below is an example full Field Spec for some
+values types fields and the same spec in shorthand notation.
 
 .. code-block:: json
 
@@ -69,25 +66,21 @@ shorthand notation.
      "field3": "CONSTANT"
    }
 
-The value after the field name is just the value of the data element from the
-full Field Spec. Config params can be added to the key using the URL syntax
-described below.
+The value after the field name is just the value of the data element from the full Field Spec. Config params can be
+added to the key using the URL syntax described below.
 
 Inline Key Type Shorthand
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Some specs lend themselves to being easily specified with few parameters. One
-short hand way to do this is the use a colon in the key to specify the type
-after the field name. For example ``{"id:uuid":{}}``. This says the field ``id`` is
-of type ``uuid`` and has no further configuration. If no type is specified, the
-field is assumed to be a ``values`` type.
+Some specs lend themselves to being easily specified with few parameters. One short hand way to do this is the use a
+colon in the key to specify the type after the field name. For example ``{"id:uuid":{}}``. This says the field ``id`` is
+of type ``uuid`` and has no further configuration. If no type is specified, the field is assumed to be a ``values``
+type.
 
 Inline Key Config Shorthand
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is also possible to specify configuration parameters in the key by using URL
-style parameters. For example.
-
+It is also possible to specify configuration parameters in the key by using URL style parameters. For example.
 
 .. code-block:: json
 
@@ -95,15 +88,13 @@ style parameters. For example.
      "network:ipv4?cidr=192.168.0.0/16": {}
    }
 
-The ``network`` field is of type ``ipv4`` and the required ``cidr`` param is specified
-in the key.
+The ``network`` field is of type ``ipv4`` and the required ``cidr`` param is specified in the key.
 
 Spec Configuration
 ------------------
 
-There are two ways to configure a spec. One is by providing a ``config`` element
-in the Field Spec and the other is by using a URL parameter format in the key.
-For example, the following two fields will produce the same values:
+There are two ways to configure a spec. One is by providing a ``config`` element in the Field Spec and the other is
+by using a URL parameter format in the key. For example, the following two fields will produce the same values:
 
 
 .. code-block:: json
@@ -126,8 +117,7 @@ For example, the following two fields will produce the same values:
 Common Configurations
 ^^^^^^^^^^^^^^^^^^^^^
 
-There are some configuration values that can be applied to all or a subset of
-types. These are listed below
+There are some configuration values that can be applied to all or a subset of types. These are listed below
 
 .. list-table::
    :header-rows: 1
@@ -173,23 +163,18 @@ Example:
 Count Config Parameter
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Several types support a ``count`` config parameter. The value of the count
-parameter can be any of the supported values specs formats. For example a
-constant ``3``\ , list ``[2, 3, 7]``\ , or weighted
-map ``{"1": 0.5, "2": 0.3, "3": 0.2 }``. This will produce the number of values by
-creating a value supplier for the count based on the supplied parameter. Most of
-the time if the count is greater than 1, the values will be returned as an
-array. Some types support joining the values by specifying the ``join_with``
-parameter. Some types will let you explicitly set the ``as_list`` parameter to
-force the results to be returned as an array and not the default for the given
-type.
+Several types support a ``count`` config parameter. The value of the count parameter can be any of the supported
+values specs formats. For example a constant ``3``\ , list ``[2, 3, 7]``\ , or weighted map ``{"1": 0.5, "2": 0.3,
+"3": 0.2 }``. This will produce the number of values by creating a value supplier for the count based on the supplied
+parameter. Most of the time if the count is greater than 1, the values will be returned as an array. Some types
+support joining the values by specifying the ``join_with`` parameter. Some types will let you explicitly set the
+``as_list`` parameter to force the results to be returned as an array and not the default for the given type.
 
 Count Distributions
 ^^^^^^^^^^^^^^^^^^^
 
-Another way to specify a count is to use a count distribution. This is done with
-the ``count_dist`` param.  The param takes a string argument which is the
-distribution along with its required arguments in function call form with
+Another way to specify a count is to use a count distribution. This is done with the ``count_dist`` param.  The param
+takes a string argument which is the distribution along with its required arguments in function call form with
 parameters explicitly named.  See the table below.
 
 .. list-table::
@@ -238,3 +223,11 @@ Example:
      }
    }
 
+Custom distributions can be supplied using the :ref:`custom code<custom_code>` loading and the
+``@datagen.registry.distribution`` decorator:
+
+.. code-block:: python
+
+    >>> @datagen.registry.distribution('gamma')
+    ... def _gamma_distribution(a, moments, **kwargs):
+    ...     # return a datagen.Distribution, args can be custom for the defined distribution

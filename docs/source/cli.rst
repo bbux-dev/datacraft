@@ -23,18 +23,16 @@ To test small spec fragments, you can use the ``--inline <spec>`` flag. Example:
 Log Levels
 ----------
 
-You can change the logging levels to one of ``debug, info, warn, error, or off``
-by using the ``-l`` or ``--log-level`` flag. See example above.
+You can change the logging levels to one of ``debug, info, warn, error, or off`` by using the ``-l`` or
+``--log-level`` flag. See example above.
 
 Formatting Output
 -----------------
 
-Sometimes it may be useful to dump the generated data into a format that is
-easier to consume or view. Use the ``-f`` or ``--format`` flag to specify one
-of ``json`` or ``json-pretty`` or ``csv``. The ``json`` format will print a flat version
-of each record that takes up a single line for each iteration. The
-``json-pretty`` format will print an indented version of each record that will
-span multiple lines. The ``csv`` format will output each record as a comma
+Sometimes it may be useful to dump the generated data into a format that is easier to consume or view. Use the ``-f``
+or ``--format`` flag to specify one of ``json`` or ``json-pretty`` or ``csv``. The ``json`` format will print a flat
+version of each record that takes up a single line for each iteration. The ``json-pretty`` format will print an
+indented version of each record that will span multiple lines. The ``csv`` format will output each record as a comma
 separated value line. Examples:
 
 .. code-block:: shell
@@ -66,18 +64,16 @@ separated value line. Examples:
 Apply Raw ``--apply-raw``
 -------------------------
 
-The ``--apply-raw`` command line flag will treat the argument of the ``-s`` flag as
-the raw-data that should be applied to the template. This can be helpful when
-working on adjusting the template that is being generated. You can dump the
-generated data from N iterations using the ``--format json``
-or ``--format json-pretty`` then use this as raw input to the template file.
+The ``--apply-raw`` command line flag will treat the argument of the ``-s`` flag as the raw-data that should be
+applied to the template. This can be helpful when working on adjusting the template that is being generated. You can
+dump the generated data from N iterations using the ``--format json`` or ``--format json-pretty`` then use this as
+raw input to the template file.
 
 Debugging Specifications
 ------------------------
 
-There are a bunch of shorthand formats for creating specifications. These
-ultimately get turned into a full spec format. It may be useful to see what the
-full spec looks like after all the transformations have taken place. Use the
+There are a bunch of shorthand formats for creating specifications. These ultimately get turned into a full spec
+format. It may be useful to see what the full spec looks like after all the transformations have taken place. Use the
 ``--debug-spec`` to dump the internal form of the specification for inspection.
 
 .. code-block:: shell
@@ -97,10 +93,9 @@ full spec looks like after all the transformations have taken place. Use the
 Schema Level Validation
 -----------------------
 
-Most of the default supported field spec types have JSON based schemas defined
-for them. Schema based validation is turned off by default. Use the ``--strict``
-command line flag to turn on the strict schema based checks for types that have
-schemas defined. Example:
+Most of the default supported field spec types have JSON based schemas defined for them. Schema based validation is
+turned off by default. Use the ``--strict`` command line flag to turn on the strict schema based checks for types
+that have schemas defined. Example:
 
 .. code-block:: shell
 
@@ -117,8 +112,8 @@ schemas defined. Example:
 Default Values
 --------------
 
-There are some default values used when a given spec does not provide them.
-These defaults can be viewed using the ``--debug-defaults`` flag.
+There are some default values used when a given spec does not provide them. These defaults can be viewed using the
+``--debug-defaults`` flag.
 
 .. code-block:: shell
 
@@ -137,11 +132,9 @@ These defaults can be viewed using the ``--debug-defaults`` flag.
        "json_indent": 4
    }
 
-The general convention is to use the type as a prefix for the key that it
-effects. You can save this information to disk by specifying the ``-o``
-or ``--outdir`` flag. In the output above the default ``join_with`` config param is
-a comma for the ``geo`` type, but is an empty string for the ``combine``
-and ``char_class`` types.
+The general convention is to use the type as a prefix for the key that it effects. You can save this information to
+disk by specifying the ``-o`` or ``--outdir`` flag. In the output above the default ``join_with`` config param is
+a comma for the ``geo`` type, but is an empty string for the ``combine`` and ``char_class`` types.
 
 Override Defaults
 -----------------
