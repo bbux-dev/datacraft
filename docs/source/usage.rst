@@ -494,14 +494,16 @@ Programmatic Usage
 Building Specs
 ^^^^^^^^^^^^^^
 
-The ``datagen.builder`` module contains tools that can be used to
+The :ref:`datagen.builder<builder_module>` module contains tools that can be used to
 programmatically generate Data Specs. This may be easier for some who are not as
 familiar with JSON or prefer to manage their structures in code. The core object
 is the ``Builder``. You can add fields, refs, and field groups to this. Each of
 the core field types has a builder function that will generate a Field Spec for
 it. See example below.
 
-This is the email address example from above using the ``builder`` module.
+These examples can be used to generate email addresses.  The first example uses the
+raw API to build up the spec. The second uses a dictionary that mirrors the JSON
+format.
 
 .. code-block:: python
 

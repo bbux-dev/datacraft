@@ -2,6 +2,7 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
+from typing import Tuple, List
 
 
 class DataSpec(dict):
@@ -90,4 +91,16 @@ class ValueSupplierInterface(ABC):
 
         Returns:
             the next value
+        """
+
+
+class KeyProviderInterface(ABC):
+    """ Interface for KeyProviders """
+
+    @abstractmethod
+    def get(self) -> Tuple[str, List[str]]:
+        """get the next set of field names to process
+
+        Returns:
+            key_group_name, key_list_for_group_name
         """

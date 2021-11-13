@@ -7,25 +7,12 @@ provides classes that provide these fields according to various schemes such as 
 
 """
 from typing import List, Tuple, Union, Dict
-from abc import ABC, abstractmethod
 import json
 from . import suppliers, ValueSupplierInterface
-from .model import DataSpec
+from .model import DataSpec, KeyProviderInterface
 from .exceptions import SpecException
 
 ROOT_KEYS = ['refs', 'field_groups']
-
-
-class KeyProviderInterface(ABC):
-    """ Interface for KeyProviders """
-
-    @abstractmethod
-    def get(self) -> Tuple[str, List[str]]:
-        """get the next set of field names to process
-
-        Returns:
-            key_group_name, key_list_for_group_name
-        """
 
 
 def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:

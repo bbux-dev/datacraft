@@ -11,6 +11,7 @@ from . import builder
 from . import suppliers
 from . import template_engines
 from . import spec_formatters
+from . import key_providers
 
 
 def parse_spec(raw_spec: dict) -> DataSpec:

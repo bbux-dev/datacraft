@@ -1,4 +1,6 @@
 import pytest
+
+import datagen
 from datagen import builder, Loader
 from datagen.supplier.core import nested
 
@@ -81,3 +83,46 @@ def test_nested_count_edge_cases(count, as_list, expected):
     generator = spec.generator(1)
     single_record = next(generator)
     assert single_record['outer'] == expected
+
+
+def test_nested_field_groups():
+    raw_spec = {
+        "outer": {
+            "type": "nested",
+            "fields": {
+                "one": "Val 1",
+                "two": "Val 2"
+            },
+            "field_groups": [
+                ["one"],
+                ["one", "two"]
+            ]
+        }
+    }
+    spec = datagen.parse_spec(raw_spec)
+    gen = spec.generator(iterations=2)
+    first = next(gen)["outer"]
+    second = next(gen)["outer"]
+    assert "two" not in first
+    assert "two" in second
+
+
+def test_nested_field_groups_invalid_name():
+    raw_spec = {
+        "outer": {
+            "type": "nested",
+            "fields": {
+                "one": "Val 1",
+                "two": "Val 2"
+            },
+            "field_groups": [
+                ["one"],
+                ["one", "tre"]
+            ]
+        }
+    }
+    with pytest.raises(datagen.SpecException):
+        spec = datagen.parse_spec(raw_spec)
+        gen = spec.generator(iterations=2)
+        next(gen)  # no error
+        next(gen)  # should trigger
