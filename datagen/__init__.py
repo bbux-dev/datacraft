@@ -7,6 +7,8 @@ from .loader import Loader, preprocess_spec
 from .exceptions import SpecException, ResourceError
 from .builder import spec_builder
 from .supplier.core import *
+from .defaults import *
+from .preprocessor import *
 from . import builder
 from . import suppliers
 from . import template_engines

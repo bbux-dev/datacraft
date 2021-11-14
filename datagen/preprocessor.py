@@ -2,9 +2,9 @@
 Module for preprocessing spec before generating values. Exists to handle shorthand notation and
 pushing params from URL form of field?param=value in to config object.
 """
+import re
 import json
 import logging
-from urllib.parse import urlparse
 from urllib.parse import parse_qs
 import datagen
 from .exceptions import SpecException
@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 @datagen.registry.preprocessors('default')
-def preprocess_spec(raw_spec):
+def _preprocess_spec(raw_spec):
     """
     Preprocesses the spec into a format that is easier to use.
     Pushes all url params in keys into config object. Converts shorthand specs into full specs
@@ -27,7 +27,7 @@ def preprocess_spec(raw_spec):
     updated_specs = {}
     for key, spec in raw_spec.items():
         if key == 'refs':
-            updated_specs[key] = preprocess_spec(raw_spec[key])
+            updated_specs[key] = _preprocess_spec(raw_spec[key])
             continue
         if key == 'field_groups':
             updated_specs[key] = spec
@@ -41,7 +41,7 @@ def preprocess_spec(raw_spec):
 
 
 @datagen.registry.preprocessors('csv-select')
-def preprocess_csv_select(raw_spec):
+def _preprocess_csv_select(raw_spec):
     """
     Converts and csv-select elements into standard csv ones
 
@@ -82,7 +82,7 @@ def preprocess_csv_select(raw_spec):
 
 
 @datagen.registry.preprocessors('nested')
-def preprocess_nested(raw_spec):
+def _preprocess_nested(raw_spec):
     """
     Converts all nested elements
 
@@ -95,16 +95,16 @@ def preprocess_nested(raw_spec):
     updated_specs = {}
     if 'refs' in raw_spec:
         if 'refs' in updated_specs:
-            updated_specs['refs'].update(preprocess_spec(raw_spec['refs']))
+            updated_specs['refs'].update(_preprocess_spec(raw_spec['refs']))
         else:
-            updated_specs['refs'] = preprocess_spec(raw_spec['refs'])
+            updated_specs['refs'] = _preprocess_spec(raw_spec['refs'])
     for key, spec in raw_spec.items():
         if key == 'refs':
             # run preprocessors on refs too
-            updated_refs = preprocess_spec(spec)
-            updated_refs = preprocess_csv_select(updated_refs)
+            updated_refs = _preprocess_spec(spec)
+            updated_refs = _preprocess_csv_select(updated_refs)
             # in case we have nested nested elements
-            updated_refs = preprocess_nested(updated_refs)
+            updated_refs = _preprocess_nested(updated_refs)
             updated_specs['refs'] = updated_refs
             continue
 
@@ -112,10 +112,10 @@ def preprocess_nested(raw_spec):
             if 'fields' not in spec:
                 raise datagen.SpecException('Missing fields key for nested spec: ' + json.dumps(spec))
             fields = spec['fields']
-            updated = preprocess_spec(fields)
-            updated = preprocess_csv_select(updated)
+            updated = _preprocess_spec(fields)
+            updated = _preprocess_csv_select(updated)
             # in case we have nested nested elements
-            updated = preprocess_nested(updated)
+            updated = _preprocess_nested(updated)
             # this may have created a refs element, need to move this to the root
             _update_root_refs(updated_specs, updated)
             spec['fields'] = updated
@@ -208,18 +208,16 @@ def _parse_key(field_name):
 
     2. field?param1=val...
     """
-    parsed_url = urlparse(field_name)
-    parsed_query = parse_qs(parsed_url.query)
-    if parsed_url.scheme:
-        newkey = parsed_url.scheme
-        spectype = parsed_url.path
+    parts = re.split(r'\?', field_name)
+    key_type = parts[0].split(':')
+    parsed_query = parse_qs(parts[1])
+
+    if len(key_type) > 1:
+        newkey = key_type[0]
+        spectype = key_type[1]
     else:
-        # case that the key portion has non standard chars such as _
-        if ':' in parsed_url.path:
-            newkey, spectype = parsed_url.path.split(':', 2)
-        else:
-            newkey = parsed_url.path
-            spectype = None
+        newkey = parts[0]
+        spectype = None
     config = {}
     for key, value in parsed_query.items():
         if len(value) == 1:
