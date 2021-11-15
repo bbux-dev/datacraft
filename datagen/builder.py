@@ -569,26 +569,28 @@ class Builder:
         self.refs_builder.add_field(key, spec)
         return self
 
-    def weighted_field_group(self, key: str, fields: List[str], weight: float):
+    def weighted_field_group(self, weight: float, fields: List[str]):
         """
         Creates a weighted field group for a single key and add to Spec
 
         Args:
-            key: the name of the field group
             fields: the fields in the group
             weight: the weight for this group
 
         Returns:
             FieldInfo for field group
+
+        Examples:
+            >>> import datagen
+            >>> builder = datagen.spec_builder()
+            >>> builder.weighted_field_group(0.6, ['name', 'age', 'gender'])
+            >>> builder.weighted_field_group(0.4, ['name', 'age'])
         """
         field_group = {
-            key: {
-                "weight": weight,
-                "fields": fields
-            }
+            str(weight): fields
         }
         self.field_groups.append(field_group)
-        return FieldInfo(key, 'field_group')
+        return FieldInfo(str(weight), 'field_group')
 
     def named_field_group(self, key: str, fields: List[str]):
         """
@@ -600,6 +602,12 @@ class Builder:
 
         Returns:
             FieldInfo
+
+        Examples:
+            >>> import datagen
+            >>> builder = datagen.spec_builder()
+            >>> builder.named_field_group("all", ['name', 'age', 'gender'])
+            >>> builder.named_field_group("no_gender", ['name', 'age'])
         """
         field_group = {
             key: fields

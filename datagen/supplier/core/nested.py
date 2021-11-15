@@ -138,7 +138,7 @@ class NestedSupplier(datagen.model.ValueSupplierInterface):
         if any(val is None for val in subset.values()):
             raise datagen.SpecException(f'One or more keys provided in nested spec are not valid: {keys}, valid keys: '
                                         f'{list(self.field_supplier_map.keys())}')
-        return {key: supplier.next(iteration) for key, supplier in subset.items()}
+        return {key: supplier.next(iteration) for key, supplier in subset.items()}  # type: ignore
 
 
 @datagen.registry.types('nested')

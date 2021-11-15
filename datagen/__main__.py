@@ -251,7 +251,11 @@ def _load_json_or_yaml(data_path):
     # not JSON, try yaml
     with open(data_path, 'r') as handle:
         log.debug('Attempting to load data as YAML')
-        loaded = yaml.load(handle, Loader=yaml.FullLoader)
+        try:
+            loaded = yaml.load(handle, Loader=yaml.FullLoader)
+        except yaml.parser.ParserError as err:
+            log.warning(err)
+            loaded = None
     if not isinstance(loaded, dict):
         raise SpecException(f'Unable to load data from path: {data_path}, Please verify it is valid JSON or YAML')
     return loaded
