@@ -33,6 +33,8 @@ date
 
 .. automodule:: datagen.supplier.core.date
 
+.. _csv_core_types:
+
 csv
 ---
 

@@ -112,6 +112,76 @@ is supported is YAML:
 
 There are also shorthand notations, see :doc:`fieldspecs` for more details.
 
+Refs
+----------
+
+There is a special section in the Data Spec called ``refs``.  This is short for references and is where a Field
+Spec be defined outside of a field.  Field Specs can then point to a ref to supply values it can use for the data
+generation process.  The simplest example of this is the ``combine`` type:
+
+.. code-block:: json
+
+    {
+      "combine": {
+        "type": "combine",
+        "refs": ["first", "last"],
+        "config": {
+          "join_with": " "
+        }
+      },
+      "refs": {
+        "first": {
+          "type": "values",
+          "data": ["zebra", "hedgehog", "llama", "flamingo"]
+        },
+        "last": {
+          "type": "values",
+          "data": ["jones", "smith", "williams"]
+        }
+      }
+    }
+
+Here the combine type takes a refs argument that specifies the name of two reference to combine the values of. There
+is also a ``ref`` type. This is useful for making Data Specs easier to read by segmenting the structures into smaller
+pieces.  This is particularly useful with ``nested`` types:
+
+.. code-block:: json
+
+    {
+      "outer": {
+        "type": "nested",
+        "fields": {
+          "simple_uuid": { "type": "uuid" },
+          "complex_value:ref": "COMPLEX_VALUE_DEFINED"
+        }
+      },
+      "refs": {
+        "COMPLEX_VALUE_DEFINED": {
+          "type": "rand_range",
+          "data": [0, 42],
+          "config": {
+            "prefix": "~",
+            "suffix": " microns per second",
+            "quote": "'",
+            "precision": 3
+          }
+        }
+      }
+    }
+
+In this example the ``complex_value`` field has a lot going on.  To simplify the specification for the ``outer``
+field, the spec uses a type of ``ref`` to point to the ``COMPLEX_VALUE_DEFINED`` reference.  Notice that we use the
+shorthand notation of ``<field name>:<type>`` to simplify the spec.  The full spec version of this can be seen with the
+``--debug-spec`` command line argument. If we run this spec from the command line:
+
+.. code-block:: text
+
+    $ datagen -s refs_type.json --log-level debug -i 3 --log-level off --format json -x
+    {"outer": {"simple_uuid": "c77a5bee-83bb-4bae-a8e8-21be735f73c9", "complex_value": "'~4.028 microns per second'"}}
+    {"outer": {"simple_uuid": "5d27eb03-c5a3-4167-9dd1-56c1f0b5a49c", "complex_value": "'~21.221 microns per second'"}}
+    {"outer": {"simple_uuid": "6fa92f9f-d3ac-4118-ad2f-89b73bafb7c5", "complex_value": "'~27.432 microns per second'"}}
+
+
 Templating
 ----------
 
@@ -239,6 +309,8 @@ In the above spec the number of users created will be weighted so that half the 
 half there are three or four. NOTE: It is important to make sure that the ``count`` param is equal to the maximum number
 that will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
+.. _field_groups:
+
 Field Groups
 ------------
 
@@ -289,19 +361,12 @@ with the fields that should be output together.
      "name": "...",
      "tag": "...",
      "field_groups": {
-       "thirty_percent": {
-         "weight": 0.3,
-         "fields": ["id", "name"]
-       },
-       "two": {
-         "weight": 0.7,
-         "fields": ["id", "name", "tag"]
-       }
+       "0.3": ["id", "name"],
+       "0.7": ["id", "name", "tag"]
      }
    }
 
-The keys of the ``field_groups`` dictionary are arbitrary. The ``weight`` and ``fields`` element underneath are
-required.
+The keys of the ``field_groups`` must all be floating point numbers as strings.
 
 Running this example:
 
@@ -319,7 +384,8 @@ Running this example:
    {"id": 9, "name": "Fido", "tag": "Aloof"}
    {"id": 10, "name": "Fluffy", "tag": "Affectionate"}
 
-The final form is a variation on form 2. Here the ``field_groups`` value is a dictionary of name to fields list. i.e.:
+The final form is a variation on form 2. Here the ``field_groups`` value is a dictionary of name to fields list. This
+acts like the first form and the sets of fields are rotated through in turn.
 
 .. code-block:: json
 
@@ -333,8 +399,32 @@ The final form is a variation on form 2. Here the ``field_groups`` value is a di
      }
    }
 
-Notes on CSV Inputs
--------------------
+CSV Inputs
+----------
+
+Instead of hard coding large numbers of values into a Data Spec, these can be externalized using the one of the
+:ref:`csv<csv_core_types>` types. This requires a ``-d`` or ``--datadir`` argument when running from the command line
+to specify where the referenced csv files live. For example:
+
+.. code-block:: json
+
+    {
+      "cities": {
+        "type": "csv",
+        "config": {
+          "col": 1,
+          "datafile": "cities.csv",
+          "sample": true
+        }
+      }
+    }
+
+.. code-block:: shell
+
+    datagen -s spec.json -d dir_with_csvs --log-level off -i 3
+    New York
+    San Diego
+    Springfield
 
 Processing Large CSVs
 ^^^^^^^^^^^^^^^^^^^^^
@@ -393,12 +483,12 @@ Custom Code Loading and Schemas
 -------------------------------
 
 There are a lot of types of data that are not generated with this tool. Instead of adding them all, there is a
-mechanism to bring your own data suppliers. We make use of the handy `catalogue <https://pypi
-.org/project/catalogue/>`_ package to allow auto discovery of custom functions using decorators. Use the
-``@datagen.registry.types('<type key>')`` to register a function that will create a
-:ref:`Value Supplier<value_supplier_interface>` for the supplied Field Spec. Below is an example of a custom class
-which reverses the output of another supplier. Types that are amazing and useful should be nominated for core
-inclusion. Please put up a PR if you create or use one that solves many of your data generation issues.
+mechanism to bring your own data suppliers. We make use of the handy `catalogue <https://pypi.org/project/catalogue/>`_
+package to allow auto discovery of custom functions using decorators. Use the ``@datagen.registry.types('<type key>')``
+to register a function that will create a :ref:`Value Supplier<value_supplier_interface>` for the supplied Field
+Spec. Below is an example of a custom class which reverses the output of another supplier. Types that are amazing and
+useful should be nominated for core inclusion. Please put up a PR if you create or use one that solves many of your
+data generation issues.
 
 To supply custom code to the tool use the ``-c`` or ``--code`` arguments. One or more module files can be imported.
 
@@ -511,7 +601,12 @@ second uses a dictionary that mirrors the JSON format.
 
    spec = spec_builder.build()
 
-An alternative is to have a spec as a dictionary:
+   # print single generated record
+   print(next(spec.generator(1)))
+   #{'email': 'zebra_dispatch@gmail.com'}
+
+
+An alternative is to have a spec as a dictionary that mirrors the JSON format:
 
 .. code-block:: python
 
@@ -545,6 +640,11 @@ An alternative is to have a spec as a dictionary:
    }
 
    spec = datagen.parse_spec(raw_sepec)
+
+   # print single generated record
+   print(next(spec.generator(1)))
+   #{'email': 'zebra_fling@gmail.com'}
+
 
 Record Generator
 ^^^^^^^^^^^^^^^^
