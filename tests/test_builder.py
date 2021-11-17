@@ -186,11 +186,9 @@ invalid_spec_build_tests = [
     builder.spec_builder().ip('name', base="192.1680"),  # type in base
     builder.spec_builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
     builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),  # ref not defined
-    # TODO: when schemas for these are created
-    # builder.spec_builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
-    # builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
-    # builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
-    # builder.spec_builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
+    builder.spec_builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+    builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
+    builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
 ]
 
 
