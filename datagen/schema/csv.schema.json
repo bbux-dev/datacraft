@@ -62,6 +62,11 @@
           "default": false,
           "$ref": "#/definitions/affirmative_check"
         },
+        "sample_rows": {
+          "description": "If the values for the csv should be sampled at a row level",
+          "default": false,
+          "$ref": "#/definitions/affirmative_check"
+        },
         "count": {
           "$ref": "#/definitions/count",
           "description": "Number of values in column to use for field",

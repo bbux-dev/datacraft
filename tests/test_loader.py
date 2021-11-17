@@ -6,7 +6,7 @@ import pytest
 # to trigger registration
 from datagen.supplier.core import combine, weighted_refs
 
-spec = builder.Builder() \
+spec = builder.spec_builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \
     .add_ref('ONE', builder.values(['do', 'ca', 'pi'])) \
     .add_ref('TWO', builder.values(['g', 't', 'g'])) \
@@ -34,7 +34,7 @@ def test_load_spec_missing_type_defaults_to_values():
 
 
 def test_load_spec_undefined_refs():
-    spec_undefined_refs = builder.Builder() \
+    spec_undefined_refs = builder.spec_builder() \
         .add_field('foo', builder.combine(['ONE', 'TWO'])) \
         .build()
     loader = Loader(spec_undefined_refs)
@@ -57,7 +57,7 @@ def test_load_spec_weighted_ref():
         "NEGATIVE": 0.4,
         "NEUTRAL": 0.1
     }
-    weighted_ref_spec = builder.Builder() \
+    weighted_ref_spec = builder.spec_builder() \
         .add_field('foo', builder.weightedref(ref_weights)) \
         .add_ref('POSITIVE', ['yes']) \
         .add_ref('NEGATIVE', ['no']) \
@@ -87,7 +87,7 @@ def test_shortcut_notation_config_in_key():
 
 
 def test_load_ref_by_name():
-    refs_only_spec = builder.Builder() \
+    refs_only_spec = builder.spec_builder() \
         .add_ref('ONE', 'uno') \
         .add_ref('TWO', 'dos') \
         .build()

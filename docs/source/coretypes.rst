@@ -40,6 +40,8 @@ csv
 
 .. automodule:: datagen.supplier.core.csv
 
+.. _config_ref_core_types:
+
 configref
 ---------
 

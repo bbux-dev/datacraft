@@ -9,10 +9,10 @@ def test_single_nested():
     # Geo
     # - Place
     # - Coord
-    geo_spec = builder.Builder() \
+    geo_spec = builder.spec_builder() \
         .add_field("place_id:uuid", {}) \
         .add_field("coordinates", builder.geo_pair(as_list=True))
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build())) \
         .build()
@@ -28,13 +28,13 @@ def test_multi_nested():
     # - Geo
     # - - Place
     # - - Coord
-    geo_spec = builder.Builder() \
+    geo_spec = builder.spec_builder() \
         .add_field("place_id:uuid", {}) \
         .add_field("coordinates", builder.geo_pair(as_list=True))
-    user_spec = builder.Builder() \
+    user_spec = builder.spec_builder() \
         .add_field("user_id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build()))
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("id:uuid", {}) \
         .add_field("user", builder.nested(fields=user_spec.build())) \
         .build()
@@ -53,10 +53,10 @@ def test_single_nested_as_list():
     # Geo
     # - Place
     # - Coord
-    geo_spec = builder.Builder() \
+    geo_spec = builder.spec_builder() \
         .add_field("place_id:uuid", {}) \
         .add_field("coordinates", builder.geo_pair(as_list=True))
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build(), as_list=True)) \
         .build()

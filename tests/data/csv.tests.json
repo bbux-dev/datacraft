@@ -7,6 +7,7 @@
       {"instance": {"type": "csv", "config": {"datafile": "test.csv", "column": "status"}}},
       {"instance": {"type": "csv", "config": {"datafile": "test.csv", "quotechar": "'"}}},
       {"instance": {"type": "csv", "config": {"datafile": "test.csv", "sample": true}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "sample_rows": true}}},
       {"instance": {"type": "csv", "config": {"datafile": "test.csv", "count": 2}}},
       {"instance": {"type": "csv", "config": {"datafile": "test.csv", "count": [1, 1, 2], "join_with": " "}}}
     ],

@@ -71,7 +71,8 @@ Examples:
           "config": {
             "datafile": "tabs.csv",
             "delimiter": "\\t",
-            "headers": true
+            "headers": true,
+            "sample_rows": true
           }
         }
       }
@@ -150,10 +151,12 @@ Examples:
       }
     }
 """
+from abc import ABC, abstractmethod
 import csv
 import json
 import os
 import random
+import logging
 from typing import Dict
 from typing import Union
 
@@ -164,8 +167,10 @@ ONE_MB = 1024 * 1024
 SMALL_ENOUGH_THRESHOLD = 250 * ONE_MB
 _DEFAULT_BUFFER_SIZE = 1000000
 
+log = logging.getLogger(__name__)
 
-class CsvDataBase:
+
+class CsvDataBase(ABC):
     """
     Class for encapsulating the data for a single CSV file so that multiple suppliers
     only need one copy of the underlying data
@@ -186,6 +191,7 @@ class CsvDataBase:
         if len(self.valid_keys) == 0:
             self.valid_keys = [i + 1 for i in range(len(self.data[0]))]
 
+    @abstractmethod
     def next(self, field: Union[int, str], iteration: int, sample: bool, count: int):
         """
         Obtains the next value(s) for the field for the given iteration
@@ -200,12 +206,12 @@ class CsvDataBase:
             array of values if count > 1 else the next value
         """
 
+    @abstractmethod
     def _load_data(self) -> list:
         """
         Method for subclass to load initial data
             the loaded data
         """
-        raise NotImplementedError()
 
     def _get_column_index(self, field: Union[int, str]):
         """
@@ -252,6 +258,36 @@ class SampleEnabledCsv(CsvDataBase):
             else:
                 idx = iteration % len(self.data) + i
             values.append(self.data[idx][colidx])
+        if count == 1:
+            return values[0]
+        return values
+
+
+class RowLevelSampleEnabledCsv(CsvDataBase):
+    """
+    CSV Data that reads whole file into memory. Supports sampling at a row level
+    """
+
+    def __init__(self, csv_path: str, delimiter: str, quotechar: str, has_headers: bool):
+        self.csv_path = csv_path
+        self.delimiter = delimiter
+        self.quotechar = quotechar
+        self.current = -1
+        self.idx = -1
+        super().__init__(has_headers)
+
+    def _load_data(self):
+        with open(self.csv_path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=self.delimiter, quotechar=self.quotechar)
+            return list(reader)
+
+    def next(self, field, iteration, sample, count):
+        colidx = self._get_column_index(field)
+        # update the index only when the iteration changes
+        if iteration != self.current:
+            self.current = iteration
+            self.idx = random.randint(0, len(self.data) - 1)
+        values = [self.data[self.idx+i][colidx] for i in range(count)]
         if count == 1:
             return values[0]
         return values
@@ -451,8 +487,12 @@ def _load_csv_data(field_spec, config, datadir):
 
     size_in_bytes = os.stat(csv_path).st_size
     max_csv_size = int(datagen.types.get_default('large_csv_size_mb')) * ONE_MB
+    sample_rows = datagen.utils.is_affirmative('sample_rows', config)
     if size_in_bytes <= max_csv_size:
-        csv_data = SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
+        if sample_rows:
+            csv_data = RowLevelSampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
+        else:
+            csv_data = SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
     else:
         csv_data = BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)
     _csv_data_cache[csv_path] = csv_data

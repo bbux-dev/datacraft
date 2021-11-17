@@ -44,7 +44,7 @@ def test_generator_no_template():
 
 
 def build_spec(data):
-    spec_builder = builder.Builder()
+    spec_builder = builder.spec_builder()
     for key, value in data.items():
         spec_builder.add_field(key, value)
     return spec_builder.build()

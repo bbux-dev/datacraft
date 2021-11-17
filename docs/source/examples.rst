@@ -211,7 +211,8 @@ Both ``GEOMETRY`` and ``PROPERTIES`` are nested fields. The ``geometry`` element
 currently a reserved key word in DataSpecs, so can't be used as a field name. The field is named geo_type instead and
 the value is set to a constant value "Point". There are other types of geometry, but for this demo we are only
 producing points. The lat and long field are supplied from the csv fie using the references that were defined earlier.
-The properties values also come from the refeferences defined earlier.  The ``PROPERTIES`` reference is a nested type
+The properties values also come from the references defined earlier.  The ``PROPERTIES`` reference is a nested type
 and has another property defined ``field_groups``.  These are explained in detail in :ref:`FieldGroups<field_groups>`
 The type here is a weighted one. 80% of the records will contain all three fields in the properties and 20% of the
-time there will only be 2 or the 3.
+time there will only be two.
+

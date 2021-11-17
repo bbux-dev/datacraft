@@ -426,6 +426,53 @@ to specify where the referenced csv files live. For example:
     San Diego
     Springfield
 
+Common CSV Configs
+^^^^^^^^^^^^^^^^^^
+
+If more than one field is used from a csv file, it may be useful to create a :ref:`configref<config_ref_core_types>`
+to hold the common configurations for the fields. Below there are two fields that use the same csv file to supply
+their values. The common configurations for the csv file are placed in the refs section in a ref titled
+``http_csv_config``. The status and status_name fields now only have two configuration parameters: ``col`` and
+``configref``.
+
+.. code-block:: json
+
+    {
+      "status:csv": {
+        "config": {
+          "col": 1,
+          "configref": "http_csv_config"
+        }
+      },
+      "status_name:csv": {
+        "config": {
+          "col": 2,
+          "configref": "http_csv_config"
+        }
+      },
+      "refs": {
+        "http_csv_config": {
+          "type": "configref",
+          "config": {
+            "datafile": "http_codes.csv",
+            "headers": true,
+            "delimiter": "\\t"
+            "sample_rows": true
+          }
+        }
+      }
+    }
+
+Row Level Sampling
+^^^^^^^^^^^^^^^^^^
+
+By default, the rows of a CSV file are iterated through in order.  It is possible to enable sampling on a per column
+basis by setting the ``sample`` config value to one of on, yes, or true. If you want to sample a csv file at the row
+level, you need to set the config param ``sample_rows`` to one of on, yes, or true. If this value is set for the
+first csv field from the same file defined, it will be inherited by the rest. If it is not configured on the first
+field, it will not be enabled, even if set on a later field. It is safest to define the field in a configref that all
+of the fields share, as illustrated in the above example.
+
 Processing Large CSVs
 ^^^^^^^^^^^^^^^^^^^^^
 

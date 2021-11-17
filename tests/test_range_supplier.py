@@ -57,7 +57,7 @@ def test_range_float_start_end():
 
 
 def test_rand_range():
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("field", builder.rand_range([100.9, 109.9], cast="int")) \
         .build()
     supplier = Loader(spec).get('field')

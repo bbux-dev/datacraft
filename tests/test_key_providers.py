@@ -80,7 +80,7 @@ def one_two_three_builder():
 
 
 def one_two_builder():
-    spec_builder = builder.Builder()
+    spec_builder = builder.spec_builder()
     spec_builder.values('one', ["uno", "ichi"])
     spec_builder.values('two', ["dos", "ni"])
     return spec_builder

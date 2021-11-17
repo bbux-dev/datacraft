@@ -136,7 +136,7 @@ def test_ip_spec_invalid_base2():
 
 
 def test_default_delim_mac_address():
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field('mac', builder.mac()) \
         .build()
     value = next(spec.generator(1))['mac']
@@ -144,7 +144,7 @@ def test_default_delim_mac_address():
 
 
 def test_mac_address_dashes():
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field('mac', builder.mac(dashes='true')) \
         .build()
     value = next(spec.generator(1))['mac']
@@ -168,18 +168,18 @@ def _create_ip_spec_with_base(base):
 
 
 def _ip_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('network', builder.ip(**config)) \
         .build()
 
 
 def _ipv4_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('network', builder.ipv4(**config)) \
         .build()
 
 
 def _ip_precise_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('network', builder.ip_precise(**config)) \
         .build()
