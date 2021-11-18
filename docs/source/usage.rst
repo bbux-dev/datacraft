@@ -412,7 +412,7 @@ to specify where the referenced csv files live. For example:
       "cities": {
         "type": "csv",
         "config": {
-          "col": 1,
+          "column": 1,
           "datafile": "cities.csv",
           "sample": true
         }
@@ -432,7 +432,7 @@ Common CSV Configs
 If more than one field is used from a csv file, it may be useful to create a :ref:`configref<config_ref_core_types>`
 to hold the common configurations for the fields. Below there are two fields that use the same csv file to supply
 their values. The common configurations for the csv file are placed in the refs section in a ref titled
-``http_csv_config``. The status and status_name fields now only have two configuration parameters: ``col`` and
+``http_csv_config``. The status and status_name fields now only have two configuration parameters: ``column`` and
 ``configref``.
 
 .. code-block:: json
@@ -440,13 +440,13 @@ their values. The common configurations for the csv file are placed in the refs 
     {
       "status:csv": {
         "config": {
-          "col": 1,
+          "column": 1,
           "configref": "http_csv_config"
         }
       },
       "status_name:csv": {
         "config": {
-          "col": 2,
+          "column": 2,
           "configref": "http_csv_config"
         }
       },
@@ -686,7 +686,7 @@ An alternative is to have a spec as a dictionary that mirrors the JSON format:
      }
    }
 
-   spec = datagen.parse_spec(raw_sepec)
+   spec = datagen.parse_spec(raw_spec)
 
    # print single generated record
    print(next(spec.generator(1)))
