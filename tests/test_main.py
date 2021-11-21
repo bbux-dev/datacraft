@@ -60,6 +60,12 @@ def test_parse_debug_spec(tmpdir):
     assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
 
 
+def test_parse_debug_spec_yaml(tmpdir):
+    args = ['--debug-spec-yaml', '-o', str(tmpdir), '--inline', '{foo: [1,2,3]}']
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
 def test_parse_debug_defaults(tmpdir):
     args = ['--debug-defaults', '-o', str(tmpdir)]
     dgmain.main(args)

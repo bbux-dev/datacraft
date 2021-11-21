@@ -15,6 +15,7 @@ Examples:
     >>> builder.build()
     {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}, 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
 """
+import os
 import json
 import logging
 from pathlib import Path
@@ -1339,7 +1340,8 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
         iterations: number of iterations before max
 
     Keyword Args:
-        template (Union[str, Path]): inline string template or path to template on disk
+        processor: (RecordProcessor): For any Record Level transformations such templating or formatters
+        output: (OutputHandlerInterface): For any
         data_dir (str): path the data directory with csv files and such
         enforce_schema (bool): If schema validation should be applied where possible
 
@@ -1353,18 +1355,12 @@ class DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
-        template = kwargs.get('template')
+        processor = kwargs.get('processor')
         data_dir = kwargs.get('data_dir', types.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output = kwargs.get('output', None)
         loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
-
-        if template is not None:
-            if isinstance(template, Path):
-                engine = template_engines.for_file(template)
-            else:
-                engine = template_engines.string(template)
 
         key_provider = key_providers.from_spec(loader.specs)
 
@@ -1379,7 +1375,7 @@ class DataSpecImpl(DataSpec):
             if output:
                 output.finished_record(i, group, exclude_internal)
 
-            if template is not None:
-                yield engine.process(record)
+            if processor is not None:
+                yield processor.process(record)
             else:
                 yield record

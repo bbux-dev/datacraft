@@ -112,7 +112,7 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
         >>> asssert calculate.next(0) == 121.92
     """
 
-    def __init__(self, suppliers: dict, engine: datagen.template_engines.TemplateEngine):
+    def __init__(self, suppliers: dict, engine: datagen.model.RecordProcessor):
         self.suppliers = suppliers
         self.engine = engine
         self.aeval = asteval.Interpreter()

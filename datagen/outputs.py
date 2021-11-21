@@ -1,14 +1,17 @@
 """
 Module holds output related classes and functions
 """
-from typing import Any
+from typing import Union
 from abc import ABC, abstractmethod
 import os
 import json
 import logging
 import catalogue  # type: ignore
+from pathlib import Path
 import datagen
-from .types import registry
+from . import template_engines, types
+from .model import RecordProcessor, OutputHandlerInterface
+from .exceptions import SpecException
 
 log = logging.getLogger(__name__)
 
@@ -22,41 +25,13 @@ def _format_json(record: dict) -> str:
 @datagen.registry.formats('json-pretty')
 def _format_json_pretty(record: dict) -> str:
     """pretty prints the record as json  """
-    return json.dumps(record, indent=int(datagen.types.get_default('json_indent')))
+    return json.dumps(record, indent=int(types.get_default('json_indent')))
 
 
 @datagen.registry.formats('csv')
 def _format_csv(record: dict) -> str:
     """formats the values of the record as comma separated values  """
     return ','.join([str(val) for val in record.values()])
-
-
-class OutputHandlerInterface(ABC):
-    """Interface four handling generated output values"""
-
-    @abstractmethod
-    def handle(self, key: str, value: Any):
-        """
-        This is called each time a new value is generated for a given field
-
-        Args:
-            key: the field name
-            value: the new value for the field
-        """
-
-    @abstractmethod
-    def finished_record(self,
-                        iteration: int,
-                        group_name: str,
-                        exclude_internal: bool = False):
-        """
-        This is called whenever all of the fields for a record have been generated for one iteration
-
-        Args:
-            iteration: iteration we are on
-            group_name: group this record is apart of
-            exclude_internal: if external fields should be excluded from output record
-        """
 
 
 class WriterInterface(ABC):
@@ -71,7 +46,7 @@ class WriterInterface(ABC):
         """
 
 
-class SingleFieldOutput(OutputHandlerInterface):
+class _SingleFieldOutput(OutputHandlerInterface):
     """Writes each field as it is created"""
 
     def __init__(self, writer: WriterInterface, output_key):
@@ -88,8 +63,8 @@ class SingleFieldOutput(OutputHandlerInterface):
         pass
 
 
-class RecordLevelOutput(OutputHandlerInterface):
-    """Class to output after all fields have been generated"""
+class _RecordLevelOutput(OutputHandlerInterface):
+    """Class that outputs after all fields have been generated"""
 
     def __init__(self, record_processor, writer):
         self.record_processor = record_processor
@@ -117,14 +92,26 @@ def stdout_writer() -> WriterInterface:
     Returns:
         writer that writes to stdout
     """
-    return StdOutWriter()
+    return _StdOutWriter()
 
 
-class StdOutWriter(WriterInterface):
+class _StdOutWriter(WriterInterface):
     """Writes values to stdout"""
 
     def write(self, value: str):
         print(value)
+
+
+def suppress_output_writer() -> WriterInterface:
+    """ Returns a writer that suppresses the output to stdout """
+    return _SuppressOutput()
+
+
+class _SuppressOutput(WriterInterface):
+    """ Suppresses output """
+
+    def write(self, value):
+        pass
 
 
 def single_file_writer(outdir: str, outname: str, overwrite: bool) -> WriterInterface:
@@ -138,10 +125,10 @@ def single_file_writer(outdir: str, outname: str, overwrite: bool) -> WriterInte
     Returns:
         Writer for a single file
     """
-    return SingleFileWriter(outdir, outname, overwrite)
+    return _SingleFileWriter(outdir, outname, overwrite)
 
 
-class SingleFileWriter(WriterInterface):
+class _SingleFileWriter(WriterInterface):
     """Writes all values to same file"""
 
     def __init__(self, outdir: str, outname: str, overwrite: bool):
@@ -165,21 +152,21 @@ def incrementing_file_writer(outdir: str,
                              outname: str,
                              extension: str = None,
                              records_per_file: int = 1) -> WriterInterface:
-    """Creates a WriterInterface that increments the a count in the file name
+    """Creates a WriterInterface that increments the count in the file name once records_per_file have been written
 
     Args:
         outdir: output directory
         outname: output file name
-        extension: to append to the file i.e. csv
+        extension: to append to the file i.e. .csv
         records_per_file: number of records to write before a new file is opened
 
     Returns:
         a Writer that increments the a count in the file name
     """
-    return IncrementingFileWriter(outdir, outname, extension, records_per_file)
+    return _IncrementingFileWriter(outdir, outname, extension, records_per_file)
 
 
-class IncrementingFileWriter(WriterInterface):
+class _IncrementingFileWriter(WriterInterface):
     """Writes processed output to disk and increments the file name with a count"""
 
     def __init__(self, outdir, outname, extension=None, records_per_file=1):
@@ -210,7 +197,7 @@ class IncrementingFileWriter(WriterInterface):
             self.count += 1
 
 
-class FormatProcessor:
+class _FormatProcessor(RecordProcessor):
     """A simple class that wraps a record formatting function"""
 
     def __init__(self, key):
@@ -229,7 +216,7 @@ class FormatProcessor:
         return self.format_func(record)
 
 
-def for_format(key: str) -> FormatProcessor:
+def _for_format(key: str) -> _FormatProcessor:
     """
     Creates FormatProcessor for provided key if one is registered
 
@@ -243,6 +230,118 @@ def for_format(key: str) -> FormatProcessor:
         SpecException when key is not registered
     """
     try:
-        return FormatProcessor(key)
+        return _FormatProcessor(key)
     except catalogue.RegistryError as err:
-        raise datagen.SpecException(str(err))
+        raise SpecException(str(err))
+
+
+def processor(template: Union[str, Path] = None, format_name: str = None) -> Union[None, RecordProcessor]:
+    """
+    Configures the record level processor for either the template or for the format_name
+
+    Args:
+        template: path to template or template as string
+        format_name: one of the valid registered formatter names
+
+    Returns:
+        RecordProcessor if valid template of format_name provide, None otherwise
+
+    Raises:
+        SpecException when format_name is not registered or if both template and format specified
+
+    Examples:
+        >>> import datagen
+        >>> processor = datagen.outputs.processor(template='/path/to/template.jinja')
+        >>> processor = datagen.outputs.processor(template='{{ Inline: {{ variable }}')
+        >>> processor = datagen.outputs.processor(format_name='json')
+        >>> processor = datagen.outputs.processor(format_name='my_custom_registered_format')
+    """
+    if template and format_name:
+        raise SpecException('Only one of template or format_name should be supplied')
+    processor = None
+    if template:
+        log.debug('Using template: %s', template)
+        if os.path.exists(template):
+            processor = template_engines.for_file(template)
+        elif '{{' in template:  # type: ignore
+            processor = template_engines.string(template)  # type: ignore
+        else:
+            raise SpecException(f'Unable to determine how to handle template {template}, with type: {type(template)}')
+    elif format_name:
+        log.debug('Using %s formatter for output', format_name)
+        processor = _for_format(format_name)
+
+    return processor
+
+
+def get_writer(outdir: str = None,
+               outfile: str = None,
+               overwrite: bool = False,
+               **kwargs) -> WriterInterface:
+    """
+    creates the appropriate output writer from the given args and params
+
+    If no output directory is specified/configured will write to stdout
+
+    Args:
+        outdir: Directory to write output to
+        outfile: If a specific file should be used for the output, default is to construct the name from kwargs
+        overwrite: Should existing files with the same name be overwritten
+
+    Keyword Args:
+        outfileprefix: the prefix of the output files i.e. test-data-
+        extension: to append to the file name prefix i.e. .csv
+        recordsperfile: how many records per file to write
+        suppress_output: if output to stdout should be suppressed, only valid if outdir is None
+
+    Returns:
+        The configured Writer
+
+    Examples:
+        >>> import datagen
+        >>> writer = datagen.outputs.get_writer('./output', outfileprefix='test-data-', extension='.csv')
+    """
+    if outdir:
+        log.debug('Creating output file writer for dir: %s', outdir)
+        if outfile:
+            writer = single_file_writer(
+                outdir=outdir,
+                outname=outfile,
+                overwrite=overwrite
+            )
+        else:
+            writer = incrementing_file_writer(
+                outdir=outdir,
+                outname=kwargs.get('outfileprefix', types.get_default('outfileprefix')),
+                extension=kwargs.get('extension'),
+                records_per_file=kwargs.get('recordsperfile', 1)
+            )
+    else:
+        if kwargs.get('suppress_output'):
+            writer = suppress_output_writer()
+        else:
+            log.debug('Writing output to stdout')
+            writer = stdout_writer()
+    return writer
+
+
+def configure_output(writer: WriterInterface,
+                     processor: RecordProcessor,
+                     printkey: bool = False) -> OutputHandlerInterface:
+    """
+    Configures the OutputHandler for the given processor using the given writer. If no processor if provided,
+    uses the default OutputHandler which just writes each value for each field as it is generated
+
+    Args:
+        writer (WriterInterface): to use to output to
+        processor (RecordProcessor): if any, to use
+        printkey: For case the no processor is used, if single field output should also write the key with the value
+
+    Returns:
+        OutputHandlerInterface
+    """
+
+    if processor:
+        return _RecordLevelOutput(processor, writer)
+
+    return _SingleFieldOutput(writer, printkey)

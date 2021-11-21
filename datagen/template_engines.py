@@ -2,28 +2,15 @@
 Handles loading and creating the templating engine
 """
 import os
-from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Union
 
 from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape  # type: ignore
 
-
-class TemplateEngine(ABC):
-    @abstractmethod
-    def process(self, record: dict) -> str:
-        """
-        Render the template using the fields in the provided record
-
-        Args:
-            record: dictionary of field in template to value to populate the field with
-
-        Returns:
-            The rendered template
-        """
+from .model import RecordProcessor
 
 
-def for_file(template_file: Union[str, Path]) -> TemplateEngine:
+def for_file(template_file: Union[str, Path]) -> RecordProcessor:
     """
     Loads the templating engine for the template file specified
 
@@ -36,12 +23,12 @@ def for_file(template_file: Union[str, Path]) -> TemplateEngine:
     return _Jinja2Engine(template_file)
 
 
-def string(template: str) -> TemplateEngine:
+def string(template: str) -> RecordProcessor:
     """ Returns a template engine for processing templates as strings """
     return _Jinja2StringEngine(template)
 
 
-class _Jinja2Engine(TemplateEngine):
+class _Jinja2Engine(RecordProcessor):
     """
     A simple class that creates a facade around a Jinja2 templating environment
     """
@@ -59,7 +46,7 @@ class _Jinja2Engine(TemplateEngine):
         return template.render(record)
 
 
-class _Jinja2StringEngine(TemplateEngine):
+class _Jinja2StringEngine(RecordProcessor):
     """
     A Jinja2 Templating Engine for String Templates
     """

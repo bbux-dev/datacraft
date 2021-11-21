@@ -32,6 +32,12 @@ Core Classes
 .. autoclass:: datagen.CasterInterface
    :members:
 
+.. autoclass:: datagen.model.RecordProcessor
+   :members:
+
+.. autoclass:: datagen.model.OutputHandlerInterface
+   :members:
+
 .. _registry_decorators:
 
 Registry Decorators
@@ -53,7 +59,11 @@ Datagen Errors
 
 Builder Module
 --------------
-.. autofunction:: datagen.spec_builder
+.. autofunction:: datagen.builder.spec_builder
+   :noindex:
+
+.. autofunction:: datagen.builder.generator
+   :noindex:
 
 .. automodule:: datagen.builder
    :members:
@@ -63,6 +73,13 @@ Builder Module
 Suppliers Module
 ----------------
 .. automodule:: datagen.suppliers
+   :members:
+
+.. _outputs_module:
+
+Outputs Module
+--------------
+.. automodule:: datagen.outputs
    :members:
 
 .. _template_engines_module:

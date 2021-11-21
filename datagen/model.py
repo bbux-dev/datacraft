@@ -2,7 +2,7 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
-from typing import Tuple, List
+from typing import Tuple, List, Any
 
 
 class DataSpec(dict):
@@ -43,7 +43,7 @@ class DataSpec(dict):
             **kwargs:
 
         Keyword Args:
-            template (Union[str, Path]): inline string template or path to template on disk
+            processor: (RecordProcessor): For any Record Level transformations such templating or formatters
             data_dir (str): path the data directory with csv files and such
             enforce_schema (bool): If schema validation should be applied where possible
 
@@ -57,9 +57,10 @@ class DataSpec(dict):
             >>> builder.values(['bob', 'bobby', 'robert', 'bobo']))
             >>> spec = builder.build()
             >>> template = 'Name: {{ name }}'
+            >>> processor = datagen.outputs.processor(template=template)
             >>> generator = spec.generator(
             ...     iterations=4,
-            ...     template=template)
+            ...     processor=processor)
             >>> record = next(generator)
             >>> print(record)
             Name: bob
@@ -103,4 +104,48 @@ class KeyProviderInterface(ABC):
 
         Returns:
             key_group_name, key_list_for_group_name
+        """
+
+
+class RecordProcessor(ABC):
+    """A Class that takes in a generated record and returns it formatted as a string for output"""
+
+    @abstractmethod
+    def process(self, record: dict) -> str:
+        """
+        Processes the given record into the appropriate output string
+
+        Args:
+            record: generated record for current iteration
+
+        Returns:
+            The formatted record
+        """
+
+
+class OutputHandlerInterface(ABC):
+    """Interface four handling generated output values"""
+
+    @abstractmethod
+    def handle(self, key: str, value: Any):
+        """
+        This is called each time a new value is generated for a given field
+
+        Args:
+            key: the field name
+            value: the new value for the field
+        """
+
+    @abstractmethod
+    def finished_record(self,
+                        iteration: int,
+                        group_name: str,
+                        exclude_internal: bool = False):
+        """
+        This is called whenever all of the fields for a record have been generated for one iteration
+
+        Args:
+            iteration: iteration we are on
+            group_name: group this record is apart of
+            exclude_internal: if external fields should be excluded from output record
         """

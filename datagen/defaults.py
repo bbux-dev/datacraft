@@ -83,3 +83,8 @@ def _default_csv_file():
 @registry.defaults('mac_addr_separator')
 def _default_mac_address_separator():
     return ':'
+
+
+@registry.defaults('outfileprefix')
+def _default_outfileprefix():
+    return 'generated-'
