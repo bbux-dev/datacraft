@@ -15,6 +15,7 @@ Examples:
     >>> builder.build()
     {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}, 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
 """
+from typing import Generator
 import os
 import json
 import logging
@@ -24,6 +25,8 @@ from typing import Any, Union, Dict, List
 from . import utils, template_engines, key_providers, types
 from .loader import Loader
 from .model import DataSpec
+from .outputs import RecordProcessor
+
 
 log = logging.getLogger(__name__)
 
@@ -1331,7 +1334,7 @@ def _create_key_list(entries):
     return entries
 
 
-def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
+def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator:
     """
     Creates a generator for the raw spec for the specified iterations
 
@@ -1341,9 +1344,12 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
 
     Keyword Args:
         processor: (RecordProcessor): For any Record Level transformations such templating or formatters
-        output: (OutputHandlerInterface): For any
+        output: (OutputHandlerInterface): For any field or record level output
         data_dir (str): path the data directory with csv files and such
         enforce_schema (bool): If schema validation should be applied where possible
+
+    Yields:
+        Records or rendered template strings
 
     Returns:
         the generator for the provided spec

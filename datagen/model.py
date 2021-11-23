@@ -2,7 +2,7 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Any
+from typing import Tuple, List, Any, Generator
 
 
 class DataSpec(dict):
@@ -34,7 +34,7 @@ class DataSpec(dict):
     def __init__(self, raw_spec):
         self.raw_spec = raw_spec
 
-    def generator(self, iterations: int, **kwargs):
+    def generator(self, iterations: int, **kwargs) -> Generator:
         """
         Creates a generator that will produce records or render the template for each record
 
@@ -44,6 +44,7 @@ class DataSpec(dict):
 
         Keyword Args:
             processor: (RecordProcessor): For any Record Level transformations such templating or formatters
+            output: (OutputHandlerInterface): For any field or record level output
             data_dir (str): path the data directory with csv files and such
             enforce_schema (bool): If schema validation should be applied where possible
 
