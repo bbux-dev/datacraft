@@ -171,7 +171,7 @@ def process_args(args):
     ##################
     processor = outputs.processor(args.template, args.format)
     writer = _get_writer(args)
-    output = outputs.configure_output(writer, processor, args.printkey)
+    output = _get_output(args, processor, writer)
 
     generator = builder.generator(
         spec,
@@ -192,6 +192,14 @@ def _get_writer(args):
                               recordsperfile=args.recordsperfile,
                               server=args.server,
                               suppress_output=(args.suppress_output or args.server))
+
+
+def _get_output(args, processor, writer):
+    if processor:
+        return outputs.record_level(processor, writer)
+
+    return outputs.single_field(writer, args.printkey)
+
 
 def _load_spec(args):
     """

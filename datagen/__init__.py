@@ -1,7 +1,7 @@
 """ init for datagen """
 
 from .types import registry
-from .model import DataSpec, Distribution, ValueSupplierInterface
+from .model import DataSpec, Distribution, ValueSupplierInterface, RecordProcessor, OutputHandlerInterface
 from .casters import CasterInterface
 from .loader import Loader, preprocess_spec
 from .exceptions import SpecException, ResourceError
@@ -16,7 +16,7 @@ from . import spec_formatters
 from . import key_providers
 from . import cli
 from . import outputs
-from . import server
+from . import utils
 
 
 def parse_spec(raw_spec: dict) -> DataSpec:
@@ -30,4 +30,4 @@ def parse_spec(raw_spec: dict) -> DataSpec:
         the fully parsed and loaded spec
     """
     specs = preprocess_spec(raw_spec)
-    return builder.DataSpecImpl(specs)
+    return builder._DataSpecImpl(specs)

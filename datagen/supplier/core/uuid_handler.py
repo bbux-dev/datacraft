@@ -7,7 +7,10 @@ Prototype:
 
     {
       "<field name>": {
-        "type": "uuid"
+        "type": "uuid",
+        "config": {
+          "variant": 1, 3, 4, or 5, default is 4, optional
+        }
       }
     }
 
@@ -21,6 +24,12 @@ Examples:
         "type": "uuid"
       },
       "id_shorthand:uuid": {}
+      "id_variant3" {
+        "type": "uuid",
+        "config": {
+          "variant": 3
+        }
+      }
     }
 
 
@@ -34,6 +43,8 @@ UUID_KEY = 'uuid'
 
 class UuidSupplier(datagen.ValueSupplierInterface):
     """ Value Supplier for uuid type """
+    def __init__(self, func):
+        self.func = func
 
     def next(self, _):
         return str(uuid.uuid4())
@@ -46,6 +57,16 @@ def _get_uuid_schema():
 
 
 @datagen.registry.types(UUID_KEY)
-def _configure_supplier(_, __):
+def _configure_supplier(field_spec, loader):
     """ configure the supplier for uuid types """
-    return UuidSupplier()
+    config = datagen.utils.load_config(field_spec, loader)
+    variant = int(config.get('variant', 4))
+    _func_map = {
+        1: uuid.uuid1,
+        3: uuid.uuid3,
+        4: uuid.uuid4,
+        5: uuid.uuid5
+    }
+    if variant not in _func_map:
+        raise datagen.SpecException('Invalid variant for: ' + field_spec)
+    return UuidSupplier(_func_map.get(variant))

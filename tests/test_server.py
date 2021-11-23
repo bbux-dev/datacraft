@@ -14,7 +14,6 @@ def test_server(mocker):
 
 
 def test_server_callback_stop_iteration(mocker):
-    mocker.patch('os._exit', return_value=None)
     mocker.patch('flask.jsonify', return_value=None)
     spec = {"test:uuid": {}}
 
@@ -28,7 +27,6 @@ def test_server_callback_stop_iteration(mocker):
 
 
 def test_server_callback(mocker):
-    mocker.patch('sys.exit', return_value=None)
     spec = {"test:values": 42}
 
     processor = datagen.outputs.processor(format_name='json-pretty')

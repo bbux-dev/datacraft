@@ -2,7 +2,6 @@
 Light weight module for running a Flask Server that returns data from a generator.
 """
 from typing import Generator
-import os
 import logging
 import flask
 
@@ -21,16 +20,15 @@ class _Server:
         try:
             data = next(self.generator)
         except StopIteration:
-            log.warning('No more iterations available, exiting')
-            os._exit(1)
-
-            return
+            log.warning('No more iterations available')
+            return flask.Response(None, status=204)
         if self.data_is_json:
             return flask.jsonify(data)
         return data
 
     def run(self):
         app = flask.Flask(__name__)
+        log.info('Adding endpoint to server: %s', self.endpoint)
         app.add_url_rule(self.endpoint, view_func=self.callback)
         app.run()
 
@@ -38,7 +36,7 @@ class _Server:
 def run(generator: Generator, endpoint: str, data_is_json: bool):
     """
     Runs a light weight Flask server with data returned by the provided generator served at each subsequent call to
-    the provided endpoint. End point should start with /. When StopIteration encountered, does a sys.exit(0).
+    the provided endpoint. End point should start with /. When StopIteration encountered, returns a 204 status code.
 
     Args:
         generator: that provides response data as dictionary

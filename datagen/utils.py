@@ -44,7 +44,7 @@ def is_affirmative(key: str, config: dict, default=False) -> bool:
     return value in ['yes', 'true', 'on']
 
 
-def load_config(field_spec: dict, loader, **kwargs):
+def load_config(field_spec: dict, loader, **kwargs) -> dict:
     """
     Loads the config and any secondary configs into one object
 

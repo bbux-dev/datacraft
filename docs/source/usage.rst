@@ -703,18 +703,71 @@ Example:
 
 .. code-block:: python
 
-   import datagen
+    import datagen
 
-   name_list = ['bob', 'bobby', 'robert', 'bobo']
-   builder = datagen.spec_builder()
-   spec = builder.values('names', name_list).to_spec()
+    name_list = ['bob', 'bobby', 'robert', 'bobo']
+    builder = datagen.spec_builder()
+    spec = builder.values('name', name_list).to_spec()
 
-   template = 'Name: {{ name }}'
+    template = 'Name: {{ name }}'
+    # need this to apply the data to the template
+    processor = datagen.outputs.processor(template=template)
 
-   generator = spec.generator(
+    generator = spec.generator(
        iterations=5,
-       template=template)
-   # 'Name: bob'
-   single_record = next(generator)
+       processor=processor)
+
+    single_record = next(generator)
+    # 'Name: bob'
+    remaining_records = list(generator)  # five iterations wraps around to first
     # ['Name: bobby', 'Name: robert', 'Name: bobo', 'Name: bob']
-   remaining_records = list(generator)  # five iterations wraps around to first
+
+
+REST Server
+-----------
+
+Datagen comes with a lightweight Flask server to use to retrieve generated data. Use the ``--server`` with the optional
+``--server-endpoint /someendpoint`` flags to launch this server.  The default end point will be found at
+http://127.0.0.1:5000/data. If using a template, each call to the endpoint will return the results of applying a
+single record to the template data. If you specify one of the ``--format`` flags, the formatted record will be returned.
+If neither a formatter or a template are applied, the record for each itertion will be returned.
+
+Server side of the transaction, serving up data formatted using the json-pretty formatter. The records contain a
+uuid and a timestamp field.
+
+.. code-block:: shell
+
+    $ datagen --inline "{id:uuid: {}, ts:date: {}}" -i 2 --log-level debug --format json-pretty --server
+     * Serving Flask app 'datagen.server' (lazy loading)
+     * Environment: production
+       WARNING: This is a development server. Do not use it in a production deployment.
+       Use a production WSGI server instead.
+     * Debug mode: off
+     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    127.0.0.1 - - [23/Nov/2021 20:48:41] "GET /data HTTP/1.1" 200 -
+    127.0.0.1 - - [23/Nov/2021 20:48:44] "GET /data HTTP/1.1" 200 -
+    No more iterations available
+    127.0.0.1 - - [23/Nov/2021 20:48:46] "GET /data HTTP/1.1" 204 -
+
+Client side of the transaction
+
+.. code-block:: bash
+
+    $ curl -s -w "\n%{http_code}\n%" http://127.0.0.1:5000/data
+    {
+        "id": "505b62d6-0d21-4965-92a7-f719463fdb0b",
+        "ts": "03-12-2050"
+    }
+    200
+    $ curl -s -w "\n%{http_code}\n%" http://127.0.0.1:5000/data
+    {
+        "id": "51e5d07b-4d46-48d7-9523-e1e0ecf723f3",
+        "ts": "09-12-2050"
+    }
+    200
+    $ curl -s -w "\n%{http_code}\n%" http://127.0.0.1:5000/data
+
+    204
+
+In this exchange, three requests are made.  The first two return the generated data formatted. The third returns a 204
+or No Content response code.  This is because the number of iterations was set to 2.

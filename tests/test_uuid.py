@@ -1,4 +1,7 @@
 import re
+
+import pytest
+
 from datagen import builder, Loader
 # need this to trigger registration
 from datagen.supplier.core import uuid_handler
@@ -20,9 +23,19 @@ def test_uuid_spec():
     assert value1 != value2
 
 
-def test_uuid_schema():
+valid_data_specs = [
+    ("foo:uuid", {}),
+    ("foo:uuid", {"config": {"variant": 1}}),
+    ("foo:uuid", {"config": {"variant": 3}}),
+    ("foo:uuid", {"config": {"variant": 4}}),
+    ("foo:uuid", {"config": {"variant": 5}}),
+]
+
+
+@pytest.mark.parametrize("key,spec", valid_data_specs)
+def test_uuid_valid_schema(key, spec):
     # for coverage
-    spec = builder.single_field("foo:uuid", {}).build()
+    spec = builder.single_field(key, spec).build()
     loader = Loader(spec, enforce_schema=True)
     supplier = loader.get('foo')
 

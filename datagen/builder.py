@@ -657,7 +657,7 @@ class Builder:
         if len(self.field_groups) > 0:
             self._configure_field_groups(spec)
 
-        return DataSpecImpl(spec)
+        return _DataSpecImpl(spec)
 
     def _configure_field_groups(self, spec: dict):
         """
@@ -1348,10 +1348,10 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
     Returns:
         the generator for the provided spec
     """
-    return DataSpecImpl(raw_spec).generator(iterations, **kwargs)
+    return _DataSpecImpl(raw_spec).generator(iterations, **kwargs)
 
 
-class DataSpecImpl(DataSpec):
+class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):

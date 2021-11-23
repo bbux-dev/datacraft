@@ -46,10 +46,24 @@ class WriterInterface(ABC):
         """
 
 
+def single_field(writer: WriterInterface, output_key: bool):
+    """
+    Creates a OutputHandler field level events
+
+    Args:
+        writer (WriterInterface): to write the processed records
+        output_key: if the key should be output along with the value
+
+    Returns:
+        OutputHandlerInterface
+    """
+    return _SingleFieldOutput(writer, output_key)
+
+
 class _SingleFieldOutput(OutputHandlerInterface):
     """Writes each field as it is created"""
 
-    def __init__(self, writer: WriterInterface, output_key):
+    def __init__(self, writer: WriterInterface, output_key: bool):
         self.writer = writer
         self.output_key = output_key
 
@@ -61,6 +75,20 @@ class _SingleFieldOutput(OutputHandlerInterface):
 
     def finished_record(self, iteration=None, group_name=None, exclude_internal=False):
         pass
+
+
+def record_level(record_processor: RecordProcessor, writer: WriterInterface) -> OutputHandlerInterface:
+    """
+    Creates a OutputHandler for record level events
+
+    Args:
+        record_processor (RecordProcessor): to process the records into strings
+        writer (WriterInterface): to write the processed records
+
+    Returns:
+        OutputHandlerInterface
+    """
+    return _RecordLevelOutput(record_processor, writer)
 
 
 class _RecordLevelOutput(OutputHandlerInterface):
@@ -201,7 +229,7 @@ class _FormatProcessor(RecordProcessor):
     """A simple class that wraps a record formatting function"""
 
     def __init__(self, key):
-        self.format_func = registry.formats.get(key)
+        self.format_func = types.registry.formats.get(key)
 
     def process(self, record: dict) -> str:
         """
@@ -324,24 +352,3 @@ def get_writer(outdir: str = None,
             writer = stdout_writer()
     return writer
 
-
-def configure_output(writer: WriterInterface,
-                     processor: RecordProcessor,
-                     printkey: bool = False) -> OutputHandlerInterface:
-    """
-    Configures the OutputHandler for the given processor using the given writer. If no processor if provided,
-    uses the default OutputHandler which just writes each value for each field as it is generated
-
-    Args:
-        writer (WriterInterface): to use to output to
-        processor (RecordProcessor): if any, to use
-        printkey: For case the no processor is used, if single field output should also write the key with the value
-
-    Returns:
-        OutputHandlerInterface
-    """
-
-    if processor:
-        return _RecordLevelOutput(processor, writer)
-
-    return _SingleFieldOutput(writer, printkey)
