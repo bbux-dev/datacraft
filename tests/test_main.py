@@ -157,3 +157,11 @@ def test_wrap_main(tmpdir):
     sys.argv = args
     # for coverage
     dgmain.wrap_main()
+
+
+def test_server(tmpdir, mocker):
+    mocker.patch('datagen.server.run', side_effect=ModuleNotFoundError())
+    args = ['--format', 'json',
+            '--inline', '{A: 1, B: [2, 4, 6], C: 3}',
+            '-i', '5', '--server']
+    dgmain.main(args)
