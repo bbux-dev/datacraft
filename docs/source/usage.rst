@@ -5,10 +5,9 @@ Usage
 
 Installation
 ------------
-
 To use Datagen, first install it using pip:
 
-.. code-block:: console
+.. code-block:: text
 
    (.venv) $ pip install git+https://github.com/bbux-dev/datagen.git
 
@@ -17,9 +16,11 @@ To use Datagen, first install it using pip:
 Generating Data
 ----------------
 
-The Datagen tool uses Data Specs to construct records. If for example, we need a list of uuids:
+The Datagen tool uses what we call Data Specs to construct records. A Data Spec consists of one or more Field Specs.
+Each Field Spec will generate the values for one field. If for example, you need a list of uuids, you can run the
+command below.
 
-.. code-block:: console
+.. code-block:: text
 
     $ datagen --inline "{demo: {type: uuid}}" --log-level off -i 5
     d1e027bd-0836-4a07-b073-9d8c33aa432a
@@ -28,13 +29,15 @@ The Datagen tool uses Data Specs to construct records. If for example, we need a
     3f9843a7-d8a4-45e5-b36b-88c4b5f88cd8
     a4704ff0-3305-456e-9e51-93327d1459d3
 
-This command uses an inline yaml syntax to specify a single field called ``demo`` that has a type of ``uuid``. We tell
-the datagen tool to turn off logging and to generate 5 records from this inline spec. The default is for output to be
-printed to the console. Inline Data Specs can be useful for testing and development. Most Data Specs will be in JSON or
-YAML files. Use the ``--debug-spec`` flag to dump the inline spec out as JSON for easier additions and configuration
-changes. Use the ``--debug-spec-yaml`` flag if you prefer to work with the more compact YAML format.
+This command uses an inline yaml syntax for the Data Spec. The spec consists of a single field ``demo``. The value
+for the demo key is the Field Spec. The Field Spec has a type of ``uuid``, which is all that is needed for this spec.
+The command tells the datagen tool to turn off logging and to generate 5 records from this inline spec. The default
+is for output to be printed to the console. Inline Data Specs can be useful for testing and development. Most Data
+Specs will be in JSON or YAML files. Use the ``--debug-spec`` flag to dump the inline spec out as JSON for easier
+additions and configuration changes. Use the ``--debug-spec-yaml`` flag if you prefer to work with the more compact
+YAML format.
 
-.. code-block:: console
+.. code-block:: text
 
     $ datagen --inline "{demo: {type: uuid}}" --log-level off --debug-spec > demo.json
     $ cat demo.json
@@ -70,7 +73,7 @@ called a Field Spec. This defines the type of data the field consists of and how
 field is a ``uuid`` just like the previous example.  The ``timestamp`` is a ISO 8601 date and the ``count`` is a random
 number between 1 and 100 that is cast to an integer. If we run this spec and specify the ``--format json`` flag:
 
-.. code-block:: console
+.. code-block:: text
 
     $ datagen -s demo.json --log-level off -i 5 --format json -x
     {"id": "706bf38c-02a8-4087-bf41-62cdf4963f0b", "timestamp": "2021-11-30T05:21:14", "count": 59}
@@ -82,7 +85,7 @@ number between 1 and 100 that is cast to an integer. If we run this spec and spe
 There are other output formats available and a mechanism to register custom formatters. If a csv file is more suited
 for your needs:
 
-.. code-block:: console
+.. code-block:: text
 
     $ datagen -s demo.json --log-level off -i 5 --format csv -x
     1ad0b69b-0843-4c0d-90a3-d7b77574a3af,2021-11-21T21:24:44,2
@@ -116,7 +119,7 @@ Refs
 ----------
 
 There is a special section in the Data Spec called ``refs``.  This is short for references and is where a Field
-Spec be defined outside of a field.  Field Specs can then point to a ref to supply values it can use for the data
+Spec can be defined outside of a field.  Field Specs can then point to a ref to supply values it can use for the data
 generation process.  The simplest example of this is the ``combine`` type:
 
 .. code-block:: json
@@ -296,16 +299,26 @@ Then we could update our spec to contain a ``num_users`` field:
 
 .. code-block:: json
 
-   {
-     "users?count=4?sample=true": ["bob", "bobby", "rob", "roberta", "steve"],
-     "num_users": {
-       "2": 0.5,
-       "3": 0.3,
-       "4": 0.2
-     }
-   }
+    {
+      "users": {
+        "type": "values",
+        "data": ["bob", "bobby", "rob", "roberta", "steve"],
+        "config": {
+          "count": "4",
+          "sample": "true"
+        }
+      },
+      "num_users": {
+        "type": "values",
+        "data": {
+          "2": 0.5,
+          "3": 0.3,
+          "4": 0.2
+        }
+      }
+    }
 
-In the above spec the number of users created will be weighted so that half the time there are two, and the other
+In the above spec, the number of users created will be weighted so that half the time there are two, and the other
 half there are three or four. NOTE: It is important to make sure that the ``count`` param is equal to the maximum number
 that will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
@@ -317,7 +330,7 @@ Field Groups
 Field groups provide a mechanism to generate different subsets of the defined fields together. This can be useful
 when modeling data that contains field that are not present in all records. There are several formats that are
 supported for Field Groups. Field Groups are defined in a root section of the document named ``field_groups`` or as
-parte of ``nested`` Field Specs. Below is an example spec with no ``field_groups`` defined.
+part of ``nested`` Field Specs. Below is an example spec with no ``field_groups`` defined.
 
 .. code-block:: json
 
@@ -370,7 +383,7 @@ The keys of the ``field_groups`` must all be floating point numbers as strings.
 
 Running this example:
 
-.. code-block:: console
+.. code-block:: text
 
    datagen -s pets.json -i 10 -l off -x --format json
    {"id": 1, "name": "Fido"}
