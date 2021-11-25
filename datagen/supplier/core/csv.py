@@ -163,8 +163,8 @@ from typing import Union
 import datagen
 
 # 250 MB
-ONE_MB = 1024 * 1024
-SMALL_ENOUGH_THRESHOLD = 250 * ONE_MB
+_ONE_MB = 1024 * 1024
+_SMALL_ENOUGH_THRESHOLD = 250 * _ONE_MB
 _DEFAULT_BUFFER_SIZE = 1000000
 
 log = logging.getLogger(__name__)
@@ -418,7 +418,7 @@ def _configure_weighted_csv(field_spec, loader):
 
 
 @datagen.registry.schemas('weighted_csv')
-def get_weighted_csv_schema():
+def _get_weighted_csv_schema():
     """ get the schema for the weighted_csv type """
     return datagen.schemas.load('weighted_csv')
 
@@ -455,7 +455,7 @@ def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: b
         return [float(val[column_index - 1]) for val in reader]
 
 
-ONE_MB = 1024 * 1024
+_ONE_MB = 1024 * 1024
 
 
 def _load_csv_data(field_spec, config, datadir):
@@ -486,7 +486,7 @@ def _load_csv_data(field_spec, config, datadir):
     has_headers = datagen.utils.is_affirmative('headers', config)
 
     size_in_bytes = os.stat(csv_path).st_size
-    max_csv_size = int(datagen.types.get_default('large_csv_size_mb')) * ONE_MB
+    max_csv_size = int(datagen.types.get_default('large_csv_size_mb')) * _ONE_MB
     sample_rows = datagen.utils.is_affirmative('sample_rows', config)
     if size_in_bytes <= max_csv_size:
         if sample_rows:

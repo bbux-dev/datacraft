@@ -58,7 +58,7 @@ def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
         supplier = single_value(data)
 
     # Check for count param
-    if 'count' in config:
+    if 'count' in config or 'count_dist' in config:
         return MultipleValueSupplier(supplier, count_supplier_from_config(config))
     return supplier
 
@@ -219,7 +219,8 @@ def _value_list(data: list,
     """
     if config is None:
         config = {}
-    return ListValueSupplier(data, count_supplier_from_config(config), do_sampling)
+    as_list = is_affirmative('as_list', config)
+    return ListValueSupplier(data, count_supplier_from_config(config), do_sampling, as_list)
 
 
 def weighted_values(data: dict, config=None) -> ValueSupplierInterface:

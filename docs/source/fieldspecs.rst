@@ -223,11 +223,54 @@ Example:
      }
    }
 
+Custom Count Distributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Custom distributions can be supplied using the :ref:`custom code<custom_code>` loading and the
 ``@datagen.registry.distribution`` decorator:
 
-.. code-block:: python
+.. tabs::
 
-    >>> @datagen.registry.distribution('gamma')
-    ... def _gamma_distribution(a, moments, **kwargs):
-    ...     # return a datagen.Distribution, args can be custom for the defined distribution
+   .. tab:: Custom Code
+
+      .. code-block:: python
+
+         from scipy.stats import gamma
+         import datagen
+
+         class _GammaDist(datagen.Distribution):
+             def __init__(self, a):
+                 self.a = a
+
+             def next_value(self):
+                 return gamma.rvs(self.a)
+
+         @datagen.registry.distribution('gamma')
+         def _gamma_distribution(a, **kwargs):
+             """ example custom distribution """
+             return _GammaDist(a)
+
+   .. tab:: Data Spec
+
+      .. code-block:: json
+
+         {
+           "users": {
+             "type": "values",
+             "data": ["bob", "bobby", "rob", "roberta", "steve", "flora", "fauna", "samantha", "abigail"],
+             "config": {
+               "count_dist": "gamma(a=3.4)",
+               "sample": true,
+               "as_list": true
+             }
+           }
+         }
+
+   .. tab:: Command and Output
+
+      .. code-block:: shell
+
+         $ datagen -s spec.json -c dist.py -i 3
+         ['abigail', 'flora', 'bob']
+         ['rob', 'abigail']
+         ['bobby', 'roberta', 'fauna', 'bob', 'rob', 'flora']

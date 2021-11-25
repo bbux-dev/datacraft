@@ -73,7 +73,7 @@ called a Field Spec. This defines the type of data the field consists of and how
 field is a ``uuid`` just like the previous example.  The ``timestamp`` is a ISO 8601 date and the ``count`` is a random
 number between 1 and 100 that is cast to an integer. If we run this spec and specify the ``--format json`` flag:
 
-.. code-block:: text
+.. code-block:: shell
 
     $ datagen -s demo.json --log-level off -i 5 --format json -x
     {"id": "706bf38c-02a8-4087-bf41-62cdf4963f0b", "timestamp": "2021-11-30T05:21:14", "count": 59}
@@ -85,7 +85,7 @@ number between 1 and 100 that is cast to an integer. If we run this spec and spe
 There are other output formats available and a mechanism to register custom formatters. If a csv file is more suited
 for your needs:
 
-.. code-block:: text
+.. code-block:: shell
 
     $ datagen -s demo.json --log-level off -i 5 --format csv -x
     1ad0b69b-0843-4c0d-90a3-d7b77574a3af,2021-11-21T21:24:44,2
@@ -113,7 +113,47 @@ is supported is YAML:
       config:
         cast: int
 
-There are also shorthand notations, see :doc:`fieldspecs` for more details.
+There are also shorthand notations, see :doc:`fieldspecs` for more details. A spec in one format can be converted to
+the other by using the command line ``--debug-spec`` and ``--debug-spec-yaml`` flags. ``--debug-spec`` will write out
+the JSON version, and ``--debug-spec-yaml`` will write out the YAML version. These commands will output the full
+format for the specs and any shorthand notations will be pushed down into the field spec. For example:
+
+.. code-block:: json
+
+    {
+      "foo:cc-word?mean=5&min=3&max=12": {}
+    }
+
+Will become
+
+.. tabs::
+
+   .. tab:: JSON
+
+      .. code-block:: json
+
+        {
+          "foo": {
+            "type": "cc-word",
+            "config": {
+              "mean": "5",
+              "min": "3",
+              "max": "12"
+            }
+          }
+        }
+
+   .. tab:: YAML
+
+      .. code-block:: yaml
+
+        foo:
+          type: cc-word
+          config:
+            mean: '5'
+            min: '3'
+            max: '12'
+
 
 Refs
 ----------
@@ -144,7 +184,7 @@ generation process.  The simplest example of this is the ``combine`` type:
       }
     }
 
-Here the combine type takes a refs argument that specifies the name of two reference to combine the values of. There
+Here the combine type takes a refs argument that specifies the name of two references to combine the values of. There
 is also a ``ref`` type. This is useful for making Data Specs easier to read by segmenting the structures into smaller
 pieces.  This is particularly useful with ``nested`` types:
 
@@ -173,13 +213,13 @@ pieces.  This is particularly useful with ``nested`` types:
     }
 
 In this example the ``complex_value`` field has a lot going on.  To simplify the specification for the ``outer``
-field, the spec uses a type of ``ref`` to point to the ``COMPLEX_VALUE_DEFINED`` reference.  Notice that we use the
-shorthand notation of ``<field name>:<type>`` to simplify the spec.  The full spec version of this can be seen with the
-``--debug-spec`` command line argument. If we run this spec from the command line:
+field, the spec uses a type of ``ref`` to point to the ``COMPLEX_VALUE_DEFINED`` reference.  Notice that the
+shorthand notation of ``<field name>:<type>`` is used to simplify the spec.  The full spec version of this can be seen
+with the ``--debug-spec`` command line argument. If we run this spec from the command line:
 
-.. code-block:: text
+.. code-block:: shell
 
-    $ datagen -s refs_type.json --log-level debug -i 3 --log-level off --format json -x
+    $ datagen -s refs_type.json -i 3 --log-level off --format json -x
     {"outer": {"simple_uuid": "c77a5bee-83bb-4bae-a8e8-21be735f73c9", "complex_value": "'~4.028 microns per second'"}}
     {"outer": {"simple_uuid": "5d27eb03-c5a3-4167-9dd1-56c1f0b5a49c", "complex_value": "'~21.221 microns per second'"}}
     {"outer": {"simple_uuid": "6fa92f9f-d3ac-4118-ad2f-89b73bafb7c5", "complex_value": "'~27.432 microns per second'"}}
@@ -229,7 +269,7 @@ It is also possible to do templating inline from the command line:
 
 .. code-block:: shell
 
-   datagen -s es-spec.json --format json -i 5  --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
+   datagen -s es-spec.json -i 5 --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
    bob: (22, F)
    rob: (24, M)
    bobby: (26, M)
@@ -240,8 +280,8 @@ Loops in Templates
 ^^^^^^^^^^^^^^^^^^
 
 `Jinja2 Control Structures <https://jinja.palletsprojects.com/en/2.11.x/templates/#list-of-control-structures>`_
-support looping. To provide multiple values to use in a loop use the ``count`` parameter. For example modifying the
-example from the Jinja2 documentation to work with our tool:
+support looping. To provide multiple values to use in a loop use the ``count`` parameter. Modifying the
+example from the Jinja2 documentation to work with datagen:
 
 .. code-block:: html
 
@@ -252,7 +292,7 @@ example from the Jinja2 documentation to work with our tool:
        {% endfor %}
    </ul>
 
-If we use a regular spec such as ``{"users":["bob","bobby","rob"]}`` the templating engine will not populate the
+If a regular spec is used such as ``{"users":["bob","bobby","rob"]}`` the templating engine will not populate the
 template correctly since during each iteration only a single name is returned as a string for the engine to process.
 
 .. code-block:: html
@@ -264,7 +304,7 @@ template correctly since during each iteration only a single name is returned as
        <li>b</li>
    </ul>
 
-The engine requires collections to iterate over. A small change to our spec will address this issue:
+The engine requires collections to iterate over. A small change to the spec will address this issue:
 
 .. code-block:: json
 
@@ -283,8 +323,8 @@ Now we get
 Dynamic Loop Counters
 ^^^^^^^^^^^^^^^^^^^^^
 
-Another mechanism to do loops in Jinja2 is by using the python builtin ``range`` function. For example if we wanted a
-variable number of line items we could create a template like the following:
+Another mechanism to do loops in Jinja2 is by using the python builtin ``range`` function. If a variable
+number of line items was desired, you could create a template like the following:
 
 .. code-block:: html
 
@@ -295,7 +335,7 @@ variable number of line items we could create a template like the following:
        {% endfor %}
    </ul>
 
-Then we could update our spec to contain a ``num_users`` field:
+The spec could then be updated to contain a ``num_users`` field:
 
 .. code-block:: json
 
@@ -318,7 +358,7 @@ Then we could update our spec to contain a ``num_users`` field:
       }
     }
 
-In the above spec, the number of users created will be weighted so that half the time there are two, and the other
+In the spec above, the number of users created will be weighted so that half the time there are two, and the other
 half there are three or four. NOTE: It is important to make sure that the ``count`` param is equal to the maximum number
 that will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
@@ -344,8 +384,8 @@ part of ``nested`` Field Specs. Below is an example spec with no ``field_groups`
      }
    }
 
-If the tag field was only present in 50% of the data, we would want to be able to adjust our output to match this.
-Here is an updated version of the spec with the ``field_groups`` specified to give us our 50/50 output. This uses the
+If the tag field was only present in 50% of the data, we would want to be able to adjust the output to match this.
+Here is an updated version of the spec with the ``field_groups`` specified to give the 50/50 output. This uses the
 first form of the ``field_groups`` a List of Lists of field names to output together.
 
 .. code-block:: json
@@ -364,8 +404,8 @@ first form of the ``field_groups`` a List of Lists of field names to output toge
      ]
    }
 
-If we need more precise weightings we can use the second format where we specify a weight for each field group along
-with the fields that should be output together.
+If more precise weightings are needed, you can use the second format where a weight is specified for each field group
+along with the fields that should be output together.
 
 .. code-block:: json
 
@@ -383,9 +423,9 @@ The keys of the ``field_groups`` must all be floating point numbers as strings.
 
 Running this example:
 
-.. code-block:: text
+.. code-block:: shell
 
-   datagen -s pets.json -i 10 -l off -x --format json
+   $ datagen -s pets.json -i 10 -l off -x --format json
    {"id": 1, "name": "Fido"}
    {"id": 2, "name": "Fluffy", "tag": "Agreeable"}
    {"id": 3, "name": "Bandit", "tag": "Affectionate"}
@@ -530,7 +570,7 @@ Running this spec would produce:
 
 .. code-block:: shell
 
-   datagen --spec csv-select.yaml -i 5 --datadir ./data --format json --log-level off -x
+   $ datagen --spec csv-select.yaml -i 5 --datadir ./data --format json --log-level off -x
    {"geonameid": "2986043", "name": "Pic de Font Blanca", "latitude": "42.64991", "longitude": "1.53335", "country_code": "AD", "population": "0"}
    {"geonameid": "2994701", "name": "Roc M\u00e9l\u00e9", "latitude": "42.58765", "longitude": "1.74028", "country_code": "AD", "population": "0"}
    {"geonameid": "3007683", "name": "Pic des Langounelles", "latitude": "42.61203", "longitude": "1.47364", "country_code": "AD", "population": "0"}
