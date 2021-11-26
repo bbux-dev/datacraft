@@ -8,6 +8,7 @@ import logging
 from urllib.parse import parse_qs
 import datagen
 from .exceptions import SpecException
+from . import types
 
 log = logging.getLogger(__name__)
 
@@ -123,6 +124,20 @@ def _preprocess_nested(raw_spec):
         else:
             updated_specs[key] = spec
     return updated_specs
+
+
+@datagen.registry.preprocessors('type_check')
+def _preprocess_verify_types(raw_spec):
+    """ log only checks """
+    for key, field_spec in raw_spec.items():
+        if key == 'refs':
+            _preprocess_verify_types(field_spec)
+            continue
+        type_name = field_spec.get('type')
+        if types.lookup_type(type_name) is None:
+            log.warning('Unknown type key: %s for spec %s, known types are %s',
+                        type_name, field_spec, types.registered_types())
+    return raw_spec
 
 
 def _update_root_refs(updated_specs, updated):

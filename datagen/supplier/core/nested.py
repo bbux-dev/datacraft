@@ -53,6 +53,11 @@ class _NestedSupplier(datagen.model.ValueSupplierInterface):
         return {key: supplier.next(iteration) for key, supplier in subset.items()}  # type: ignore
 
 
+@datagen.registry.schemas('nested')
+def _get_nested_schema():
+    return datagen.schemas.load('nested')
+
+
 @datagen.registry.types('nested')
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """

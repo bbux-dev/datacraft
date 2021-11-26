@@ -5,6 +5,11 @@ import json
 import datagen
 
 
+@datagen.registry.schemas('ref')
+def _get_ref_schema():
+    return datagen.schemas.load('ref')
+
+
 @datagen.registry.types('ref')
 def _configure_ref_supplier(field_spec: dict, loader: datagen.Loader):
     """ configures supplier for ref type """

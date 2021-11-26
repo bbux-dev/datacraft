@@ -83,7 +83,14 @@ def lookup_type(key):
     Returns:
         the type if found
     """
-    return registry.types.get(key)
+    all_keys = list(registry.types.get_all().keys())
+    if key in all_keys:
+        func = registry.types.get(key)
+    else:
+        log.debug('No schema found for type %s', key)
+        return None
+
+    return func
 
 
 def lookup_schema(key):
@@ -129,6 +136,11 @@ def lookup_caster(key):
 def registered_formats():
     """ list of registered formats """
     return list(registry.formats.get_all().keys())
+
+
+def registered_types():
+    """ list of registered types """
+    return list(registry.types.get_all().keys())
 
 
 def get_default(key):

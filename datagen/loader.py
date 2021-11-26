@@ -4,6 +4,7 @@ delegating the handling of various data types.
 """
 
 import json
+import logging
 from typing import Any, Dict, Union
 
 from . import suppliers
@@ -12,6 +13,9 @@ from .exceptions import SpecException
 from .model import DataSpec
 from .schemas import validate_schema_for_spec
 from .types import lookup_type, lookup_schema, registry
+
+
+_log = logging.getLogger(__name__)
 
 
 class Refs:
@@ -151,5 +155,9 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     preprocessors = registry.preprocessors.get_all()
     for name in preprocessors:
         preprocessor = registry.preprocessors.get(name)
-        updated = preprocessor(updated)
+        processed = preprocessor(updated)
+        if processed is None:
+            _log.error('Invalid preprocessor %s, returned None instead of updated spec, skipping', name)
+            continue
+        updated = processed
     return updated
