@@ -150,3 +150,24 @@ class OutputHandlerInterface(ABC):
             group_name: group this record is apart of
             exclude_internal: if external fields should be excluded from output record
         """
+
+
+class CasterInterface(ABC):
+    """
+    Interface for Classes that cast objects to different types
+    """
+
+    @abstractmethod
+    def cast(self, value: Any) -> Any:
+        """
+        casts the value according to the specified type
+
+        Args:
+            value: to cast
+
+        Returns:
+            the cast form of the value
+
+        Raises:
+            SpecException when unable to cast value
+        """

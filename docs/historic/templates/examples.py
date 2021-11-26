@@ -364,7 +364,7 @@ refs = spec_builder.refs()
 refs.add_field('GOOD_CODES', {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1})
 refs.add_field('BAD_CODES', {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1})
 
-spec_builder.weightedref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
+spec_builder.weighted_ref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
 """),
     Example(
         name="select_list_example_one",
@@ -408,7 +408,7 @@ spec_builder.csv(
         name="csv_spec_example_two",
         iterations=5,
         fragment="""
-spec_builder.configref(
+spec_builder.config_ref(
     key="tabs_config",
     datafile="tabs.csv",
     delimiter="\\t",
@@ -416,12 +416,12 @@ spec_builder.configref(
 spec_builder.csv(
     key="status",
     column=1,
-    configref="tabs_config")
+    config_ref="tabs_config")
 spec_builder.csv(
     key="description",
     column=2,
-    configref="tabs_config")
-spec_builder.add_field("status_type:csv?configref=tabs_config&column=3", {})
+    config_ref="tabs_config")
+spec_builder.add_field("status_type:csv?config_ref=tabs_config&column=3", {})
 """,
         pipes="--datadir ./data"),
     Example(

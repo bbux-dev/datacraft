@@ -338,9 +338,9 @@ class Builder:
         """
         return self._add_field_spec(key, mac(**config))
 
-    def weightedref(self, key: str, data: Dict[str, float], **config) -> FieldInfo:
+    def weighted_ref(self, key: str, data: Dict[str, float], **config) -> FieldInfo:
         """
-        creates weightedref Field Spec and adds to Data Spec
+        creates weighted_ref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -348,9 +348,9 @@ class Builder:
             config: in kwargs format
 
         Returns:
-            FieldInfo for the added weightedref field
+            FieldInfo for the added weighted_ref field
         """
-        return self._add_field_spec(key, weightedref(data, **config))
+        return self._add_field_spec(key, weighted_ref(data, **config))
 
     def select_list_subset(self, key: str, data: List[Any] = None, ref: str = None, **config) -> FieldInfo:
         """
@@ -408,22 +408,22 @@ class Builder:
         """
         return self._add_field_spec(key, nested(fields, **config))
 
-    def configref(self, key: str, **config) -> FieldInfo:
+    def config_ref(self, key: str, **config) -> FieldInfo:
         """
-        creates configref Field Spec and adds to Data Spec
+        creates config_ref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
             config: in kwargs format
 
         Returns:
-            FieldInfo for the added configref field
+            FieldInfo for the added config_ref field
         """
         # this must be a refs instance
         if self.refs_builder is None:
-            return self.add_field(key, configref(**config))
+            return self.add_field(key, config_ref(**config))
         else:
-            return self.add_ref(key, configref(**config))
+            return self.add_ref(key, config_ref(**config))
 
     def calculate(self, key: str,
                   refs: dict = None,
@@ -1106,20 +1106,20 @@ def mac(**config) -> dict:
     return spec
 
 
-def weightedref(data: Dict[str, float], **config) -> dict:
+def weighted_ref(data: Dict[str, float], **config) -> dict:
     """
-    Constructs a weightedref Field Spec
+    Constructs a weighted_ref Field Spec
 
     Args:
         data: Mapping of ref name to weight
         config: in kwargs format
 
     Returns:
-        the weightedref spec
+        the weighted_ref spec
     """
 
     spec = {
-        "type": "weightedref",
+        "type": "weighted_ref",
         "data": data
     }  # type: Dict[str, Any]
 
@@ -1219,19 +1219,19 @@ def nested(fields: Union[Dict[str, Dict], DataSpec], **config) -> dict:
     return spec
 
 
-def configref(**config) -> dict:
+def config_ref(**config) -> dict:
     """
-    Constructs a configref Field Spec
+    Constructs a config_ref Field Spec
 
     Args:
         config: in kwargs format
 
     Returns:
-        the configref spec
+        the config_ref spec
     """
 
     spec = {
-        "type": "configref"
+        "type": "config_ref"
     }  # type: Dict[str, Any]
 
     if len(config) > 0:

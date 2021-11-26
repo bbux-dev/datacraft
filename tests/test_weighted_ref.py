@@ -9,7 +9,7 @@ def test_weighted_ref_missing_key():
         'bar': 0.4,
         'baz': 0.1,
     }
-    spec = builder.single_field('field', builder.weightedref(ref_weights)) \
+    spec = builder.single_field('field', builder.weighted_ref(ref_weights)) \
         .add_ref('foo', ['foo']) \
         .add_ref('bar', 'bar') \
         .add_ref('baz', {'baz': 0.999}) \
@@ -30,7 +30,7 @@ def test_weighed_ref_count_as_list():
         'two': 0.4,
         'tre': 0.1,
     }
-    spec = builder.single_field('field', builder.weightedref(ref_weights, count=3)) \
+    spec = builder.single_field('field', builder.weighted_ref(ref_weights, count=3)) \
         .add_ref('one', 'uno') \
         .add_ref('two', 'dos') \
         .add_ref('tre', 'tres') \

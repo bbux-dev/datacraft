@@ -1,8 +1,8 @@
 """ init for datagen """
 
 from .types import registry
-from .model import DataSpec, Distribution, ValueSupplierInterface, RecordProcessor, OutputHandlerInterface
-from .casters import CasterInterface
+from .model import DataSpec, Distribution, ValueSupplierInterface, RecordProcessor, OutputHandlerInterface, \
+    CasterInterface
 from .loader import Loader, preprocess_spec
 from .exceptions import SpecException, ResourceError
 from .builder import spec_builder

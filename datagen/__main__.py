@@ -7,6 +7,7 @@ import sys
 # this activates the decorators, so they will be discoverable
 from .preprocessor import *
 from .schemas import *
+from .logging_handler import *
 
 log = logging.getLogger(__name__)
 

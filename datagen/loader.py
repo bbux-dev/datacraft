@@ -94,8 +94,8 @@ class Loader:
             # assume it is data, so values?
             spec_type = 'values'
 
-        if spec_type == 'configref':
-            raise SpecException(f'Cannot use configref as source of data: {json.dumps(field_spec)}')
+        if spec_type == 'config_ref':
+            raise SpecException(f'Cannot use config_ref as source of data: {json.dumps(field_spec)}')
         if spec_type is None or spec_type == 'values':
             if self.enforce_schema:
                 _validate_schema_for_spec(spec_type, field_spec)

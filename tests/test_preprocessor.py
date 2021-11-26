@@ -109,12 +109,12 @@ csv_select_transform_tests = [
             "another:range": [1, 10]
         },
         {
-            "one": {"type": "csv", "config": {"column": 1, "configref": "placeholder_configref"}},
-            "two": {"type": "csv", "config": {"column": 2, "configref": "placeholder_configref"}},
-            "six": {"type": "csv", "config": {"column": 6, "configref": "placeholder_configref"}},
+            "one": {"type": "csv", "config": {"column": 1, "config_ref": "placeholder_config_ref"}},
+            "two": {"type": "csv", "config": {"column": 2, "config_ref": "placeholder_config_ref"}},
+            "six": {"type": "csv", "config": {"column": 6, "config_ref": "placeholder_config_ref"}},
             "another": {"type": "range", "data": [1, 10]},
             "refs": {
-                "placeholder_configref": {"type": "configref", "config": {"datafile": "not_real.csv", "headers": "no"}}
+                "placeholder_config_ref": {"type": "config_ref", "config": {"datafile": "not_real.csv", "headers": "no"}}
             }
         }
     )
@@ -161,14 +161,14 @@ nested_transform_tests = [
             "another:range": [1, 10]
         },
         {
-            "refs": {"placeholder_configref": {"type": "configref",
+            "refs": {"placeholder_config_ref": {"type": "config_ref",
                                                "config": {"datafile": "not_real.csv", "headers": "no"}}},
             "outer": {
                 "type": "nested",
                 "fields": {
-                    "one": {"type": "csv", "config": {"column": 1, "configref": "placeholder_configref"}},
-                    "two": {"type": "csv", "config": {"column": 2, "configref": "placeholder_configref"}},
-                    "six": {"type": "csv", "config": {"column": 6, "configref": "placeholder_configref"}}
+                    "one": {"type": "csv", "config": {"column": 1, "config_ref": "placeholder_config_ref"}},
+                    "two": {"type": "csv", "config": {"column": 2, "config_ref": "placeholder_config_ref"}},
+                    "six": {"type": "csv", "config": {"column": 6, "config_ref": "placeholder_config_ref"}}
                 }
             },
             "another": {"type": "range", "data": [1, 10]},
@@ -194,7 +194,7 @@ nested_transform_tests = [
     ),
     (
         {
-            "one": {"type": "weightedref", "data": {"geo": 0.1}},
+            "one": {"type": "weighted_ref", "data": {"geo": 0.1}},
             "refs": {
                 "geo": {
                     "type": "nested",
@@ -207,7 +207,7 @@ nested_transform_tests = [
             }
         },
         {
-            "one": {"type": "weightedref", "data": {"geo": 0.1}},
+            "one": {"type": "weighted_ref", "data": {"geo": 0.1}},
             "refs": {
                 "geo": {
                     "type": "nested",

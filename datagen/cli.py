@@ -50,7 +50,7 @@ def parseargs(argv):
                         help='Path to external directory to load external data files such as csvs')
     parser.add_argument('-l', '--log-level', dest='log_level', default=logging.INFO,
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
-    formats = str(types.valid_formats())
+    formats = str(types.registered_formats())
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + formats)
     parser.add_argument('--strict', action='store_true', default=False,

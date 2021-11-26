@@ -1,76 +1,5 @@
 """
-There are two main range types sequential and random.  A sequential range is
-specified using the ``range`` type.  A random one uses the ``rand_range`` type.
-
-range
------
-
-Prototype:
-
-.. code-block:: python
-
-    {
-      "<field name>": {
-        "type": "range",
-        "data": [<start>, <end>, <step> (optional)],
-        or
-        "data": [
-          [<start>, <end>, <step> (optional)],
-          [<start>, <end>, <step> (optional)],
-          ...
-          [<start>, <end>, <step> (optional)],
-        ],
-      }
-    }
-
-    start: (Union[int, float]) - start of range
-    end: (Union[int, float]) - end of range
-    step: (Union[int, float]) - step for range, default is 1
-
-Examples:
-
-.. code-block:: json
-
-    {
-      "zero_to_ten_step_half": {
-        "type": "range",
-        "data": [0, 10, 0.5]
-      }
-    }
-
-.. code-block:: json
-
-    {
-      "range_shorthand1:range": {
-        "data": [0, 10, 0.5]
-      }
-    }
-
-.. code-block:: json
-
-    {"range_shorthand2:range": [0, 10, 0.5]},
-
-rand_range
-----------
-
-Prototype:
-
-.. code-block:: python
-
-    {
-      "<field name>": {
-        "type": "rand_range",
-        "data": [<upper>],
-        or
-        "data": [<lower>, <upper>],
-        or
-        "data": [<lower>, <upper>, <precision> (optional)]
-      }
-    }
-
-    upper: (Union[int, float]) - upper limit of random range
-    lower: (Union[int, float]) - lower limit of random range
-    precision: (int) - Number of digits after decimal point
+Module for range related types: range and rand_range
 """
 import decimal
 import json
@@ -129,7 +58,7 @@ def _configure_supplier_for_data(field_spec, data):
         precision = config.get('precision', None)
         if precision and not str(precision).isnumeric():
             raise datagen.SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
-        range_values = list(float_range(float(start), float(end), float(step), precision))
+        range_values = list(_float_range(float(start), float(end), float(step), precision))
     else:
         range_values = list(range(start, end, step))
     return datagen.suppliers.values(range_values)
@@ -167,10 +96,10 @@ def _any_is_float(data):
     return False
 
 
-def float_range(start: float,
-                stop: float,
-                step: float,
-                precision=None):
+def _float_range(start: float,
+                 stop: float,
+                 step: float,
+                 precision=None):
     """
     Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
     stored

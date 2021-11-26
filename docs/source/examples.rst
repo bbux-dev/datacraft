@@ -118,7 +118,7 @@ file to hold the bulk of the information.
 
 If you use the free version of the data from https://simplemaps.com/data/world-cities, you can reference this from a
 Data Spec using the csv type. We will put the fields, ``name``, ``lat``, ``long``, ``country``, and ``population`` in
-the ``refs`` section of the spec and use a ``configref`` to store the common config information for each field.
+the ``refs`` section of the spec and use a ``config_ref`` to store the common config information for each field.
 
 .. code-block:: json
 
@@ -127,17 +127,17 @@ the ``refs`` section of the spec and use a ``configref`` to store the common con
         "NAME": {
           "type": "csv",
           "config": {
-            "configref": "CITY_FILE_CONFIG",
+            "config_ref": "CITY_FILE_CONFIG",
             "column": 1,
             "quote": "\""
           }
         },
-        "LAT:csv?configref=CITY_FILE_CONFIG&column=3&cast=float": {},
-        "LONG:csv?configref=CITY_FILE_CONFIG&column=4&cast=float": {},
-        "COUNTRY:csv?configref=CITY_FILE_CONFIG&column=5&quote=\"": {},
-        "POP:csv?configref=CITY_FILE_CONFIG&column=10&cast=int": {},
+        "LAT:csv?config_ref=CITY_FILE_CONFIG&column=3&cast=float": {},
+        "LONG:csv?config_ref=CITY_FILE_CONFIG&column=4&cast=float": {},
+        "COUNTRY:csv?config_ref=CITY_FILE_CONFIG&column=5&quote=\"": {},
+        "POP:csv?config_ref=CITY_FILE_CONFIG&column=10&cast=int": {},
         "CITY_FILE_CONFIG": {
-          "type": "configref",
+          "type": "config_ref",
           "config": {
             "datafile": "worldcities.csv",
             "headers": true,
@@ -350,18 +350,18 @@ Running the earlier command and specifying this template produces:
         "NAME": {
           "type": "csv",
           "config": {
-            "configref": "CITY_FILE_CONFIG",
+            "config_ref": "CITY_FILE_CONFIG",
             "column": 1,
             "quote": "\""
           }
         },
-        "NAME2:csv?configref=CITY_FILE_CONFIG&column=1&quote=\"": {},
-        "LAT:csv?configref=CITY_FILE_CONFIG&column=3&cast=float": {},
-        "LONG:csv?configref=CITY_FILE_CONFIG&column=4&cast=float": {},
-        "COUNTRY:csv?configref=CITY_FILE_CONFIG&column=5&quote=\"": {},
-        "POP:csv?configref=CITY_FILE_CONFIG&column=10&cast=int": {},
+        "NAME2:csv?config_ref=CITY_FILE_CONFIG&column=1&quote=\"": {},
+        "LAT:csv?config_ref=CITY_FILE_CONFIG&column=3&cast=float": {},
+        "LONG:csv?config_ref=CITY_FILE_CONFIG&column=4&cast=float": {},
+        "COUNTRY:csv?config_ref=CITY_FILE_CONFIG&column=5&quote=\"": {},
+        "POP:csv?config_ref=CITY_FILE_CONFIG&column=10&cast=int": {},
         "CITY_FILE_CONFIG": {
-          "type": "configref",
+          "type": "config_ref",
           "config": {
             "datafile": "worldcities.csv",
             "headers": true,

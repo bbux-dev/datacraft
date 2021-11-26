@@ -1,92 +1,15 @@
 """
-There are times when one field needs the value of another field in order to
-calculate its own value. For example, if you wanted to produce values that
-represented a users' height in inches and in centimeters, you would want them to
-correlate. You could use the `calculate` type to specify a `formula` to do this
-calculation. There are two ways to specify the fields to calculate a value from.
-The first is to use the `fields` and/or the `refs` keys with an array of fields
-or refs to use in the formula.  The second is the use a map where the field
-or ref name to be used is mapped to a string that will be used as an alias for
-it in the formula. See second example below for the mapped alias version.
-
-Prototype:
-
-.. code-block:: python
-
-    {
-      "<field name>": {
-        "type": "calculate",
-        "fields": List[str],
-        or
-        "refs": List[str],
-        "formula": <formula>
-        "config": {
-          "key": Any
-        }
-      }
-    }
-
-    formula (str): The formula to use in calculations
-
-Examples:
-
-.. code-block:: json
-
-    {
-      "height_in": [60, 70, 80, 90],
-      "height_cm": {
-        "type": "calculate",
-        "fields": ["height_in"],
-        "formula": "{{ height_in }} * 2.54"
-      }
-    }
-
-.. code-block:: json
-
-    {
-      "long_name_one": {
-        "type": "values",
-        "data": [4, 5, 6]
-      },
-      "long_name_two": {
-        "type": "values",
-        "data": [3, 6, 9]
-      },
-      "c": {
-        "type": "calculate",
-        "fields": {
-          "long_name_one": "a",
-          "long_name_two": "b"
-        },
-        "formula": "sqrt({{a}}*{{a}} + {{b}}*{{b}})"
-      }
-    }
-
-We use the `asteval <http://newville.github.io/asteval/basics.html>`_
-package to do formula evaluation. This provides a fairly safe way to do
-evaluation. The package provides a bunch of
-`built-in-functions <http://newville.github.io/asteval/basics.html#built-in-functions>`_
-as well. We also use the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating
-engine format for specifying variable names to substitute. In theory, you
-could use any valid jinja2 syntax i.e.:
-
-.. code-block:: json
-
-    {
-      "formula": "sqrt({{ value_that_might_be_a_string | int }})"
-    }
-
+Module for classes and function to support calculate type
 """
 import json
-import keyword
 import logging
 import asteval  # type: ignore
 import datagen
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
-class CalculateSupplier(datagen.ValueSupplierInterface):
+class _CalculateSupplier(datagen.ValueSupplierInterface):
     """
     ValueSupplier for calculate types
 
@@ -108,7 +31,7 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
         >>> import datagen
         >>> formula = "{{ft}} * 30.48"
         >>> suppliers = { "ft": datagen.suppliers.values([4, 5, 6]) }
-        >>> calculate = CalculateSupplier(suppliers=suppliers, formula=formula)
+        >>> calculate = _CalculateSupplier(suppliers=suppliers, formula=formula)
         >>> asssert calculate.next(0) == 121.92
     """
 
@@ -155,7 +78,7 @@ def _configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
         suppliers[alias] = supplier
 
     engine = datagen.template_engines.string(template)
-    return CalculateSupplier(suppliers=suppliers, engine=engine)
+    return _CalculateSupplier(suppliers=suppliers, engine=engine)
 
 
 def _get_mappings(field_spec, key):

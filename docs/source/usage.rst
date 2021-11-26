@@ -482,11 +482,11 @@ to specify where the referenced csv files live. For example:
 Common CSV Configs
 ^^^^^^^^^^^^^^^^^^
 
-If more than one field is used from a csv file, it may be useful to create a :ref:`configref<config_ref_core_types>`
+If more than one field is used from a csv file, it may be useful to create a :ref:`config_ref<config_ref_core_types>`
 to hold the common configurations for the fields. Below there are two fields that use the same csv file to supply
 their values. The common configurations for the csv file are placed in the refs section in a ref titled
 ``http_csv_config``. The status and status_name fields now only have two configuration parameters: ``column`` and
-``configref``.
+``config_ref``.
 
 .. code-block:: json
 
@@ -494,18 +494,18 @@ their values. The common configurations for the csv file are placed in the refs 
       "status:csv": {
         "config": {
           "column": 1,
-          "configref": "http_csv_config"
+          "config_ref": "http_csv_config"
         }
       },
       "status_name:csv": {
         "config": {
           "column": 2,
-          "configref": "http_csv_config"
+          "config_ref": "http_csv_config"
         }
       },
       "refs": {
         "http_csv_config": {
-          "type": "configref",
+          "type": "config_ref",
           "config": {
             "datafile": "http_codes.csv",
             "headers": true,
@@ -523,7 +523,7 @@ By default, the rows of a CSV file are iterated through in order.  It is possibl
 basis by setting the ``sample`` config value to one of on, yes, or true. If you want to sample a csv file at the row
 level, you need to set the config param ``sample_rows`` to one of on, yes, or true. If this value is set for the
 first csv field from the same file defined, it will be inherited by the rest. If it is not configured on the first
-field, it will not be enabled, even if set on a later field. It is safest to define the field in a configref that all
+field, it will not be enabled, even if set on a later field. It is safest to define the field in a config_ref that all
 of the fields share, as illustrated in the above example.
 
 Processing Large CSVs
@@ -586,50 +586,77 @@ There are a lot of types of data that are not generated with this tool. Instead 
 mechanism to bring your own data suppliers. We make use of the handy `catalogue <https://pypi.org/project/catalogue/>`_
 package to allow auto discovery of custom functions using decorators. Use the ``@datagen.registry.types('<type key>')``
 to register a function that will create a :ref:`Value Supplier<value_supplier_interface>` for the supplied Field
-Spec. Below is an example of a custom class which reverses the output of another supplier. Types that are amazing and
-useful should be nominated for core inclusion. Please put up a PR if you create or use one that solves many of your
-data generation issues.
+Spec. Below is an example of a custom class which reverses the output of another supplier. This same operation could
+also be done with a :ref:`custom caster<custom_value_casters>`
 
 To supply custom code to the tool use the ``-c`` or ``--code`` arguments. One or more module files can be imported.
 
-.. code-block:: python
+.. tabs::
 
-   import datagen
-   from datagen import ValueSupplierInterface
+   .. tab:: Custom Code
 
+      .. code-block:: python
 
-   class ReverseStringSupplier(ValueSupplierInterface):
-       def __init__(self, wrapped):
-           self.wrapped = wrapped
+         import datagen
 
-       def next(self, iteration):
-           # value from the wrapped supplier
-           value = str(self.wrapped.next(iteration))
-           # python way to reverse a string, hehe
-           return value[::-1]
+         class ReverseStringSupplier(datagen.ValueSupplierInterface):
+             def __init__(self, wrapped):
+                 self.wrapped = wrapped
 
+             def next(self, iteration):
+                 # value from the wrapped supplier
+                 value = str(self.wrapped.next(iteration))
+                 # python way to reverse a string, hehe
+                 return value[::-1]
 
-   @datagen.registry.types('reverse_string')
-   def configure_supplier(field_spec, loader):
-       # load the supplier for the given ref
-       key = field_spec.get('ref')
-       wrapped = loader.get(key)
-       # wrap this with our custom reverse string supplier
-       return ReverseStringSupplier(wrapped)
+         @datagen.registry.types('reverse_string')
+         def configure_supplier(field_spec: dict,
+                                loader: datagen.Loader) -> datagen.ValueSupplierInterface:
+             # load the supplier for the given ref
+             key = field_spec.get('ref')
+             wrapped = loader.get(key)
+             # wrap this with our custom reverse string supplier
+             return ReverseStringSupplier(wrapped)
 
+         @datagen.registry.schemas('reverse_string')
+         def get_reverse_string_schema():
+             return {
+                 "$schema": "http://json-schema.org/draft-07/schema#",
+                 "$id": "reverse_string.schema.json",
+                 "type": "object",
+                 "required": ["type", "ref"],
+                 "properties": {
+                     "type": {"type": "string", "pattern": "^reverse_string$"},
+                     "ref": {"type": "string"}
+                 }
+             }
 
-   @datagen.registry.schemas('reverse_string')
-   def get_reverse_string_schema():
-       return {
-           "$schema": "http://json-schema.org/draft-07/schema#",
-           "$id": "reverse_string.schema.json",
-           "type": "object",
-           "required": ["type", "ref"],
-           "properties": {
-               "type": {"type": "string", "pattern": "^reverse_string$"},
-               "ref": {"type": "string"}
+   .. tab:: Data Spec
+
+      .. code-block::
+
+         {
+           "backwards": {
+             "type": "reverse_string",
+             "ref": "ANIMALS"
+           },
+           "refs": {
+             "ANIMALS": {
+               "type": "values",
+               "data": ["zebra", "hedgehog", "llama", "flamingo"]
+             }
            }
-       }
+         }
+
+   .. tab:: Command and Output
+
+      .. code-block:: shell
+
+         .datagen -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
+         arbez
+         gohegdeh
+         amall
+         ognimalf
 
 Now when we see a type of "reverse_string" like in the example below, we will use the given function to configure the
 supplier for it. The function name for the decorated function is arbitrary, but the signature must match. The signature
@@ -638,28 +665,9 @@ the next value for the given iteration. You can also optionally register a schem
 applied to the spec if the ``--strict`` command line flag is specified, otherwise you will have to perform your own
 validation in your code.
 
-.. code-block::
 
-   {
-     "backwards": {
-       "type": "reverse_string",
-       "ref": "ANIMALS"
-     },
-     "refs": {
-       "ANIMALS": {
-         "type": "values",
-         "data": ["zebra", "hedgehog", "llama", "flamingo"]
-       }
-     }
-   }
 
-.. code-block:: shell
 
-   .datagen -s reverse-spec.json -i 4 -c custom.py another.py -x --log-level off
-   arbez
-   gohegdeh
-   amall
-   ognimalf
 
 Programmatic Usage
 ------------------

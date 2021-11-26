@@ -58,7 +58,7 @@ def test_load_spec_weighted_ref():
         "NEUTRAL": 0.1
     }
     weighted_ref_spec = builder.spec_builder() \
-        .add_field('foo', builder.weightedref(ref_weights)) \
+        .add_field('foo', builder.weighted_ref(ref_weights)) \
         .add_ref('POSITIVE', ['yes']) \
         .add_ref('NEGATIVE', ['no']) \
         .add_ref('NEUTRAL', ['meh']) \

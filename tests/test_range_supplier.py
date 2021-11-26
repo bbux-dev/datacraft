@@ -110,15 +110,15 @@ def test_nested_range_lists_mixed_types_and_step_cast():
 
 
 def test_float_range1():
-    range_list = list(range_suppliers.float_range(1.0, 5.0, 1.0))
+    range_list = list(range_suppliers._float_range(1.0, 5.0, 1.0))
     assert range_list == [1.0, 2.0, 3.0, 4.0]
 
 
 def test_float_range_with_precision1():
-    range_list = list(range_suppliers.float_range(1.25, 2.25, 0.25, 2))
+    range_list = list(range_suppliers._float_range(1.25, 2.25, 0.25, 2))
     assert range_list == [1.25, 1.5, 1.75, 2.0]
 
 
 def test_float_range_with_precision2():
-    range_list = list(range_suppliers.float_range(1.2499999, 2.2499999, 0.25, 2))
+    range_list = list(range_suppliers._float_range(1.2499999, 2.2499999, 0.25, 2))
     assert range_list == [1.25, 1.5, 1.75, 2.0]

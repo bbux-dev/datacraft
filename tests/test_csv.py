@@ -101,9 +101,9 @@ def test_row_level_sampling():
         "headers": True,
         "sample_rows": "on"
     }
-    builder.configref('csvconfig', **config)
-    builder.csv('status', configref='csvconfig', column=1)
-    builder.csv('status_description', configref='csvconfig', column=2)
+    builder.config_ref('csvconfig', **config)
+    builder.csv('status', config_ref='csvconfig', column=1)
+    builder.csv('status_description', config_ref='csvconfig', column=2)
     spec = builder.build()
 
     with open(os.sep.join([test_dir, 'test.csv'])) as handle:
@@ -133,7 +133,7 @@ def _build_csv_spec(field_name, **config):
 
 def test_buffered_csv_end_of_data_raises_spec_exception():
     csv_path = f'{test_dir}/test.csv'
-    csv_data = csv.BufferedCsvData(csv_path, ',', '"', True, 5)
+    csv_data = csv._BufferedCsvData(csv_path, ',', '"', True, 5)
     with pytest.raises(datagen.SpecException):
         csv_data.next('status', 100, False, 1)
 
@@ -141,7 +141,7 @@ def test_buffered_csv_end_of_data_raises_spec_exception():
 def test_buffered_csv_does_not_support_sample_mode():
     csv_path = f'{test_dir}/test.csv'
     do_sampling = True
-    csv_data = csv.BufferedCsvData(csv_path, ',', '"', True, 5)
+    csv_data = csv._BufferedCsvData(csv_path, ',', '"', True, 5)
     with pytest.raises(datagen.SpecException):
         csv_data.next('status', 0, do_sampling, 1)
 
@@ -149,17 +149,17 @@ def test_buffered_csv_does_not_support_sample_mode():
 def test_buffered_csv_does_not_support_count_greater_than_one():
     csv_path = f'{test_dir}/test.csv'
     invalid_count = 2
-    csv_data = csv.BufferedCsvData(csv_path, ',', '"', True, 5)
+    csv_data = csv._BufferedCsvData(csv_path, ',', '"', True, 5)
     with pytest.raises(datagen.SpecException):
         csv_data.next('status', 0, False, invalid_count)
 
 
 def test_row_sample_csv_does_not_support_count_greater_than_one():
     csv_path = f'{test_dir}/test.csv'
-    csv_data = csv.RowLevelSampleEnabledCsv(csv_path=csv_path,
-                                            delimiter=',',
-                                            quotechar='"',
-                                            has_headers=True)
+    csv_data = csv._RowLevelSampleEnabledCsv(csv_path=csv_path,
+                                             delimiter=',',
+                                             quotechar='"',
+                                             has_headers=True)
     value = csv_data.next('status', 0, False, 2)
     assert value is not None
     assert isinstance(value, list)
@@ -167,9 +167,9 @@ def test_row_sample_csv_does_not_support_count_greater_than_one():
 
 def test_row_sample_csv_count_of_one():
     csv_path = f'{test_dir}/test.csv'
-    csv_data = csv.RowLevelSampleEnabledCsv(csv_path=csv_path,
-                                            delimiter=',',
-                                            quotechar='"',
-                                            has_headers=True)
+    csv_data = csv._RowLevelSampleEnabledCsv(csv_path=csv_path,
+                                             delimiter=',',
+                                             quotechar='"',
+                                             has_headers=True)
     value = csv_data.next('status', 0, False, 1)
     assert value is not None

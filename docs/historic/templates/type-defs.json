@@ -125,7 +125,7 @@
       "type_name": "ip.precise"
     },
     {
-      "type_name": "weightedref",
+      "type_name": "weighted_ref",
       "params": [
         {
           "name": "data",
@@ -177,8 +177,8 @@
       "spec_params": [{"name": "fields", "value": "utils.get_raw_spec(fields)"}]
     },
     {
-      "type_name": "configref",
-      "custom_builder_logic": "    # this must be a refs instance\n        if self.refs_builder is None:\n            return self.add_field(key, configref(**config))\n        else:\n            return self.add_ref(key, configref(**config))"
+      "type_name": "config_ref",
+      "custom_builder_logic": "    # this must be a refs instance\n        if self.refs_builder is None:\n            return self.add_field(key, config_ref(**config))\n        else:\n            return self.add_ref(key, config_ref(**config))"
     },
     {
       "type_name": "calculate",

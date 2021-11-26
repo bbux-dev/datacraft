@@ -9,7 +9,7 @@
       "type": "object",
       "anyOf": [
         {"required": ["datafile"]},
-        {"required": ["configref", "column"]}
+        {"required": ["config_ref", "column"]}
       ],
       "properties": {
         "datafile": {
@@ -20,9 +20,9 @@
             "subdir/example2.csv"
           ]
         },
-        "configref": {
+        "config_ref": {
           "type": "string",
-          "description": "Name of configref to use to populate config for this field",
+          "description": "Name of config_ref to use to populate config for this field",
           "examples": ["tabs_config", "common_csv_config"]
         },
         "headers": {

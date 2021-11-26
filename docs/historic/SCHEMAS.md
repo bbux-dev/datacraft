@@ -7,7 +7,7 @@ Built in Field Spec Type Schemas
 1. [char_class](#char_class)
 1. [combine-list](#combine-list)
 1. [combine](#combine)
-1. [configref](#configref)
+1. [config_ref](#config_ref)
 1. [csv](#csv)
 1. [Date types (data, date.iso, date.iso.us)](#date)
 1. [geo.lat](#geo.lat)
@@ -374,9 +374,9 @@ Types covered by schema: `combine`
 ```
 </details>
 
-# <a name="configref"></a>configref
+# <a name="config_ref"></a>config_ref
 
-Types covered by schema: `configref`
+Types covered by schema: `config_ref`
 
 <details>
   <summary>JSON Schema</summary>
@@ -384,14 +384,14 @@ Types covered by schema: `configref`
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/datagen/schemas/configref.schema.json",
+  "$id": "https://github.com/bbux-dev/datagen/schemas/config_ref.schema.json",
   "type": "object",
   "description": "Type used to store configurations that are used across multiple fields",
   "required": ["type", "config"],
   "properties": {
     "type": {
       "type": "string",
-      "pattern": "^configref$"
+      "pattern": "^config_ref$"
     },
     "config": {
       "type": "object"
@@ -420,7 +420,7 @@ Types covered by schema: `csv`
       "type": "object",
       "anyOf": [
         {"required": ["datafile"]},
-        {"required": ["configref", "column"]}
+        {"required": ["config_ref", "column"]}
       ],
       "properties": {
         "datafile": {
@@ -431,9 +431,9 @@ Types covered by schema: `csv`
             "subdir/example2.csv"
           ]
         },
-        "configref": {
+        "config_ref": {
           "type": "string",
-          "description": "Name of configref to use to populate config for this field",
+          "description": "Name of config_ref to use to populate config for this field",
           "examples": ["tabs_config", "common_csv_config"]
         },
         "headers": {
@@ -1091,7 +1091,7 @@ Types covered by schema: `weighted_csv`
       "type": "object",
       "anyOf": [
         {"required": ["datafile"]},
-        {"required": ["configref", "column"]}
+        {"required": ["config_ref", "column"]}
       ],
       "properties": {
         "datafile": {
@@ -1102,9 +1102,9 @@ Types covered by schema: `weighted_csv`
             "subdir/example2.csv"
           ]
         },
-        "configref": {
+        "config_ref": {
           "type": "string",
-          "description": "Name of configref to use to populate config for this field",
+          "description": "Name of config_ref to use to populate config for this field",
           "examples": ["tabs_config", "common_csv_config"]
         },
         "headers": {

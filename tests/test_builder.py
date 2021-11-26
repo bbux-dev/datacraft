@@ -84,8 +84,8 @@ field_spec_build_tests = [
      {"type": "ipv4", "config": {"cidr": "2.22.222.0/16"}}),
     (builder.ip_precise(cidr="10.0.0.0/8"),
      {"type": "ip.precise", "config": {"cidr": "10.0.0.0/8"}}),
-    (builder.weightedref({"One": 0.5, "Two": 0.3, "Three": 0.2}),
-     {"type": "weightedref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}),
+    (builder.weighted_ref({"One": 0.5, "Two": 0.3, "Three": 0.2}),
+     {"type": "weighted_ref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}),
     (builder.select_list_subset(data=["A", "B", "C"], mean=5, stddev=2),
      {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}),
     (builder.select_list_subset(ref="LIST", mean=5, stddev=2),
@@ -145,8 +145,8 @@ full_spec_build_tests = [
      {"name": {"type": "ipv4", "config": {"cidr": "2.22.222.0/16"}}}),
     (builder.spec_builder().ip_precise('name', cidr="10.0.0.0/8"),
      {"name": {"type": "ip.precise", "config": {"cidr": "10.0.0.0/8"}}}),
-    (builder.spec_builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
-     {"name": {"type": "weightedref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}}),
+    (builder.spec_builder().weighted_ref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+     {"name": {"type": "weighted_ref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}}),
     (builder.spec_builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
      {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}}),
     (builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
@@ -186,7 +186,7 @@ invalid_spec_build_tests = [
     builder.spec_builder().ip('name', base="192.1680"),  # type in base
     builder.spec_builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
     builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),  # ref not defined
-    builder.spec_builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+    builder.spec_builder().weighted_ref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
     builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
     builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
 ]

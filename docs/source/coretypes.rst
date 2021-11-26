@@ -3,88 +3,40 @@ Core Types
 
 These are the built in field spec types.
 
-values
-------
+.. include:: types/values.rst
 
-.. automodule:: datagen.supplier.core.values
+.. include:: types/refs.rst
 
-refs
-----
+.. include:: types/weighted_refs.rst
 
-.. automodule:: datagen.supplier.core.refs
+.. include:: types/ranges.rst
 
-weighted_refs
--------------
+.. include:: types/combine.rst
 
-.. automodule:: datagen.supplier.core.weighted_refs
-
-range_suppliers
----------------
-
-.. automodule:: datagen.supplier.core.range_suppliers
-
-combine
--------
-
-.. automodule:: datagen.supplier.core.combine
-
-date
-----
-
-.. automodule:: datagen.supplier.core.date
+.. include:: types/date.rst
 
 .. _csv_core_types:
 
-csv
----
-
-.. automodule:: datagen.supplier.core.csv
+.. include:: types/csv.rst
 
 .. _config_ref_core_types:
 
-configref
----------
+.. include:: types/config_ref.rst
 
-.. automodule:: datagen.supplier.core.configref
+.. include:: types/uuid.rst
 
-uuid
-----
+.. include:: types/select_list.rst
 
-.. automodule:: datagen.supplier.core.uuid_handler
+.. include:: types/char_class.rst
 
-select_list_subset
-------------------
+.. include:: types/unicode.rst
 
-.. automodule:: datagen.supplier.core.select_list_subset
+.. include:: types/geo.rst
 
-char_class
-----------
+.. include:: types/network.rst
 
-.. automodule:: datagen.supplier.core.char_class
+.. include:: types/nested.rst
 
-unicode_range
--------------
-
-.. automodule:: datagen.supplier.core.unicode_range
-
-geo
----
-
-.. automodule:: datagen.supplier.core.geo
-
-network
--------
-
-.. automodule:: datagen.supplier.core.network
-
-nested
-------
-
-.. automodule:: datagen.supplier.core.nested
-
-calculate
----------
-
-.. automodule:: datagen.supplier.core.calculate
+.. include:: types/calculate.rst
 
 

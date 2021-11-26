@@ -43,7 +43,7 @@ def test_combine_list_empty_refs_invalid():
 
 def test_refs_specified_but_invalid_type():
     spec = _combine_list_spec([["ONE", "TWO"]])
-    spec['refs']['TWO'] = builder.configref(prefix='foo', suffix='@bar')
+    spec['refs']['TWO'] = builder.config_ref(prefix='foo', suffix='@bar')
     _test_invalid_combine_spec(spec)
 
 

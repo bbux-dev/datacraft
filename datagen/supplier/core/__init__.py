@@ -1,6 +1,6 @@
 __all__ = ['char_class',
            'combine',
-           'configref',
+           'config_ref',
            'csv',
            'date',
            'geo',

@@ -61,7 +61,7 @@ type                         | description                            | config p
 [geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision
 [ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | base, cidr /8,/16,/24 only
 [ip.precise](#IP_Addresses)  | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/14
-[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |
+[weighted_ref](#Weighted_Ref) | produces values from refs in weighted fashion |
 [select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
@@ -2851,12 +2851,12 @@ spec = spec_builder.build()
 A weighted ref spec is used to select the values from a set of refs in a
 weighted fashion.
 
-The weightedref Field Spec structure is:
+The weighted_ref Field Spec structure is:
 
 ```
 {
   "<field name>": {
-    "type": "weightedref",
+    "type": "weighted_ref",
     "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...}
   }
 }
@@ -2871,7 +2871,7 @@ mostly success related codes we could use the follow spec.
 ```json
 {
   "http_code": {
-    "type": "weightedref",
+    "type": "weighted_ref",
     "data": {"GOOD_CODES": 0.7, "BAD_CODES": 0.3}
   },
   "refs": {
@@ -2897,7 +2897,7 @@ mostly success related codes we could use the follow spec.
 
 ```yaml
 http_code:
-  type: weightedref
+  type: weighted_ref
   data: {GOOD_CODES: 0.7, BAD_CODES: 0.3}
 refs:
   GOOD_CODES:
@@ -2925,7 +2925,7 @@ refs = spec_builder.refs()
 refs.add_field('GOOD_CODES', {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1})
 refs.add_field('BAD_CODES', {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1})
 
-spec_builder.weightedref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
+spec_builder.weighted_ref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
 
 spec = spec_builder.build()
 ```
@@ -3133,7 +3133,7 @@ values for a field. Another advantage of using a csv spec is that it is easy to
 have fields that are correlated be generated together. All rows will be selected
 incrementally, unless any of the fields are configured to use `sample` mode. You
 can use `sample` mode on individual columns, or you can use it across all
-columns by creating a `configref` spec. See [csv_select](#csv_select) for an
+columns by creating a `config_ref` spec. See [csv_select](#csv_select) for an
 efficient way to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
@@ -3164,7 +3164,7 @@ The `csv` Field Spec structure is:
 param | type | description                                  | default | examples
 ------|------|----------------------------------------------|---------|--------- 
 datafile|string |Name of file in data directory that</br>contains the data for this field | |example.csv</br>subdir/example2.csv</br> 
-configref|string |Name of configref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
+config_ref|string |Name of config_ref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
 headers| |If the csv file has headers |False | 
 column|['number', 'string'] |1 based column number or field name if</br>headers are present |1 |1</br>col_2</br>name</br> 
 delimiter|string |how values are separated in the csv</br>file, default is comma |, |,</br>	</br>;</br> </br> 
@@ -3271,20 +3271,20 @@ Our Data Spec looks like:
     "type": "csv",
     "config": {
       "column": 1,
-      "configref": "tabs_config"
+      "config_ref": "tabs_config"
     }
   },
   "description": {
     "type": "csv",
     "config": {
       "column": 2,
-      "configref": "tabs_config"
+      "config_ref": "tabs_config"
     }
   },
-  "status_type:csv?configref=tabs_config&column=3": {},
+  "status_type:csv?config_ref=tabs_config&column=3": {},
   "refs": {
     "tabs_config": {
-      "type": "configref",
+      "type": "config_ref",
       "config": {
         "datafile": "tabs.csv",
         "delimiter": "\t",
@@ -3304,16 +3304,16 @@ status:
   type: csv
   config:
     column: 1
-    configref: tabs_config
+    config_ref: tabs_config
 description:
   type: csv
   config:
     column: 2
-    configref: tabs_config
-status_type:csv?configref=tabs_config&column=3: {}
+    config_ref: tabs_config
+status_type:csv?config_ref=tabs_config&column=3: {}
 refs:
   tabs_config:
-    type: configref
+    type: config_ref
     config:
       datafile: tabs.csv
       delimiter: "\t"
@@ -3329,7 +3329,7 @@ import datagen
 
 spec_builder = datagen.spec_builder()
 
-spec_builder.configref(
+spec_builder.config_ref(
     key="tabs_config",
     datafile="tabs.csv",
     delimiter="\t",
@@ -3337,19 +3337,19 @@ spec_builder.configref(
 spec_builder.csv(
     key="status",
     column=1,
-    configref="tabs_config")
+    config_ref="tabs_config")
 spec_builder.csv(
     key="description",
     column=2,
-    configref="tabs_config")
-spec_builder.add_field("status_type:csv?configref=tabs_config&column=3", {})
+    config_ref="tabs_config")
+spec_builder.add_field("status_type:csv?config_ref=tabs_config&column=3", {})
 
 spec = spec_builder.build()
 ```
 
 </details>
 
-The `configref` exist so that we don't have to repeat ourselves for common
+The `config_ref` exist so that we don't have to repeat ourselves for common
 configurations across multiple fields. If we use the following template `{{ status }},{{ description }},{{ status_type }}` and run this
 spec we will get output similar to:
 
@@ -3458,7 +3458,7 @@ Springfield,0.01
 param | type | description                                  | default | examples
 ------|------|----------------------------------------------|---------|--------- 
 datafile|string |Name of file in data directory that</br>contains the data for this field | |example.csv</br>subdir/example2.csv</br> 
-configref|string |Name of configref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
+config_ref|string |Name of config_ref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
 headers| |If the csv file has headers |False | 
 column|['number', 'string'] |1 based column number or field name if</br>headers are present |1 |1</br>col_2</br>name</br> 
 weight_column|['number', 'string'] |1 based column number or field name if</br>headers are present where weights are</br>defined |2 |1</br>col_2</br>name</br> 

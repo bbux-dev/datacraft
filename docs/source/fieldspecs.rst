@@ -226,7 +226,7 @@ Example:
 Custom Count Distributions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Custom distributions can be supplied using the :ref:`custom code<custom_code>` loading and the
+Custom distributions can be supplied using :ref:`custom code<custom_code>` loading and the
 ``@datagen.registry.distribution`` decorator:
 
 .. tabs::
@@ -239,16 +239,16 @@ Custom distributions can be supplied using the :ref:`custom code<custom_code>` l
          import datagen
 
          class _GammaDist(datagen.Distribution):
-             def __init__(self, a):
+             def __init__(self, a: float):
                  self.a = a
 
              def next_value(self):
                  return gamma.rvs(self.a)
 
          @datagen.registry.distribution('gamma')
-         def _gamma_distribution(a, **kwargs):
+         def _gamma_distribution(a, **kwargs) -> datagen.Distribution:
              """ example custom distribution """
-             return _GammaDist(a)
+             return _GammaDist(float(a))
 
    .. tab:: Data Spec
 
@@ -270,7 +270,142 @@ Custom distributions can be supplied using the :ref:`custom code<custom_code>` l
 
       .. code-block:: shell
 
-         $ datagen -s spec.json -c dist.py -i 3
+         $ datagen -s spec.json -c dist.py -i 3 --log-level off
          ['abigail', 'flora', 'bob']
          ['rob', 'abigail']
          ['bobby', 'roberta', 'fauna', 'bob', 'rob', 'flora']
+
+Casting Values
+^^^^^^^^^^^^^^
+
+The CasterInterface exists to modify the results of generated data in small ways. An example would be the
+``rand_range`` type that produces floating point numbers within a given range. If you want an integer in the range
+provided by the supplier, you can use the ``"cast": "int"`` config param.  Below is a table of all of the built in
+caster types. Custom casters can be registered with the ``@datagen.registry.casters`` decorator as well.  See example
+below.
+
+Built in Casters
+~~~~~~~~~~~~~~~~
+
+.. table::
+   :widths: 15 60 15 15
+
+   +-------+------------------------------------------+--------+--------+
+   | name  | description                              | input  | output |
+   +=======+==========================================+========+========+
+   | int   | casts floats or string floats to integers| 44.567 | 44     |
+   +-------+------------------------------------------+--------+--------+
+   | i     | alias for int                            |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | float | casts float strings or integers to floats| 44     | 44.0   |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | '44.23'| 44.23  |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | '44.23'| 44.23  |
+   +-------+------------------------------------------+--------+--------+
+   | f     | alias for float                          |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | string| casts any type to a string               | 123    | '123'  |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 44.23  | '44.23'|
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | True   | 'True' |
+   +-------+------------------------------------------+--------+--------+
+   | str   | alias for string                         |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | s     | alias for string                         |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | hex   | casts integer objects to hexidecimal form| 123    | '0x7b' |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 1023   | '0x3ff'|
+   +-------+------------------------------------------+--------+--------+
+   | h     | alias for hex                            |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | lower | casts to string and lower cases value    | 'aBcD' | 'abcd' |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 123    | '123'  |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | True   | 'true' |
+   +-------+------------------------------------------+--------+--------+
+   | l     | alias for lower                          |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | upper | casts to string and upper cases value    | 'aBcD' | 'ABCD' |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 123    | '123'  |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | True   | 'TRUE' |
+   +-------+------------------------------------------+--------+--------+
+   | u     | alias for upper                          |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | trim  | removes leading and trailing whitespace  | ' val '| 'val'  |
+   +-------+------------------------------------------+--------+--------+
+   | t     | alias for trim                           |        |        |
+   +-------+------------------------------------------+--------+--------+
+   | round | round to nearest integer                 | 44.567 | 45     |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 44.123 | 44     |
+   +-------+------------------------------------------+--------+--------+
+   | round0| round to ones, type is float             | 44.567 | 45.0   |
+   +-------+------------------------------------------+--------+--------+
+   | round1| round to first decimal place             | 44.567 | 45.6   |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 44.123 | 44.1   |
+   +-------+------------------------------------------+--------+--------+
+   | round2| round to second decimal place            | 44.567 | 45.57  |
+   +-------+------------------------------------------+--------+--------+
+   |       |                                          | 44.123 | 44.12  |
+   +-------+------------------------------------------+--------+--------+
+   | ...   | same for round3 up to round7             |        |        |
+   +-------+------------------------------------------+--------+--------+
+
+.. _custom_value_casters:
+
+Custom Value Casters
+^^^^^^^^^^^^^^^^^^^^
+
+Custom casters can be supplied using :ref:`custom code<custom_code>` loading and the
+``@datagen.registry.casters`` decorator:
+
+.. tabs::
+
+   .. tab:: Custom Code
+
+      .. code-block:: python
+
+         from typeing import Any
+         import datagen
+
+         class _ReverseCaster(datagen.CasterInterface):
+             def cast(self, value: Any) -> str:
+                 return str(value)[::-1]
+
+         @datagen.registry.casters('reverse')
+         def _reverse_caster() -> datagen.CasterInterface:
+             """ example custom caster """
+             return _ReverseCaster()
+
+   .. tab:: Data Spec
+
+      .. code-block:: json
+
+         {
+           "cast_demo": {
+             "type": "values",
+             "data": ["zebra", "llama", "donkey", "flamingo", "rhinoceros"],
+             "config": {
+               "cast": "reverse"
+             }
+           }
+         }
+
+   .. tab:: Command and Output
+
+      .. code-block:: shell
+
+         $ datagen -s cast.json -c cast.py -i 5  --log-level off
+         arbez
+         amall
+         yeknod
+         ognimalf
+         soreconihr
+

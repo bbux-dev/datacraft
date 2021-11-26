@@ -52,9 +52,15 @@ class registry:
 
         defaults: default values
 
-            >>> @registry.defaults('special_sauce_ingredient')
+            >>> @datagen.registry.defaults('special_sauce_ingredient')
             ... def _default_special_sauce_ingredient():
             ...     # return the default value (i.e. onions)
+
+        casters: cast or alter values in simple ways
+
+            >>> @datagen.registry.casters('reverse')
+            ... def _cast_reverse_strings():
+            ...     # return a datagen.CasterInterface
 
     """
     types = catalogue.create('datagen', 'type')
@@ -64,6 +70,7 @@ class registry:
     formats = catalogue.create('datagen', 'format')
     distribution = catalogue.create('datagen', 'distribution')
     defaults = catalogue.create('datagen', 'defaults')
+    casters = catalogue.create('datagen', 'casters')
 
 
 def lookup_type(key):
@@ -99,7 +106,27 @@ def lookup_schema(key):
     return schema_load_function()
 
 
-def valid_formats():
+def lookup_caster(key):
+    """
+    Looks up the caster in the registry
+
+    Args:
+        key: for caster to look up
+
+    Returns:
+        the caster if found
+    """
+    all_keys = list(registry.casters.get_all().keys())
+    if key in all_keys:
+        caster_load_function = registry.casters.get(key)
+    else:
+        log.debug('No caster found for type %s', key)
+        return None
+
+    return caster_load_function()
+
+
+def registered_formats():
     """ list of registered formats """
     return list(registry.formats.get_all().keys())
 

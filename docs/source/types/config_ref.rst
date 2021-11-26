@@ -1,5 +1,7 @@
-"""
-Reference for holding configurations common to multiple fields
+config_ref
+----------
+
+Reference for holding configurations common to multiple fields.
 
 Prototype:
 
@@ -8,7 +10,7 @@ Prototype:
     {
       "refs": {
         "<config ref name>": {
-          "type": "configref",
+          "type": "config_ref",
           "config": {
             "key1": Any,
             ...
@@ -27,20 +29,20 @@ Examples:
         "type": "csv",
         "config": {
           "column": 1,
-          "configref": "tabs_config"
+          "config_ref": "tabs_config"
         }
       },
       "description": {
         "type": "csv",
         "config": {
           "column": 2,
-          "configref": "tabs_config"
+          "config_ref": "tabs_config"
         }
       },
-      "status_type:csv?configref=tabs_config&column=3": {},
+      "status_type:csv?config_ref=tabs_config&column=3": {},
       "refs": {
         "tabs_config": {
-          "type": "configref",
+          "type": "config_ref",
           "config": {
             "datafile": "tabs.csv",
             "delimiter": "\t",
@@ -49,11 +51,3 @@ Examples:
         }
       }
     }
-
-"""
-import datagen
-
-
-@datagen.registry.types('configref')
-def _configure_handler(_, __):
-    """" Does nothing, just place holder """

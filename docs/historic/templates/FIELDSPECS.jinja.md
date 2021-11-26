@@ -151,7 +151,7 @@ type                         | description                            | config p
 [geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision
 [ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | base, cidr /8,/16,/24 only
 [ip.precise](#IP_Addresses)  | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/14
-[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |
+[weighted_ref](#Weighted_Ref) | produces values from refs in weighted fashion |
 [select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
@@ -933,12 +933,12 @@ Ips in the 2.22.220.0 to 2.22.223.255 range, speed is tolerable
 A weighted ref spec is used to select the values from a set of refs in a
 weighted fashion.
 
-The weightedref Field Spec structure is:
+The weighted_ref Field Spec structure is:
 
 ```
 {
   "<field name>": {
-    "type": "weightedref",
+    "type": "weighted_ref",
     "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...}
   }
 }
@@ -1009,7 +1009,7 @@ values for a field. Another advantage of using a csv spec is that it is easy to
 have fields that are correlated be generated together. All rows will be selected
 incrementally, unless any of the fields are configured to use `sample` mode. You
 can use `sample` mode on individual columns, or you can use it across all
-columns by creating a `configref` spec. See [csv_select](#csv_select) for an
+columns by creating a `config_ref` spec. See [csv_select](#csv_select) for an
 efficient way to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
@@ -1076,7 +1076,7 @@ Our Data Spec looks like:
 
 {{ show_example(examples.csv_spec_example_two) }}
 
-The `configref` exist so that we don't have to repeat ourselves for common
+The `config_ref` exist so that we don't have to repeat ourselves for common
 configurations across multiple fields. If we use the following template {% raw
 %}`{{ status }},{{ description }},{{ status_type }}`{% endraw %} and run this
 spec we will get output similar to:

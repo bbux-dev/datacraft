@@ -54,21 +54,21 @@ def _preprocess_csv_select(raw_spec):
     updated_specs = {}
     for key, spec in raw_spec.items():
         if 'type' in spec and spec['type'] == 'csv_select':
-            configref_name = f'{key}_configref'
-            configref = {
-                'type': 'configref',
+            config_ref_name = f'{key}_config_ref'
+            config_ref = {
+                'type': 'config_ref',
                 'config': spec.get('config', {})
             }
             if 'refs' not in raw_spec:
-                updated_specs['refs'] = {configref_name: configref}
+                updated_specs['refs'] = {config_ref_name: config_ref}
             else:
-                updated_specs['refs'][configref_name] = configref
+                updated_specs['refs'][config_ref_name] = config_ref
             for name, column in spec.get('data', {}).items():
                 spec_for_column = {
                     'type': 'csv',
                     'config': {
                         'column': column,
-                        'configref': configref_name
+                        'config_ref': config_ref_name
                     }
                 }
                 if name not in raw_spec:

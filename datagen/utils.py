@@ -60,10 +60,10 @@ def load_config(field_spec: dict, loader, **kwargs) -> dict:
 
     config = field_spec.get('config', {})
     config.update(kwargs)
-    refkey = config.get('configref')
+    refkey = config.get('config_ref')
     if refkey:
-        configref = loader.get_ref_spec(refkey)
-        config.update(configref.get('config', {}))
+        config_ref = loader.get_ref_spec(refkey)
+        config.update(config_ref.get('config', {}))
     return config
 
 
