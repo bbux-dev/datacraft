@@ -75,6 +75,11 @@ Suppliers Module
 .. automodule:: datagen.suppliers
    :members:
 
+Key Providers Module
+--------------------
+.. automodule:: datagen.key_providers
+   :members:
+
 .. _outputs_module:
 
 Outputs Module
@@ -87,4 +92,9 @@ Outputs Module
 Template Engines
 ----------------
 .. automodule:: datagen.template_engines
+   :members:
+
+Spec Formatters
+---------------
+.. automodule:: datagen.spec_formatters
    :members:

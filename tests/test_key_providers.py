@@ -48,7 +48,7 @@ def test_weighted_field_groups():
 
 def test_weighted_field_groups_invalid_name():
     field_groups = {'one': ['A', 'B', 'C']}
-    key_provider = key_providers.WeightedGroupKeyProvider(field_groups, datagen.suppliers.values(['uno']))
+    key_provider = key_providers._WeightedGroupKeyProvider(field_groups, datagen.suppliers.values(['uno']))
     # for coverage
     with pytest.raises(SpecException):
         key_provider.get()

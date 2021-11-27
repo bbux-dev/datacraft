@@ -13,7 +13,7 @@ from . import utils, types, template_engines, builder, spec_formatters, loader
 from .preprocessor import *
 from .schemas import *
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 def parseargs(argv):
@@ -99,11 +99,11 @@ def process_args(args):
     ###################
 
     _configure_logging(args)
-    log.info('Starting Loading Configurations...')
-    log.debug('Parsing Args')
+    _log.info('Starting Loading Configurations...')
+    _log.debug('Parsing Args')
 
     if args.code:
-        log.debug('Loading custom code from %s', args.code)
+        _log.debug('Loading custom code from %s', args.code)
         for code in args.code:
             utils.load_custom_code(code)
 
@@ -119,8 +119,8 @@ def process_args(args):
         for setting in args.set_defaults:
             parts = setting.split('=')
             if len(parts) != 2:
-                log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
-                            setting)
+                _log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
+                             setting)
                 continue
             types.set_default(parts[0], parts[1])
     # command line overrides any configs
@@ -138,7 +138,7 @@ def process_args(args):
     # Load Data Spec
     ###################
 
-    log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
+    _log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
     spec = _load_spec(args)
     if spec is None:
         return None
@@ -221,21 +221,21 @@ def _load_spec(args):
 def _load_json_or_yaml(data_path):
     """ attempts to load the data at path as JSON, if that fails tries as YAML """
     if not os.path.exists(data_path):
-        log.error('Unable to load data from path: %s', data_path)
+        _log.error('Unable to load data from path: %s', data_path)
         return None
     with open(data_path, 'r') as handle:
-        log.debug('Attempting to load data as JSON')
+        _log.debug('Attempting to load data as JSON')
         try:
             return json.load(handle)
         except json.decoder.JSONDecodeError:
-            log.debug('Data is not Valid JSON')
+            _log.debug('Data is not Valid JSON')
     # not JSON, try yaml
     with open(data_path, 'r') as handle:
-        log.debug('Attempting to load data as YAML')
+        _log.debug('Attempting to load data as YAML')
         try:
             loaded = yaml.load(handle, Loader=yaml.FullLoader)
         except yaml.parser.ParserError as err:
-            log.warning(err)
+            _log.warning(err)
             loaded = None
     if not isinstance(loaded, dict):
         raise SpecException(f'Unable to load data from path: {data_path}, Please verify it is valid JSON or YAML')
@@ -254,13 +254,13 @@ def _parse_spec_string(inline: str):
     try:
         return json.loads(inline)
     except json.decoder.JSONDecodeError as err:
-        log.debug('Spec is not Valid JSON: %s', str(err))
+        _log.debug('Spec is not Valid JSON: %s', str(err))
     # not JSON, try yaml
-    log.debug('Attempting to load spec as YAML')
+    _log.debug('Attempting to load spec as YAML')
     try:
         return yaml.load(inline, Loader=yaml.FullLoader)
     except yaml.parser.ParserError as err:
-        log.debug('Spec is not Valid YAML %s', str(err))
+        _log.debug('Spec is not Valid YAML %s', str(err))
     raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
 
 

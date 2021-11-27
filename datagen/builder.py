@@ -15,20 +15,16 @@ Examples:
     >>> builder.build()
     {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}, 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
 """
-from typing import Generator
-import os
 import json
 import logging
-from pathlib import Path
 from typing import Any, Union, Dict, List
+from typing import Generator
 
-from . import utils, template_engines, key_providers, types
+from . import utils, key_providers, types
 from .loader import Loader
 from .model import DataSpec
-from .outputs import RecordProcessor
 
-
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class FieldInfo:
@@ -523,8 +519,8 @@ class Builder:
             >>> builder.add_field("field2", builder.another_spec(with_args))
         """
         if key in self.keys:
-            log.warning('%s key already defined, overwriting with %s',
-                        key, json.dumps(spec))
+            _log.warning('%s key already defined, overwriting with %s',
+                         key, json.dumps(spec))
         if isinstance(key, FieldInfo):
             key = key.key
         self.keys.add(key)
@@ -568,7 +564,7 @@ class Builder:
             >>> builder.add_ref("ref2", builder.another_spec(with_args))
         """
         if key in self.keys:
-            log.warning('%s key already defined, overwriting with %s', key, json.dumps(spec))
+            _log.warning('%s key already defined, overwriting with %s', key, json.dumps(spec))
         self.keys.add(key)
         self.refs_builder.add_field(key, spec)
         return self

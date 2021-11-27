@@ -6,7 +6,7 @@ import logging
 import flask
 
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class _Server:
@@ -20,7 +20,7 @@ class _Server:
         try:
             data = next(self.generator)
         except StopIteration:
-            log.warning('No more iterations available')
+            _log.warning('No more iterations available')
             return flask.Response(None, status=204)
         if self.data_is_json:
             return flask.jsonify(data)
@@ -28,7 +28,7 @@ class _Server:
 
     def run(self):
         app = flask.Flask(__name__)
-        log.info('Adding endpoint to server: %s', self.endpoint)
+        _log.info('Adding endpoint to server: %s', self.endpoint)
         app.add_url_rule(self.endpoint, view_func=self.callback)
         app.run()
 

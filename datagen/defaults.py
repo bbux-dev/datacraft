@@ -3,7 +3,7 @@ Module for storing default settings across package
 """
 from . import registry
 
-LARGE_CSV_SIZE_MB = 250
+_LARGE_CSV_SIZE_MB = 250
 
 
 @registry.defaults('sample_mode')
@@ -65,7 +65,7 @@ def _default_json_indent():
 @registry.defaults('large_csv_size_mb')
 def _default_large_csv_size():
     """ default size for what constitutes a large csv file """
-    return LARGE_CSV_SIZE_MB
+    return _LARGE_CSV_SIZE_MB
 
 
 @registry.defaults('data_dir')

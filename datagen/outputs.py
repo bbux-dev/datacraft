@@ -13,7 +13,7 @@ from . import template_engines, types
 from .model import RecordProcessor, OutputHandlerInterface
 from .exceptions import SpecException
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 @datagen.registry.formats('json')
@@ -173,7 +173,7 @@ class _SingleFileWriter(WriterInterface):
         with open(outfile, mode) as handle:
             handle.write(value)
             handle.write('\n')
-        log.info('Wrote data to %s', outfile)
+        _log.info('Wrote data to %s', outfile)
 
 
 def incrementing_file_writer(outdir: str,
@@ -288,7 +288,7 @@ def processor(template: Union[str, Path] = None, format_name: str = None) -> Uni
         raise SpecException('Only one of template or format_name should be supplied')
     processor = None
     if template:
-        log.debug('Using template: %s', template)
+        _log.debug('Using template: %s', template)
         if os.path.exists(template):
             processor = template_engines.for_file(template)
         elif '{{' in template:  # type: ignore
@@ -296,7 +296,7 @@ def processor(template: Union[str, Path] = None, format_name: str = None) -> Uni
         else:
             raise SpecException(f'Unable to determine how to handle template {template}, with type: {type(template)}')
     elif format_name:
-        log.debug('Using %s formatter for output', format_name)
+        _log.debug('Using %s formatter for output', format_name)
         processor = _for_format(format_name)
 
     return processor
@@ -330,7 +330,7 @@ def get_writer(outdir: str = None,
         >>> writer = datagen.outputs.get_writer('./output', outfileprefix='test-data-', extension='.csv')
     """
     if outdir:
-        log.debug('Creating output file writer for dir: %s', outdir)
+        _log.debug('Creating output file writer for dir: %s', outdir)
         if outfile:
             writer = single_file_writer(
                 outdir=outdir,
@@ -348,7 +348,7 @@ def get_writer(outdir: str = None,
         if kwargs.get('suppress_output'):
             writer = suppress_output_writer()
         else:
-            log.debug('Writing output to stdout')
+            _log.debug('Writing output to stdout')
             writer = stdout_writer()
     return writer
 

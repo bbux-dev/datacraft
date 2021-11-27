@@ -49,7 +49,7 @@ def build_example(name, spec, iterations=5, pipes=""):
         print(dirty_yaml)
 
     example = {
-        "json": json.dumps(ordered, cls=spec_formatters.MyEncoder, sort_keys=False, indent=2).strip(),
+        "json": json.dumps(ordered, cls=spec_formatters._MyEncoder, sort_keys=False, indent=2).strip(),
         "yaml": cleaned_yaml,
         "api": code.strip().replace('\n\n\n', '\n\n'),
         "command": cmd.strip(),
@@ -89,4 +89,4 @@ for name, iterations, fragment, pipes in EXAMPLES:
         raise Exception() from err
         # exit(-1)
 
-print(json.dumps({"examples": built_examples}, cls=spec_formatters.MyEncoder, sort_keys=False, indent=2))
+print(json.dumps({"examples": built_examples}, cls=spec_formatters._MyEncoder, sort_keys=False, indent=2))

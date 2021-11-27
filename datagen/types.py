@@ -6,7 +6,7 @@ from typing import Any
 
 import catalogue  # type: ignore
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class registry:
@@ -87,7 +87,7 @@ def lookup_type(key):
     if key in all_keys:
         func = registry.types.get(key)
     else:
-        log.debug('No schema found for type %s', key)
+        _log.debug('No schema found for type %s', key)
         return None
 
     return func
@@ -107,7 +107,7 @@ def lookup_schema(key):
     if key in all_keys:
         schema_load_function = registry.schemas.get(key)
     else:
-        log.debug('No schema found for type %s', key)
+        _log.debug('No schema found for type %s', key)
         return None
 
     return schema_load_function()
@@ -127,7 +127,7 @@ def lookup_caster(key):
     if key in all_keys:
         caster_load_function = registry.casters.get(key)
     else:
-        log.debug('No caster found for type %s', key)
+        _log.debug('No caster found for type %s', key)
         return None
 
     return caster_load_function()

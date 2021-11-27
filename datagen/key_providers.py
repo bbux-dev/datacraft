@@ -12,7 +12,7 @@ from . import suppliers, ValueSupplierInterface
 from .model import DataSpec, KeyProviderInterface
 from .exceptions import SpecException
 
-ROOT_KEYS = ['refs', 'field_groups']
+_ROOT_KEYS = ['refs', 'field_groups']
 
 
 def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
@@ -77,11 +77,11 @@ def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
         if isinstance(field_groups, list):
             return _create_rotating_lists_key_provider(field_groups)
     # default when no field groups specified
-    keys = [key for key in raw_spec.keys() if key not in ROOT_KEYS]
-    return KeyListProvider(keys)
+    keys = [key for key in raw_spec.keys() if key not in _ROOT_KEYS]
+    return _KeyListProvider(keys)
 
 
-class KeyListProvider(KeyProviderInterface):
+class _KeyListProvider(KeyProviderInterface):
     """ Class the provides static list of keys """
 
     def __init__(self, keys: List[str]):
@@ -91,7 +91,7 @@ class KeyListProvider(KeyProviderInterface):
         return 'ALL', self.keys
 
 
-class RotatingKeyListProvider(KeyProviderInterface):
+class _RotatingKeyListProvider(KeyProviderInterface):
     """Class the provides keys from list of various keys in rotating manner """
 
     def __init__(self, keys: List[Tuple[str, List[str]]]):
@@ -113,7 +113,7 @@ class RotatingKeyListProvider(KeyProviderInterface):
         return entry
 
 
-class WeightedGroupKeyProvider(KeyProviderInterface):
+class _WeightedGroupKeyProvider(KeyProviderInterface):
     """Class that supplies keys according to weighted scheme """
 
     def __init__(self, field_groups: dict, supplier: ValueSupplierInterface):
@@ -132,7 +132,7 @@ def _create_weighted_key_provider(field_groups: Dict) -> KeyProviderInterface:
     keys = field_groups.keys()
     weights = {key: float(key) for key in keys}
     supplier = suppliers.weighted_values(weights)
-    return WeightedGroupKeyProvider(field_groups, supplier)
+    return _WeightedGroupKeyProvider(field_groups, supplier)
 
 
 def _create_rotating_lists_key_provider(field_groups: Union[List, Dict]) -> KeyProviderInterface:
@@ -143,4 +143,4 @@ def _create_rotating_lists_key_provider(field_groups: Union[List, Dict]) -> KeyP
         keys = [(key, value) for key, value in field_groups.items()]
     else:
         raise ValueError('Invalid type for field_groups only one of list or dict allowed')
-    return RotatingKeyListProvider(keys)
+    return _RotatingKeyListProvider(keys)
