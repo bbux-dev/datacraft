@@ -665,6 +665,8 @@ the next value for the given iteration. You can also optionally register a schem
 applied to the spec if the ``--strict`` command line flag is specified, otherwise you will have to perform your own
 validation in your code.
 
+See the :ref:`Registry Decorators<registry_decorators>` for the complete list of components that can be expanded or
+registered.
 
 
 

@@ -59,12 +59,6 @@ Datagen Errors
 
 Builder Module
 --------------
-.. autofunction:: datagen.builder.spec_builder
-   :noindex:
-
-.. autofunction:: datagen.builder.generator
-   :noindex:
-
 .. automodule:: datagen.builder
    :members:
 

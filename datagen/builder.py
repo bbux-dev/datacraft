@@ -1,5 +1,5 @@
 """
-Module for building Data Specs programmatically
+Module for building Data Specs programmatically.
 
 Examples:
     >>> import datagen
