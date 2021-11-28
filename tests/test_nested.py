@@ -1,4 +1,6 @@
 import pytest
+
+import datagen
 from datagen import builder, Loader
 from datagen.supplier.core import nested
 
@@ -7,10 +9,10 @@ def test_single_nested():
     # Geo
     # - Place
     # - Coord
-    geo_spec = builder.Builder() \
+    geo_spec = builder.spec_builder() \
         .add_field("place_id:uuid", {}) \
         .add_field("coordinates", builder.geo_pair(as_list=True))
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build())) \
         .build()
@@ -26,13 +28,13 @@ def test_multi_nested():
     # - Geo
     # - - Place
     # - - Coord
-    geo_spec = builder.Builder() \
+    geo_spec = builder.spec_builder() \
         .add_field("place_id:uuid", {}) \
         .add_field("coordinates", builder.geo_pair(as_list=True))
-    user_spec = builder.Builder() \
+    user_spec = builder.spec_builder() \
         .add_field("user_id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build()))
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("id:uuid", {}) \
         .add_field("user", builder.nested(fields=user_spec.build())) \
         .build()
@@ -51,10 +53,10 @@ def test_single_nested_as_list():
     # Geo
     # - Place
     # - Coord
-    geo_spec = builder.Builder() \
+    geo_spec = builder.spec_builder() \
         .add_field("place_id:uuid", {}) \
         .add_field("coordinates", builder.geo_pair(as_list=True))
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build(), as_list=True)) \
         .build()
@@ -81,3 +83,46 @@ def test_nested_count_edge_cases(count, as_list, expected):
     generator = spec.generator(1)
     single_record = next(generator)
     assert single_record['outer'] == expected
+
+
+def test_nested_field_groups():
+    raw_spec = {
+        "outer": {
+            "type": "nested",
+            "fields": {
+                "one": "Val 1",
+                "two": "Val 2"
+            },
+            "field_groups": [
+                ["one"],
+                ["one", "two"]
+            ]
+        }
+    }
+    spec = datagen.parse_spec(raw_spec)
+    gen = spec.generator(iterations=2)
+    first = next(gen)["outer"]
+    second = next(gen)["outer"]
+    assert "two" not in first
+    assert "two" in second
+
+
+def test_nested_field_groups_invalid_name():
+    raw_spec = {
+        "outer": {
+            "type": "nested",
+            "fields": {
+                "one": "Val 1",
+                "two": "Val 2"
+            },
+            "field_groups": [
+                ["one"],
+                ["one", "tre"]
+            ]
+        }
+    }
+    with pytest.raises(datagen.SpecException):
+        spec = datagen.parse_spec(raw_spec)
+        gen = spec.generator(iterations=2)
+        next(gen)  # no error
+        next(gen)  # should trigger

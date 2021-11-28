@@ -8,7 +8,7 @@ from jsonschema import Draft7Validator  # type: ignore
 from datagen import schema
 from .exceptions import ResourceError, SpecException
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 def load(key: str) -> dict:
@@ -58,5 +58,5 @@ def validate_schema_for_spec(spec_type, field_spec, type_schema):
     errors = sorted(validator.iter_errors(field_spec), key=lambda e: e.path)
     if len(errors) > 0:
         for error in errors:
-            log.warning(error.message)
+            _log.warning(error.message)
         raise SpecException(f'Failed to validate spec type: {spec_type} with spec: {field_spec}')

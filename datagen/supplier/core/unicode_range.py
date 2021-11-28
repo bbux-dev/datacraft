@@ -1,5 +1,5 @@
 """
-Module for handling unicode ranges
+Module for unicode_range type
 """
 import json
 

@@ -8,6 +8,7 @@ import random
 from collections import deque
 
 import datagen
+import datagen.model
 
 
 class SingleValue(datagen.ValueSupplierInterface):
@@ -101,7 +102,7 @@ class CastingSupplier(datagen.ValueSupplierInterface):
 
     def __init__(self,
                  wrapped: datagen.ValueSupplierInterface,
-                 caster: datagen.CasterInterface):
+                 caster: datagen.model.CasterInterface):
         """
         Args:
             wrapped: supplier to get values from

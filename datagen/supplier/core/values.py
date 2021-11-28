@@ -1,13 +1,13 @@
 """
-Module for values type functionality
+Module for values types
 """
 
 import datagen
 
-VALUES_KEY = 'values'
+_VALUES_KEY = 'values'
 
 
-@datagen.registry.schemas(VALUES_KEY)
+@datagen.registry.schemas(_VALUES_KEY)
 def _get_schema():
     """ returns the values schema """
-    return datagen.schemas.load(VALUES_KEY)
+    return datagen.schemas.load(_VALUES_KEY)

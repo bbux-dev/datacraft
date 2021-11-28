@@ -108,22 +108,22 @@ def _verify_in_range_and_has_precision(value, start, end, exponent):
     as_decimal = decimal.Decimal(str(value))
     assert as_decimal >= start
     assert as_decimal <= end
-    assert as_decimal.as_tuple().exponent >= exponent
+    assert as_decimal.as_tuple().exponent >= exponent, f'value has wrong exponent {value}, expected {exponent}'
 
 
 def _geo_lat_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('lat', builder.geo_lat(**config)) \
         .build()
 
 
 def _geo_long_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('long', builder.geo_long(**config)) \
         .build()
 
 
 def _geo_pair_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('pair', builder.geo_pair(**config)) \
         .build()

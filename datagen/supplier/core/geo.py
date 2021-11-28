@@ -1,16 +1,16 @@
 """
-Module for handling geo types
+Module for geo related types.  geo.lat, geo.long, geo.pair
 """
 import json
 
 import datagen
 
-GEO_LAT_KEY = 'geo.lat'
-GEO_LONG_KEY = 'geo.long'
-GEO_PAIR_KEY = 'geo.pair'
+_GEO_LAT_KEY = 'geo.lat'
+_GEO_LONG_KEY = 'geo.long'
+_GEO_PAIR_KEY = 'geo.pair'
 
 
-class GeoSupplier(datagen.ValueSupplierInterface):
+class _GeoSupplier(datagen.ValueSupplierInterface):
     """
     Default implementation for generating geo related values
     """
@@ -23,34 +23,34 @@ class GeoSupplier(datagen.ValueSupplierInterface):
         return value
 
 
-@datagen.registry.schemas(GEO_LAT_KEY)
+@datagen.registry.schemas(_GEO_LAT_KEY)
 def _get_geo_lat_schema():
-    return datagen.schemas.load(GEO_LAT_KEY)
+    return datagen.schemas.load(_GEO_LAT_KEY)
 
 
-@datagen.registry.schemas(GEO_LONG_KEY)
+@datagen.registry.schemas(_GEO_LONG_KEY)
 def _get_geo_long_schema():
-    return datagen.schemas.load(GEO_LONG_KEY)
+    return datagen.schemas.load(_GEO_LONG_KEY)
 
 
-@datagen.registry.schemas(GEO_PAIR_KEY)
+@datagen.registry.schemas(_GEO_PAIR_KEY)
 def _get_geo_pair_schema():
-    return datagen.schemas.load(GEO_PAIR_KEY)
+    return datagen.schemas.load(_GEO_PAIR_KEY)
 
 
-@datagen.registry.types(GEO_LAT_KEY)
+@datagen.registry.types(_GEO_LAT_KEY)
 def _configure_geo_lat(field_spec, loader):
     """ configures value supplier for geo.lat type """
     return _configure_lat_type(field_spec, loader)
 
 
-@datagen.registry.types(GEO_LONG_KEY)
+@datagen.registry.types(_GEO_LONG_KEY)
 def _configure_geo_long(field_spec, loader):
     """ configures value supplier for geo.long type """
     return _configure_long_type(field_spec, loader)
 
 
-@datagen.registry.types(GEO_PAIR_KEY)
+@datagen.registry.types(_GEO_PAIR_KEY)
 def _configure_geo_pair(field_spec, loader):
     """ configures value supplier for geo.pair type """
     config = datagen.utils.load_config(field_spec, loader)
@@ -80,9 +80,10 @@ def _configure_geo_type(spec, loader, default_start, default_end, suffix):
     config = datagen.utils.load_config(spec, loader)
     precision = config.get('precision', datagen.types.get_default('geo_precision'))
     if not str(precision).isnumeric():
-        raise datagen.SpecException(f'precision for geo should be valid integer: {json.dumps(spec)}')
+        raise datagen.SpecException(f'precision for geo should be valid integer >= 0: {json.dumps(spec)}')
     start, end = _get_start_end(config, default_start, default_end, suffix)
-    return GeoSupplier(datagen.suppliers.random_range(start, end, precision))
+    range_supplier = datagen.suppliers.random_range(start, end, precision)
+    return _GeoSupplier(range_supplier)
 
 
 def _get_start_end(config, default_start, default_end, suffix):

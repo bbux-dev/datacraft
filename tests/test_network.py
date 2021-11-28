@@ -2,7 +2,7 @@ import pytest
 from datagen.loader import Loader
 from datagen import builder, SpecException
 # need this to trigger registration
-from datagen.supplier.core import ip_addresses
+from datagen.supplier.core import network
 
 
 def test_ip_v4_spec():
@@ -135,6 +135,23 @@ def test_ip_spec_invalid_base2():
     _test_ip_spec_invalid_base('1000.')
 
 
+def test_default_delim_mac_address():
+    spec = builder.spec_builder() \
+        .add_field('mac', builder.mac()) \
+        .build()
+    value = next(spec.generator(1))['mac']
+    assert len(value) == 17
+
+
+def test_mac_address_dashes():
+    spec = builder.spec_builder() \
+        .add_field('mac', builder.mac(dashes='true')) \
+        .build()
+    value = next(spec.generator(1))['mac']
+    assert len(value) == 17
+    assert '-' in value, f'No dashes in: {value}'
+
+
 def _test_ip_spec_invalid_base(base):
     loader = Loader(_create_ip_spec_with_base(base))
     with pytest.raises(SpecException):
@@ -151,18 +168,18 @@ def _create_ip_spec_with_base(base):
 
 
 def _ip_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('network', builder.ip(**config)) \
         .build()
 
 
 def _ipv4_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('network', builder.ipv4(**config)) \
         .build()
 
 
 def _ip_precise_spec(**config):
-    return builder.Builder() \
+    return builder.spec_builder() \
         .add_field('network', builder.ip_precise(**config)) \
         .build()

@@ -1,12 +1,12 @@
 """
-Module for handling character class types
+Module to support char_class and related types
 """
 import json
 import string
 
 import datagen
 
-CHAR_CLASS_KEY = 'char_class'
+_CHAR_CLASS_KEY = 'char_class'
 _UNDER_SCORE = '_'
 
 _CLASS_MAPPING = {
@@ -26,20 +26,20 @@ _CLASS_MAPPING = {
 }
 
 
-@datagen.registry.schemas(CHAR_CLASS_KEY)
+@datagen.registry.schemas(_CHAR_CLASS_KEY)
 def _get_char_class_schema():
     """ get the schema for the char_class type """
-    return datagen.schemas.load(CHAR_CLASS_KEY)
+    return datagen.schemas.load(_CHAR_CLASS_KEY)
 
 
 for key in _CLASS_MAPPING.keys():
     @datagen.registry.schemas("cc-" + key)
     def _get_char_class_alias_schema():
         """ get the schema for the char_class type """
-        return datagen.schemas.load(CHAR_CLASS_KEY)
+        return datagen.schemas.load(_CHAR_CLASS_KEY)
 
 
-@datagen.registry.types(CHAR_CLASS_KEY)
+@datagen.registry.types(_CHAR_CLASS_KEY)
 def _configure_supplier(spec, _):
     """ configure the supplier for char_class types """
     if 'data' not in spec:

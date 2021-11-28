@@ -9,7 +9,7 @@
       "type": "object",
       "anyOf": [
         {"required": ["datafile"]},
-        {"required": ["configref", "column"]}
+        {"required": ["config_ref", "column"]}
       ],
       "properties": {
         "datafile": {
@@ -20,9 +20,9 @@
             "subdir/example2.csv"
           ]
         },
-        "configref": {
+        "config_ref": {
           "type": "string",
-          "description": "Name of configref to use to populate config for this field",
+          "description": "Name of config_ref to use to populate config for this field",
           "examples": ["tabs_config", "common_csv_config"]
         },
         "headers": {
@@ -59,6 +59,11 @@
         },
         "sample": {
           "description": "If the values for the field should be selected at random from the values in the column, default is false",
+          "default": false,
+          "$ref": "#/definitions/affirmative_check"
+        },
+        "sample_rows": {
+          "description": "If the values for the csv should be sampled at a row level",
           "default": false,
           "$ref": "#/definitions/affirmative_check"
         },

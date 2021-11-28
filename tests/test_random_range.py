@@ -1,7 +1,5 @@
 import decimal
-
 import pytest
-
 import datagen
 
 

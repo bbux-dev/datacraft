@@ -1,16 +1,15 @@
 """
-module for handling calculate types
+Module for classes and function to support calculate type
 """
 import json
-import keyword
 import logging
 import asteval  # type: ignore
 import datagen
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
-class CalculateSupplier(datagen.ValueSupplierInterface):
+class _CalculateSupplier(datagen.ValueSupplierInterface):
     """
     ValueSupplier for calculate types
 
@@ -26,17 +25,17 @@ class CalculateSupplier(datagen.ValueSupplierInterface):
 
     Formula should contain operations for values returned by aliases suppliers
 
-    i.e.:
+    Variables should be encased in Jinja2 double brace format
 
     Examples:
         >>> import datagen
-        >>> formula = "ft * 30.48"
+        >>> formula = "{{ft}} * 30.48"
         >>> suppliers = { "ft": datagen.suppliers.values([4, 5, 6]) }
-        >>> calculate = CalculateSupplier(suppliers=suppliers, formula=formula)
+        >>> calculate = _CalculateSupplier(suppliers=suppliers, formula=formula)
         >>> asssert calculate.next(0) == 121.92
     """
 
-    def __init__(self, suppliers: dict, engine: datagen.template_engines.Jinja2Engine):
+    def __init__(self, suppliers: dict, engine: datagen.model.RecordProcessor):
         self.suppliers = suppliers
         self.engine = engine
         self.aeval = asteval.Interpreter()
@@ -63,7 +62,8 @@ def _configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
         raise datagen.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
     if 'refs' in field_spec and 'fields' in field_spec:
         raise datagen.SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
-    if field_spec.get('formula') is None:
+    template = field_spec.get('formula')
+    if template is None:
         raise datagen.SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
     mappings = _get_mappings(field_spec, 'refs')
@@ -77,9 +77,8 @@ def _configure_calculate_supplier(field_spec: dict, loader: datagen.Loader):
         supplier = loader.get(field_or_ref)
         suppliers[alias] = supplier
 
-    template = field_spec.get('formula')
     engine = datagen.template_engines.string(template)
-    return CalculateSupplier(suppliers=suppliers, engine=engine)
+    return _CalculateSupplier(suppliers=suppliers, engine=engine)
 
 
 def _get_mappings(field_spec, key):

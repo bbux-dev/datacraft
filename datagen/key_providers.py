@@ -7,25 +7,12 @@ provides classes that provide these fields according to various schemes such as 
 
 """
 from typing import List, Tuple, Union, Dict
-from abc import ABC, abstractmethod
 import json
 from . import suppliers, ValueSupplierInterface
-from .model import DataSpec
+from .model import DataSpec, KeyProviderInterface
 from .exceptions import SpecException
 
-ROOT_KEYS = ['refs', 'field_groups']
-
-
-class KeyProviderInterface(ABC):
-    """ Interface for KeyProviders """
-
-    @abstractmethod
-    def get(self) -> Tuple[str, List[str]]:
-        """get the next set of field names to process
-
-        Returns:
-            key_group_name, key_list_for_group_name
-        """
+_ROOT_KEYS = ['refs', 'field_groups']
 
 
 def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
@@ -39,31 +26,36 @@ def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
     1. List[List[str]] i.e:
 
     .. code-block:: json
-    { "field_groups": [
-        ["one", "two"],
-        ["one", "two", "three"]
-      ]
-    }
 
-    2. Dict[str, Dict[str, ] -> With weight and fields specified i.e.
+        { "field_groups": [
+            ["one", "two"],
+            ["one", "two", "three"]
+          ]
+        }
 
-    .. code-block:: json
-    { "field_groups": {
-      "groupA": {
-        "weight": 0.7, "fields": ["one", "two"]
-      },
-      "groupB": {
-        "weight": 0.3, "fields": ["one", "two", "three"]
-      }
-    }
 
-    3. Dict[str, List[str]] -> This is called named groups
+    2. Dict[str, List[str]] -> With weights as keys and fields specified i.e.
 
     .. code-block:: json
-    {
-      "groupA": ["one", "two"],
-      "groupB": ["one", "two", "three"], ...
-    }
+
+        {
+          "field_groups": {
+            "0.7": ["one", "two"]
+            "0.3": ["one", "two", "three"]
+          }
+        }
+
+
+    3. Dict[str, List[str]] -> With names as keys and fields specified i.e.
+
+    .. code-block:: json
+
+        {
+          "field_groups": {
+            "missing_three": ["one", "two"]
+            "all_there": ["one", "two", "three"]
+          }
+        }
 
     Returns:
         Appropriate KeyProvider
@@ -75,17 +67,21 @@ def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
     if 'field_groups' in raw_spec:
         field_groups = raw_spec['field_groups']
         if isinstance(field_groups, dict):
-            if isinstance(list(field_groups.values())[0], list):
+            try:
+                # check if all of the keys are numeric
+                [float(key) for key in field_groups.keys()]
+                return _create_weighted_key_provider(field_groups)
+            except ValueError as err:
+                # must be named variety
                 return _create_rotating_lists_key_provider(field_groups)
-            return _create_weighted_key_provider(field_groups)
         if isinstance(field_groups, list):
             return _create_rotating_lists_key_provider(field_groups)
     # default when no field groups specified
-    keys = [key for key in raw_spec.keys() if key not in ROOT_KEYS]
-    return KeyListProvider(keys)
+    keys = [key for key in raw_spec.keys() if key not in _ROOT_KEYS]
+    return _KeyListProvider(keys)
 
 
-class KeyListProvider(KeyProviderInterface):
+class _KeyListProvider(KeyProviderInterface):
     """ Class the provides static list of keys """
 
     def __init__(self, keys: List[str]):
@@ -95,7 +91,7 @@ class KeyListProvider(KeyProviderInterface):
         return 'ALL', self.keys
 
 
-class RotatingKeyListProvider(KeyProviderInterface):
+class _RotatingKeyListProvider(KeyProviderInterface):
     """Class the provides keys from list of various keys in rotating manner """
 
     def __init__(self, keys: List[Tuple[str, List[str]]]):
@@ -117,27 +113,26 @@ class RotatingKeyListProvider(KeyProviderInterface):
         return entry
 
 
-class WeightedGroupKeyProvider(KeyProviderInterface):
+class _WeightedGroupKeyProvider(KeyProviderInterface):
     """Class that supplies keys according to weighted scheme """
 
-    def __init__(self, field_groups: dict, supplier: ValueSupplierInterface, fields_key: str = 'fields'):
+    def __init__(self, field_groups: dict, supplier: ValueSupplierInterface):
         self.field_groups = field_groups
         self.supplier = supplier
-        self.fields_key = fields_key
 
     def get(self):
         key = self.supplier.next(0)
-        if key not in self.field_groups or self.fields_key not in self.field_groups[key]:
-            raise SpecException(
-                f'Key: {key}, or fields key {self.fields_key} not found: {json.dumps(self.field_groups)}')
-        return key, self.field_groups[key]['fields']
+        if key not in self.field_groups:
+            raise SpecException(f'Key: {key} not found: {json.dumps(self.field_groups)}')
+        return key, self.field_groups[key]
 
 
 def _create_weighted_key_provider(field_groups: Dict) -> KeyProviderInterface:
     """Creates a weighted field group key provide for the supplied field_groups """
-    weights = {key: value['weight'] for key, value in field_groups.items()}
+    keys = field_groups.keys()
+    weights = {key: float(key) for key in keys}
     supplier = suppliers.weighted_values(weights)
-    return WeightedGroupKeyProvider(field_groups, supplier)
+    return _WeightedGroupKeyProvider(field_groups, supplier)
 
 
 def _create_rotating_lists_key_provider(field_groups: Union[List, Dict]) -> KeyProviderInterface:
@@ -148,4 +143,4 @@ def _create_rotating_lists_key_provider(field_groups: Union[List, Dict]) -> KeyP
         keys = [(key, value) for key, value in field_groups.items()]
     else:
         raise ValueError('Invalid type for field_groups only one of list or dict allowed')
-    return RotatingKeyListProvider(keys)
+    return _RotatingKeyListProvider(keys)

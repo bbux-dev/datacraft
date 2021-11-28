@@ -1,7 +1,6 @@
 """
-Configures a supplier to provide a range of integers. Range is are inclusive for start and end
+Module for range related types: range and rand_range
 """
-from typing import Union
 import decimal
 import json
 import math
@@ -67,7 +66,7 @@ def _configure_supplier_for_data(field_spec, data):
         precision = config.get('precision', None)
         if precision and not str(precision).isnumeric():
             raise datagen.SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
-        range_values = list(float_range(float(start), float(end), float(step), precision))
+        range_values = list(_float_range(float(start), float(end), float(step), precision))
     else:
         range_values = list(range(start, end, step))
     return datagen.suppliers.values(range_values)
@@ -114,10 +113,10 @@ def _any_is_float(data):
     return False
 
 
-def float_range(start: float,
-                stop: float,
-                step: float,
-                precision=None):
+def _float_range(start: float,
+                 stop: float,
+                 step: float,
+                 precision=None):
     """
     Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
     stored

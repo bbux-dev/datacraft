@@ -12,13 +12,13 @@ outdir = f'{test_dir}/../build'
 
 def test_outputs_single_field():
     # for coverage
-    writer = outputs.IncrementingFileWriter(
+    writer = outputs._IncrementingFileWriter(
         outdir=outdir,
         outname='test_single',
         extension='txt',
         records_per_file=1
     )
-    output = outputs.SingleFieldOutput(writer, True)
+    output = outputs._SingleFieldOutput(writer, True)
     output.handle('key', 'value')
     output.finished_record()
 
@@ -27,7 +27,7 @@ def test_outputs_single_field():
 
 def test_outputs_record_level():
     # for coverage
-    writer = outputs.IncrementingFileWriter(
+    writer = outputs._IncrementingFileWriter(
         outdir=outdir,
         outname='test_record',
         extension='txt',
@@ -35,7 +35,7 @@ def test_outputs_record_level():
     )
 
     engine = engines.for_file(f'{test_dir}/data/template.jinja')
-    output = outputs.RecordLevelOutput(engine, writer)
+    output = outputs._RecordLevelOutput(engine, writer)
 
     # template looks like: A:{{ A }}, B:{{ B }}, C:{{ C }}
     output.handle('A', '1')
@@ -50,27 +50,27 @@ def test_outputs_record_level():
 
 
 def test_format_json():
-    as_json = outputs.for_format('json').process({'field': 'value'})
+    as_json = outputs.processor(format_name='json').process({'field': 'value'})
     assert as_json == "{\"field\": \"value\"}"
 
 
 def test_format_json_pretty():
-    as_json = outputs.for_format('json-pretty').process({'field': 'value'})
+    as_json = outputs.processor(format_name='json-pretty').process({'field': 'value'})
     assert as_json == "{\n    \"field\": \"value\"\n}"
 
 
 def test_format_csv():
-    as_csv = outputs.for_format('csv').process({'field1': 'value1', 'field2': 'value2'})
+    as_csv = outputs.processor(format_name='csv').process({'field1': 'value1', 'field2': 'value2'})
     assert as_csv == "value1,value2"
 
 
 def test_for_unregistered_format():
     with pytest.raises(datagen.SpecException):
-        outputs.for_format('sparkle').process({'field': 'value'})
+        outputs.processor(format_name='sparkle').process({'field': 'value'})
 
 
 def test_single_file_writer(tmpdir):
-    writer = outputs.SingleFileWriter(
+    writer = outputs.single_file_writer(
         outdir=tmpdir,
         outname='foo.bar',
         overwrite=True
@@ -83,7 +83,7 @@ def test_single_file_writer(tmpdir):
 
 
 def test_single_file_writer_append(tmpdir):
-    writer = outputs.SingleFileWriter(
+    writer = outputs.single_file_writer(
         outdir=tmpdir,
         outname='single_file_append',
         overwrite=False
@@ -98,7 +98,7 @@ def test_single_file_writer_append(tmpdir):
 
 def test_std_out_writer():
     # for coverage
-    outputs.StdOutWriter().write("blah")
+    outputs.stdout_writer().write("blah")
 
 
 def _verify_output(fild_name, expected_content):

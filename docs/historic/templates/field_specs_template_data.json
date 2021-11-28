@@ -11,7 +11,7 @@
       "json": "{\n  \"combine\": {\n    \"type\": \"combine\",\n    \"refs\": [\"ONE\", \"TWO\"]\n  },\n  \"refs\": {\n    \"ONE\": {\n      \"type\": \"values\",\n      \"data\": [\"A\", \"B\", \"C\"]\n    },\n    \"TWO\": {\n      \"type\": \"values\",\n      \"data\": [1, 2, 3, 4]\n    }\n  }\n}",
       "yaml": "combine:\n  type: combine\n  refs: [ONE, TWO]\nrefs:\n  ONE:\n    type: values\n    data: [A, B, C]\n  TWO:\n    type: values\n    data: [1, 2, 3, 4]",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nrefs = spec_builder.refs()\none = refs.values('ONE', [\"A\", \"B\", \"C\"])\ntwo = refs.values('TWO', [1, 2, 3, 4])\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()",
-      "command": "datagen -s dataspec.json --log-level error -i 12 \\\n  | sort",
+      "command": "datagen -s dataspec.json --log-level error -i 12 | sort",
       "output": "A1\nA2\nA3\nA4\nB1\nB2\nB3\nB4\nC1\nC2\nC3\nC4"
     },
     "overview_example_three": {
@@ -19,28 +19,28 @@
       "yaml": "combine:\n  type: combine\n  refs: [ONE, TWO]\nrefs:\n  ONE:\n    type: values\n    data: [A, B, C]\n    config:\n      sample: true\n  TWO:\n    type: values\n    data: [1, 2, 3, 4]\n    config:\n      sample: 'yes'",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nrefs = spec_builder.refs()\none = refs.values('ONE', [\"A\", \"B\", \"C\"], sample=True)\ntwo = refs.values('TWO', [1, 2, 3, 4], sample=\"yes\")\n\nspec_builder.combine('combine', refs=[one, two])\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "C1\nB3\nA2\nB1\nA1"
+      "output": "B4\nA4\nC2\nC3\nA2"
     },
     "values_shorthand_one": {
       "json": "{\n  \"field1\": {\n    \"type\": \"values\",\n    \"data\": [1, 2, 3, 4, 5]\n  },\n  \"field2\": {\n    \"type\": \"values\",\n    \"data\": {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}\n  },\n  \"field3\": {\n    \"type\": \"values\",\n    \"data\": \"CONSTANT\"\n  }\n}",
       "yaml": "field1:\n  type: values\n  data: [1, 2, 3, 4, 5]\nfield2:\n  type: values\n  data: {A: 0.5, B: 0.3, C: 0.2}\nfield3:\n  type: values\n  data: CONSTANT",
-      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field('field1', dataspec.builder.values([1, 2, 3, 4, 5]))\nspec_builder.add_field('field2', dataspec.builder.values({\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}))\nspec_builder.add_field('field3', dataspec.builder.values(\"CONSTANT\"))\n\nspec = spec_builder.build()",
+      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field('field1', datagen.builder.values([1, 2, 3, 4, 5]))\nspec_builder.add_field('field2', datagen.builder.values({\"A\": 0.5, \"B\": 0.3, \"C\": 0.2}))\nspec_builder.add_field('field3', datagen.builder.values(\"CONSTANT\"))\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "1\nA\nCONSTANT\n2\nA\nCONSTANT\n3\nB\nCONSTANT\n4\nA\nCONSTANT\n5\nC\nCONSTANT"
+      "output": "1\nA\nCONSTANT\n2\nA\nCONSTANT\n3\nA\nCONSTANT\n4\nA\nCONSTANT\n5\nA\nCONSTANT"
     },
     "values_shorthand_two": {
       "json": "{\n  \"field1\": [1, 2, 3, 4, 5],\n  \"field2\": {\n    \"A\": 0.5,\n    \"B\": 0.3,\n    \"C\": 0.2\n  },\n  \"field3\": \"CONSTANT\"\n}",
       "yaml": "field1: [1, 2, 3, 4, 5]\nfield2:\n  A: 0.5\n  B: 0.3\n  C: 0.2\nfield3: CONSTANT",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field('field1', [1, 2, 3, 4, 5])\nspec_builder.add_field('field2', {\"A\": 0.5, \"B\": 0.3, \"C\": 0.2})\nspec_builder.add_field('field3', \"CONSTANT\")\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "1\nA\nCONSTANT\n2\nC\nCONSTANT\n3\nA\nCONSTANT\n4\nA\nCONSTANT\n5\nB\nCONSTANT"
+      "output": "1\nA\nCONSTANT\n2\nB\nCONSTANT\n3\nB\nCONSTANT\n4\nA\nCONSTANT\n5\nC\nCONSTANT"
     },
     "inline_key_example": {
       "json": "{\n  \"network:ipv4?cidr=192.168.0.0/16\": {}\n}",
       "yaml": "network:ipv4?cidr=192.168.0.0/16: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"network:ipv4?cidr=192.168.0.0/16\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"network:ipv4?cidr=192.168.0.0/16\": {}}' --log-level error -i 5",
-      "output": "192.168.14.9\n192.168.161.229\n192.168.96.176\n192.168.114.209\n192.168.61.146"
+      "command": "datagen -s dataspec.json --log-level error -i 5",
+      "output": "192.168.222.18\n192.168.217.18\n192.168.118.65\n192.168.87.163\n192.168.186.29"
     },
     "config_example_one": {
       "json": "{\n  \"ONE\": {\n    \"type\": \"values\",\n    \"data\": [1, 2, 3],\n    \"config\": {\n      \"prefix\": \"TEST\",\n      \"suffix\": \"@DEMO\"\n    }\n  },\n  \"TWO?prefix=TEST&suffix=@DEMO\": {\n    \"type\": \"values\",\n    \"data\": [1, 2, 3]\n  }\n}",
@@ -61,7 +61,7 @@
       "yaml": "field:\n  type: char_class\n  data: visible\n  config:\n    count_dist: normal(mean=5, stddev=2, min=1, max=9)",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.char_class(key='field',\n                        data='visible',\n                        count_dist='normal(mean=5, stddev=2, min=1, max=9)')\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "vp}MHZh\n{^6_@\n$dY@:\n]\n);`~AQz"
+      "output": "#1TNrm\n50n=}z{B3\nBoDd2\nk/\"B}W\neu]-\""
     },
     "constants_example_one": {
       "json": "{\n  \"constant1\": {\n    \"type\": \"values\",\n    \"data\": 42\n  },\n  \"shorthand_constant\": \"This is simulated data and should not be used for nefarious purposes\"\n}",
@@ -75,21 +75,21 @@
       "yaml": "list1:\n  type: values\n  data: [200, 202, 303, 400, 404, 500]\nshorthand_list: [200, 202, 303, 400, 404, 500]\nrandom_pet?sample=true: [dog, cat, bunny, pig, rhino, hedgehog]",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.values('list1', [200, 202, 303, 400, 404, 500])\nspec_builder.add_field(\"shorthand_list\",  [200, 202, 303, 400, 404, 500])\nspec_builder.add_field(\"random_pet?sample=true\", [\"dog\", \"cat\", \"bunny\", \"pig\", \"rhino\", \"hedgehog\"])\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "200\n200\nrhino\n202\n202\npig\n303\n303\ndog\n400\n400\npig\n404\n404\ncat"
+      "output": "200\n200\nrhino\n202\n202\nhedgehog\n303\n303\ncat\n400\n400\npig\n404\n404\nhedgehog"
     },
     "weighted_values_example_one": {
       "json": "{\n  \"weighted1\": {\n    \"type\": \"values\",\n    \"data\": {\"200\": 0.4, \"202\": 0.3, \"303\": 0.1, \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05}\n  },\n  \"shorthand_weighted\": {\n    \"200\": 0.4,\n    \"202\": 0.3,\n    \"303\": 0.1,\n    \"400\": 0.05,\n    \"403\": 0.05,\n    \"404\": 0.05,\n    \"500\": 0.05\n  }\n}",
       "yaml": "weighted1:\n  type: values\n  data: {'200': 0.4, '202': 0.3, '303': 0.1, '400': 0.05, '403': 0.05, '404': 0.05, '500': 0.05}\nshorthand_weighted:\n  '200': 0.4\n  '202': 0.3\n  '303': 0.1\n  '400': 0.05\n  '403': 0.05\n  '404': 0.05\n  '500': 0.05",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.values('weighted1', {\n        \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n        \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n})\nspec_builder.add_field(\"shorthand_weighted\", {\n        \"200\": 0.4, \"202\": 0.3, \"303\": 0.1,\n        \"400\": 0.05, \"403\": 0.05, \"404\": 0.05, \"500\": 0.05\n})\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "200\n202\n200\n403\n202\n202\n202\n200\n200\n400"
+      "output": "200\n200\n200\n200\n202\n500\n400\n303\n404\n404"
     },
     "sample_mode_example_one": {
       "json": "{\n  \"combine\": {\n    \"type\": \"combine\",\n    \"refs\": [\"ONE\", \"TWO\"]\n  },\n  \"refs\": {\n    \"ONE?sample=true\": [\"A\", \"B\", \"C\"],\n    \"TWO?sample=true\": [1, 2, 3, 4]\n  }\n}",
       "yaml": "combine:\n  type: combine\n  refs: [ONE, TWO]\nrefs:\n  ONE?sample=true: [A, B, C]\n  TWO?sample=true: [1, 2, 3, 4]",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nrefs = spec_builder.refs()\nrefs.add_field('ONE?sample=true', [\"A\", \"B\", \"C\"])\nrefs.add_field('TWO?sample=true', [1, 2, 3, 4])\n\nspec_builder.combine('combine', refs=['ONE', 'TWO'])\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "A1\nC1\nA1\nC4\nC4"
+      "output": "A3\nA1\nC3\nA3\nC1"
     },
     "combine_spec_example_one": {
       "json": "{\n  \"combine\": {\n    \"type\": \"combine\",\n    \"refs\": [\"first\", \"last\"],\n    \"config\": {\n      \"join_with\": \" \"\n    }\n  },\n  \"refs\": {\n    \"first\": {\n      \"type\": \"values\",\n      \"data\": [\"zebra\", \"hedgehog\", \"llama\", \"flamingo\"]\n    },\n    \"last\": {\n      \"type\": \"values\",\n      \"data\": [\"jones\", \"smith\", \"williams\"]\n    }\n  }\n}",
@@ -103,91 +103,91 @@
       "yaml": "full_name:\n  type: combine-list\n  refs:\n  - [first, last]\n  - [first, middle, last]\n  - [first, middle_initial, last]\n  config:\n    join_with: ' '\nrefs:\n  first:\n    type: values\n    data: [zebra, hedgehog, llama, flamingo]\n  last:\n    type: values\n    data: [jones, smith, williams]\n  middle:\n    type: values\n    data: [cloud, sage, river]\n  middle_initial:\n    type: values\n    data: {a: 0.3, m: 0.3, j: 0.1, l: 0.1, e: 0.1, w: 0.1}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nrefs = spec_builder.refs()\nfirst = refs.values(\n    key=\"first\",\n    data=[\"zebra\", \"hedgehog\", \"llama\", \"flamingo\"])\nlast = refs.values(\n    key=\"last\",\n    data=[\"jones\", \"smith\", \"williams\"])\nmiddle = refs.values(\n    key=\"middle\",\n    data=[\"cloud\", \"sage\", \"river\"])\nmiddle_initial = refs.values(\n    key=\"middle_initial\",\n    data={\"a\": 0.3, \"m\": 0.3, \"j\": 0.1, \"l\": 0.1, \"e\": 0.1, \"w\": 0.1})\n\nspec_builder.combine_list(\n    key='full_name',\n    refs=[\n        [first, last],\n        [first, middle, last],\n        [first, middle_initial, last],\n        ],\n    join_with=\" \")\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "zebra jones\nzebra cloud jones\nzebra a jones\nhedgehog smith\nhedgehog sage smith"
+      "output": "zebra jones\nzebra cloud jones\nzebra m jones\nhedgehog smith\nhedgehog sage smith"
     },
     "uniform_date_example_exhaustive": {
       "json": "{\n  \"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\": {}\n}",
       "yaml": "dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen -s dataspec.json --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "15-Dec-2050 13:41\n31-Jan-2051 23:32"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "03-Mar-2051 07:48\n12-Jan-2051 10:52\n12-Jan-2051 12:16\n14-Mar-2051 09:12\n24-Jan-2051 14:01\n26-Feb-2051 09:22\n26-Jan-2051 12:58\n26-Jan-2051 20:37\n28-Jan-2051 09:48\n29-Dec-2050 09:47"
     },
     "uniform_date_example_one": {
       "json": "{\n  \"dates:date\": {}\n}",
       "yaml": "dates:date: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "02-07-2021\n01-08-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "03-12-2021\n04-12-2021\n12-11-2021\n13-11-2021\n18-11-2021\n18-11-2021\n20-11-2021\n22-11-2021\n28-11-2021\n29-11-2021"
     },
     "uniform_date_example_two": {
       "json": "{\n  \"dates:date?offset=1\": {}\n}",
       "yaml": "dates:date?offset=1: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?offset=1\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?offset=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "01-07-2021\n31-07-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "02-12-2021\n11-11-2021\n12-11-2021\n14-11-2021\n19-11-2021\n23-11-2021\n24-11-2021\n25-11-2021\n29-11-2021\n30-11-2021"
     },
     "uniform_date_example_three": {
       "json": "{\n  \"dates:date?duration_days=1\": {}\n}",
       "yaml": "dates:date?duration_days=1: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?duration_days=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "02-07-2021\n03-07-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "11-11-2021\n11-11-2021\n11-11-2021\n11-11-2021\n11-11-2021\n11-11-2021\n12-11-2021\n12-11-2021\n12-11-2021\n12-11-2021"
     },
     "uniform_date_example_four": {
       "json": "{\n  \"dates:date?duration_days=10\": {}\n}",
       "yaml": "dates:date?duration_days=10: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=10\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?duration_days=10\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "02-07-2021\n12-07-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "11-11-2021\n12-11-2021\n12-11-2021\n16-11-2021\n17-11-2021\n17-11-2021\n18-11-2021\n19-11-2021\n19-11-2021\n20-11-2021"
     },
     "uniform_date_example_five": {
       "json": "{\n  \"dates:date?duration_days=1&offset=1\": {}\n}",
       "yaml": "dates:date?duration_days=1&offset=1: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&offset=1\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?duration_days=1&offset=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "01-07-2021\n02-07-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "10-11-2021\n10-11-2021\n10-11-2021\n10-11-2021\n10-11-2021\n10-11-2021\n10-11-2021\n11-11-2021\n11-11-2021\n11-11-2021"
     },
     "uniform_date_example_six": {
       "json": "{\n  \"dates:date?duration_days=1&offset=-1\": {}\n}",
       "yaml": "dates:date?duration_days=1&offset=-1: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&offset=-1\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?duration_days=1&offset=-1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "03-07-2021\n04-07-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "12-11-2021\n12-11-2021\n12-11-2021\n12-11-2021\n12-11-2021\n12-11-2021\n13-11-2021\n13-11-2021\n13-11-2021\n13-11-2021"
     },
     "uniform_date_example_seven": {
       "json": "{\n  \"dates:date?duration_days=1&offset=1&start=15-12-2050\": {}\n}",
       "yaml": "dates:date?duration_days=1&offset=1&start=15-12-2050: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&offset=1&start=15-12-2050\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?duration_days=1&offset=1&start=15-12-2050\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "14-12-2050\n14-12-2050"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050\n14-12-2050"
     },
     "uniform_date_example_eight": {
       "json": "{\n  \"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\": {}\n}",
       "yaml": "dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'",
-      "output": "15-Dec-2050 12:00\n16-Dec-2050 11:58"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "15-Dec-2050 13:47\n15-Dec-2050 14:57\n15-Dec-2050 16:13\n15-Dec-2050 18:01\n15-Dec-2050 18:05\n15-Dec-2050 20:54\n15-Dec-2050 22:24\n16-Dec-2050 00:12\n16-Dec-2050 06:09\n16-Dec-2050 11:31"
     },
     "centered_date_example_exhaustive": {
       "json": "{\n  \"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\": {}\n}",
       "yaml": "dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2\": {}}' --log-level error -i 1000 \\\n  | sort -n | uniq | sed -n '1p;$p'",
-      "output": "20500525 20:43\n20500607 00:36"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "20500527 23:36\n20500528 08:12\n20500528 20:41\n20500531 19:46\n20500601 03:01\n20500601 11:03\n20500601 23:25\n20500602 10:34\n20500602 20:39\n20500602 22:06"
     },
     "centered_date_example_one": {
       "json": "{\n  \"dates:date?stddev_days=1\": {}\n}",
       "yaml": "dates:date?stddev_days=1: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?stddev_days=1\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?stddev_days=1\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "29-06-2021\n05-07-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "10-11-2021\n11-11-2021\n11-11-2021\n11-11-2021\n11-11-2021\n12-11-2021\n12-11-2021\n12-11-2021\n12-11-2021\n14-11-2021"
     },
     "centered_date_example_two": {
       "json": "{\n  \"dates:date?stddev_days=15\": {}\n}",
       "yaml": "dates:date?stddev_days=15: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"dates:date?stddev_days=15\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"dates:date?stddev_days=15\": {}}' --log-level error -i 1000 \\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'",
-      "output": "19-05-2021\n16-08-2021"
+      "command": "datagen -s dataspec.json --log-level error -i 10 | sort",
+      "output": "02-12-2021\n11-11-2021\n13-11-2021\n15-11-2021\n15-11-2021\n16-12-2021\n21-10-2021\n26-11-2021\n27-11-2021\n31-10-2021"
     },
     "range_spec_example_one": {
       "json": "{\n  \"zero_to_ten\": {\n    \"type\": \"range\",\n    \"data\": [0, 10, 0.5]\n  },\n  \"range_shorthand1:range\": {\n    \"data\": [0, 10, 0.5]\n  },\n  \"range_shorthand2:range\": [0, 10, 0.5]\n}",
@@ -208,103 +208,103 @@
       "yaml": "population:\n  type: rand_range\n  data: [100, 1000]\n  config:\n    cast: int\npop:rand_range?cast=f: [200.2, 1222.7, 2]",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.rand_range(\n    key=\"population\",\n    data=[100, 1000],\n    cast=\"int\")\nspec_builder.add_field(\"pop:rand_range?cast=f\", [200.2, 1222.7, 2])\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5  --format json -x",
-      "output": "{\"population\": 828, \"pop\": 630.87}\n{\"population\": 339, \"pop\": 361.01}\n{\"population\": 254, \"pop\": 549.29}\n{\"population\": 509, \"pop\": 261.89}\n{\"population\": 980, \"pop\": 594.94}"
+      "output": "{\"population\": 739, \"pop\": 683.02}\n{\"population\": 366, \"pop\": 987.41}\n{\"population\": 304, \"pop\": 917.4}\n{\"population\": 256, \"pop\": 657.58}\n{\"population\": 564, \"pop\": 1090.33}"
     },
     "uuid_spec_example_one": {
       "json": "{\n  \"id\": {\n    \"type\": \"uuid\"\n  },\n  \"id_shorthand:uuid\": {}\n}",
       "yaml": "id:\n  type: uuid\nid_shorthand:uuid: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.uuid(key=\"id\")\nspec_builder.add_field(\"id_shorthand:uuid\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"id\": {\"type\": \"uuid\"}, \"id_shorthand:uuid\": {}}' --log-level error -i 5",
-      "output": "130a7ce9-172d-4a5e-9245-e302c7115c68\nc7faf24d-dc8c-4535-bc19-cccaffeba945\n9de09fa7-cb2e-4d09-9346-54a1cb573383\nc3035653-d787-40c4-9007-211a78184743\n0038703f-8435-4ff2-bfd2-564cec464b84\n69b754d2-e73c-4f98-8497-3efabc13e6cd\nbd28c1cf-d66a-4d3c-bec2-7985ba999726\na23187cf-33ba-4917-a7d3-ba0e589889a8\n6efa948f-e9e8-4fd2-81f7-1385adaba4ed\n8534c17c-5eb9-418a-807d-c60a510f28c0"
+      "command": "datagen -s dataspec.json --log-level error -i 5",
+      "output": "1a345120-dd21-4fd2-99e3-acfb0425fbb4\n14bbcec8-f306-4ce3-b63a-72c90f3eaf21\nb204850f-ecea-4fda-adbd-fd2bedd96443\ndcd16edf-a102-4e5b-b609-1d8ccff883c5\nc64aaec5-16a3-4fb3-b13f-e19e43cc85bd\n1288a7a6-9b86-4a10-b5d4-b2a12c22df98\nf73f5f73-adf6-4b6f-9664-44921819e5d4\n7fd5ea2e-b7bd-45f3-a21f-33c34addb810\n855b337d-deda-4c70-a07e-4d4354a92231\n8cdfc84f-a0e7-4fc1-b23b-f6bb0057d37a"
     },
     "char_class_spec_example_one": {
       "json": "{\n  \"one_to_five_digits:cc-digits?min=1&max=5\": {}\n}",
       "yaml": "one_to_five_digits:cc-digits?min=1&max=5: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"one_to_five_digits:cc-digits?min=1&max=5\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"one_to_five_digits:cc-digits?min=1&max=5\": {}}' --log-level error -i 5",
-      "output": "3062\n69470\n560\n49613\n368"
+      "command": "datagen -s dataspec.json --log-level error -i 5",
+      "output": "3794\n84621\n31952\n645\n01492"
     },
     "char_class_spec_example_two": {
       "json": "{\n  \"password\": {\n    \"type\": \"char_class\",\n    \"data\": [\"word\", \"special\", \"hex-lower\", \"M4$p3c!@l$@uc3\"],\n    \"config\": {\n      \"mean\": 14,\n      \"stddev\": 2,\n      \"min\": 10,\n      \"max\": 18,\n      \"exclude\": [\n        \"-\",\n        \"\\\"\"\n      ]\n    }\n  }\n}",
       "yaml": "password:\n  type: char_class\n  data: [word, special, hex-lower, M4$p3c!@l$@uc3]\n  config:\n    mean: 14\n    stddev: 2\n    min: 10\n    max: 18\n    exclude:\n    - '-'\n    - '\"'",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.char_class(\n    key=\"password\",\n    data=[\n      \"word\",\n      \"special\",\n      \"hex-lower\",\n      \"M4$p3c!@l$@uc3\"\n    ],\n    mean=14,\n    stddev=2,\n    min=10,\n    max=18,\n    exclude=[\"-\", \"\\\"\"])\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 10",
-      "output": "c3cFwpv!7c>(\n@qf`4;3yF7d#DM\n;'&5]$8pu3_7,E?\n|$aULq73cJY\nhb2cM4Zl2pPMnX_\nNV3TDhFsyQ)|4c\npd01u|859!p)iT\ni7$8F93x+3uKG\nd8hb@_SfHaP!\n,ps]`Sbw;k<3o["
+      "output": "c?EF${e$79LuC\nT$v<ejk474~Gd\nReM@F3|I?8cd@\n@}X<,Q6#c)W!\nQ:!eO0bs58DVW\n}.@vh6gNIXf\n5.DucWlp2q4N\n;Uh}cOucaC0,\n>\\ff3#UL:ur0<yq}\nZz@S~o0JKWc#"
     },
     "unicode_range_example_one": {
       "json": "{\n  \"text\": {\n    \"type\": \"unicode_range\",\n    \"data\": [\"3040\", \"309f\"],\n    \"config\": {\n      \"mean\": 5\n    }\n  }\n}",
       "yaml": "text:\n  type: unicode_range\n  data: ['3040', 309f]\n  config:\n    mean: 5",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.unicode_range(\"text\", [\"3040\", \"309f\"], mean=5)\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 10",
-      "output": "\u3058\n\u3093\u3058\n\u3080\u306c\n\u3067\u3069\u3097\n\u3042\u3049\u3054\u305d\u306f\u3076\u3075\n\u306c\u308a\u3088\u3096\u3073\n\u3093\u309c\u308c\u3086\u3072\u3064\u3069\n\u3041\u305d\u309d\u3069\u305e\u304a\u3057\u308d\n\u3047\u3083\u3074\u3051\n\u3081\u304d\u309a"
+      "output": "\u309f\u3047\u3089\u3091\u3043\u309a\u306f\u304d\n\u3050\n\u3041\u304f\u305a\u3089\u3062\u3064\u304a\u3040\u3057\u306d\n\u307d\u3062\n\u3059\n\u3050\u309a\u3043\n\u307c\u307f\u304c\n\u307e\u3051\u3096\u305f\u3087\u3081\u308c\u308b\u304c\n\u3082\u3095\u3043\u3077\u3083\u304a\u307e\n\u3077\u309d\u3059\u3070\u306a\u3083"
     },
     "geo_point_spec_example_one": {
       "json": "{\n  \"egypt\": {\n    \"type\": \"geo.pair\",\n    \"config\": {\n      \"bbox\": [\n        31.33134,\n        22.03795,\n        34.19295,\n        25.00562\n      ],\n      \"precision\": 3\n    }\n  }\n}",
       "yaml": "egypt:\n  type: geo.pair\n  config:\n    bbox:\n    - 31.33134\n    - 22.03795\n    - 34.19295\n    - 25.00562\n    precision: 3",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.geo_pair(\"egypt\", bbox=[31.33134, 22.03795, 34.19295, 25.00562], precision=3)\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "33.341, 22.072\n 33.920, 24.315\n 32.019, 22.702\n 32.135, 24.033\n 33.032, 24.534"
+      "output": "31.507, 23.783\n 32.354, 24.584\n 32.915, 24.595\n 31.341, 24.592\n 32.151, 22.569"
     },
     "ip_spec_example_one": {
       "json": "{\n  \"network\": {\n    \"type\": \"ipv4\",\n    \"config\": {\n      \"cidr\": \"2.22.222.0/16\"\n    }\n  },\n  \"network_shorthand:ip?cidr=2.22.222.0/16\": {},\n  \"network_with_base:ip?base=192.168.0\": {}\n}",
       "yaml": "network:\n  type: ipv4\n  config:\n    cidr: 2.22.222.0/16\nnetwork_shorthand:ip?cidr=2.22.222.0/16: {}\nnetwork_with_base:ip?base=192.168.0: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.ipv4(key=\"network\", cidr=\"2.22.222.0/16\")\nspec_builder.add_field(\"network_shorthand:ip?cidr=2.22.222.0/16\", {})\nspec_builder.add_field(\"network_with_base:ip?base=192.168.0\", {})\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "2.22.45.93\n2.22.173.141\n192.168.0.15\n2.22.110.18\n2.22.137.49\n192.168.0.131\n2.22.111.100\n2.22.4.235\n192.168.0.64\n2.22.164.39\n2.22.193.130\n192.168.0.70\n2.22.23.245\n2.22.215.27\n192.168.0.88"
+      "output": "2.22.75.160\n2.22.61.161\n192.168.0.180\n2.22.227.11\n2.22.143.119\n192.168.0.119\n2.22.46.93\n2.22.40.172\n192.168.0.190\n2.22.85.13\n2.22.193.137\n192.168.0.67\n2.22.153.189\n2.22.55.193\n192.168.0.234"
     },
     "ip_precise_example_one": {
       "json": "{\n  \"network:ip.precise?cidr=10.0.0.0/8\": {}\n}",
       "yaml": "network:ip.precise?cidr=10.0.0.0/8: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"network:ip.precise?cidr=10.0.0.0/8\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"network:ip.precise?cidr=10.0.0.0/8\": {}}' --log-level error -i 5",
+      "command": "datagen -s dataspec.json --log-level error -i 5",
       "output": "10.0.0.0\n10.0.0.1\n10.0.0.2\n10.0.0.3\n10.0.0.4"
     },
     "ip_precise_example_two": {
       "json": "{\n  \"network:ip.precise?cidr=192.168.0.0/14&sample=true\": {}\n}",
       "yaml": "network:ip.precise?cidr=192.168.0.0/14&sample=true: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"network:ip.precise?cidr=192.168.0.0/14&sample=true\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"network:ip.precise?cidr=192.168.0.0/14&sample=true\": {}}' --log-level error -i 5",
-      "output": "192.169.145.223\n192.168.179.53\n192.168.91.96\n192.169.196.71\n192.170.176.96"
+      "command": "datagen -s dataspec.json --log-level error -i 5",
+      "output": "192.170.114.96\n192.171.208.192\n192.168.40.181\n192.168.137.81\n192.168.72.23"
     },
     "ip_precise_example_three": {
       "json": "{\n  \"network:ip.precise?cidr=2.22.0.0/22\": {}\n}",
       "yaml": "network:ip.precise?cidr=2.22.0.0/22: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.add_field(\"network:ip.precise?cidr=2.22.0.0/22\", {})\n\nspec = spec_builder.build()",
-      "command": "datagen --inline '{\"network:ip.precise?cidr=2.22.0.0/22\": {}}' --log-level error -i 5",
+      "command": "datagen -s dataspec.json --log-level error -i 5",
       "output": "2.22.0.0\n2.22.0.1\n2.22.0.2\n2.22.0.3\n2.22.0.4"
     },
     "weighted_ref_example_one": {
-      "json": "{\n  \"http_code\": {\n    \"type\": \"weightedref\",\n    \"data\": {\"GOOD_CODES\": 0.7, \"BAD_CODES\": 0.3}\n  },\n  \"refs\": {\n    \"GOOD_CODES\": {\n      \"200\": 0.5,\n      \"202\": 0.3,\n      \"203\": 0.1,\n      \"300\": 0.1\n    },\n    \"BAD_CODES\": {\n      \"400\": 0.5,\n      \"403\": 0.3,\n      \"404\": 0.1,\n      \"500\": 0.1\n    }\n  }\n}",
-      "yaml": "http_code:\n  type: weightedref\n  data: {GOOD_CODES: 0.7, BAD_CODES: 0.3}\nrefs:\n  GOOD_CODES:\n    '200': 0.5\n    '202': 0.3\n    '203': 0.1\n    '300': 0.1\n  BAD_CODES:\n    '400': 0.5\n    '403': 0.3\n    '404': 0.1\n    '500': 0.1",
-      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nrefs = spec_builder.refs()\nrefs.add_field('GOOD_CODES', {\"200\": 0.5, \"202\": 0.3, \"203\": 0.1, \"300\": 0.1})\nrefs.add_field('BAD_CODES', {\"400\": 0.5, \"403\": 0.3, \"404\": 0.1, \"500\": 0.1})\n\nspec_builder.weightedref('http_code', data={\"GOOD_CODES\": 0.7, \"BAD_CODES\": 0.3})\n\nspec = spec_builder.build()",
+      "json": "{\n  \"http_code\": {\n    \"type\": \"weighted_ref\",\n    \"data\": {\"GOOD_CODES\": 0.7, \"BAD_CODES\": 0.3}\n  },\n  \"refs\": {\n    \"GOOD_CODES\": {\n      \"200\": 0.5,\n      \"202\": 0.3,\n      \"203\": 0.1,\n      \"300\": 0.1\n    },\n    \"BAD_CODES\": {\n      \"400\": 0.5,\n      \"403\": 0.3,\n      \"404\": 0.1,\n      \"500\": 0.1\n    }\n  }\n}",
+      "yaml": "http_code:\n  type: weighted_ref\n  data: {GOOD_CODES: 0.7, BAD_CODES: 0.3}\nrefs:\n  GOOD_CODES:\n    '200': 0.5\n    '202': 0.3\n    '203': 0.1\n    '300': 0.1\n  BAD_CODES:\n    '400': 0.5\n    '403': 0.3\n    '404': 0.1\n    '500': 0.1",
+      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nrefs = spec_builder.refs()\nrefs.add_field('GOOD_CODES', {\"200\": 0.5, \"202\": 0.3, \"203\": 0.1, \"300\": 0.1})\nrefs.add_field('BAD_CODES', {\"400\": 0.5, \"403\": 0.3, \"404\": 0.1, \"500\": 0.1})\n\nspec_builder.weighted_ref('http_code', data={\"GOOD_CODES\": 0.7, \"BAD_CODES\": 0.3})\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "300\n200\n200\n400\n202"
+      "output": "202\n200\n400\n202\n500"
     },
     "select_list_example_one": {
       "json": "{\n  \"ingredients\": {\n    \"type\": \"select_list_subset\",\n    \"data\": [\"onions\", \"mushrooms\", \"garlic\", \"bell peppers\", \"spinach\", \"potatoes\", \"carrots\"],\n    \"config\": {\n      \"mean\": 3,\n      \"stddev\": 1,\n      \"min\": 2,\n      \"max\": 4,\n      \"join_with\": \", \"\n    }\n  }\n}",
       "yaml": "ingredients:\n  type: select_list_subset\n  data: [onions, mushrooms, garlic, bell peppers, spinach, potatoes, carrots]\n  config:\n    mean: 3\n    stddev: 1\n    min: 2\n    max: 4\n    join_with: ', '",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.select_list_subset(\n    key=\"ingredients\",\n    data=[\"onions\", \"mushrooms\", \"garlic\", \"bell peppers\", \"spinach\", \"potatoes\", \"carrots\"],\n    mean=3,\n    stddev=1,\n    min=2,\n    max=4,\n    join_with=\", \")\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "mushrooms, garlic\ncarrots, potatoes\ngarlic, onions\ncarrots, potatoes, mushrooms\ngarlic, bell peppers, mushrooms"
+      "output": "bell peppers, garlic\ncarrots, bell peppers, spinach\npotatoes, garlic, spinach, onions\npotatoes, onions, bell peppers\nonions, mushrooms"
     },
     "select_list_example_two": {
       "json": "{\n  \"ingredients\": {\n    \"type\": \"select_list_subset\",\n    \"data\": [\"onions\", \"mushrooms\", \"garlic\", \"bell peppers\", \"spinach\", \"potatoes\", \"carrots\"],\n    \"config\": {\n      \"mean\": 3,\n      \"stddev\": 1,\n      \"min\": 2,\n      \"max\": 4,\n      \"join_with\": \"\\\", \\\"\",\n      \"quote\": \"\\\"\"\n    }\n  }\n}",
       "yaml": "ingredients:\n  type: select_list_subset\n  data: [onions, mushrooms, garlic, bell peppers, spinach, potatoes, carrots]\n  config:\n    mean: 3\n    stddev: 1\n    min: 2\n    max: 4\n    join_with: '\", \"'\n    quote: '\"'",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.select_list_subset(\n    key=\"ingredients\",\n    data=[\"onions\", \"mushrooms\", \"garlic\", \"bell peppers\", \"spinach\", \"potatoes\", \"carrots\"],\n    mean=3,\n    stddev=1,\n    min=2,\n    max=4,\n    join_with=\"\\\", \\\"\",\n    quote=\"\\\"\")\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5",
-      "output": "\"onions\", \"bell peppers\"\n\"carrots\", \"spinach\"\n\"mushrooms\", \"bell peppers\", \"carrots\"\n\"bell peppers\", \"garlic\"\n\"potatoes\", \"spinach\""
+      "output": "\"onions\", \"garlic\"\n\"spinach\", \"onions\", \"mushrooms\"\n\"spinach\", \"mushrooms\"\n\"potatoes\", \"garlic\"\n\"onions\", \"garlic\", \"carrots\""
     },
     "csv_spec_example_one": {
       "json": "{\n  \"cities\": {\n    \"type\": \"csv\",\n    \"config\": {\n      \"datafile\": \"cities.csv\",\n      \"delimiter\": \"~\",\n      \"sample\": true\n    }\n  }\n}",
       "yaml": "cities:\n  type: csv\n  config:\n    datafile: cities.csv\n    delimiter: '~'\n    sample: true",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.csv(\n    key=\"cities\",\n    datafile=\"cities.csv\",\n    delimiter=\"~\",\n    sample=True)\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5 --datadir ./data",
-      "output": "Oxford\nOxford\nLondon\nSeattle\nTokyo"
+      "output": "Springfield\nNew York\nNew York\nSan Diego\nTokyo"
     },
     "csv_spec_example_two": {
-      "json": "{\n  \"status\": {\n    \"type\": \"csv\",\n    \"config\": {\n      \"column\": 1,\n      \"configref\": \"tabs_config\"\n    }\n  },\n  \"description\": {\n    \"type\": \"csv\",\n    \"config\": {\n      \"column\": 2,\n      \"configref\": \"tabs_config\"\n    }\n  },\n  \"status_type:csv?configref=tabs_config&column=3\": {},\n  \"refs\": {\n    \"tabs_config\": {\n      \"type\": \"configref\",\n      \"config\": {\n        \"datafile\": \"tabs.csv\",\n        \"delimiter\": \"\\t\",\n        \"headers\": true\n      }\n    }\n  }\n}",
-      "yaml": "status:\n  type: csv\n  config:\n    column: 1\n    configref: tabs_config\ndescription:\n  type: csv\n  config:\n    column: 2\n    configref: tabs_config\nstatus_type:csv?configref=tabs_config&column=3: {}\nrefs:\n  tabs_config:\n    type: configref\n    config:\n      datafile: tabs.csv\n      delimiter: \"\\t\"\n      headers: true",
-      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.configref(\n    key=\"tabs_config\",\n    datafile=\"tabs.csv\",\n    delimiter=\"\\t\",\n    headers=True)\nspec_builder.csv(\n    key=\"status\",\n    column=1,\n    configref=\"tabs_config\")\nspec_builder.csv(\n    key=\"description\",\n    column=2,\n    configref=\"tabs_config\")\nspec_builder.add_field(\"status_type:csv?configref=tabs_config&column=3\", {})\n\nspec = spec_builder.build()",
+      "json": "{\n  \"status\": {\n    \"type\": \"csv\",\n    \"config\": {\n      \"column\": 1,\n      \"config_ref\": \"tabs_config\"\n    }\n  },\n  \"description\": {\n    \"type\": \"csv\",\n    \"config\": {\n      \"column\": 2,\n      \"config_ref\": \"tabs_config\"\n    }\n  },\n  \"status_type:csv?config_ref=tabs_config&column=3\": {},\n  \"refs\": {\n    \"tabs_config\": {\n      \"type\": \"config_ref\",\n      \"config\": {\n        \"datafile\": \"tabs.csv\",\n        \"delimiter\": \"\\t\",\n        \"headers\": true\n      }\n    }\n  }\n}",
+      "yaml": "status:\n  type: csv\n  config:\n    column: 1\n    config_ref: tabs_config\ndescription:\n  type: csv\n  config:\n    column: 2\n    config_ref: tabs_config\nstatus_type:csv?config_ref=tabs_config&column=3: {}\nrefs:\n  tabs_config:\n    type: config_ref\n    config:\n      datafile: tabs.csv\n      delimiter: \"\\t\"\n      headers: true",
+      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.config_ref(\n    key=\"tabs_config\",\n    datafile=\"tabs.csv\",\n    delimiter=\"\\t\",\n    headers=True)\nspec_builder.csv(\n    key=\"status\",\n    column=1,\n    config_ref=\"tabs_config\")\nspec_builder.csv(\n    key=\"description\",\n    column=2,\n    config_ref=\"tabs_config\")\nspec_builder.add_field(\"status_type:csv?config_ref=tabs_config&column=3\", {})\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5 --datadir ./data",
       "output": "100\nContinue\nInformational\n101\nSwitching Protocols\nInformational\n200\nOK\nSuccessful\n201\nCreated\nSuccessful\n202\nAccepted\nSuccessful"
     },
@@ -313,14 +313,14 @@
       "yaml": "placeholder:\n  type: csv_select\n  data: {geonameid: 1, name: 2, latitude: 5, longitude: 6, country_code: 9, population: 15}\n  config:\n    datafile: allCountries.txt\n    headers: false\n    delimiter: \"\\t\"",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.csv_select(\n    key=\"placeholder\",\n    data={\n        \"geonameid\": 1,\n        \"name\": 2,\n        \"latitude\": 5,\n        \"longitude\": 6,\n        \"country_code\": 9,\n        \"population\": 15\n    },\n    datafile=\"allCountries.txt\",\n    headers=False,\n    delimiter=\"\t\")\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 5 --datadir ./data",
-      "output": "2986043\nPic de Font Blanca\n42.64991\n1.53335\nAD\n0\n2994701\nRoc M\u00e9l\u00e9\n42.58765\n1.74028\nAD\n0\n3007683\nPic des Langounelles\n42.61203\n1.47364\nAD\n0\n3017832\nPic de les Abelletes\n42.52535\n1.73343\nAD\n0\n3017833\nEstany de les Abelletes\n42.52915\n1.73362\nAD\n0"
+      "output": "2986043\nPic de Font Blanca\n42.64991\n1.53335\nAD\n0\n2994701\nRoc M\u00c3\u00a9l\u00c3\u00a9\n42.58765\n1.74028\nAD\n0\n3007683\nPic des Langounelles\n42.61203\n1.47364\nAD\n0\n3017832\nPic de les Abelletes\n42.52535\n1.73343\nAD\n0\n3017833\nEstany de les Abelletes\n42.52915\n1.73362\nAD\n0"
     },
     "nested_example_one": {
       "json": "{\n  \"id\": {\n    \"type\": \"uuid\"\n  },\n  \"user\": {\n    \"type\": \"nested\",\n    \"fields\": {\n      \"user_id\": {\n        \"type\": \"uuid\"\n      },\n      \"geo\": {\n        \"type\": \"nested\",\n        \"fields\": {\n          \"place_id:cc-digits?mean=5\": {},\n          \"coordinates:geo.pair?as_list=true\": {}\n        }\n      }\n    }\n  }\n}",
       "yaml": "id:\n  type: uuid\nuser:\n  type: nested\n  fields:\n    user_id:\n      type: uuid\n    geo:\n      type: nested\n      fields:\n        place_id:cc-digits?mean=5: {}\n        coordinates:geo.pair?as_list=true: {}",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\ngeo_fields = datagen.spec_builder()\ngeo_fields.add_field(\"place_id:cc-digits?mean=5\", {})\ngeo_fields.add_field(\"coordinates:geo.pair?as_list=true\", {})\n\nuser_fields = datagen.spec_builder()\nuser_fields.uuid(\"user_id\")\nuser_fields.nested(\"geo\", geo_fields.build())\n\nspec_builder.uuid(\"id\")\nspec_builder.nested(\"user\", user_fields.build())\n\nspec = spec_builder.build()",
       "command": "datagen -s dataspec.json --log-level error -i 1 --format json-pretty -x",
-      "output": "{\n    \"id\": \"02825a62-2bd5-4461-a6be-773df096cfc4\",\n    \"user\": {\n        \"user_id\": \"bfbab550-024f-4f46-b63a-a3cf1a7e1c9e\",\n        \"geo\": {\n            \"place_id\": \"6138\",\n            \"coordinates\": [\n                \" 75.0154\",\n                \"-80.9406\"\n            ]\n        }\n    }\n}"
+      "output": "{\n    \"id\": \"6d2a9148-efb6-4680-8ce7-b851fc472e5d\",\n    \"user\": {\n        \"user_id\": \"7f7ba781-f4e6-41e9-b375-f303f4628053\",\n        \"geo\": {\n            \"place_id\": \"318\",\n            \"coordinates\": [\n                \" 113.9928\",\n                \"-26.9717\"\n            ]\n        }\n    }\n}"
     },
     "calculate_example_one": {
       "json": "{\n  \"height_in\": {\n    \"type\": \"values\",\n    \"data\": [60, 70, 80, 90]\n  },\n  \"height_cm\": {\n    \"type\": \"calculate\",\n    \"fields\": [\n      \"height_in\"\n    ],\n    \"formula\": \"{{ height_in }} * 2.54\"\n  }\n}",
@@ -336,12 +336,19 @@
       "command": "datagen -s dataspec.json --log-level error -i 3 --format json -x",
       "output": "{\"long_name_one\": 4, \"long_name_two\": 3, \"c\": 5.0}\n{\"long_name_one\": 5, \"long_name_two\": 6, \"c\": 7.810249675906654}\n{\"long_name_one\": 6, \"long_name_two\": 9, \"c\": 10.816653826391969}"
     },
+    "weighted_csv_example_one": {
+      "json": "{\n  \"height_in\": {\n    \"type\": \"values\",\n    \"data\": [60, 70, 80, 90]\n  },\n  \"height_cm\": {\n    \"type\": \"calculate\",\n    \"fields\": [\n      \"height_in\"\n    ],\n    \"formula\": \"{{ height_in }} * 2.54\"\n  }\n}",
+      "yaml": "height_in:\n  type: values\n  data: [60, 70, 80, 90]\nheight_cm:\n  type: calculate\n  fields:\n  - height_in\n  formula: '{{ height_in }} * 2.54'",
+      "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.values('height_in', [60, 70, 80, 90])\nfields = ['height_in']\nformula = '{{ height_in }} * 2.54'\nspec_builder.calculate('height_cm', fields=fields, formula=formula)\n\nspec = spec_builder.build()",
+      "command": "datagen -s dataspec.json --log-level error -i 4 --format json -x",
+      "output": "{\"height_in\": 60, \"height_cm\": 152.4}\n{\"height_in\": 70, \"height_cm\": 177.8}\n{\"height_in\": 80, \"height_cm\": 203.2}\n{\"height_in\": 90, \"height_cm\": 228.6}"
+    },
     "weighted_csv_spec_example_one": {
       "json": "{\n  \"cities\": {\n    \"type\": \"weighted_csv\",\n    \"config\": {\n      \"datafile\": \"weighted_cities.csv\"\n    }\n  }\n}",
       "yaml": "cities:\n  type: weighted_csv\n  config:\n    datafile: weighted_cities.csv",
       "api": "import datagen\n\nspec_builder = datagen.spec_builder()\n\nspec_builder.weighted_csv(\n    key=\"cities\",\n    datafile=\"weighted_cities.csv\")\n\nspec = spec_builder.build()",
-      "command": "datagen -s dataspec.json --log-level error -i 100 --datadir ./data | sort | uniq -c | sort -n",
-      "output": "      8 London\n      8 New York\n      9 Oxford\n     18 Cambridge\n     20 Seattle\n     37 San Diego"
+      "command": "datagen -s dataspec.json --log-level error -i 100 --datadir ./data | sort",
+      "output": "Cambridge\nCambridge\nCambridge\nCambridge\nCambridge\nCambridge\nCambridge\nCambridge\nCambridge\nCambridge\nCambridge\nLondon\nLondon\nLondon\nLondon\nLondon\nLondon\nLondon\nLondon\nLondon\nNew York\nNew York\nNew York\nNew York\nNew York\nNew York\nNew York\nNew York\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nOxford\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSan Diego\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle\nSeattle"
     }
   }
 }

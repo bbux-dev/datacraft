@@ -1,7 +1,5 @@
 """
-This module handles the weightedref type.
-
-A weighted ref spec is used to select the values from a set of refs in a weighted fashion.
+Module for weighted_ref type
 """
 from typing import Dict
 
@@ -32,7 +30,7 @@ class WeightedRefsSupplier(datagen.ValueSupplierInterface):
         return supplier.next(iteration)
 
 
-@datagen.registry.types('weightedref')
+@datagen.registry.types('weighted_ref')
 def _configure_supplier(parent_field_spec, loader):
     """ configures supplier for weighted ref specs """
     config = datagen.utils.load_config(parent_field_spec, loader)

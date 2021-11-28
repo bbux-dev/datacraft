@@ -1,16 +1,30 @@
 """
-Module for building Data Specs programmatically
+Module for building Data Specs programmatically.
+
+Examples:
+    >>> import datagen
+    >>> builder = datagen.spec_builder()
+    >>> builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
+    >>> builder.range_spec('ages', data=[22, 33])
+    {'names': {'type': 'values', 'data': ['amy', 'bob', 'cat', 'dan', 'earl']}, 'ages': {'type': 'range', 'data': [22, 33]}}
+
+    >>> refs = spec_builder.refs()
+    >>> one = refs.values('ONE', ["A", "B", "C"])
+    >>> two = refs.values('TWO', [1, 2, 3])
+    >>> builder.combine('combine', refs=[one, two])
+    >>> builder.build()
+    {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}, 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
 """
 import json
 import logging
-from pathlib import Path
 from typing import Any, Union, Dict, List
+from typing import Generator
 
-from . import utils, template_engines, key_providers, types
+from . import utils, key_providers, types
 from .loader import Loader
 from .model import DataSpec
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 class FieldInfo:
@@ -37,12 +51,6 @@ class FieldInfo:
 class Builder:
     """
     Container class for constructing the Data Spec by adding fields, refs, and field_groups
-
-    Examples:
-        >>> builder = datagen.Builder()
-        >>> builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
-        >>> builder.range('ages', start=22, end=33)
-        >>> spec = builder.build()
     """
 
     def __init__(self, has_refs=True):
@@ -72,7 +80,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: to use to supply values
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added values field
@@ -90,7 +98,7 @@ class Builder:
             key: name of ref/field
             refs: refs to combine
             fields: fields to combine
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added combine field
@@ -106,7 +114,7 @@ class Builder:
         Args:
             key: name of ref/field
             refs: lists of lists of refs to combine
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added combine-list field
@@ -120,7 +128,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: with start, end, and optional step
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added range field
@@ -134,7 +142,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: with start and end of ranges
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added rand_range field
@@ -147,7 +155,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added date field
@@ -160,7 +168,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added date.iso field
@@ -173,7 +181,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added date.iso.us field
@@ -186,7 +194,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added uuid field
@@ -200,7 +208,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: either known character class or set of characters to use for sampling from
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added char_class field
@@ -214,7 +222,7 @@ class Builder:
         Args:
             key: name of ref/field
             cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added char_class_abbrev field
@@ -228,7 +236,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: hex start and end unicode ranges or lists of these
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added unicode_range field
@@ -241,7 +249,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added geo.lat field
@@ -254,7 +262,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added geo.long field
@@ -267,7 +275,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added geo.pair field
@@ -280,7 +288,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ip field
@@ -293,7 +301,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ipv4 field
@@ -306,26 +314,39 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ip.precise field
         """
         return self._add_field_spec(key, ip_precise(**config))
 
-    def weightedref(self, key: str, data: Dict[str, float], **config) -> FieldInfo:
+    def mac(self, key: str, **config) -> FieldInfo:
         """
-        creates weightedref Field Spec and adds to Data Spec
+        creates net.mac Field Spec and adds to Data Spec
+
+        Args:
+            key: name of ref/field
+            config: in kwargs format
+
+        Returns:
+            FieldInfo for the added net.mac field
+        """
+        return self._add_field_spec(key, mac(**config))
+
+    def weighted_ref(self, key: str, data: Dict[str, float], **config) -> FieldInfo:
+        """
+        creates weighted_ref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
             data: Mapping of ref name to weight
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
-            FieldInfo for the added weightedref field
+            FieldInfo for the added weighted_ref field
         """
-        return self._add_field_spec(key, weightedref(data, **config))
+        return self._add_field_spec(key, weighted_ref(data, **config))
 
     def select_list_subset(self, key: str, data: List[Any] = None, ref: str = None, **config) -> FieldInfo:
         """
@@ -335,7 +356,7 @@ class Builder:
             key: name of ref/field
             data: to select from
             ref: that contains data to select from
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added select_list_subset field
@@ -348,7 +369,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added csv field
@@ -362,7 +383,7 @@ class Builder:
         Args:
             key: name of ref/field
             data: Mapping of field name to one based column number
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added csv_select field
@@ -376,29 +397,29 @@ class Builder:
         Args:
             key: name of ref/field
             fields: sub field specifications
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added nested field
         """
         return self._add_field_spec(key, nested(fields, **config))
 
-    def configref(self, key: str, **config) -> FieldInfo:
+    def config_ref(self, key: str, **config) -> FieldInfo:
         """
-        creates configref Field Spec and adds to Data Spec
+        creates config_ref Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
-            FieldInfo for the added configref field
+            FieldInfo for the added config_ref field
         """
         # this must be a refs instance
         if self.refs_builder is None:
-            return self.add_field(key, configref(**config))
+            return self.add_field(key, config_ref(**config))
         else:
-            return self.add_ref(key, configref(**config))
+            return self.add_ref(key, config_ref(**config))
 
     def calculate(self, key: str,
                   refs: dict = None,
@@ -413,7 +434,7 @@ class Builder:
             refs: mapping of ref to alias to used in formula
             fields: mapping of field name to alias used in formula
             formula: formula to execute against results of refs/fields
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added calculate field
@@ -428,7 +449,7 @@ class Builder:
             key: name of ref/field
             ref_name: name of reference to get values from
             data: name of reference to get values from
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added ref field
@@ -441,7 +462,7 @@ class Builder:
 
         Args:
             key: name of ref/field
-            config: in **kwargs format
+            config: in kwargs format
 
         Returns:
             FieldInfo for the added weighted_csv field
@@ -474,9 +495,7 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_buider()
-            >>> builder.add_fields( \
-            >>>     FIELDNAME1=builder.some_spec(with_args), \
-            >>>     FIELDNAME2=builder.another_spec(with_args)
+            >>> builder.add_fields(FIELDNAME1=builder.some_spec(with_args), FIELDNAME2=builder.another_spec(with_args)
         )
         """
         for key, spec in kwargs.items():
@@ -496,12 +515,12 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_buider()
-            >>> builder.add_field("field1", builder.some_spec(with_args)) \
-            >>>    .add_field("field2", builder.another_spec(with_args))
+            >>> builder.add_field("field1", builder.some_spec(with_args))
+            >>> builder.add_field("field2", builder.another_spec(with_args))
         """
         if key in self.keys:
-            log.warning('%s key already defined, overwriting with %s',
-                        key, json.dumps(spec))
+            _log.warning('%s key already defined, overwriting with %s',
+                         key, json.dumps(spec))
         if isinstance(key, FieldInfo):
             key = key.key
         self.keys.add(key)
@@ -520,9 +539,9 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_buider()
-            >>> builder.add_refs( \
-            >>>     REFNAME1=builder.some_spec(with_args), \
-            >>>     REFNAME2=builder.another_spec(with_args))
+            >>> builder.add_refs(
+            ...     REFNAME1=builder.some_spec(with_args),
+            ...     REFNAME2=builder.another_spec(with_args))
         """
         for key, spec in kwargs.items():
             self.add_ref(key, spec)
@@ -541,35 +560,37 @@ class Builder:
 
         Examples:
             >>> builder = datagen.spec_builder()
-            >>> builder.add_ref("ref1", builder.some_spec(with_args)) \
-            >>> .add_ref("ref2", builder.another_spec(with_args))
+            >>> builder.add_ref("ref1", builder.some_spec(with_args))
+            >>> builder.add_ref("ref2", builder.another_spec(with_args))
         """
         if key in self.keys:
-            log.warning('%s key already defined, overwriting with %s', key, json.dumps(spec))
+            _log.warning('%s key already defined, overwriting with %s', key, json.dumps(spec))
         self.keys.add(key)
         self.refs_builder.add_field(key, spec)
         return self
 
-    def weighted_field_group(self, key: str, fields: List[str], weight: float):
+    def weighted_field_group(self, weight: float, fields: List[str]):
         """
         Creates a weighted field group for a single key and add to Spec
 
         Args:
-            key: the name of the field group
             fields: the fields in the group
             weight: the weight for this group
 
         Returns:
             FieldInfo for field group
+
+        Examples:
+            >>> import datagen
+            >>> builder = datagen.spec_builder()
+            >>> builder.weighted_field_group(0.6, ['name', 'age', 'gender'])
+            >>> builder.weighted_field_group(0.4, ['name', 'age'])
         """
         field_group = {
-            key: {
-                "weight": weight,
-                "fields": fields
-            }
+            str(weight): fields
         }
         self.field_groups.append(field_group)
-        return FieldInfo(key, 'field_group')
+        return FieldInfo(str(weight), 'field_group')
 
     def named_field_group(self, key: str, fields: List[str]):
         """
@@ -581,6 +602,12 @@ class Builder:
 
         Returns:
             FieldInfo
+
+        Examples:
+            >>> import datagen
+            >>> builder = datagen.spec_builder()
+            >>> builder.named_field_group("all", ['name', 'age', 'gender'])
+            >>> builder.named_field_group("no_gender", ['name', 'age'])
         """
         field_group = {
             key: fields
@@ -629,7 +656,7 @@ class Builder:
         if len(self.field_groups) > 0:
             self._configure_field_groups(spec)
 
-        return DataSpecImpl(spec)
+        return _DataSpecImpl(spec)
 
     def _configure_field_groups(self, spec: dict):
         """
@@ -675,7 +702,7 @@ def values(data: Union[int, float, str, bool, List, Dict[str, float]], **config)
 
     Args:
         data: to use to supply values
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the values spec
@@ -700,7 +727,7 @@ def combine(refs: Union[List[str], List[FieldInfo]] = None,
     Args:
         refs: refs to combine
         fields: fields to combine
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the combine spec
@@ -725,7 +752,7 @@ def combine_list(refs: List[Union[List[str], List[FieldInfo]]] = None, **config)
 
     Args:
         refs: lists of lists of refs to combine
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the combine-list spec
@@ -748,7 +775,7 @@ def range_spec(data: list, **config) -> dict:
 
     Args:
         data: with start, end, and optional step
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the range spec
@@ -770,7 +797,7 @@ def rand_range(data: list, **config) -> dict:
 
     Args:
         data: with start and end of ranges
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the rand_range spec
@@ -791,7 +818,7 @@ def date(**config) -> dict:
     Constructs a date Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the date spec
@@ -811,7 +838,7 @@ def date_iso(**config) -> dict:
     Constructs a date.iso Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the date.iso spec
@@ -831,7 +858,7 @@ def date_iso_us(**config) -> dict:
     Constructs a date.iso.us Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the date.iso.us spec
@@ -851,7 +878,7 @@ def uuid(**config) -> dict:
     Constructs a uuid Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the uuid spec
@@ -872,7 +899,7 @@ def char_class(data: Union[str, List[str]], **config) -> dict:
 
     Args:
         data: either known character class or set of characters to use for sampling from
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the char_class spec
@@ -894,7 +921,7 @@ def char_class_abbrev(cc_abbrev: str, **config) -> dict:
 
     Args:
         cc_abbrev: alternative type abbreviation i.e. ascii, cc-ascii, visible, cc-visible
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the char_class_abbrev spec
@@ -919,7 +946,7 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
 
     Args:
         data: hex start and end unicode ranges or lists of these
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the unicode_range spec
@@ -940,7 +967,7 @@ def geo_lat(**config) -> dict:
     Constructs a geo.lat Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the geo.lat spec
@@ -960,7 +987,7 @@ def geo_long(**config) -> dict:
     Constructs a geo.long Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the geo.long spec
@@ -980,7 +1007,7 @@ def geo_pair(**config) -> dict:
     Constructs a geo.pair Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the geo.pair spec
@@ -1000,7 +1027,7 @@ def ip(**config) -> dict:
     Constructs a ip Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ip spec
@@ -1020,7 +1047,7 @@ def ipv4(**config) -> dict:
     Constructs a ipv4 Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ipv4 spec
@@ -1040,7 +1067,7 @@ def ip_precise(**config) -> dict:
     Constructs a ip.precise Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ip.precise spec
@@ -1055,20 +1082,40 @@ def ip_precise(**config) -> dict:
     return spec
 
 
-def weightedref(data: Dict[str, float], **config) -> dict:
+def mac(**config) -> dict:
     """
-    Constructs a weightedref Field Spec
+    Constructs a mac Field Spec
 
     Args:
-        data: Mapping of ref name to weight
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
-        the weightedref spec
+        the mac spec
     """
 
     spec = {
-        "type": "weightedref",
+        "type": "net.mac"
+    }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def weighted_ref(data: Dict[str, float], **config) -> dict:
+    """
+    Constructs a weighted_ref Field Spec
+
+    Args:
+        data: Mapping of ref name to weight
+        config: in kwargs format
+
+    Returns:
+        the weighted_ref spec
+    """
+
+    spec = {
+        "type": "weighted_ref",
         "data": data
     }  # type: Dict[str, Any]
 
@@ -1084,7 +1131,7 @@ def select_list_subset(data: List[Any] = None, ref: str = None, **config) -> dic
     Args:
         data: to select from
         ref: that contains data to select from
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the select_list_subset spec
@@ -1108,7 +1155,7 @@ def csv(**config) -> dict:
     Constructs a csv Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the csv spec
@@ -1129,7 +1176,7 @@ def csv_select(data: Dict[str, int] = None, **config) -> dict:
 
     Args:
         data: Mapping of field name to one based column number
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the csv_select spec
@@ -1152,7 +1199,7 @@ def nested(fields: Union[Dict[str, Dict], DataSpec], **config) -> dict:
 
     Args:
         fields: sub field specifications
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the nested spec
@@ -1168,19 +1215,19 @@ def nested(fields: Union[Dict[str, Dict], DataSpec], **config) -> dict:
     return spec
 
 
-def configref(**config) -> dict:
+def config_ref(**config) -> dict:
     """
-    Constructs a configref Field Spec
+    Constructs a config_ref Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
-        the configref spec
+        the config_ref spec
     """
 
     spec = {
-        "type": "configref"
+        "type": "config_ref"
     }  # type: Dict[str, Any]
 
     if len(config) > 0:
@@ -1199,7 +1246,7 @@ def calculate(refs: dict = None,
         refs: mapping of ref to alias to used in formula
         fields: mapping of field name to alias used in formula
         formula: formula to execute against results of refs/fields
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the calculate spec
@@ -1226,7 +1273,7 @@ def ref(ref_name: str = None, data: str = None, **config) -> dict:
     Args:
         ref_name: name of reference to get values from
         data: name of reference to get values from
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the ref spec
@@ -1250,7 +1297,7 @@ def weighted_csv(**config) -> dict:
     Constructs a weighted_csv Field Spec
 
     Args:
-        config: in **kwargs format
+        config: in kwargs format
 
     Returns:
         the weighted_csv spec
@@ -1283,37 +1330,39 @@ def _create_key_list(entries):
     return entries
 
 
-def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> DataSpec:
+def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator:
     """
     Creates a generator for the raw spec for the specified iterations
 
     Args:
         raw_spec: to create generator for
         iterations: number of iterations before max
-        kwargs: args to generator i.e. enforce_schema, etc.
+
+    Keyword Args:
+        processor: (RecordProcessor): For any Record Level transformations such templating or formatters
+        output: (OutputHandlerInterface): For any field or record level output
+        data_dir (str): path the data directory with csv files and such
+        enforce_schema (bool): If schema validation should be applied where possible
+
+    Yields:
+        Records or rendered template strings
 
     Returns:
         the generator for the provided spec
     """
-    return DataSpecImpl(raw_spec).generator(iterations, **kwargs)
+    return _DataSpecImpl(raw_spec).generator(iterations, **kwargs)
 
 
-class DataSpecImpl(DataSpec):
+class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
-        template = kwargs.get('template')
+        processor = kwargs.get('processor')
         data_dir = kwargs.get('data_dir', types.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output = kwargs.get('output', None)
         loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
-
-        if template is not None:
-            if isinstance(template, Path):
-                engine = template_engines.for_file(template)
-            else:
-                engine = template_engines.string(template)
 
         key_provider = key_providers.from_spec(loader.specs)
 
@@ -1328,7 +1377,7 @@ class DataSpecImpl(DataSpec):
             if output:
                 output.finished_record(i, group, exclude_internal)
 
-            if template is not None:
-                yield engine.process(record)
+            if processor is not None:
+                yield processor.process(record)
             else:
                 yield record

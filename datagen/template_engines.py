@@ -4,10 +4,13 @@ Handles loading and creating the templating engine
 import os
 from pathlib import Path
 from typing import Union
+
 from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape  # type: ignore
 
+from .model import RecordProcessor
 
-def for_file(template_file: Union[str, Path]):
+
+def for_file(template_file: Union[str, Path]) -> RecordProcessor:
     """
     Loads the templating engine for the template file specified
 
@@ -17,15 +20,15 @@ def for_file(template_file: Union[str, Path]):
     Returns:
         the templating engine
     """
-    return Jinja2Engine(template_file)
+    return _Jinja2Engine(template_file)
 
 
-def string(template):
+def string(template: str) -> RecordProcessor:
     """ Returns a template engine for processing templates as strings """
-    return Jinja2StringEngine(template)
+    return _Jinja2StringEngine(template)
 
 
-class Jinja2Engine:
+class _Jinja2Engine(RecordProcessor):
     """
     A simple class that creates a facade around a Jinja2 templating environment
     """
@@ -38,21 +41,12 @@ class Jinja2Engine:
             autoescape=select_autoescape(['html', 'xml'])
         )
 
-    def process(self, record):
-        """
-        Render the template using the fields in the provided record
-
-        Args:
-            record: dictionary of field in template to value to populate the field with
-
-        Returns:
-            The rendered template
-        """
+    def process(self, record: dict) -> str:
         template = self.env.get_template(self.template_name)
         return template.render(record)
 
 
-class Jinja2StringEngine:
+class _Jinja2StringEngine(RecordProcessor):
     """
     A Jinja2 Templating Engine for String Templates
     """
@@ -64,7 +58,7 @@ class Jinja2StringEngine:
             autoescape=select_autoescape(['html', 'xml'])
         )
 
-    def process(self, record):
+    def process(self, record: dict) -> str:
         """
         Render the template using the fields in the provided record
 

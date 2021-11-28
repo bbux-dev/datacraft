@@ -61,7 +61,7 @@ type                         | description                            | config p
 [geo.pair](#Geo)             | generates long,lat pair                | join_with,start_lat,end_lat,start_long,end_long,precision
 [ip/ipv4](#IP_Addresses)     | generates ip v4 addresses              | base, cidr /8,/16,/24 only
 [ip.precise](#IP_Addresses)  | generates ip v4 addresses              | cidr(required) i.e. 192.168.1.0/14
-[weightedref](#Weighted_Ref) | produces values from refs in weighted fashion |
+[weighted_ref](#Weighted_Ref) | produces values from refs in weighted fashion |
 [select_list_subset](#Select_List_Subset) | selects subset of fields that are combined to create the value for the field | join_with
 [csv](#CSV_Data)             | Uses external csv file to supply data  | many see details below
 [csv_select](#CSV_Select)    | Efficient way to select multiple csv columns | many see details below
@@ -220,8 +220,7 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen -s dataspec.json --log-level error -i 12 \
-  | sort
+datagen -s dataspec.json --log-level error -i 12 | sort
 A1
 A2
 A3
@@ -387,9 +386,9 @@ import datagen
 
 spec_builder = datagen.spec_builder()
 
-spec_builder.add_field('field1', dataspec.builder.values([1, 2, 3, 4, 5]))
-spec_builder.add_field('field2', dataspec.builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
-spec_builder.add_field('field3', dataspec.builder.values("CONSTANT"))
+spec_builder.add_field('field1', datagen.builder.values([1, 2, 3, 4, 5]))
+spec_builder.add_field('field2', datagen.builder.values({"A": 0.5, "B": 0.3, "C": 0.2}))
+spec_builder.add_field('field3', datagen.builder.values("CONSTANT"))
 
 spec = spec_builder.build()
 ```
@@ -1284,10 +1283,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen -s dataspec.json --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-15-Dec-2050 13:41
-31-Jan-2051 23:32
+datagen -s dataspec.json --log-level error -i 10 | sort
+03-Mar-2051 07:48
+12-Jan-2051 10:52
+12-Jan-2051 12:16
+14-Mar-2051 09:12
+24-Jan-2051 14:01
+26-Feb-2051 09:22
+26-Jan-2051 12:58
+26-Jan-2051 20:37
+28-Jan-2051 09:48
+29-Dec-2050 09:47
 ```
 
 </details>
@@ -1333,10 +1339,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-02-07-2021
-01-08-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+03-12-2021
+04-12-2021
+12-11-2021
+13-11-2021
+18-11-2021
+18-11-2021
+20-11-2021
+22-11-2021
+28-11-2021
+29-11-2021
 ```
 
 </details>
@@ -1379,10 +1392,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?offset=1": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-01-07-2021
-31-07-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+02-12-2021
+11-11-2021
+12-11-2021
+14-11-2021
+19-11-2021
+23-11-2021
+24-11-2021
+25-11-2021
+29-11-2021
+30-11-2021
 ```
 
 </details>
@@ -1425,10 +1445,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?duration_days=1": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-02-07-2021
-03-07-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+11-11-2021
+11-11-2021
+11-11-2021
+11-11-2021
+11-11-2021
+11-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
 ```
 
 </details>
@@ -1471,10 +1498,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?duration_days=10": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-02-07-2021
-12-07-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+11-11-2021
+12-11-2021
+12-11-2021
+16-11-2021
+17-11-2021
+17-11-2021
+18-11-2021
+19-11-2021
+19-11-2021
+20-11-2021
 ```
 
 </details>
@@ -1517,10 +1551,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?duration_days=1&offset=1": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-01-07-2021
-02-07-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+10-11-2021
+10-11-2021
+10-11-2021
+10-11-2021
+10-11-2021
+10-11-2021
+10-11-2021
+11-11-2021
+11-11-2021
+11-11-2021
 ```
 
 </details>
@@ -1563,10 +1604,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?duration_days=1&offset=-1": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-03-07-2021
-04-07-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+12-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
+13-11-2021
+13-11-2021
+13-11-2021
+13-11-2021
 ```
 
 </details>
@@ -1609,8 +1657,15 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?duration_days=1&offset=1&start=15-12-2050": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
+datagen -s dataspec.json --log-level error -i 10 | sort
+14-12-2050
+14-12-2050
+14-12-2050
+14-12-2050
+14-12-2050
+14-12-2050
+14-12-2050
+14-12-2050
 14-12-2050
 14-12-2050
 ```
@@ -1655,10 +1710,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'
-15-Dec-2050 12:00
-16-Dec-2050 11:58
+datagen -s dataspec.json --log-level error -i 10 | sort
+15-Dec-2050 13:47
+15-Dec-2050 14:57
+15-Dec-2050 16:13
+15-Dec-2050 18:01
+15-Dec-2050 18:05
+15-Dec-2050 20:54
+15-Dec-2050 22:24
+16-Dec-2050 00:12
+16-Dec-2050 06:09
+16-Dec-2050 11:31
 ```
 
 </details>
@@ -1704,10 +1766,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2": {}}' --log-level error -i 1000 \
-  | sort -n | uniq | sed -n '1p;$p'
-20500525 20:43
-20500607 00:36
+datagen -s dataspec.json --log-level error -i 10 | sort
+20500527 23:36
+20500528 08:12
+20500528 20:41
+20500531 19:46
+20500601 03:01
+20500601 11:03
+20500601 23:25
+20500602 10:34
+20500602 20:39
+20500602 22:06
 ```
 
 </details>
@@ -1753,10 +1822,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?stddev_days=1": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-29-06-2021
-05-07-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+10-11-2021
+11-11-2021
+11-11-2021
+11-11-2021
+11-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
+12-11-2021
+14-11-2021
 ```
 
 </details>
@@ -1799,10 +1875,17 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen --inline '{"dates:date?stddev_days=15": {}}' --log-level error -i 1000 \
-  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'
-19-05-2021
-16-08-2021
+datagen -s dataspec.json --log-level error -i 10 | sort
+02-12-2021
+11-11-2021
+13-11-2021
+15-11-2021
+15-11-2021
+16-12-2021
+21-10-2021
+26-11-2021
+27-11-2021
+31-10-2021
 ```
 
 </details>
@@ -2040,11 +2123,11 @@ spec = spec_builder.build()
 
 ```shell
 datagen -s dataspec.json --log-level error -i 5  --format json -x
-{"population": 828, "pop": 630.87}
-{"population": 339, "pop": 361.01}
-{"population": 254, "pop": 549.29}
-{"population": 509, "pop": 261.89}
-{"population": 980, "pop": 594.94}
+{"population": 739, "pop": 683.02}
+{"population": 366, "pop": 987.41}
+{"population": 304, "pop": 917.4}
+{"population": 256, "pop": 657.58}
+{"population": 564, "pop": 1090.33}
 ```
 
 </details>
@@ -2306,16 +2389,16 @@ spec = spec_builder.build()
 
 ```shell
 datagen -s dataspec.json --log-level error -i 10
-c3cFwpv!7c>(
-@qf`4;3yF7d#DM
-;'&5]$8pu3_7,E?
-|$aULq73cJY
-hb2cM4Zl2pPMnX_
-NV3TDhFsyQ)|4c
-pd01u|859!p)iT
-i7$8F93x+3uKG
-d8hb@_SfHaP!
-,ps]`Sbw;k<3o[
+c?EF${e$79LuC
+T$v<ejk474~Gd
+ReM@F3|I?8cd@
+@}X<,Q6#c)W!
+Q:!eO0bs58DVW
+}.@vh6gNIXf
+5.DucWlp2q4N
+;Uh}cOucaC0,
+>\ff3#UL:ur0<yq}
+Zz@S~o0JKWc#
 ```
 
 </details>
@@ -2421,16 +2504,16 @@ spec = spec_builder.build()
 
 ```shell
 datagen -s dataspec.json --log-level error -i 10
-じ
-んじ
-むぬ
-でど゗
-あぉごそはぶふ
-ぬりよゖび
-ん゜れゆひつど
-ぁそゝどぞおしろ
-ぇゃぴけ
-めき゚
+ゟぇらゑぃ゚はき
+ぐ
+ぁくずらぢつお぀しね
+ぽぢ
+す
+ぐ゚ぃ
+ぼみが
+まけゖたょめれるが
+もゕぃぷゃおま
+ぷゝすばなゃ
 ```
 
 </details>
@@ -2768,12 +2851,12 @@ spec = spec_builder.build()
 A weighted ref spec is used to select the values from a set of refs in a
 weighted fashion.
 
-The weightedref Field Spec structure is:
+The weighted_ref Field Spec structure is:
 
 ```
 {
   "<field name>": {
-    "type": "weightedref",
+    "type": "weighted_ref",
     "data": {"valid_ref_1": 0.N, "valid_ref_2": 0.N, ...}
   }
 }
@@ -2788,7 +2871,7 @@ mostly success related codes we could use the follow spec.
 ```json
 {
   "http_code": {
-    "type": "weightedref",
+    "type": "weighted_ref",
     "data": {"GOOD_CODES": 0.7, "BAD_CODES": 0.3}
   },
   "refs": {
@@ -2814,7 +2897,7 @@ mostly success related codes we could use the follow spec.
 
 ```yaml
 http_code:
-  type: weightedref
+  type: weighted_ref
   data: {GOOD_CODES: 0.7, BAD_CODES: 0.3}
 refs:
   GOOD_CODES:
@@ -2842,7 +2925,7 @@ refs = spec_builder.refs()
 refs.add_field('GOOD_CODES', {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1})
 refs.add_field('BAD_CODES', {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1})
 
-spec_builder.weightedref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
+spec_builder.weighted_ref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
 
 spec = spec_builder.build()
 ```
@@ -2947,11 +3030,11 @@ spec = spec_builder.build()
 
 ```shell
 datagen -s dataspec.json --log-level error -i 5
-mushrooms, garlic
-carrots, potatoes
-garlic, onions
-carrots, potatoes, mushrooms
-garlic, bell peppers, mushrooms
+bell peppers, garlic
+carrots, bell peppers, spinach
+potatoes, garlic, spinach, onions
+potatoes, onions, bell peppers
+onions, mushrooms
 ```
 
 </details>
@@ -3031,11 +3114,11 @@ spec = spec_builder.build()
 
 ```shell
 datagen -s dataspec.json --log-level error -i 5
-"onions", "bell peppers"
-"carrots", "spinach"
-"mushrooms", "bell peppers", "carrots"
-"bell peppers", "garlic"
-"potatoes", "spinach"
+"onions", "garlic"
+"spinach", "onions", "mushrooms"
+"spinach", "mushrooms"
+"potatoes", "garlic"
+"onions", "garlic", "carrots"
 ```
 
 </details>
@@ -3050,7 +3133,7 @@ values for a field. Another advantage of using a csv spec is that it is easy to
 have fields that are correlated be generated together. All rows will be selected
 incrementally, unless any of the fields are configured to use `sample` mode. You
 can use `sample` mode on individual columns, or you can use it across all
-columns by creating a `configref` spec. See [csv_select](#csv_select) for an
+columns by creating a `config_ref` spec. See [csv_select](#csv_select) for an
 efficient way to select multiple columns from a csv file.
 
 The `csv` Field Spec structure is:
@@ -3081,7 +3164,7 @@ The `csv` Field Spec structure is:
 param | type | description                                  | default | examples
 ------|------|----------------------------------------------|---------|--------- 
 datafile|string |Name of file in data directory that</br>contains the data for this field | |example.csv</br>subdir/example2.csv</br> 
-configref|string |Name of configref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
+config_ref|string |Name of config_ref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
 headers| |If the csv file has headers |False | 
 column|['number', 'string'] |1 based column number or field name if</br>headers are present |1 |1</br>col_2</br>name</br> 
 delimiter|string |how values are separated in the csv</br>file, default is comma |, |,</br>	</br>;</br> </br> 
@@ -3188,20 +3271,20 @@ Our Data Spec looks like:
     "type": "csv",
     "config": {
       "column": 1,
-      "configref": "tabs_config"
+      "config_ref": "tabs_config"
     }
   },
   "description": {
     "type": "csv",
     "config": {
       "column": 2,
-      "configref": "tabs_config"
+      "config_ref": "tabs_config"
     }
   },
-  "status_type:csv?configref=tabs_config&column=3": {},
+  "status_type:csv?config_ref=tabs_config&column=3": {},
   "refs": {
     "tabs_config": {
-      "type": "configref",
+      "type": "config_ref",
       "config": {
         "datafile": "tabs.csv",
         "delimiter": "\t",
@@ -3221,16 +3304,16 @@ status:
   type: csv
   config:
     column: 1
-    configref: tabs_config
+    config_ref: tabs_config
 description:
   type: csv
   config:
     column: 2
-    configref: tabs_config
-status_type:csv?configref=tabs_config&column=3: {}
+    config_ref: tabs_config
+status_type:csv?config_ref=tabs_config&column=3: {}
 refs:
   tabs_config:
-    type: configref
+    type: config_ref
     config:
       datafile: tabs.csv
       delimiter: "\t"
@@ -3246,7 +3329,7 @@ import datagen
 
 spec_builder = datagen.spec_builder()
 
-spec_builder.configref(
+spec_builder.config_ref(
     key="tabs_config",
     datafile="tabs.csv",
     delimiter="\t",
@@ -3254,19 +3337,19 @@ spec_builder.configref(
 spec_builder.csv(
     key="status",
     column=1,
-    configref="tabs_config")
+    config_ref="tabs_config")
 spec_builder.csv(
     key="description",
     column=2,
-    configref="tabs_config")
-spec_builder.add_field("status_type:csv?configref=tabs_config&column=3", {})
+    config_ref="tabs_config")
+spec_builder.add_field("status_type:csv?config_ref=tabs_config&column=3", {})
 
 spec = spec_builder.build()
 ```
 
 </details>
 
-The `configref` exist so that we don't have to repeat ourselves for common
+The `config_ref` exist so that we don't have to repeat ourselves for common
 configurations across multiple fields. If we use the following template `{{ status }},{{ description }},{{ status_type }}` and run this
 spec we will get output similar to:
 
@@ -3375,7 +3458,7 @@ Springfield,0.01
 param | type | description                                  | default | examples
 ------|------|----------------------------------------------|---------|--------- 
 datafile|string |Name of file in data directory that</br>contains the data for this field | |example.csv</br>subdir/example2.csv</br> 
-configref|string |Name of configref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
+config_ref|string |Name of config_ref to use to populate</br>config for this field | |tabs_config</br>common_csv_config</br> 
 headers| |If the csv file has headers |False | 
 column|['number', 'string'] |1 based column number or field name if</br>headers are present |1 |1</br>col_2</br>name</br> 
 weight_column|['number', 'string'] |1 based column number or field name if</br>headers are present where weights are</br>defined |2 |1</br>col_2</br>name</br> 
@@ -3435,13 +3518,107 @@ spec = spec_builder.build()
   <summary>Example Command and Output</summary>
 
 ```shell
-datagen -s dataspec.json --log-level error -i 100 --datadir ./data | sort | uniq -c | sort -n
-      8 London
-      8 New York
-      9 Oxford
-     18 Cambridge
-     20 Seattle
-     37 San Diego
+datagen -s dataspec.json --log-level error -i 100 --datadir ./data | sort
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+Cambridge
+London
+London
+London
+London
+London
+London
+London
+London
+London
+New York
+New York
+New York
+New York
+New York
+New York
+New York
+New York
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+Oxford
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+San Diego
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
+Seattle
 ```
 
 </details>
@@ -3576,14 +3753,14 @@ spec = spec_builder.build()
 ```shell
 datagen -s dataspec.json --log-level error -i 1 --format json-pretty -x
 {
-    "id": "02825a62-2bd5-4461-a6be-773df096cfc4",
+    "id": "6d2a9148-efb6-4680-8ce7-b851fc472e5d",
     "user": {
-        "user_id": "bfbab550-024f-4f46-b63a-a3cf1a7e1c9e",
+        "user_id": "7f7ba781-f4e6-41e9-b375-f303f4628053",
         "geo": {
-            "place_id": "6138",
+            "place_id": "318",
             "coordinates": [
-                " 75.0154",
-                "-80.9406"
+                " 113.9928",
+                "-26.9717"
             ]
         }
     }

@@ -1,18 +1,21 @@
 """
-Module for handling ip types
+Module for types related to networks: ip, ipv4, ip.precise, net.mac
 """
 from typing import Dict
 import ipaddress
 import json
+import string
 import random
 
 import datagen
 
-IP_KEY = 'ip'
-IPV4_KEY = 'ipv4'
+_IP_KEY = 'ip'
+_IPV4_KEY = 'ipv4'
+_IP_PRECISE_KEY = 'ip.precise'
+_NET_MAC_KEY = 'net.mac'
 
 
-class IpV4Supplier(datagen.ValueSupplierInterface):
+class _IpV4Supplier(datagen.ValueSupplierInterface):
     """
     Default implementation for generating ip values, uses separate suppliers for each octet of the ip
     """
@@ -35,26 +38,38 @@ class IpV4Supplier(datagen.ValueSupplierInterface):
         return f'{first}.{second}.{third}.{fourth}'
 
 
-@datagen.registry.schemas(IP_KEY)
+@datagen.registry.schemas(_IP_KEY)
 def _get_ip_schema():
     """ returns the schema for the ip types """
-    return datagen.schemas.load(IP_KEY)
+    return datagen.schemas.load(_IP_KEY)
 
 
-@datagen.registry.schemas(IPV4_KEY)
+@datagen.registry.schemas(_IPV4_KEY)
 def _get_ipv4_schema():
     """ returns the schema for the ipv4 types """
     # shares schema with ip
-    return datagen.schemas.load(IP_KEY)
+    return datagen.schemas.load(_IP_KEY)
 
 
-@datagen.registry.types(IPV4_KEY)
+@datagen.registry.schemas(_IP_PRECISE_KEY)
+def _get_ip_precise_schema():
+    """ returns the schema for the ip.precise types """
+    return datagen.schemas.load(_IP_PRECISE_KEY)
+
+
+@datagen.registry.schemas(_NET_MAC_KEY)
+def _get_mac_addr_schema():
+    """ returns the schema for the net.mac types """
+    return datagen.schemas.load(_NET_MAC_KEY)
+
+
+@datagen.registry.types(_IPV4_KEY)
 def _configure_ipv4(field_spec, _):
     """ configures value supplier for ipv4 type """
     return _configure_ip(field_spec, _)
 
 
-@datagen.registry.types(IP_KEY)
+@datagen.registry.types(_IP_KEY)
 def _configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = datagen.utils.load_config(field_spec, loader)
@@ -72,7 +87,7 @@ def _configure_ip(field_spec, loader):
         'third': _create_octet_supplier(parts, 2, sample),
         'fourth': _create_octet_supplier(parts, 3, sample),
     }
-    return IpV4Supplier(octet_supplier_map)
+    return _IpV4Supplier(octet_supplier_map)
 
 
 def _get_base_parts(config):
@@ -126,7 +141,7 @@ def _create_octet_supplier(parts, index, sample):
     return datagen.suppliers.values(spec)
 
 
-class IpV4PreciseSupplier(datagen.ValueSupplierInterface):
+class _IpV4PreciseSupplier(datagen.ValueSupplierInterface):
     """
     Class that supports precise ip address generation by specifying cidr values, much slower for large ip ranges
     """
@@ -152,7 +167,7 @@ class IpV4PreciseSupplier(datagen.ValueSupplierInterface):
         return str(self.net[idx])
 
 
-@datagen.registry.types('ip.precise')
+@datagen.registry.types(_IP_PRECISE_KEY)
 def _configure_precise_ip(field_spec, _):
     """ configures value supplier for ip.precise type """
     config = field_spec.get('config')
@@ -162,4 +177,31 @@ def _configure_precise_ip(field_spec, _):
     sample = config.get('sample', 'no').lower() in ['yes', 'true', 'on']
     if cidr is None:
         raise datagen.SpecException('Invalid config for: ' + json.dumps(field_spec) + ', param cidr required')
-    return IpV4PreciseSupplier(cidr, sample)
+    return _IpV4PreciseSupplier(cidr, sample)
+
+
+class _MacAddressSupplier(datagen.ValueSupplierInterface):
+    """ Class for supplying random mac addresses """
+    def __init__(self, delim: str):
+        """
+        Args:
+            delim: how mac address pieces are separated
+        """
+        self.delim = delim
+        self.tokens = string.digits + 'ABCDEF'
+
+    def next(self, iteration):
+        parts = [''.join(random.sample(self.tokens, 2)) for _ in range(6)]
+        return self.delim.join(parts)
+
+
+@datagen.registry.types(_NET_MAC_KEY)
+def _configure_mac_address_supplier(field_spec, loader):
+    """ configures value supplier for net.mac type """
+    config = datagen.utils.load_config(field_spec, loader)
+    if datagen.utils.is_affirmative('dashes', config):
+        delim = '-'
+    else:
+        delim = datagen.types.get_default('mac_addr_separator')
+
+    return _MacAddressSupplier(delim)

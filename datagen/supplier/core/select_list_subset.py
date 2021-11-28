@@ -1,8 +1,5 @@
 """
-select_list_subset handler builds a select_list_subset supplier from the provided spec
-
-A select list subset spec is used to select multiple values from a list to use as the value for a field.
-
+Module for select_list_subset type
 """
 import json
 

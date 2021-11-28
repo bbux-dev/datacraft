@@ -14,7 +14,7 @@ def test_api_builder():
     }
 
     # first build uses direct build methods
-    builder1 = builder.Builder()
+    builder1 = builder.spec_builder()
     refs1 = builder1.refs_builder
     domains = refs1.values('DOMAINS', domain_weights)
     animals = refs1.values('ANIMALS', animal_names)
@@ -25,7 +25,7 @@ def test_api_builder():
     spec1 = builder1.build()
 
     # second builder uses the fluent api style
-    builder2 = builder.Builder()
+    builder2 = builder.spec_builder()
 
     animals_spec = builder.values(data=animal_names)
     actions_spec = builder.values(data=action_list, sample=True)
@@ -84,8 +84,8 @@ field_spec_build_tests = [
      {"type": "ipv4", "config": {"cidr": "2.22.222.0/16"}}),
     (builder.ip_precise(cidr="10.0.0.0/8"),
      {"type": "ip.precise", "config": {"cidr": "10.0.0.0/8"}}),
-    (builder.weightedref({"One": 0.5, "Two": 0.3, "Three": 0.2}),
-     {"type": "weightedref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}),
+    (builder.weighted_ref({"One": 0.5, "Two": 0.3, "Three": 0.2}),
+     {"type": "weighted_ref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}),
     (builder.select_list_subset(data=["A", "B", "C"], mean=5, stddev=2),
      {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}),
     (builder.select_list_subset(ref="LIST", mean=5, stddev=2),
@@ -105,57 +105,57 @@ def test_spec_builder(generated_spec, expected_spec):
 
 
 full_spec_build_tests = [
-    (builder.Builder().values('name', [1, 2, 3], prefix="foo"),
+    (builder.spec_builder().values('name', [1, 2, 3], prefix="foo"),
      {"name": {"type": "values", "data": [1, 2, 3], "config": {"prefix": "foo"}}}),
-    (builder.Builder().combine('name', refs=["ONE", "TWO"], join_with='@'),
+    (builder.spec_builder().combine('name', refs=["ONE", "TWO"], join_with='@'),
      {"name": {"type": "combine", "refs": ["ONE", "TWO"], "config": {"join_with": "@"}}}),
-    (builder.Builder().combine('name', fields=["ONE", "TWO"], join_with='-'),
+    (builder.spec_builder().combine('name', fields=["ONE", "TWO"], join_with='-'),
      {"name": {"type": "combine", "fields": ["ONE", "TWO"], "config": {"join_with": "-"}}}),
-    (builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
+    (builder.spec_builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
      {"name": {"type": "combine-list", "config": {"join_with": ","}, "refs": [["A", "B"], ["A", "B", "C"]]}}),
-    (builder.Builder().range_spec('name', [1, 5, 1], as_list=True, count=2),
+    (builder.spec_builder().range_spec('name', [1, 5, 1], as_list=True, count=2),
      {"name": {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}}),
-    (builder.Builder().rand_range('name', [20, 44], count=[2, 3, 4]),
+    (builder.spec_builder().rand_range('name', [20, 44], count=[2, 3, 4]),
      {"name": {"type": "rand_range", "config": {"count": [2, 3, 4]}, "data": [20, 44]}}),
-    (builder.Builder().date('name', duration_days=3, offset=4),
+    (builder.spec_builder().date('name', duration_days=3, offset=4),
      {"name": {"type": "date", "config": {"duration_days": 3, "offset": 4}}}),
-    (builder.Builder().date_iso('name', duration_days=4, offset=5),
+    (builder.spec_builder().date_iso('name', duration_days=4, offset=5),
      {"name": {"type": "date.iso", "config": {"duration_days": 4, "offset": 5}}}),
-    (builder.Builder().date_iso_us('name', duration_days=5, offset=6),
+    (builder.spec_builder().date_iso_us('name', duration_days=5, offset=6),
      {"name": {"type": "date.iso.us", "config": {"duration_days": 5, "offset": 6}}}),
-    (builder.Builder().uuid('name', quote="'"),
+    (builder.spec_builder().uuid('name', quote="'"),
      {"name": {"type": "uuid", "config": {"quote": "'"}}}),
-    (builder.Builder().char_class('name', "visible", min=5, max=7),
+    (builder.spec_builder().char_class('name', "visible", min=5, max=7),
      {"name": {"type": "char_class", "config": {"min": 5, "max": 7}, "data": "visible"}}),
-    (builder.Builder().char_class_abbrev('name', "visible", min=3, max=10),
+    (builder.spec_builder().char_class_abbrev('name', "visible", min=3, max=10),
      {"name": {"type": "cc-visible", "config": {"min": 3, "max": 10}}}),
-    (builder.Builder().unicode_range('name', ["3040", "309f"], mean=3),
+    (builder.spec_builder().unicode_range('name', ["3040", "309f"], mean=3),
      {"name": {"type": "unicode_range", "config": {"mean": 3}, "data": ["3040", "309f"]}}),
-    (builder.Builder().unicode_range('name', [["3040", "309f"]], mean=3),
+    (builder.spec_builder().unicode_range('name', [["3040", "309f"]], mean=3),
      {"name": {"type": "unicode_range", "config": {"mean": 3}, "data": [["3040", "309f"]]}}),
-    (builder.Builder().geo_lat('name', start_lat=75.5),
+    (builder.spec_builder().geo_lat('name', start_lat=75.5),
      {"name": {"type": "geo.lat", "config": {"start_lat": 75.5}}}),
-    (builder.Builder().geo_long('name', bbox=[31.3, 22.0, 34.1, 25.0]),
+    (builder.spec_builder().geo_long('name', bbox=[31.3, 22.0, 34.1, 25.0]),
      {"name": {"type": "geo.long", "config": {"bbox": [31.3, 22.0, 34.1, 25.0]}}}),
-    (builder.Builder().geo_pair('name', join_with=":", as_list="yes"),
+    (builder.spec_builder().geo_pair('name', join_with=":", as_list="yes"),
      {"name": {"type": "geo.pair", "config": {"join_with": ":", "as_list": "yes"}}}),
-    (builder.Builder().ip('name', base="192.168"),
+    (builder.spec_builder().ip('name', base="192.168"),
      {"name": {"type": "ip", "config": {"base": "192.168"}}}),
-    (builder.Builder().ipv4('name', cidr="2.22.222.0/16"),
+    (builder.spec_builder().ipv4('name', cidr="2.22.222.0/16"),
      {"name": {"type": "ipv4", "config": {"cidr": "2.22.222.0/16"}}}),
-    (builder.Builder().ip_precise('name', cidr="10.0.0.0/8"),
+    (builder.spec_builder().ip_precise('name', cidr="10.0.0.0/8"),
      {"name": {"type": "ip.precise", "config": {"cidr": "10.0.0.0/8"}}}),
-    (builder.Builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
-     {"name": {"type": "weightedref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}}),
-    (builder.Builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
+    (builder.spec_builder().weighted_ref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+     {"name": {"type": "weighted_ref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}}),
+    (builder.spec_builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
      {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}}),
-    (builder.Builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
+    (builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
      {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "ref": "LIST"}}),
-    (builder.Builder().csv('name', datafile="demo.csv", sample="on"),
+    (builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
      {"name": {"type": "csv", "config": {"datafile": "demo.csv", "sample": "on"}}}),
-    (builder.Builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
+    (builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
      {"name": {"type": "csv_select", "config": {"headers": False}, "data": {"one": 1, "two": 2}}}),
-    (builder.Builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
+    (builder.spec_builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
      {"name": {"type": "nested", "fields": {"one": {"type": "values", "data": 1}}}}),
 ]
 
@@ -167,30 +167,28 @@ def test_full_spec_builder(field_info, expected_spec):
 
 
 invalid_spec_build_tests = [
-    builder.Builder().values('name', data=[1, 2, 3], count={}),  # invalid count
-    builder.Builder().combine('name', refs=["ONE", "TWO"], join_with='@'),  # no refs defined
-    builder.Builder().combine('name', fields=["ONE", "TWO"], join_with='-'),  # no refs defined
-    builder.Builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
-    builder.Builder().range_spec('name', [1, 5, 1], as_list=True, count={}),  # invalid count
-    builder.Builder().rand_range('name', [20, 44], count=None),  # invalid count
-    builder.Builder().date('name', duration_days={1: 0.5, 2: 0.5}, offset=4),  # invalid duration_days
-    builder.Builder().date_iso('name', duration_days=4, offset="1"),  # invalid offset
-    builder.Builder().date_iso_us('name', duration_days=5, offset=6, start=42),  # invalid start
-    builder.Builder().char_class('name', "visible", min="5", max=7),  # min should be number
-    builder.Builder().char_class_abbrev('name', "visible", min=3, max="10"),  # max should be number
-    builder.Builder().unicode_range('name', ["3040", "309f"], count=4, mean=3),  # can't have count and mean
-    builder.Builder().unicode_range('name', [["3040", "309f"]], count=5, max=6),  # can't have count and max
-    builder.Builder().geo_lat('name', start_lat=175.5),  # lat out of range
-    builder.Builder().geo_long('name', bbox=[31.3, 22.0]),  # bbox wrong dimensions
-    builder.Builder().geo_pair('name', join_with=":", precision="yes"),  # invalid precision
-    builder.Builder().ip('name', base="192.1680"),  # type in base
-    builder.Builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
-    builder.Builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),  # ref not defined
-    # TODO: when schemas for these are created
-    # builder.Builder().weightedref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
-    # builder.Builder().csv('name', datafile="demo.csv", sample="on"),
-    # builder.Builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
-    # builder.Builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
+    builder.spec_builder().values('name', data=[1, 2, 3], count={}),  # invalid count
+    builder.spec_builder().combine('name', refs=["ONE", "TWO"], join_with='@'),  # no refs defined
+    builder.spec_builder().combine('name', fields=["ONE", "TWO"], join_with='-'),  # no refs defined
+    builder.spec_builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
+    builder.spec_builder().range_spec('name', [1, 5, 1], as_list=True, count={}),  # invalid count
+    builder.spec_builder().rand_range('name', [20, 44], count=None),  # invalid count
+    builder.spec_builder().date('name', duration_days={1: 0.5, 2: 0.5}, offset=4),  # invalid duration_days
+    builder.spec_builder().date_iso('name', duration_days=4, offset="1"),  # invalid offset
+    builder.spec_builder().date_iso_us('name', duration_days=5, offset=6, start=42),  # invalid start
+    builder.spec_builder().char_class('name', "visible", min="5", max=7),  # min should be number
+    builder.spec_builder().char_class_abbrev('name', "visible", min=3, max="10"),  # max should be number
+    builder.spec_builder().unicode_range('name', ["3040", "309f"], count=4, mean=3),  # can't have count and mean
+    builder.spec_builder().unicode_range('name', [["3040", "309f"]], count=5, max=6),  # can't have count and max
+    builder.spec_builder().geo_lat('name', start_lat=175.5),  # lat out of range
+    builder.spec_builder().geo_long('name', bbox=[31.3, 22.0]),  # bbox wrong dimensions
+    builder.spec_builder().geo_pair('name', join_with=":", precision="yes"),  # invalid precision
+    builder.spec_builder().ip('name', base="192.1680"),  # type in base
+    builder.spec_builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
+    builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),  # ref not defined
+    builder.spec_builder().weighted_ref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
+    builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
+    builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
 ]
 
 
@@ -211,7 +209,7 @@ def test_api_change():
     }
 
     # for building the final spec
-    spec_builder = builder.Builder()
+    spec_builder = builder.spec_builder()
 
     # for building the regs section of the spec
     refs = spec_builder.refs_builder
@@ -245,7 +243,7 @@ short_hand_tests = [
 
 @pytest.mark.parametrize("key_as_spec,field_name,first_value_contains", short_hand_tests)
 def test_shorthand_key_support(key_as_spec, field_name, first_value_contains):
-    spec_builder = builder.Builder()
+    spec_builder = builder.spec_builder()
     spec_builder.add_field(key_as_spec, {})
     spec = spec_builder.build()
     first = next(spec.generator(1, enforce_schema=True))

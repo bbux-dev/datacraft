@@ -1,5 +1,5 @@
 """
-Module for handling nested types
+Module for nested types
 """
 from typing import Dict, Any
 
@@ -7,7 +7,7 @@ import datagen
 import datagen.model
 
 
-class NestedSupplier(datagen.model.ValueSupplierInterface):
+class _NestedSupplier(datagen.model.ValueSupplierInterface):
     """
     Implementation for Nested Value Supplier
     """
@@ -15,15 +15,18 @@ class NestedSupplier(datagen.model.ValueSupplierInterface):
     def __init__(self,
                  field_supplier_map: Dict[str, datagen.model.ValueSupplierInterface],
                  count_supplier: datagen.model.ValueSupplierInterface,
+                 key_supplier: datagen.model.KeyProviderInterface,
                  as_list: bool):
         """
         Args:
             field_supplier_map: mapping of nested field name to value supplier for it
             count_supplier: number of nested objects to create
+            key_supplier: to supply nest fields names
             as_list: for counts of one, if the result should be a list instead of an object
         """
         self.field_supplier_map = field_supplier_map
         self.count_supplier = count_supplier
+        self.key_supplier = key_supplier
         self.as_list = as_list
 
     def next(self, iteration: int):
@@ -42,7 +45,17 @@ class NestedSupplier(datagen.model.ValueSupplierInterface):
         return vals
 
     def _single_pass(self, iteration: int) -> Dict[str, Any]:
-        return {key: supplier.next(iteration) for key, supplier in self.field_supplier_map.items()}
+        _, keys = self.key_supplier.get()
+        subset = {key: self.field_supplier_map.get(key) for key in keys}
+        if any(val is None for val in subset.values()):
+            raise datagen.SpecException(f'One or more keys provided in nested spec are not valid: {keys}, valid keys: '
+                                        f'{list(self.field_supplier_map.keys())}')
+        return {key: supplier.next(iteration) for key, supplier in subset.items()}  # type: ignore
+
+
+@datagen.registry.schemas('nested')
+def _get_nested_schema():
+    return datagen.schemas.load('nested')
 
 
 @datagen.registry.types('nested')
@@ -52,6 +65,11 @@ def _configure_nested_supplier(spec, loader):
     keys = [key for key in fields.keys() if key not in loader.RESERVED]
     config = datagen.utils.load_config(spec, loader)
     count_supplier = datagen.suppliers.count_supplier_from_data(config.get('count', 1))
+    if 'field_groups' in spec:
+        key_supplier = datagen.key_providers.from_spec(spec)
+    else:
+        key_supplier = datagen.key_providers.from_spec(fields)
+
     as_list = datagen.utils.is_affirmative('as_list', config)
 
     field_supplier_map = {}
@@ -63,4 +81,4 @@ def _configure_nested_supplier(spec, loader):
         else:
             supplier = loader.get_from_spec(nested_spec)
         field_supplier_map[key] = supplier
-    return NestedSupplier(field_supplier_map, count_supplier, as_list)
+    return _NestedSupplier(field_supplier_map, count_supplier, key_supplier, as_list)

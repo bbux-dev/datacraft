@@ -1,4 +1,4 @@
-from datagen.preprocessor import preprocess_spec, preprocess_csv_select, preprocess_nested
+from datagen.preprocessor import _preprocess_spec, _preprocess_csv_select, _preprocess_nested
 from datagen.preprocessor import _parse_key, _is_spec_data, _update_no_params
 from datagen import builder, SpecException
 import pytest
@@ -50,7 +50,7 @@ specs_should_raise_exception = [
 @pytest.mark.parametrize("spec", specs_should_raise_exception)
 def test_preprocess_should_raise_spec_exception(spec):
     with pytest.raises(SpecException):
-        preprocess_spec(spec)
+        _preprocess_spec(spec)
 
 
 default_transform_spec_tests = [
@@ -97,7 +97,7 @@ default_transform_spec_tests = [
 
 @pytest.mark.parametrize("input_spec,expected_output_spec", default_transform_spec_tests)
 def test_preprocess_valid_specs(input_spec, expected_output_spec):
-    updated = preprocess_spec(input_spec)
+    updated = _preprocess_spec(input_spec)
     assert updated == expected_output_spec
 
 
@@ -109,12 +109,12 @@ csv_select_transform_tests = [
             "another:range": [1, 10]
         },
         {
-            "one": {"type": "csv", "config": {"column": 1, "configref": "placeholder_configref"}},
-            "two": {"type": "csv", "config": {"column": 2, "configref": "placeholder_configref"}},
-            "six": {"type": "csv", "config": {"column": 6, "configref": "placeholder_configref"}},
+            "one": {"type": "csv", "config": {"column": 1, "config_ref": "placeholder_config_ref"}},
+            "two": {"type": "csv", "config": {"column": 2, "config_ref": "placeholder_config_ref"}},
+            "six": {"type": "csv", "config": {"column": 6, "config_ref": "placeholder_config_ref"}},
             "another": {"type": "range", "data": [1, 10]},
             "refs": {
-                "placeholder_configref": {"type": "configref", "config": {"datafile": "not_real.csv", "headers": "no"}}
+                "placeholder_config_ref": {"type": "config_ref", "config": {"datafile": "not_real.csv", "headers": "no"}}
             }
         }
     )
@@ -124,8 +124,8 @@ csv_select_transform_tests = [
 @pytest.mark.parametrize("input_spec,expected_output_spec", csv_select_transform_tests)
 def test_preprocess_csv_select(input_spec, expected_output_spec):
     # need first layer of pre-processing done
-    updated = preprocess_spec(input_spec)
-    updated = preprocess_csv_select(updated)
+    updated = _preprocess_spec(input_spec)
+    updated = _preprocess_csv_select(updated)
     assert updated == expected_output_spec
 
 
@@ -161,14 +161,14 @@ nested_transform_tests = [
             "another:range": [1, 10]
         },
         {
-            "refs": {"placeholder_configref": {"type": "configref",
+            "refs": {"placeholder_config_ref": {"type": "config_ref",
                                                "config": {"datafile": "not_real.csv", "headers": "no"}}},
             "outer": {
                 "type": "nested",
                 "fields": {
-                    "one": {"type": "csv", "config": {"column": 1, "configref": "placeholder_configref"}},
-                    "two": {"type": "csv", "config": {"column": 2, "configref": "placeholder_configref"}},
-                    "six": {"type": "csv", "config": {"column": 6, "configref": "placeholder_configref"}}
+                    "one": {"type": "csv", "config": {"column": 1, "config_ref": "placeholder_config_ref"}},
+                    "two": {"type": "csv", "config": {"column": 2, "config_ref": "placeholder_config_ref"}},
+                    "six": {"type": "csv", "config": {"column": 6, "config_ref": "placeholder_config_ref"}}
                 }
             },
             "another": {"type": "range", "data": [1, 10]},
@@ -194,7 +194,7 @@ nested_transform_tests = [
     ),
     (
         {
-            "one": {"type": "weightedref", "data": {"geo": 0.1}},
+            "one": {"type": "weighted_ref", "data": {"geo": 0.1}},
             "refs": {
                 "geo": {
                     "type": "nested",
@@ -207,7 +207,7 @@ nested_transform_tests = [
             }
         },
         {
-            "one": {"type": "weightedref", "data": {"geo": 0.1}},
+            "one": {"type": "weighted_ref", "data": {"geo": 0.1}},
             "refs": {
                 "geo": {
                     "type": "nested",
@@ -232,8 +232,8 @@ nested_transform_tests = [
 @pytest.mark.parametrize("input_spec,expected_output_spec", nested_transform_tests)
 def test_preprocess_nested(input_spec, expected_output_spec):
     # need first layer of pre-processing done
-    updated = preprocess_spec(input_spec)
-    updated = preprocess_nested(updated)
+    updated = _preprocess_spec(input_spec)
+    updated = _preprocess_nested(updated)
     assert updated == expected_output_spec
 
 

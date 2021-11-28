@@ -98,10 +98,10 @@ def test_count_param_valid():
     assert ['A', 'B'] == first
 
 
-def test_configref_for_values():
-    """ verifies that the values ref inherits the config from the configref """
-    spec = builder.single_field("name?configref=quoteit", ["bob", "joe", "ann", "sue"]) \
-        .add_ref("quoteit", builder.configref(quote="\"")) \
+def test_config_ref_for_values():
+    """ verifies that the values ref inherits the config from the config_ref """
+    spec = builder.single_field("name?config_ref=quoteit", ["bob", "joe", "ann", "sue"]) \
+        .add_ref("quoteit", builder.config_ref(quote="\"")) \
         .build()
     supplier = Loader(spec).get('name')
     assert supplier.next(0) == '"bob"'

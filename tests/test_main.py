@@ -60,6 +60,12 @@ def test_parse_debug_spec(tmpdir):
     assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
 
 
+def test_parse_debug_spec_yaml(tmpdir):
+    args = ['--debug-spec-yaml', '-o', str(tmpdir), '--inline', '{foo: [1,2,3]}']
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
 def test_parse_debug_defaults(tmpdir):
     args = ['--debug-defaults', '-o', str(tmpdir)]
     dgmain.main(args)
@@ -151,3 +157,11 @@ def test_wrap_main(tmpdir):
     sys.argv = args
     # for coverage
     dgmain.wrap_main()
+
+
+def test_server(tmpdir, mocker):
+    mocker.patch('datagen.server.run', side_effect=ModuleNotFoundError())
+    args = ['--format', 'json',
+            '--inline', '{A: 1, B: [2, 4, 6], C: 3}',
+            '-i', '5', '--server']
+    dgmain.main(args)

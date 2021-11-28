@@ -43,7 +43,7 @@ def test_combine_list_empty_refs_invalid():
 
 def test_refs_specified_but_invalid_type():
     spec = _combine_list_spec([["ONE", "TWO"]])
-    spec['refs']['TWO'] = builder.configref(prefix='foo', suffix='@bar')
+    spec['refs']['TWO'] = builder.config_ref(prefix='foo', suffix='@bar')
     _test_invalid_combine_spec(spec)
 
 
@@ -67,7 +67,7 @@ def test_combine_lists():
 
 
 def test_combine_fields():
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("first", builder.values(["bob", "rob", "ann", "sue"])) \
         .add_field("last", builder.values(["smith", "jones", "frank", "wee"])) \
         .add_field("full_name", builder.combine(fields=["first", "last"], join_with=' ')) \
@@ -97,7 +97,7 @@ def test_combine_list_spec_valid_normal():
         ["TWO", "TRE"],
         ["TRE", "ONE"]
     ]
-    spec = builder.Builder() \
+    spec = builder.spec_builder() \
         .add_field("field", builder.combine_list(refs=ref_lists)) \
         .add_ref("ONE", builder.values('uno')) \
         .add_ref("TWO", builder.values('dos')) \
@@ -111,7 +111,7 @@ def test_combine_list_spec_valid_normal():
 
 
 def _combine_spec_refs(ref_names, **config):
-    build = builder.Builder() \
+    build = builder.spec_builder() \
         .add_field("field", builder.combine(refs=ref_names, **config))
     for name in ref_names:
         build.add_ref(name, builder.values(name))
@@ -119,7 +119,7 @@ def _combine_spec_refs(ref_names, **config):
 
 
 def _combine_spec_fields(field_names, **config):
-    build = builder.Builder() \
+    build = builder.spec_builder() \
         .add_field("field", builder.combine(fields=field_names, **config))
     for name in field_names:
         build.add_field(name, builder.values(name))
@@ -127,7 +127,7 @@ def _combine_spec_fields(field_names, **config):
 
 
 def _combine_list_spec(ref_lists, **config):
-    build = builder.Builder() \
+    build = builder.spec_builder() \
         .add_field("field", builder.combine_list(refs=ref_lists, **config))
     for ref_list in ref_lists:
         for name in ref_list:

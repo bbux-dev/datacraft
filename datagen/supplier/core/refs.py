@@ -1,15 +1,13 @@
 """
-module to handle ref specs
-
-formats supported:
-
-{ "field": { "data": "ref_name" } }, "refs": { "ref_name": 42 } }
-
-{ "field": { "ref": "ref_name" } }, "refs": { "ref_name": 42 } }
-
+Module for ref type
 """
 import json
 import datagen
+
+
+@datagen.registry.schemas('ref')
+def _get_ref_schema():
+    return datagen.schemas.load('ref')
 
 
 @datagen.registry.types('ref')

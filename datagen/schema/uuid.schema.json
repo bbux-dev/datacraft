@@ -11,7 +11,11 @@
         "prefix": {"$ref": "#/definitions/prefix"},
         "suffix": {"$ref": "#/definitions/suffix"},
         "quote": {"$ref": "#/definitions/quote"},
-        "count": {"$ref": "#/definitions/count"}
+        "count": {"$ref": "#/definitions/count"},
+        "variant": {
+          "type": "number",
+          "enum": [1, 3, 4, 5]
+        }
       }
     },
     "additionalProperties": false

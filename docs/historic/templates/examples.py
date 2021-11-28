@@ -36,7 +36,7 @@ two = refs.values('TWO', [1, 2, 3, 4])
 
 spec_builder.combine('combine', refs=[one, two])
 """,
-        pipes="\\\n  | sort"),
+        pipes="| sort"),
     Example(
         name="overview_example_three",
         iterations=5,
@@ -174,88 +174,88 @@ spec_builder.combine_list(
 """),
     Example(
         name="uniform_date_example_exhaustive",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=90&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_one",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_two",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?offset=1", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_three",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_four",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=10", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_five",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&offset=1", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_six",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&offset=-1", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_seven",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&offset=1&start=15-12-2050", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="uniform_date_example_eight",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?duration_days=1&start=15-Dec-2050 12:00&format=%d-%b-%Y %H:%M", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2M -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="centered_date_example_exhaustive",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?center_date=20500601 12:00&format=%Y%m%d %H:%M&stddev_days=2", {})
 """,
-        pipes="\\\n  | sort -n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="centered_date_example_one",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?stddev_days=1", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="centered_date_example_two",
-        iterations=1000,
+        iterations=10,
         fragment="""
 spec_builder.add_field("dates:date?stddev_days=15", {})
 """,
-        pipes="\\\n  | sort -t- -k3n -k2n -k1n | uniq | sed -n '1p;$p'"),
+        pipes="| sort"),
     Example(
         name="range_spec_example_one",
         iterations=5,
@@ -364,7 +364,7 @@ refs = spec_builder.refs()
 refs.add_field('GOOD_CODES', {"200": 0.5, "202": 0.3, "203": 0.1, "300": 0.1})
 refs.add_field('BAD_CODES', {"400": 0.5, "403": 0.3, "404": 0.1, "500": 0.1})
 
-spec_builder.weightedref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
+spec_builder.weighted_ref('http_code', data={"GOOD_CODES": 0.7, "BAD_CODES": 0.3})
 """),
     Example(
         name="select_list_example_one",
@@ -408,7 +408,7 @@ spec_builder.csv(
         name="csv_spec_example_two",
         iterations=5,
         fragment="""
-spec_builder.configref(
+spec_builder.config_ref(
     key="tabs_config",
     datafile="tabs.csv",
     delimiter="\\t",
@@ -416,12 +416,12 @@ spec_builder.configref(
 spec_builder.csv(
     key="status",
     column=1,
-    configref="tabs_config")
+    config_ref="tabs_config")
 spec_builder.csv(
     key="description",
     column=2,
-    configref="tabs_config")
-spec_builder.add_field("status_type:csv?configref=tabs_config&column=3", {})
+    config_ref="tabs_config")
+spec_builder.add_field("status_type:csv?config_ref=tabs_config&column=3", {})
 """,
         pipes="--datadir ./data"),
     Example(
@@ -498,5 +498,5 @@ spec_builder.calculate('height_cm', fields=fields, formula=formula)""",
 spec_builder.weighted_csv(
     key="cities",
     datafile="weighted_cities.csv")""",
-        pipes="--datadir ./data | sort | uniq -c | sort -n"),
+        pipes="--datadir ./data | sort"),
 ]
