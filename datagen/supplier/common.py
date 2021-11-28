@@ -135,7 +135,7 @@ class RandomRangeSupplier(datagen.ValueSupplierInterface):
         self.start = float(start)
         self.end = float(end)
         self.precision = precision
-        self.format_str = '{: .' + str(precision) + 'f}'
+        self.format_str = '{:.' + str(precision) + 'f}'
         self.count_supplier = count_supplier
 
     def next(self, iteration):

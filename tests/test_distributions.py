@@ -7,7 +7,7 @@ def test_uniform_distribution():
     dist_func = datagen.registry.distribution.get('uniform')
     distribution = dist_func(start=5, end=10)
 
-    values = set([int(distribution.next_value()) for _ in range(100)])
+    values = set([int(distribution.next_value()) for _ in range(1000)])
     assert len(values) == 5
 
 
@@ -23,7 +23,7 @@ def test_bounded_normal_distribution():
     dist_func = datagen.registry.distribution.get('normal')
     distribution = dist_func(mean=5, stddev=1, min=2, max=7)
 
-    values = set([int(distribution.next_value()) for _ in range(100)])
+    values = set([int(distribution.next_value()) for _ in range(1000)])
     for value in values:
         assert 2 <= value <= 7
 
