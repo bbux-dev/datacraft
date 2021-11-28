@@ -32,6 +32,7 @@ class DataSpec(dict):
         return self.raw_spec.pop(key)
 
     def __init__(self, raw_spec):
+        super().__init__()
         self.raw_spec = raw_spec
 
     def generator(self, iterations: int, **kwargs) -> Generator:

@@ -92,6 +92,7 @@ def _configure_rand_range_supplier(field_spec, loader):
         raise datagen.SpecException(
             'rand_range specs require data as array with at least one element: %s' % json.dumps(field_spec))
     start = 0
+    end = 0
     if len(data) == 1:
         end = data[0]
     if len(data) >= 2:
@@ -122,10 +123,9 @@ def _float_range(start: float,
     stored
     """
     # attempt to defeat some rounding errors prevalent in python
-    if precision:
-        quantize = decimal.Decimal(str(1 / math.pow(10, int(precision))))
     current = decimal.Decimal(str(start))
     if precision:
+        quantize = decimal.Decimal(str(1 / math.pow(10, int(precision))))
         current = current.quantize(quantize)
 
     dstop = decimal.Decimal(str(stop))

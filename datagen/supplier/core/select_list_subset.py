@@ -25,8 +25,7 @@ def _configure_supplier(field_spec, loader):
             data = field_spec.get('data')
         else:
             data = field_spec
-
-    if 'data' in field_spec:
+    elif 'data' in field_spec:
         data = field_spec.get('data')
     if datagen.utils.any_key_exists(config, ['mean', 'stddev']):
         return datagen.suppliers.list_stat_sampler(data, config)

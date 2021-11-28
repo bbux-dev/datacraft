@@ -348,20 +348,20 @@ class Builder:
         """
         return self._add_field_spec(key, weighted_ref(data, **config))
 
-    def select_list_subset(self, key: str, data: List[Any] = None, ref: str = None, **config) -> FieldInfo:
+    def select_list_subset(self, key: str, data: List[Any] = None, ref_name: str = None, **config) -> FieldInfo:
         """
         creates select_list_subset Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
             data: to select from
-            ref: that contains data to select from
+            ref_name: that contains data to select from
             config: in kwargs format
 
         Returns:
             FieldInfo for the added select_list_subset field
         """
-        return self._add_field_spec(key, select_list_subset(data, ref, **config))
+        return self._add_field_spec(key, select_list_subset(data, ref_name, **config))
 
     def csv(self, key: str, **config) -> FieldInfo:
         """
@@ -404,7 +404,7 @@ class Builder:
         """
         return self._add_field_spec(key, nested(fields, **config))
 
-    def config_ref(self, key: str, **config) -> FieldInfo:
+    def config_ref(self, key: str, **config):
         """
         creates config_ref Field Spec and adds to Data Spec
 
@@ -417,7 +417,7 @@ class Builder:
         """
         # this must be a refs instance
         if self.refs_builder is None:
-            return self.add_field(key, config_ref(**config))
+            return self._add_field_spec(key, config_ref(**config))
         else:
             return self.add_ref(key, config_ref(**config))
 

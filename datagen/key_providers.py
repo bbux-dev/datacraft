@@ -71,7 +71,7 @@ def from_spec(specs: Union[dict, DataSpec]) -> KeyProviderInterface:
                 # check if all of the keys are numeric
                 [float(key) for key in field_groups.keys()]
                 return _create_weighted_key_provider(field_groups)
-            except ValueError as err:
+            except ValueError:
                 # must be named variety
                 return _create_rotating_lists_key_provider(field_groups)
         if isinstance(field_groups, list):
