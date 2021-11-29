@@ -1,9 +1,8 @@
 import pytest
 from datagen import ResourceError, SpecException
 from datagen.schemas import load, validate_schema_for_spec
-from datagen import range_suppliers
-from datagen import values
-import datagen.types as types
+from datagen import cli
+import datagen.registries as types
 
 
 def test_load_unknown_key():

@@ -1,6 +1,6 @@
 """ init for datagen """
 
-from .types import registry
+from .registries import registry
 from .supplier.model import DataSpec, Distribution, ValueSupplierInterface, RecordProcessor, OutputHandlerInterface, \
     CasterInterface
 from .loader import Loader, preprocess_spec

@@ -128,7 +128,7 @@ class _RowLevelSampleEnabledCsv(CsvData):
         # update the index only when the iteration changes
         if iteration != self.current:
             self.current = iteration
-            self.idx = random.randint(0, len(self.data) - 1)
+            self.idx = random.randint(0, len(self.data) - count)
         values = [self.data[self.idx+i][colidx] for i in range(count)]
         if count == 1:
             return values[0]
@@ -231,11 +231,11 @@ def load_csv_data(csv_path: str,
     """
     if use_buffering:
         if sample_rows:
-            csv_data = _RowLevelSampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
+            csv_data = _RowLevelSampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)  # type: ignore
         else:
-            csv_data = _SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
+            csv_data = _SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)  # type: ignore
     else:
-        csv_data = _BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)
+        csv_data = _BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)  # type: ignore
     return csv_data
 
 

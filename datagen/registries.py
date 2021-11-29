@@ -106,7 +106,7 @@ def lookup_type(key):
     if key in all_keys:
         func = registry.types.get(key)
     else:
-        _log.debug('No schema found for type %s', key)
+        _log.debug('No type found for key %s', key)
         return None
 
     return func
@@ -146,7 +146,7 @@ def lookup_caster(key):
     if key in all_keys:
         caster_load_function = registry.casters.get(key)
     else:
-        _log.debug('No caster found for type %s', key)
+        _log.debug('No caster found for key %s', key)
         return None
 
     return caster_load_function()

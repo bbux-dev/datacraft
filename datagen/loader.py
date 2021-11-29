@@ -11,7 +11,7 @@ from . import suppliers, utils
 from .exceptions import SpecException
 from .supplier.model import DataSpec
 from .schemas import validate_schema_for_spec
-from .types import lookup_type, lookup_schema, registry
+from .registries import lookup_type, lookup_schema, registry
 
 
 _log = logging.getLogger(__name__)

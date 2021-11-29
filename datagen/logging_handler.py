@@ -3,7 +3,7 @@ Default module for configuring logging
 """
 import logging
 
-from . import types
+from . import registries
 
 _MAPPING = {
     "debug": logging.DEBUG,
@@ -13,7 +13,7 @@ _MAPPING = {
 }
 
 
-@types.registry.logging('default')
+@registries.registry.logging('default')
 def _configure_logging(loglevel: str):
     """
     Default Handler for Logging Configuration

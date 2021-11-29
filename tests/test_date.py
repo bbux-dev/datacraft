@@ -6,8 +6,8 @@ import pytest
 import datagen
 from datagen.loader import Loader
 from datagen import builder
-# need this to trigger type handler registration
-from datagen import date
+# to trigger registration
+from datagen import cli
 
 
 def test_basic_spec():

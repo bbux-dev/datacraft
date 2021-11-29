@@ -1,6 +1,7 @@
 import pytest
 import datagen
-import datagen.refs
+# to trigger registration
+from datagen import cli
 
 
 def test_ref_with_ref_name():

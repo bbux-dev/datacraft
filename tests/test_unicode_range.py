@@ -1,7 +1,8 @@
 import string
 import pytest
 from datagen import builder, Loader, SpecException
-from datagen import unicode_range
+# to trigger registration
+from datagen import cli
 
 
 def test_unicode_no_data_element():

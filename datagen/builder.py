@@ -20,7 +20,7 @@ import logging
 from typing import Any, Union, Dict, List
 from typing import Generator
 
-from . import types, utils
+from . import registries, utils
 from .supplier import key_suppliers
 from .loader import Loader
 from .supplier.model import DataSpec
@@ -1359,7 +1359,7 @@ class _DataSpecImpl(DataSpec):
 
     def generator(self, iterations: int, **kwargs):
         processor = kwargs.get('processor')
-        data_dir = kwargs.get('data_dir', types.get_default('data_dir'))
+        data_dir = kwargs.get('data_dir', registries.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output = kwargs.get('output', None)

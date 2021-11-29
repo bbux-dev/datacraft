@@ -2,7 +2,7 @@ import os
 import pytest
 import datagen
 from datagen.loader import Loader
-import datagen.types as types
+import datagen.registries as types
 from datagen.utils import load_custom_code
 
 spec = {

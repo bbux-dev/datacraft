@@ -1,8 +1,8 @@
 import pytest
 from datagen.loader import Loader
 from datagen import builder, suppliers, SpecException
-# to engage registration
-from datagen import select_list_subset
+# to trigger registration
+from datagen import cli
 
 
 def test_invalid_when_no_config():

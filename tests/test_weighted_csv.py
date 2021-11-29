@@ -1,8 +1,8 @@
 import os
 
 import datagen
-
-# need this to trigger registration
+# to trigger registration
+from datagen import cli
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 

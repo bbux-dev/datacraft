@@ -2,9 +2,9 @@ import os
 import pytest
 
 import datagen
-# need this to trigger registration
 import datagen.supplier.csv
-from datagen import csv
+# to trigger registration
+from datagen import cli
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
@@ -155,7 +155,7 @@ def test_buffered_csv_does_not_support_count_greater_than_one():
         csv_data.next('status', 0, False, invalid_count)
 
 
-def test_row_sample_csv_does_not_support_count_greater_than_one():
+def test_row_sample_csv_does_support_count_greater_than_one():
     csv_path = f'{test_dir}/test.csv'
     csv_data = datagen.supplier.csv._RowLevelSampleEnabledCsv(csv_path=csv_path,
                                                               delimiter=',',

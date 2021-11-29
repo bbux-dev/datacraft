@@ -22,7 +22,7 @@ def uuid_supplier(variant) -> ValueSupplierInterface:
         4: _Uuid1(),
         5: _Uuid1(),
     }
-    return supplier_map.get(variant)
+    return supplier_map.get(variant)  # type: ignore
 
 
 class _Uuid1(ValueSupplierInterface):

@@ -18,7 +18,7 @@ def test_parse_custom_code():
     dgmain.main(['-c', os.path.join(test_dir, 'custom.py'), '--inline', '{}'])
 
     # verify string_reverser is now in registry
-    handler = datagen.types.lookup_type('string_reverser')
+    handler = datagen.registries.lookup_type('string_reverser')
     assert handler is not None
 
 
@@ -36,7 +36,7 @@ def test_parse_set_default_invalid_ignored():
     args = ['--set-defaults', 'incorrect_format', 'is_valid=should_exist', '--inline', '{}']
     dgmain.main(args)
     with pytest.raises(catalogue.RegistryError):
-        datagen.types.get_default('incorrect_format')
+        datagen.registries.get_default('incorrect_format')
 
 
 def test_parse_sample_mode():
@@ -45,11 +45,11 @@ def test_parse_sample_mode():
 
 
 def _test_default_is_changed(key, args, expected):
-    orig_value = datagen.types.get_default(key)
+    orig_value = datagen.registries.get_default(key)
     dgmain.main(args)
-    new_value = datagen.types.get_default(key)
+    new_value = datagen.registries.get_default(key)
     # reset default in registry
-    datagen.types.set_default(key, orig_value)
+    datagen.registries.set_default(key, orig_value)
     assert orig_value != new_value
     assert new_value == expected, f'{key} changed with args {args}, expected {expected}, but got {new_value}'
 

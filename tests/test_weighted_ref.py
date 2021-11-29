@@ -1,6 +1,10 @@
+# to trigger registration
+import pytest
+
 from datagen import builder, suppliers, Loader, SupplierException
 from datagen.supplier.refs import weighted_ref_supplier
-import pytest
+# to trigger registration
+from datagen import cli
 
 
 def test_weighted_ref_missing_key():

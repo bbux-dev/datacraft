@@ -1,7 +1,8 @@
 import pytest
 import datagen
 import datagen.supplier.calculate
-from datagen import calculate
+# to trigger registration
+from datagen import cli
 
 simple_calc_data = [
     (

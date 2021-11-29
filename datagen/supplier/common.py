@@ -4,7 +4,7 @@ modify or wrap the functionality of the core suppliers.
 
 """
 import math
-from typing import List, Union
+from typing import List, Union, Optional
 import random
 from collections import deque
 
@@ -203,7 +203,7 @@ class WeightedValueSupplier(ValueSupplierInterface):
 
     def __init__(self, choices: list,
                  weights: list,
-                 count_supplier: ValueSupplierInterface):
+                 count_supplier: Optional[ValueSupplierInterface]):
         """
         Args:
             choices: list of choices to sample from
@@ -371,7 +371,7 @@ class _ListValueSupplier(ValueSupplierInterface):
 
 def weighted_values_explicit(choices: list,
                              weights: list,
-                             count_supplier: ValueSupplierInterface = None) -> ValueSupplierInterface:
+                             count_supplier: Optional[ValueSupplierInterface] = None) -> ValueSupplierInterface:
     """
     Creates a weighted values supplier from the explicitly provided choices and weights. Count supplier is
     optional.

@@ -2,9 +2,9 @@
 Factory like module for core supplier related functions.
 """
 import json
-from typing import Union, List, Dict, Any
+from typing import Union, List, Dict, Any, Optional
 
-from . import types, casters, distributions, utils
+from . import registries, casters, distributions, utils
 from .casters import from_config
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
@@ -43,7 +43,7 @@ def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
         data = spec['data']
 
     config = utils.load_config(spec, loader, **kwargs)
-    do_sampling = utils.is_affirmative('sample', config, default=types.get_default('sample_mode'))
+    do_sampling = utils.is_affirmative('sample', config, default=registries.get_default('sample_mode'))
 
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it
@@ -106,7 +106,7 @@ def count_supplier_from_data(data: Union[int, List[int], Dict[str, float], Distr
     return supplier
 
 
-def count_supplier_from_config(config: dict) -> ValueSupplierInterface:
+def count_supplier_from_config(config: Optional[dict]) -> ValueSupplierInterface:
     """
     creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
 
@@ -274,7 +274,7 @@ def combine(suppliers, config=None):
     if config is None:
         config = {}
     as_list = utils.is_affirmative('as_list', config)
-    join_with = config.get('join_with', types.get_default('combine_join_with'))
+    join_with = config.get('join_with', registries.get_default('combine_join_with'))
     return combine_supplier(suppliers, as_list, join_with)
 
 

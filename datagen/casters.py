@@ -3,7 +3,7 @@ Module to handle casting of values to different types
 """
 from typing import Any, Union, List
 
-from . import types
+from . import registries
 from .exceptions import SpecException
 from .supplier.model import CasterInterface
 
@@ -162,4 +162,4 @@ def _lookup_name(name):
     if name in _CASTER_MAP:
         return _CASTER_MAP.get(name)
     # check registry
-    return types.lookup_caster(name)
+    return registries.lookup_caster(name)
