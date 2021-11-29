@@ -8,27 +8,26 @@ import json
 import logging
 import catalogue  # type: ignore
 from pathlib import Path
-import datagen
 from . import template_engines, types
-from .model import RecordProcessor, OutputHandlerInterface
+from .supplier.model import RecordProcessor, OutputHandlerInterface
 from .exceptions import SpecException
 
 _log = logging.getLogger(__name__)
 
 
-@datagen.registry.formats('json')
+@types.registry.formats('json')
 def _format_json(record: dict) -> str:
     """formats the record as compressed json  """
     return json.dumps(record)
 
 
-@datagen.registry.formats('json-pretty')
+@types.registry.formats('json-pretty')
 def _format_json_pretty(record: dict) -> str:
     """pretty prints the record as json  """
     return json.dumps(record, indent=int(types.get_default('json_indent')))
 
 
-@datagen.registry.formats('csv')
+@types.registry.formats('csv')
 def _format_csv(record: dict) -> str:
     """formats the values of the record as comma separated values  """
     return ','.join([str(val) for val in record.values()])

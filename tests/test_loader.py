@@ -4,7 +4,7 @@ from datagen import builder
 from collections import Counter
 import pytest
 # to trigger registration
-from datagen.supplier.core import combine, weighted_refs
+from datagen import combine, refs
 
 spec = datagen.builder.spec_builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \

@@ -5,47 +5,48 @@ import decimal
 import json
 import math
 
-import datagen
+from . import types, schemas, suppliers, utils
+from .exceptions import SpecException
 
 RANGE_KEY = 'range'
 RAND_RANGE_KEY = 'rand_range'
 RAND_INT_RANGE_KEY = 'rand_int_range'
 
 
-@datagen.registry.schemas(RANGE_KEY)
+@types.registry.schemas(RANGE_KEY)
 def _get_range_schema():
     """ schema for range type """
-    return datagen.schemas.load(RANGE_KEY)
+    return schemas.load(RANGE_KEY)
 
 
-@datagen.registry.schemas(RAND_RANGE_KEY)
+@types.registry.schemas(RAND_RANGE_KEY)
 def _get_rand_range_schema():
     """ schema for rand range type """
     # This shares a schema with range
-    return datagen.schemas.load(RANGE_KEY)
+    return schemas.load(RANGE_KEY)
 
 
-@datagen.registry.schemas(RAND_INT_RANGE_KEY)
+@types.registry.schemas(RAND_INT_RANGE_KEY)
 def _get_rand_int_range_schema():
     """ schema for rand int range type """
     # This shares a schema with range
-    return datagen.schemas.load(RANGE_KEY)
+    return schemas.load(RANGE_KEY)
 
 
-@datagen.registry.types(RANGE_KEY)
+@types.registry.types(RANGE_KEY)
 def _configure_range_supplier(field_spec, _):
     """ configures the range value supplier """
     if 'data' not in field_spec:
-        raise datagen.SpecException('No data element defined for: %s' % json.dumps(field_spec))
+        raise SpecException('No data element defined for: %s' % json.dumps(field_spec))
 
     data = field_spec.get('data')
     if not isinstance(data, list) or len(data) < 2:
-        raise datagen.SpecException(
+        raise SpecException(
             'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
     # we have the nested case
     if isinstance(data[0], list):
         suppliers_list = [_configure_supplier_for_data(field_spec, subdata) for subdata in data]
-        return datagen.suppliers.from_list_of_suppliers(suppliers_list, True)
+        return suppliers.from_list_of_suppliers(suppliers_list, True)
     return _configure_supplier_for_data(field_spec, data)
 
 
@@ -56,7 +57,7 @@ def _configure_supplier_for_data(field_spec, data):
     # more intuitive behavior
     end = data[1] + 1
     if not end > start:
-        raise datagen.SpecException('end element must be larger than start: %s' % json.dumps(field_spec))
+        raise SpecException('end element must be larger than start: %s' % json.dumps(field_spec))
     if len(data) == 2:
         step = 1
     else:
@@ -65,31 +66,31 @@ def _configure_supplier_for_data(field_spec, data):
         config = field_spec.get('config', {})
         precision = config.get('precision', None)
         if precision and not str(precision).isnumeric():
-            raise datagen.SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
+            raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
         range_values = list(_float_range(float(start), float(end), float(step), precision))
     else:
         range_values = list(range(start, end, step))
-    return datagen.suppliers.values(range_values)
+    return suppliers.values(range_values)
 
 
-@datagen.registry.types(RAND_INT_RANGE_KEY)
+@types.registry.types(RAND_INT_RANGE_KEY)
 def _configure_rand_int_range_supplier(field_spec, loader):
     """ configures the random int range value supplier """
-    config = datagen.utils.load_config(field_spec, loader)
+    config = utils.load_config(field_spec, loader)
     config['cast'] = 'int'
     field_spec['config'] = config
     return _configure_rand_range_supplier(field_spec, loader)
 
 
-@datagen.registry.types(RAND_RANGE_KEY)
+@types.registry.types(RAND_RANGE_KEY)
 def _configure_rand_range_supplier(field_spec, loader):
     """ configures the random range value supplier """
     if 'data' not in field_spec:
-        raise datagen.SpecException('No data element defined for: %s' % json.dumps(field_spec))
+        raise SpecException('No data element defined for: %s' % json.dumps(field_spec))
     data = field_spec.get('data')
-    config = datagen.utils.load_config(field_spec, loader)
+    config = utils.load_config(field_spec, loader)
     if not isinstance(data, list) or len(data) == 0:
-        raise datagen.SpecException(
+        raise SpecException(
             'rand_range specs require data as array with at least one element: %s' % json.dumps(field_spec))
     start = 0
     end = 0
@@ -103,7 +104,7 @@ def _configure_rand_range_supplier(field_spec, loader):
         precision = data[2]
     # config overrides third data element if specified
     precision = config.get('precision', precision)
-    return datagen.suppliers.random_range(start, end, precision)
+    return suppliers.random_range(start, end, precision)
 
 
 def _any_is_float(data):

@@ -7,7 +7,7 @@ import datagen
 from datagen.loader import Loader
 from datagen import builder
 # need this to trigger type handler registration
-from datagen.supplier.core import date
+from datagen import date
 
 
 def test_basic_spec():

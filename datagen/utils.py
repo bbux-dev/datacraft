@@ -6,8 +6,7 @@ import os
 import importlib
 import logging
 
-from . import casters
-from .model import DataSpec
+from .supplier.model import DataSpec
 
 
 # not code hinted type, due to mypy issue recognising importlib.util
@@ -65,11 +64,6 @@ def load_config(field_spec: dict, loader, **kwargs) -> dict:
         config_ref = loader.get_ref_spec(refkey)
         config.update(config_ref.get('config', {}))
     return config
-
-
-def get_caster(config: dict):
-    """ returns the caster object from the config """
-    return casters.get(config.get('cast'))
 
 
 def any_key_exists(config: dict, keys: list):

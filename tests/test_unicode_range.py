@@ -1,7 +1,7 @@
 import string
 import pytest
 from datagen import builder, Loader, SpecException
-from datagen.supplier.core import unicode_range
+from datagen import unicode_range
 
 
 def test_unicode_no_data_element():

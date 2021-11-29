@@ -19,7 +19,7 @@ class registry:
             values for the given type
 
             >>> @datagen.registry.types('special_sauce')
-            ... def _handle_special_type(field_spec: dict, loader: datagen.Loader) -> datagen.ValueSupplierInterface:
+            ... def _handle_special_type(field_spec: dict, loader: datagen.Loader) -> ValueSupplierInterface:
             ...    # return ValueSupplierInterface from spec config
 
         schemas:

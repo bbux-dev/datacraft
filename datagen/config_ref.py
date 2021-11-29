@@ -2,9 +2,9 @@
 Module for config_ref type
 
 """
-import datagen
+from . import types
 
 
-@datagen.registry.types('config_ref')
+@types.registry.types('config_ref')
 def _configure_handler(_, __):
     """" Does nothing, just place holder """

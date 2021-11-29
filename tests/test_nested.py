@@ -2,7 +2,7 @@ import pytest
 
 import datagen
 from datagen import builder, Loader
-from datagen.supplier.core import nested
+from datagen import nested
 
 
 def test_single_nested():

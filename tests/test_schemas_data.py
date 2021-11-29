@@ -91,6 +91,10 @@ def test_ref():
     _test_run_validation("ref.tests.json")
 
 
+def test_weighted_ref():
+    _test_run_validation("weighted_ref.tests.json")
+
+
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)

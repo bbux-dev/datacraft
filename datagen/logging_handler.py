@@ -2,7 +2,8 @@
 Default module for configuring logging
 """
 import logging
-import datagen
+
+from . import types
 
 _MAPPING = {
     "debug": logging.DEBUG,
@@ -12,7 +13,7 @@ _MAPPING = {
 }
 
 
-@datagen.registry.logging('default')
+@types.registry.logging('default')
 def _configure_logging(loglevel: str):
     """
     Default Handler for Logging Configuration

@@ -1,5 +1,6 @@
 import pytest
 import datagen
+import datagen.refs
 
 
 def test_ref_with_ref_name():

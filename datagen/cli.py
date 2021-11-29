@@ -7,11 +7,16 @@ import sys
 
 import yaml
 
+from . import outputs, utils
+from . import template_engines, builder, spec_formatters, loader
 # this activates the decorators, so they will be discoverable
-from . import outputs
-from . import utils, types, template_engines, builder, spec_formatters, loader
 from .preprocessor import *
-from .schemas import *
+from .defaults import *
+from .distributions import *
+
+# need to prime the core types for import
+from . import (calculate, char_class, combine, config_ref, csv, date, geo, nested, network, range_suppliers, refs,
+               select_list_subset, unicode_range, uuid_handler, values)
 
 _log = logging.getLogger(__name__)
 

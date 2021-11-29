@@ -4,8 +4,8 @@ Module for numeric distributions such as uniform or gaussian
 from typing import Union
 import random
 import inspect
-import datagen
-from .model import Distribution
+from . import types
+from .supplier.model import Distribution
 
 
 class UniformDistribution(Distribution):
@@ -66,25 +66,25 @@ class BoundedDistribution(Distribution):
         return value
 
 
-@datagen.registry.distribution('uniform')
+@types.registry.distribution('uniform')
 def uniform(start, end):
     """ uniform distribution for from start to end """
     return UniformDistribution(start, end)
 
 
-@datagen.registry.distribution('normal')
+@types.registry.distribution('normal')
 def normal(mean, stddev, **kwargs):
     """ normal distribution for normal keyword """
     return _gaussian_distribution(mean, stddev, **kwargs)
 
 
-@datagen.registry.distribution('gauss')
+@types.registry.distribution('gauss')
 def gauss(mean, stddev, **kwargs):
     """ normal distribution for gauss keyword """
     return _gaussian_distribution(mean, stddev, **kwargs)
 
 
-@datagen.registry.distribution('gaussian')
+@types.registry.distribution('gaussian')
 def gaussian(mean, stddev, **kwargs):
     """ normal distribution for gaussian keyword """
     return _gaussian_distribution(mean, stddev, **kwargs)
@@ -126,7 +126,7 @@ def from_string(dist_func_str: str) -> Distribution:
         raise ValueError('Invalid function format: ' + dist_func_str)
 
     name = dist_func_str[0:open_paren]
-    dist_func = datagen.registry.distribution.get(name)
+    dist_func = types.registry.distribution.get(name)
 
     args = dist_func_str[open_paren + 1:close_paren]
     kwargs = _convert_to_kwargs(args)

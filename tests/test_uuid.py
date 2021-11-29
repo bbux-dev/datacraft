@@ -4,7 +4,7 @@ import pytest
 
 from datagen import builder, Loader
 # need this to trigger registration
-from datagen.supplier.core import uuid_handler
+from datagen import uuid_handler
 
 
 UUID_REGEX = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', re.I)

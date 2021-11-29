@@ -8,9 +8,10 @@ provides classes that provide these fields according to various schemes such as 
 """
 from typing import List, Tuple, Union, Dict
 import json
-from . import suppliers, ValueSupplierInterface
-from .model import DataSpec, KeyProviderInterface
-from .exceptions import SpecException
+
+from .model import DataSpec, KeyProviderInterface, ValueSupplierInterface
+from .exceptions import SupplierException
+from .common import weighted_values_explicit, SingleValue
 
 _ROOT_KEYS = ['refs', 'field_groups']
 
@@ -123,15 +124,15 @@ class _WeightedGroupKeyProvider(KeyProviderInterface):
     def get(self):
         key = self.supplier.next(0)
         if key not in self.field_groups:
-            raise SpecException(f'Key: {key} not found: {json.dumps(self.field_groups)}')
+            raise SupplierException(f'Key: {key} not found: {json.dumps(self.field_groups)}')
         return key, self.field_groups[key]
 
 
 def _create_weighted_key_provider(field_groups: Dict) -> KeyProviderInterface:
     """Creates a weighted field group key provide for the supplied field_groups """
-    keys = field_groups.keys()
-    weights = {key: float(key) for key in keys}
-    supplier = suppliers.weighted_values(weights)
+    keys = list(field_groups.keys())
+    weights = [float(key) for key in keys]
+    supplier = weighted_values_explicit(keys, weights, SingleValue(1))
     return _WeightedGroupKeyProvider(field_groups, supplier)
 
 

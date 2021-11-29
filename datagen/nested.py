@@ -3,19 +3,22 @@ Module for nested types
 """
 from typing import Dict, Any
 
-import datagen
-import datagen.model
+from . import types, schemas
+from . import utils, suppliers
+from .exceptions import SpecException
+from .supplier import key_suppliers
+from .supplier.model import ValueSupplierInterface, KeyProviderInterface
 
 
-class _NestedSupplier(datagen.model.ValueSupplierInterface):
+class _NestedSupplier(ValueSupplierInterface):
     """
     Implementation for Nested Value Supplier
     """
 
     def __init__(self,
-                 field_supplier_map: Dict[str, datagen.model.ValueSupplierInterface],
-                 count_supplier: datagen.model.ValueSupplierInterface,
-                 key_supplier: datagen.model.KeyProviderInterface,
+                 field_supplier_map: Dict[str, ValueSupplierInterface],
+                 count_supplier: ValueSupplierInterface,
+                 key_supplier: KeyProviderInterface,
                  as_list: bool):
         """
         Args:
@@ -48,29 +51,29 @@ class _NestedSupplier(datagen.model.ValueSupplierInterface):
         _, keys = self.key_supplier.get()
         subset = {key: self.field_supplier_map.get(key) for key in keys}
         if any(val is None for val in subset.values()):
-            raise datagen.SpecException(f'One or more keys provided in nested spec are not valid: {keys}, valid keys: '
+            raise SpecException(f'One or more keys provided in nested spec are not valid: {keys}, valid keys: '
                                         f'{list(self.field_supplier_map.keys())}')
         return {key: supplier.next(iteration) for key, supplier in subset.items()}  # type: ignore
 
 
-@datagen.registry.schemas('nested')
+@types.registry.schemas('nested')
 def _get_nested_schema():
-    return datagen.schemas.load('nested')
+    return schemas.load('nested')
 
 
-@datagen.registry.types('nested')
+@types.registry.types('nested')
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
     keys = [key for key in fields.keys() if key not in loader.RESERVED]
-    config = datagen.utils.load_config(spec, loader)
-    count_supplier = datagen.suppliers.count_supplier_from_data(config.get('count', 1))
+    config = utils.load_config(spec, loader)
+    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
     if 'field_groups' in spec:
-        key_supplier = datagen.key_providers.from_spec(spec)
+        key_supplier = key_suppliers.from_spec(spec)
     else:
-        key_supplier = datagen.key_providers.from_spec(fields)
+        key_supplier = key_suppliers.from_spec(fields)
 
-    as_list = datagen.utils.is_affirmative('as_list', config)
+    as_list = utils.is_affirmative('as_list', config)
 
     field_supplier_map = {}
     # each non reserved key should have a valid spec as a value

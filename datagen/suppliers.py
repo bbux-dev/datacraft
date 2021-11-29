@@ -1,20 +1,18 @@
 """
 Factory like module for core supplier related functions.
 """
-from typing import Union, List, Dict, Any
 import json
+from typing import Union, List, Dict, Any
 
+from . import types, casters, distributions, utils
+from .casters import from_config
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
-                              CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier, BufferedValueSuppier)
-from .utils import load_config, is_affirmative, get_caster
-from .supplier.core.combine import CombineValuesSupplier
-from .supplier.list_values import ListValueSupplier
-from .supplier.weighted_values import WeightedValueSupplier
-from .supplier.list_stat_sampler import ListStatSamplerSupplier
-from .supplier.list_count_sampler import ListCountSamplerSupplier
-from .model import Distribution
-from . import types, casters, distributions, ValueSupplierInterface
+                              CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
+                              BufferedValueSupplier, ListCountSamplerSupplier,
+                              list_stats_sampler, list_value_supplier, weighted_values_explicit)
+from .supplier.combine import combine_supplier
+from .supplier.model import Distribution, ValueSupplierInterface
 
 
 def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
@@ -44,8 +42,8 @@ def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
     else:
         data = spec['data']
 
-    config = load_config(spec, loader, **kwargs)
-    do_sampling = is_affirmative('sample', config, default=types.get_default('sample_mode'))
+    config = utils.load_config(spec, loader, **kwargs)
+    do_sampling = utils.is_affirmative('sample', config, default=types.get_default('sample_mode'))
 
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it
@@ -219,14 +217,13 @@ def _value_list(data: list,
     """
     if config is None:
         config = {}
-    as_list = is_affirmative('as_list', config)
-    return ListValueSupplier(data, count_supplier_from_config(config), do_sampling, as_list)
+    as_list = utils.is_affirmative('as_list', config)
+    return list_value_supplier(data, count_supplier_from_config(config), do_sampling, as_list)
 
 
-def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
+def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
     """
-    creates a weighted value supplier
-
+    Creates a weighted value supplier from the data, which is a mapping of value to the weight is should represent.
 
     Args:
         data: for the supplier
@@ -250,7 +247,7 @@ def weighted_values(data: dict, config=None) -> ValueSupplierInterface:
     weights = list(data.values())
     if not isinstance(weights[0], float):
         raise SpecException('Invalid type for weights: ' + str(type(weights[0])))
-    return WeightedValueSupplier(choices, weights, count_supplier_from_config(config))
+    return weighted_values_explicit(choices, weights, count_supplier_from_config(config))
 
 
 def combine(suppliers, config=None):
@@ -274,7 +271,11 @@ def combine(suppliers, config=None):
         >>> interesting_jobs = datagen.suppliers.combine([pet_supplier, job_supplier], {'join_with': ' '})
         >>> next_career = interesting_jobs.next(0)
     """
-    return CombineValuesSupplier(suppliers, config)
+    if config is None:
+        config = {}
+    as_list = utils.is_affirmative('as_list', config)
+    join_with = config.get('join_with', types.get_default('combine_join_with'))
+    return combine_supplier(suppliers, as_list, join_with)
 
 
 def random_range(start: Union[str, int, float],
@@ -325,7 +326,8 @@ def list_stat_sampler(data: Union[str, list],
         >>> char_supplier = datagen.suppliers.list_stat_sampler("#!@#$%^&*()_-~", char_config)
         >>> two_to_eight_chars = char_supplier.next(0)
     """
-    return ListStatSamplerSupplier(data, config)
+    config['as_list'] = utils.is_affirmative('as_list', config, False)
+    return list_stats_sampler(data, **config)
 
 
 def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
@@ -444,7 +446,7 @@ def cast_supplier(supplier: ValueSupplierInterface,
             config = {}
         else:
             config = field_spec.get('config', {})
-        caster = get_caster(config)
+        caster = from_config(config)
     return CastingSupplier(supplier, caster)
 
 
@@ -460,7 +462,7 @@ def is_buffered(field_spec: dict) -> bool:
 
     """
     config = field_spec.get('config', {})
-    return 'buffer_size' in config or is_affirmative('buffer', config)
+    return 'buffer_size' in config or utils.is_affirmative('buffer', config)
 
 
 def buffered(wrapped: ValueSupplierInterface, field_spec: dict) -> ValueSupplierInterface:
@@ -476,4 +478,4 @@ def buffered(wrapped: ValueSupplierInterface, field_spec: dict) -> ValueSupplier
     """
     config = field_spec.get('config', {})
     buffer_size = int(config.get('buffer_size', 10))
-    return BufferedValueSuppier(wrapped, buffer_size)
+    return BufferedValueSupplier(wrapped, buffer_size)

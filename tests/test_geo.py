@@ -1,7 +1,7 @@
 import decimal
 from datagen import builder, Loader
 # need this to trigger registration
-from datagen.supplier.core import geo
+from datagen import geo
 
 
 def test_geo_lat_default_precision():

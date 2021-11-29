@@ -1,6 +1,7 @@
 import pytest
 import datagen
-from datagen.supplier.core import calculate
+import datagen.supplier.calculate
+from datagen import calculate
 
 simple_calc_data = [
     (
@@ -30,7 +31,7 @@ simple_calc_data = [
 def test_simple_calculation(alias_to_values, formula, expected_first_value):
     mapping = {key: datagen.suppliers.values(values) for key, values in alias_to_values.items()}
 
-    supplier = calculate._CalculateSupplier(mapping, datagen.template_engines.string(formula))
+    supplier = datagen.supplier.calculate._CalculateSupplier(mapping, datagen.template_engines.string(formula))
 
     assert supplier.next(0) == expected_first_value
 

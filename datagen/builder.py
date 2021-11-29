@@ -20,9 +20,10 @@ import logging
 from typing import Any, Union, Dict, List
 from typing import Generator
 
-from . import utils, key_providers, types
+from . import types, utils
+from .supplier import key_suppliers
 from .loader import Loader
-from .model import DataSpec
+from .supplier.model import DataSpec
 
 _log = logging.getLogger(__name__)
 
@@ -1364,7 +1365,7 @@ class _DataSpecImpl(DataSpec):
         output = kwargs.get('output', None)
         loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
-        key_provider = key_providers.from_spec(loader.specs)
+        key_provider = key_suppliers.from_spec(loader.specs)
 
         for i in range(0, iterations):
             group, keys = key_provider.get()

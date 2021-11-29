@@ -1,7 +1,7 @@
 import pytest
 
 from datagen import builder, Loader, SpecException
-from datagen.supplier.core import range_suppliers
+from datagen import range_suppliers
 
 
 def test_range_missing_data():

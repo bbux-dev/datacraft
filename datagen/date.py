@@ -1,13 +1,17 @@
 """
 Module for date types: date, date.iso, date.iso.us
 """
-from typing import Union
 import datetime
 import json
 import logging
+from typing import Union
 
-import datagen
-import datagen.model
+from . import types, schemas, distributions
+from .exceptions import SpecException
+from .loader import Loader
+from .supplier.date import date_supplier
+from .supplier.model import Distribution
+from . import utils
 
 _DATE_KEY = 'date'
 _DATE__ISO_KEY = 'date.iso'
@@ -21,49 +25,24 @@ _SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
 _log = logging.getLogger(__name__)
 
 
-@datagen.registry.schemas(_DATE_KEY)
+@types.registry.schemas(_DATE_KEY)
 def _get_date_schema():
     """ returns the schema for date types """
-    return datagen.schemas.load(_DATE_KEY)
+    return schemas.load(_DATE_KEY)
 
 
-@datagen.registry.schemas(_DATE__ISO_KEY)
+@types.registry.schemas(_DATE__ISO_KEY)
 def _get_date_iso_schema():
     """ returns the schema for date.iso types """
     # NOTE: These all share a schema
-    return datagen.schemas.load(_DATE_KEY)
+    return schemas.load(_DATE_KEY)
 
 
-@datagen.registry.schemas(_DATE__ISO_US_KEY)
+@types.registry.schemas(_DATE__ISO_US_KEY)
 def _get_date_iso_us_schema():
     """ returns the schema for date.iso.us types """
     # NOTE: These all share a schema
-    return datagen.schemas.load(_DATE_KEY)
-
-
-class _DateSupplier(datagen.ValueSupplierInterface):
-    """
-    Value Supplier implementation for dates
-    """
-
-    def __init__(self,
-                 timestamp_distribution: datagen.model.Distribution,
-                 date_format_string: str):
-        """
-        Args:
-            timestamp_distribution: distribution for timestamps
-            date_format_string: format string for timestamps
-        """
-
-        self.date_format = date_format_string
-        self.timestamp_distribution = timestamp_distribution
-
-    def next(self, iteration):
-        random_seconds = self.timestamp_distribution.next_value()
-        next_date = datetime.datetime.fromtimestamp(random_seconds)
-        if self.date_format:
-            return next_date.strftime(self.date_format)
-        return next_date.replace(microsecond=0).isoformat()
+    return schemas.load(_DATE_KEY)
 
 
 def _uniform_date_timestamp(
@@ -71,7 +50,7 @@ def _uniform_date_timestamp(
         end: str,
         offset: int,
         duration: int,
-        date_format_string: str) -> Union[None, datagen.Distribution]:
+        date_format_string: str) -> Union[None, Distribution]:
     """
     Creates a uniform distribution for the start and end dates shifted by the offset
 
@@ -90,7 +69,7 @@ def _uniform_date_timestamp(
         try:
             start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
         except TypeError as err:
-            raise datagen.SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
+            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
     else:
         start_date = datetime.datetime.now() - offset_date
     if end:
@@ -99,7 +78,7 @@ def _uniform_date_timestamp(
             end_date = datetime.datetime.strptime(end, date_format_string) \
                 + datetime.timedelta(days=1) - offset_date
         except TypeError as err:
-            raise datagen.SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
+            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
     else:
         # start date already include offset, don't include it here
         end_date = start_date + datetime.timedelta(days=abs(int(duration)), seconds=1)
@@ -109,7 +88,7 @@ def _uniform_date_timestamp(
     if end_ts < start_ts:
         _log.warning("End date (%s) is before start date (%s)", start_date, end_date)
         return None
-    return datagen.distributions.uniform(start=start_ts, end=end_ts)
+    return distributions.uniform(start=start_ts, end=end_ts)
 
 
 def _gauss_date_timestamp(
@@ -133,13 +112,13 @@ def _gauss_date_timestamp(
         center_date = datetime.datetime.now()
     mean = center_date.timestamp()
     stddev = stddev_days * _SECONDS_IN_DAY
-    return datagen.distributions.normal(mean=mean, stddev=stddev)
+    return distributions.normal(mean=mean, stddev=stddev)
 
 
-@datagen.registry.types(_DATE_KEY)
-def _configure_supplier(field_spec: dict, loader: datagen.Loader):
+@types.registry.types(_DATE_KEY)
+def _configure_supplier(field_spec: dict, loader: Loader):
     """ configures the date value supplier """
-    config = datagen.utils.load_config(field_spec, loader)
+    config = utils.load_config(field_spec, loader)
     if 'center_date' in config or 'stddev_days' in config:
         return _create_stats_based_date_supplier(config)
     return _create_uniform_date_supplier(config)
@@ -148,10 +127,10 @@ def _configure_supplier(field_spec: dict, loader: datagen.Loader):
 def _create_stats_based_date_supplier(config: dict):
     """ creates stats based date supplier from config """
     center_date = config.get('center_date')
-    stddev_days = config.get('stddev_days', datagen.types.get_default('date_stddev_days'))
-    date_format = config.get('format', datagen.types.get_default('date_format'))
+    stddev_days = config.get('stddev_days', types.get_default('date_stddev_days'))
+    date_format = config.get('format', types.get_default('date_format'))
     timestamp_distribution = _gauss_date_timestamp(center_date, float(stddev_days), date_format)
-    return _DateSupplier(timestamp_distribution, date_format)
+    return date_supplier(date_format, timestamp_distribution)
 
 
 def _create_uniform_date_supplier(config):
@@ -160,28 +139,28 @@ def _create_uniform_date_supplier(config):
     offset = int(config.get('offset', 0))
     start = config.get('start')
     end = config.get('end')
-    date_format = config.get('format', datagen.types.get_default('date_format'))
+    date_format = config.get('format', types.get_default('date_format'))
     timestamp_distribution = _uniform_date_timestamp(start, end, offset, duration_days, date_format)
     if timestamp_distribution is None:
-        raise datagen.SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
-    return _DateSupplier(timestamp_distribution, date_format)
+        raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
+    return date_supplier(date_format, timestamp_distribution)
 
 
-@datagen.registry.types(_DATE__ISO_KEY)
-def _configure_supplier_iso(field_spec: dict, loader: datagen.Loader):
+@types.registry.types(_DATE__ISO_KEY)
+def _configure_supplier_iso(field_spec: dict, loader: Loader):
     """ configures the date.iso value supplier """
     return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_NO_MICRO)
 
 
-@datagen.registry.types(_DATE__ISO_US_KEY)
-def _configure_supplier_iso_microseconds(field_spec: dict, loader: datagen.Loader):
+@types.registry.types(_DATE__ISO_US_KEY)
+def _configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
     """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
 
 
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     """ configures an iso based date supplier using the provided date format """
-    config = datagen.utils.load_config(field_spec, loader)
+    config = utils.load_config(field_spec, loader)
 
     # make sure the start and end dates match the ISO format we are using
     start = config.get('start')

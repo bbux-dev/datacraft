@@ -6,14 +6,13 @@ import re
 import json
 import logging
 from urllib.parse import parse_qs
-import datagen
 from .exceptions import SpecException
 from . import types
 
 _log = logging.getLogger(__name__)
 
 
-@datagen.registry.preprocessors('default')
+@types.registry.preprocessors('default')
 def _preprocess_spec(raw_spec):
     """
     Preprocesses the spec into a format that is easier to use.
@@ -41,7 +40,7 @@ def _preprocess_spec(raw_spec):
     return updated_specs
 
 
-@datagen.registry.preprocessors('csv-select')
+@types.registry.preprocessors('csv-select')
 def _preprocess_csv_select(raw_spec):
     """
     Converts and csv-select elements into standard csv ones
@@ -82,7 +81,7 @@ def _preprocess_csv_select(raw_spec):
     return updated_specs
 
 
-@datagen.registry.preprocessors('nested')
+@types.registry.preprocessors('nested')
 def _preprocess_nested(raw_spec):
     """
     Converts all nested elements
@@ -111,7 +110,7 @@ def _preprocess_nested(raw_spec):
 
         if 'type' in spec and spec['type'] == 'nested':
             if 'fields' not in spec:
-                raise datagen.SpecException('Missing fields key for nested spec: ' + json.dumps(spec))
+                raise SpecException('Missing fields key for nested spec: ' + json.dumps(spec))
             fields = spec['fields']
             updated = _preprocess_spec(fields)
             updated = _preprocess_csv_select(updated)
@@ -126,7 +125,7 @@ def _preprocess_nested(raw_spec):
     return updated_specs
 
 
-@datagen.registry.preprocessors('type_check')
+@types.registry.preprocessors('type_check')
 def _preprocess_verify_types(raw_spec):
     """ log only checks """
     for key, field_spec in raw_spec.items():

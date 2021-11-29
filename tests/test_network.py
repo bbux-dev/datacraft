@@ -2,7 +2,7 @@ import pytest
 from datagen.loader import Loader
 from datagen import builder, SpecException
 # need this to trigger registration
-from datagen.supplier.core import network
+from datagen import network
 
 
 def test_ip_v4_spec():

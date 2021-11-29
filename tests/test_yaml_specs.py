@@ -3,7 +3,7 @@ import json
 
 from datagen.loader import Loader
 # to trigger registration
-from datagen.supplier.core import combine
+from datagen import combine
 
 
 yaml_spec = '''
