@@ -20,9 +20,10 @@ import logging
 from typing import Any, Union, Dict, List
 from typing import Generator
 
-from . import utils, key_providers, types
-from .loader import Loader
-from .model import DataSpec
+from . import registries, utils
+from .loader import Loader, preprocess_spec
+from .supplier import key_suppliers
+from .supplier.model import DataSpec
 
 _log = logging.getLogger(__name__)
 
@@ -348,20 +349,20 @@ class Builder:
         """
         return self._add_field_spec(key, weighted_ref(data, **config))
 
-    def select_list_subset(self, key: str, data: List[Any] = None, ref: str = None, **config) -> FieldInfo:
+    def select_list_subset(self, key: str, data: List[Any] = None, ref_name: str = None, **config) -> FieldInfo:
         """
         creates select_list_subset Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
             data: to select from
-            ref: that contains data to select from
+            ref_name: that contains data to select from
             config: in kwargs format
 
         Returns:
             FieldInfo for the added select_list_subset field
         """
-        return self._add_field_spec(key, select_list_subset(data, ref, **config))
+        return self._add_field_spec(key, select_list_subset(data, ref_name, **config))
 
     def csv(self, key: str, **config) -> FieldInfo:
         """
@@ -404,7 +405,7 @@ class Builder:
         """
         return self._add_field_spec(key, nested(fields, **config))
 
-    def config_ref(self, key: str, **config) -> FieldInfo:
+    def config_ref(self, key: str, **config):
         """
         creates config_ref Field Spec and adds to Data Spec
 
@@ -417,7 +418,7 @@ class Builder:
         """
         # this must be a refs instance
         if self.refs_builder is None:
-            return self.add_field(key, config_ref(**config))
+            return self._add_field_spec(key, config_ref(**config))
         else:
             return self.add_ref(key, config_ref(**config))
 
@@ -670,6 +671,20 @@ class Builder:
         all_list = all(isinstance(entry, list) for entry in self.field_groups)
         if all_list:
             spec['field_groups'] = self.field_groups
+
+
+def parse_spec(raw_spec: dict) -> DataSpec:
+    """
+    Parses the raw spec into a DataSpec object. Takes in specs that may contain shorthand specifications.
+
+    Args:
+        raw_spec: raw dictionary that conforms to JSON spec format
+
+    Returns:
+        the fully parsed and loaded spec
+    """
+    specs = preprocess_spec(raw_spec)
+    return _DataSpecImpl(specs)
 
 
 def spec_builder() -> Builder:
@@ -1358,13 +1373,13 @@ class _DataSpecImpl(DataSpec):
 
     def generator(self, iterations: int, **kwargs):
         processor = kwargs.get('processor')
-        data_dir = kwargs.get('data_dir', types.get_default('data_dir'))
+        data_dir = kwargs.get('data_dir', registries.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output = kwargs.get('output', None)
         loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
-        key_provider = key_providers.from_spec(loader.specs)
+        key_provider = key_suppliers.from_spec(loader.specs)
 
         for i in range(0, iterations):
             group, keys = key_provider.get()

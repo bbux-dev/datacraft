@@ -7,11 +7,15 @@ import sys
 
 import yaml
 
+from . import outputs, utils
+from . import template_engines, builder, spec_formatters, loader
 # this activates the decorators, so they will be discoverable
-from . import outputs
-from . import utils, types, template_engines, builder, spec_formatters, loader
 from .preprocessor import *
-from .schemas import *
+from .defaults import *
+from .distributions import *
+
+# need to prime the core types for import
+from . import _registered_types
 
 _log = logging.getLogger(__name__)
 
@@ -50,7 +54,7 @@ def parseargs(argv):
                         help='Path to external directory to load external data files such as csvs')
     parser.add_argument('-l', '--log-level', dest='log_level', default=logging.INFO,
                         help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
-    formats = str(types.registered_formats())
+    formats = str(registries.registered_formats())
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + formats)
     parser.add_argument('--strict', action='store_true', default=False,
@@ -113,7 +117,7 @@ def process_args(args):
     if args.defaults:
         defaults = _load_json_or_yaml(args.defaults)
         for key, value in defaults.items():
-            types.set_default(key, value)
+            registries.set_default(key, value)
     # command line takes precedence over config file
     if args.set_defaults:
         for setting in args.set_defaults:
@@ -122,15 +126,15 @@ def process_args(args):
                 _log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
                              setting)
                 continue
-            types.set_default(parts[0], parts[1])
+            registries.set_default(parts[0], parts[1])
     # command line overrides any configs
     if args.sample_lists:
-        types.set_default('sample_mode', True)
+        registries.set_default('sample_mode', True)
 
     # print out the defaults as currently registered
     if args.debug_defaults:
         writer = outputs.get_writer(args.outdir, outfile='dataspec_defaults.json', overwrite=True)
-        defaults = types.all_defaults()
+        defaults = registries.all_defaults()
         writer.write(json.dumps(defaults, indent=4))
         return None
 
@@ -268,6 +272,6 @@ def _configure_logging(args):
     """
     Use each logging element from the registry to configure logging
     """
-    for name in types.registry.logging.get_all():
-        configure_function = types.registry.logging.get(name)
+    for name in registries.registry.logging.get_all():
+        configure_function = registries.registry.logging.get(name)
         configure_function(args.log_level)

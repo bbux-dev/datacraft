@@ -3,10 +3,9 @@ Module to handle casting of values to different types
 """
 from typing import Any, Union, List
 
-import datagen
-from . import CasterInterface
-from . import types
+from . import registries
 from .exceptions import SpecException
+from .supplier.model import CasterInterface
 
 
 class _FloatCaster(CasterInterface):
@@ -148,14 +147,19 @@ def get(name):
     names = name.split(";")
     casters = [_lookup_name(caster_name) for caster_name in names]
     if any(caster is None for caster in casters):
-        raise datagen.SpecException('Unknown caster name in: ' + name)
+        raise SpecException('Unknown caster name in: ' + name)
     if len(casters) == 1:
         return casters[0]
     return _MultiCaster(casters)
+
+
+def from_config(config: dict):
+    """ returns the caster object from the config """
+    return get(config.get('cast'))
 
 
 def _lookup_name(name):
     if name in _CASTER_MAP:
         return _CASTER_MAP.get(name)
     # check registry
-    return types.lookup_caster(name)
+    return registries.lookup_caster(name)

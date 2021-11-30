@@ -1,7 +1,9 @@
 import string
 import pytest
-from datagen import builder, Loader, SpecException
-from datagen.supplier.core import char_class
+from datagen import builder, Loader, SpecException, SupplierException
+# to trigger registration
+from datagen import cli
+from datagen import _registered_types
 
 
 def test_char_class_no_data_element():
@@ -42,7 +44,7 @@ def test_char_class_printable():
 
 
 def test_char_class_abbreviations():
-    abbreviations = ['cc-' + key for key in char_class._CLASS_MAPPING.keys()]
+    abbreviations = ['cc-' + key for key in _registered_types._CLASS_MAPPING.keys()]
 
     for abbreviation in abbreviations:
         spec = _cc_abbrev_spec(abbrev=abbreviation, count=7)

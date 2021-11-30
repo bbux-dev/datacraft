@@ -2,7 +2,8 @@ import pytest
 
 import datagen
 from datagen import builder, Loader
-from datagen.supplier.core import nested
+# to trigger registration
+from datagen import cli
 
 
 def test_single_nested():
@@ -100,7 +101,7 @@ def test_nested_field_groups():
         }
     }
     spec = datagen.parse_spec(raw_spec)
-    gen = spec.generator(iterations=2)
+    gen = spec.generator(iterations=2, enforce_schema=True)
     first = next(gen)["outer"]
     second = next(gen)["outer"]
     assert "two" not in first
@@ -121,7 +122,7 @@ def test_nested_field_groups_invalid_name():
             ]
         }
     }
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datagen.SupplierException):
         spec = datagen.parse_spec(raw_spec)
         gen = spec.generator(iterations=2)
         next(gen)  # no error

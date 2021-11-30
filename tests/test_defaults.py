@@ -7,16 +7,16 @@ def _get_default_dinosaur():
 
 
 def test_default_registry():
-    assert datagen.types.get_default('dino') == 'velociraptor'
+    assert datagen.registries.get_default('dino') == 'velociraptor'
 
 
 def test_default_registry_set():
-    datagen.types.set_default('dino', 'triceratops')
+    datagen.registries.set_default('dino', 'triceratops')
 
-    assert datagen.types.get_default('dino') == 'triceratops'
+    assert datagen.registries.get_default('dino') == 'triceratops'
 
 
 def test_default_registry_get_all():
-    defaults = datagen.types.all_defaults()
+    defaults = datagen.registries.all_defaults()
     assert type(defaults) == dict
     assert len(defaults) > 0

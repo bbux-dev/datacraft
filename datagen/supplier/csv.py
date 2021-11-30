@@ -1,26 +1,18 @@
 """
-Module for csv related types
+Module for csv supplier implementations
 """
-from abc import ABC, abstractmethod
 import csv
-import json
-import os
 import random
-import logging
-from typing import Dict
+from abc import ABC, abstractmethod
 from typing import Union
 
-import datagen
+from .exceptions import SupplierException
+from .model import ValueSupplierInterface
 
-# 250 MB
-_ONE_MB = 1024 * 1024
-_SMALL_ENOUGH_THRESHOLD = 250 * _ONE_MB
 _DEFAULT_BUFFER_SIZE = 1000000
 
-_log = logging.getLogger(__name__)
 
-
-class _CsvDataBase(ABC):
+class CsvData(ABC):
     """
     Class for encapsulating the data for a single CSV file so that multiple suppliers
     only need one copy of the underlying data
@@ -76,13 +68,13 @@ class _CsvDataBase(ABC):
         # if we had headers we can use that name, otherwise field should be one based index
         colidx = self.mapping.get(field)
         if colidx is None and not str(field).isdigit():
-            raise datagen.SpecException(f'Invalid field name: {field} for csv, known keys: {self.valid_keys}')
+            raise SupplierException(f'Invalid field name: {field} for csv, known keys: {self.valid_keys}')
         if colidx is None:
             colidx = int(field) - 1
         return colidx
 
 
-class _SampleEnabledCsv(_CsvDataBase):
+class _SampleEnabledCsv(CsvData):
     """
     CSV Data that reads whole file into memory. Supports Sampling of columns and counts greater than 1.
     """
@@ -113,7 +105,7 @@ class _SampleEnabledCsv(_CsvDataBase):
         return values
 
 
-class _RowLevelSampleEnabledCsv(_CsvDataBase):
+class _RowLevelSampleEnabledCsv(CsvData):
     """
     CSV Data that reads whole file into memory. Supports sampling at a row level
     """
@@ -136,14 +128,14 @@ class _RowLevelSampleEnabledCsv(_CsvDataBase):
         # update the index only when the iteration changes
         if iteration != self.current:
             self.current = iteration
-            self.idx = random.randint(0, len(self.data) - 1)
+            self.idx = random.randint(0, len(self.data) - count)
         values = [self.data[self.idx+i][colidx] for i in range(count)]
         if count == 1:
             return values[0]
         return values
 
 
-class _BufferedCsvData(_CsvDataBase):
+class _BufferedCsvData(CsvData):
     """
     CSV Data that buffers in a section of the CSV file at a time. Does NOT support sampling or counts greater than 1 for
     columns.
@@ -190,24 +182,24 @@ class _BufferedCsvData(_CsvDataBase):
 
     def next(self, field, iteration, sample, count):
         if sample:
-            raise datagen.SpecException('Large CSV files do not support sample mode')
+            raise SupplierException('Large CSV files do not support sample mode')
         if count > 1:
-            raise datagen.SpecException('Large CSV files only support count of 1')
+            raise SupplierException('Large CSV files only support count of 1')
         self.fill_buffer(iteration)
         colidx = self._get_column_index(field)
 
         idx = iteration % self.size
         if idx >= len(self.data):
-            raise datagen.SpecException("Exceeded end of CSV data, unable to proceed with large CSV files")
+            raise SupplierException("Exceeded end of CSV data, unable to proceed with large CSV files")
         return self.data[idx][colidx]
 
 
-class _CsvSupplier(datagen.ValueSupplierInterface):
+class _CsvSupplier(ValueSupplierInterface):
     """
     Class for supplying data from a specific field in a csv file
     """
 
-    def __init__(self, csv_data, field_name, sample, count_supplier: datagen.ValueSupplierInterface):
+    def __init__(self, csv_data, field_name, sample, count_supplier: ValueSupplierInterface):
         self.csv_data = csv_data
         self.field_name = field_name
         self.sample = sample
@@ -218,132 +210,34 @@ class _CsvSupplier(datagen.ValueSupplierInterface):
         return self.csv_data.next(self.field_name, iteration, self.sample, count)
 
 
-# to keep from reloading the same CsvData
-_csv_data_cache: Dict[str, _CsvDataBase] = {}
-
-
-@datagen.registry.types('csv')
-def _configure_csv(field_spec, loader):
-    """ Configures the csv value supplier for this field """
-    config = datagen.utils.load_config(field_spec, loader)
-
-    field_name = config.get('column', 1)
-    sample = datagen.utils.is_affirmative('sample', config)
-    count_supplier = datagen.suppliers.count_supplier_from_data(config.get('count', 1))
-
-    csv_data = _load_csv_data(field_spec, config, loader.datadir)
-    return _CsvSupplier(csv_data, field_name, sample, count_supplier)
-
-
-@datagen.registry.schemas('csv')
-def _get_csv_schema():
-    """ get the schema for the csv type """
-    return datagen.schemas.load('csv')
-
-
-@datagen.registry.types('weighted_csv')
-def _configure_weighted_csv(field_spec, loader):
-    """ Configures the weighted_csv value supplier for this field """
-
-    config = datagen.utils.load_config(field_spec, loader)
-
-    field_name = config.get('column', 1)
-    weight_column = config.get('weight_column', 2)
-    count_supplier = datagen.suppliers.count_supplier_from_data(config.get('count', 1))
-
-    datafile = config.get('datafile', datagen.types.get_default('csv_file'))
-    csv_path = f'{loader.datadir}/{datafile}'
-    has_headers = datagen.utils.is_affirmative('headers', config)
-    numeric_index = isinstance(field_name, int)
-    if numeric_index and field_name < 1:
-        raise datagen.SpecException(f'Invalid index {field_name}, one based indexing used for column numbers')
-
-    if has_headers and not numeric_index:
-        choices = _read_named_column(csv_path, field_name)
-        weights = _read_named_column_weights(csv_path, weight_column)
-    else:
-        choices = _read_indexed_column(csv_path, int(field_name), skip_first=numeric_index)
-        weights = _read_indexed_column_weights(csv_path, int(weight_column), skip_first=numeric_index)
-    return datagen.suppliers.WeightedValueSupplier(choices, weights, count_supplier)
-
-
-@datagen.registry.schemas('weighted_csv')
-def _get_weighted_csv_schema():
-    """ get the schema for the weighted_csv type """
-    return datagen.schemas.load('weighted_csv')
-
-
-def _read_named_column(csv_path: str, column_name: str):
-    """ reads values from a named column into a list """
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        return [val[column_name] for val in reader]
-
-
-def _read_named_column_weights(csv_path: str, column_name: str):
-    """ reads values for weights for named column into a list """
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        return [float(val[column_name]) for val in reader]
-
-
-def _read_indexed_column(csv_path: str, column_index: int, skip_first: bool):
-    """ reads values from a indexed column into a list """
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.reader(csvfile)
-        if skip_first:
-            next(reader)
-        return [val[column_index - 1] for val in reader]
-
-
-def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: bool):
-    """ reads values for weights for indexed column into a list """
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.reader(csvfile)
-        if skip_first:
-            next(reader)
-        return [float(val[column_index - 1]) for val in reader]
-
-
-_ONE_MB = 1024 * 1024
-
-
-def _load_csv_data(field_spec, config, datadir):
+def load_csv_data(csv_path: str,
+                  delimiter: str,
+                  has_headers: bool,
+                  quotechar: str,
+                  sample_rows: bool,
+                  use_buffering: bool) -> CsvData:
     """
-    Creates the CsvData object, caches the object by file path so that we can share this object across fields
-
+    Loads the csv appropriate CSVDataBase
     Args:
-        field_spec: that triggered the creation
-        config: to use to do the creation
-        datadir: where to look for data files
+        csv_path: Path to CSV file to use
+        delimiter: how items are separated
+        has_headers: if the CSV file has a header row
+        quotechar: what counts as a quote
+        sample_rows: if sampling should happen at a row level, not valid if buffering is set to true
+        use_buffering: if the source file is large enough that buffering should be employed
 
     Returns:
-        the configured CsvData object
+        CsvDataBase to supply csv data from
     """
-    datafile = config.get('datafile', datagen.types.get_default('csv_file'))
-    csv_path = f'{datadir}/{datafile}'
-    if csv_path in _csv_data_cache:
-        return _csv_data_cache.get(csv_path)
-
-    if not os.path.exists(csv_path):
-        raise datagen.SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
-                                    + json.dumps(field_spec))
-    delimiter = config.get('delimiter', ',')
-    # in case tab came in as string
-    if delimiter == '\\t':
-        delimiter = '\t'
-    quotechar = config.get('quotechar', '"')
-    has_headers = datagen.utils.is_affirmative('headers', config)
-
-    size_in_bytes = os.stat(csv_path).st_size
-    max_csv_size = int(datagen.types.get_default('large_csv_size_mb')) * _ONE_MB
-    sample_rows = datagen.utils.is_affirmative('sample_rows', config)
-    if size_in_bytes <= max_csv_size:
+    if use_buffering:
         if sample_rows:
-            csv_data = _RowLevelSampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
+            csv_data = _RowLevelSampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)  # type: ignore
         else:
-            csv_data = _SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)
+            csv_data = _SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)  # type: ignore
     else:
-        csv_data = _BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)
-    _csv_data_cache[csv_path] = csv_data
+        csv_data = _BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)  # type: ignore
     return csv_data
+
+
+def csv_supplier(count_supplier: ValueSupplierInterface, csv_data, field_name, sample):
+    return _CsvSupplier(csv_data, field_name, sample, count_supplier)

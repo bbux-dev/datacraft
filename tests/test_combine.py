@@ -29,12 +29,6 @@ def test_fields_specified_but_not_all_defined():
     _test_invalid_combine_spec(spec)
 
 
-def test_combine_list_no_refs_invalid():
-    spec = _combine_list_spec([["ONE", "TWO"]])
-    spec.pop('refs')
-    _test_invalid_combine_spec(spec)
-
-
 def test_combine_list_empty_refs_invalid():
     spec = _combine_list_spec([["ONE", "TWO"]])
     spec['refs'] = {}
@@ -44,6 +38,21 @@ def test_combine_list_empty_refs_invalid():
 def test_refs_specified_but_invalid_type():
     spec = _combine_list_spec([["ONE", "TWO"]])
     spec['refs']['TWO'] = builder.config_ref(prefix='foo', suffix='@bar')
+    _test_invalid_combine_spec(spec)
+
+
+def test_combine_list_no_refs():
+    spec = {"field": {"type": "combine-list"}}
+    _test_invalid_combine_spec(spec)
+
+
+def test_combine_list_empty_refs():
+    spec = {"field": {"type": "combine-list", "refs": []}}
+    _test_invalid_combine_spec(spec)
+
+
+def test_combine_list_refs_not_list_of_lists():
+    spec = {"field": {"type": "combine-list", "refs": ["a", "b", "c"]}}
     _test_invalid_combine_spec(spec)
 
 

@@ -1,6 +1,8 @@
 import pytest
 import datagen
-from datagen.supplier.core import calculate
+import datagen.supplier.calculate
+# to trigger registration
+from datagen import cli
 
 simple_calc_data = [
     (
@@ -30,7 +32,7 @@ simple_calc_data = [
 def test_simple_calculation(alias_to_values, formula, expected_first_value):
     mapping = {key: datagen.suppliers.values(values) for key, values in alias_to_values.items()}
 
-    supplier = calculate._CalculateSupplier(mapping, datagen.template_engines.string(formula))
+    supplier = datagen.supplier.calculate._CalculateSupplier(mapping, datagen.template_engines.string(formula))
 
     assert supplier.next(0) == expected_first_value
 
@@ -42,7 +44,7 @@ def test_calculate_valid_from_builder():
     formula = '{{a}} * 2'
     spec_builder.calculate('meaning_of_life', fields=mapping, formula=formula)
 
-    assert next(spec_builder.build().generator(1))['meaning_of_life'] == 42.0
+    assert next(spec_builder.build().generator(1, enforce_schema=True))['meaning_of_life'] == 42.0
 
 
 @pytest.mark.parametrize('keyword', ['for', 'if', 'else', 'in', 'elif'])

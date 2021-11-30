@@ -1,8 +1,8 @@
 import pytest
 from datagen.loader import Loader
 from datagen import builder, suppliers, SpecException
-# to engage registration
-from datagen.supplier.core import select_list_subset
+# to trigger registration
+from datagen import cli
 
 
 def test_invalid_when_no_config():
@@ -72,7 +72,7 @@ def test_select_list_using_loader():
 
 def test_select_list_ref_contains_data():
     spec_builder = builder.spec_builder()
-    spec_builder.select_list_subset('pets', data=None, ref='pets_list', count=2)
+    spec_builder.select_list_subset('pets', data=None, ref_name='pets_list', count=2)
     spec_builder.refs().values(key='pets_list', data=['goat', 'sheep', 'bear', 'cow', 'dragon'])
     loader = Loader(spec_builder.build())
     supplier = loader.get('pets')

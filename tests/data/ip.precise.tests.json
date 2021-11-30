@@ -1,7 +1,7 @@
 {
   "ip.precise.schema.json": {
     "valid": [
-      {"instance": {"type": "ip.precise", "data": "DO I HAVE A DATA ELEMENT?"}, "note": "explanatory..."}
+      {"instance": {"type": "ip.precise", "config": {"cidr": "192.168.0.0/22"}}}
     ],
     "invalid": [
       {"instance": {}, "note": "empty"},

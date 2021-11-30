@@ -1,7 +1,11 @@
 import decimal
+
+import pytest
+
+import datagen
 from datagen import builder, Loader
-# need this to trigger registration
-from datagen.supplier.core import geo
+# to trigger registration
+from datagen import cli
 
 
 def test_geo_lat_default_precision():
@@ -17,6 +21,12 @@ def test_geo_lat_precision():
 def test_geo_long_precision():
     spec = _geo_long_spec(precision=3)
     _test_geo_spec_falls_in_range(spec, 'long', -180.0, 180.0, -3)
+
+
+def test_geo_long_invalid_precision():
+    spec = _geo_long_spec(precision=3.3)
+    with pytest.raises(datagen.SpecException):
+        Loader(spec).get('long').next(0)
 
 
 def test_geo_long_precision_shorthand():
@@ -79,6 +89,12 @@ def test_geo_spec_pair_reduced_ranges_bbox():
     parts = value.split(',')
     _verify_in_range_and_has_precision(parts[0], start_long, end_long, -4)
     _verify_in_range_and_has_precision(parts[1], start_lat, end_lat, -4)
+
+
+def test_geo_spec_pair_invalid_bbox():
+    spec = _geo_pair_spec(bbox='1,2,3,4')
+    with pytest.raises(datagen.SpecException):
+        Loader(spec).get('pair').next(0)
 
 
 def test_geo_pair_as_list():

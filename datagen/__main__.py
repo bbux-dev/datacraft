@@ -4,9 +4,11 @@ Entry point for datagen tool
 """
 import sys
 
+from . import cli
+from .exceptions import SpecException
+from .supplier.exceptions import SupplierException
 # this activates the decorators, so they will be discoverable
 from .preprocessor import *
-from .schemas import *
 from .logging_handler import *
 
 _log = logging.getLogger(__name__)
@@ -16,15 +18,15 @@ def wrap_main():
     """wraps main with try except for SpecException """
     try:
         main(sys.argv[1:])
-    except SpecException as exc:
+    except (SpecException, SupplierException) as exc:
         _log.error(str(exc))
 
 
 def main(argv):
     """Runs the tool """
 
-    args = datagen.cli.parseargs(argv)
-    generator = datagen.cli.process_args(args)
+    args = cli.parseargs(argv)
+    generator = cli.process_args(args)
     if generator is None:
         return
     if args.server:

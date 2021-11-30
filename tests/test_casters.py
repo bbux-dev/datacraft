@@ -1,24 +1,24 @@
 import pytest
 from datagen import SpecException
-from datagen.utils import get_caster
+from datagen.casters import from_config
 
 
 def test_valid_key_forms():
     valid_names = ['cast']
 
     for name in valid_names:
-        caster = get_caster({name: 'float'})
+        caster = from_config({name: 'float'})
         assert caster is not None
         assert caster.cast('1.1') == 1.1
 
 
 def test_none_is_none():
-    caster = get_caster({'cast': None})
+    caster = from_config({'cast': None})
     assert caster is None
 
 
 def test_hex_cast_value_error():
-    caster = get_caster({'cast': 'hex'})
+    caster = from_config({'cast': 'hex'})
     with pytest.raises(SpecException):
         caster.cast('abc123')
 
@@ -102,16 +102,16 @@ cast_tests = [
 
 @pytest.mark.parametrize("input_value, cast_type, expected_value", cast_tests)
 def test_valid_type_cast_forms(input_value, cast_type, expected_value):
-    caster = get_caster({'cast': cast_type})
+    caster = from_config({'cast': cast_type})
     assert caster is not None
     assert caster.cast(input_value) == expected_value
 
 
 def test_invalid_casting_int():
     with pytest.raises(SpecException):
-        get_caster({'cast': 'int'}).cast('abc123')
+        from_config({'cast': 'int'}).cast('abc123')
 
 
 def test_invalid_casting_float():
     with pytest.raises(SpecException):
-        get_caster({'cast': 'float'}).cast('456def')
+        from_config({'cast': 'float'}).cast('456def')

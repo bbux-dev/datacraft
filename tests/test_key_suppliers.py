@@ -1,12 +1,13 @@
 import pytest
 
 import datagen.suppliers
-from datagen import builder, key_providers, SpecException
+from datagen import builder, SupplierException
+from datagen.supplier import key_suppliers
 
 
 def test_no_field_groups():
     spec = one_two_builder().build()
-    provider = key_providers.from_spec(spec)
+    provider = key_suppliers.from_spec(spec)
 
     assert _get_keys(provider) == ['one', 'two']
 
@@ -21,7 +22,7 @@ def test_list_of_fields():
     spec_builder = one_two_three_builder()
     spec_builder.add_field_groups(field_groups),
     spec = spec_builder.build()
-    provider = key_providers.from_spec(spec)
+    provider = key_suppliers.from_spec(spec)
 
     assert _get_keys(provider) == ['one']
     assert _get_keys(provider) == ['one', 'two']
@@ -39,7 +40,7 @@ def test_weighted_field_groups():
     spec_builder.weighted_field_group(weight=0.3, fields=["one", "two", "three"]),
     spec = spec_builder.build()
 
-    provider = key_providers.from_spec(spec)
+    provider = key_suppliers.from_spec(spec)
     for _ in range(100):
         field_group, keys = provider.get()
         assert field_group == '0.7' or field_group == '0.3'
@@ -48,16 +49,16 @@ def test_weighted_field_groups():
 
 def test_weighted_field_groups_invalid_name():
     field_groups = {'one': ['A', 'B', 'C']}
-    key_provider = key_providers._WeightedGroupKeyProvider(field_groups, datagen.suppliers.values(['uno']))
+    key_provider = key_suppliers._WeightedGroupKeyProvider(field_groups, datagen.suppliers.values(['uno']))
     # for coverage
-    with pytest.raises(SpecException):
+    with pytest.raises(SupplierException):
         key_provider.get()
 
 
 def test_weighted_field_groups_invalid_type():
     # for coverage
     with pytest.raises(ValueError):
-        key_providers._create_rotating_lists_key_provider('one,two,three')
+        key_suppliers._create_rotating_lists_key_provider('one,two,three')
 
 
 def test_named_field_groups():
@@ -66,7 +67,7 @@ def test_named_field_groups():
     spec_builder.named_field_group(key="groupB", fields=["one", "two", "three"]),
     spec = spec_builder.build()
 
-    provider = key_providers.from_spec(spec)
+    provider = key_suppliers.from_spec(spec)
     for _ in range(100):
         field_group, keys = provider.get()
         assert field_group == 'groupA' or field_group == 'groupB'

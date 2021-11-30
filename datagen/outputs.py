@@ -8,27 +8,26 @@ import json
 import logging
 import catalogue  # type: ignore
 from pathlib import Path
-import datagen
-from . import template_engines, types
-from .model import RecordProcessor, OutputHandlerInterface
+from . import template_engines, registries
+from .supplier.model import RecordProcessor, OutputHandlerInterface
 from .exceptions import SpecException
 
 _log = logging.getLogger(__name__)
 
 
-@datagen.registry.formats('json')
+@registries.registry.formats('json')
 def _format_json(record: dict) -> str:
     """formats the record as compressed json  """
     return json.dumps(record)
 
 
-@datagen.registry.formats('json-pretty')
+@registries.registry.formats('json-pretty')
 def _format_json_pretty(record: dict) -> str:
     """pretty prints the record as json  """
-    return json.dumps(record, indent=int(types.get_default('json_indent')))
+    return json.dumps(record, indent=int(registries.get_default('json_indent')))
 
 
-@datagen.registry.formats('csv')
+@registries.registry.formats('csv')
 def _format_csv(record: dict) -> str:
     """formats the values of the record as comma separated values  """
     return ','.join([str(val) for val in record.values()])
@@ -229,7 +228,7 @@ class _FormatProcessor(RecordProcessor):
     """A simple class that wraps a record formatting function"""
 
     def __init__(self, key):
-        self.format_func = types.registry.formats.get(key)
+        self.format_func = registries.registry.formats.get(key)
 
     def process(self, record: dict) -> str:
         """
@@ -340,7 +339,7 @@ def get_writer(outdir: str = None,
         else:
             writer = incrementing_file_writer(
                 outdir=outdir,
-                outname=kwargs.get('outfileprefix', types.get_default('outfileprefix')),
+                outname=kwargs.get('outfileprefix', registries.get_default('outfileprefix')),
                 extension=kwargs.get('extension'),
                 records_per_file=kwargs.get('recordsperfile', 1)
             )

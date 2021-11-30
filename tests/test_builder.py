@@ -149,7 +149,7 @@ full_spec_build_tests = [
      {"name": {"type": "weighted_ref", "data": {"One": 0.5, "Two": 0.3, "Three": 0.2}}}),
     (builder.spec_builder().select_list_subset('name', data=["A", "B", "C"], mean=5, stddev=2),
      {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "data": ["A", "B", "C"]}}),
-    (builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),
+    (builder.spec_builder().select_list_subset('name', ref_name="LIST", mean=5, stddev=2),
      {"name": {"type": "select_list_subset", "config": {"mean": 5, "stddev": 2}, "ref": "LIST"}}),
     (builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
      {"name": {"type": "csv", "config": {"datafile": "demo.csv", "sample": "on"}}}),
@@ -185,7 +185,7 @@ invalid_spec_build_tests = [
     builder.spec_builder().geo_pair('name', join_with=":", precision="yes"),  # invalid precision
     builder.spec_builder().ip('name', base="192.1680"),  # type in base
     builder.spec_builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
-    builder.spec_builder().select_list_subset('name', ref="LIST", mean=5, stddev=2),  # ref not defined
+    builder.spec_builder().select_list_subset('name', ref_name="LIST", mean=5, stddev=2),  # ref not defined
     builder.spec_builder().weighted_ref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
     builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
     builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),

@@ -7,7 +7,7 @@ from typing import Union
 
 from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape  # type: ignore
 
-from .model import RecordProcessor
+from .supplier.model import RecordProcessor
 
 
 def for_file(template_file: Union[str, Path]) -> RecordProcessor:

@@ -1,6 +1,10 @@
-from datagen import builder, suppliers, Loader, SpecException
-from datagen.supplier.core.weighted_refs import WeightedRefsSupplier
+# to trigger registration
 import pytest
+
+from datagen import builder, suppliers, Loader, SupplierException
+from datagen.supplier.refs import weighted_ref_supplier
+# to trigger registration
+from datagen import cli
 
 
 def test_weighted_ref_missing_key():
@@ -17,9 +21,9 @@ def test_weighted_ref_missing_key():
 
     key_supplier = suppliers.values(['foo', 'bar', 'baz', 'notvalid'])
     values_map = {key: suppliers.values(value) for key, value in spec['refs'].items()}
-    supplier = WeightedRefsSupplier(key_supplier, values_map)
+    supplier = weighted_ref_supplier(key_supplier, values_map)
 
-    with pytest.raises(SpecException) as exception:
+    with pytest.raises(SupplierException) as exception:
         [supplier.next(i) for i in range(0, 10)]
     assert "Unknown Key 'notvalid' for Weighted Reference" in str(exception.value)
 

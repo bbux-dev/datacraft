@@ -32,17 +32,17 @@ Core Classes
 .. autoclass:: datagen.CasterInterface
    :members:
 
-.. autoclass:: datagen.model.RecordProcessor
+.. autoclass:: datagen.RecordProcessor
    :members:
 
-.. autoclass:: datagen.model.OutputHandlerInterface
+.. autoclass:: datagen.OutputHandlerInterface
    :members:
 
 .. _registry_decorators:
 
 Registry Decorators
 -------------------
-.. autoclass:: datagen.types.registry
+.. autoclass:: datagen.registries.registry
    :members:
 
 .. _datagen_errors:
@@ -50,6 +50,9 @@ Registry Decorators
 Datagen Errors
 --------------
 .. autoclass:: datagen.SpecException
+   :members:
+
+.. autoclass:: datagen.SupplierException
    :members:
 
 .. autoclass:: datagen.ResourceError
@@ -67,11 +70,6 @@ Builder Module
 Suppliers Module
 ----------------
 .. automodule:: datagen.suppliers
-   :members:
-
-Key Providers Module
---------------------
-.. automodule:: datagen.key_providers
    :members:
 
 .. _outputs_module:
