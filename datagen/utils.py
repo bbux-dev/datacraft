@@ -1,6 +1,8 @@
 """
 Module for storing package wide common functions
 """
+import decimal
+import math
 from typing import Union
 import os
 import importlib
@@ -78,3 +80,42 @@ def get_raw_spec(data_spec: Union[dict, DataSpec]):
     else:
         raw_spec = data_spec
     return raw_spec
+
+
+def any_is_float(data):
+    """ are any of the items floats """
+    for item in data:
+        if isinstance(item, float):
+            return True
+    return False
+
+
+def float_range(start: float,
+                stop: float,
+                step: float,
+                precision=None):
+    """
+    Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
+    stored
+    """
+    # attempt to defeat some rounding errors prevalent in python
+    current = decimal.Decimal(str(start))
+    if precision:
+        quantize = decimal.Decimal(str(1 / math.pow(10, int(precision))))
+        current = current.quantize(quantize)
+
+    dstop = decimal.Decimal(str(stop))
+    dstep = decimal.Decimal(str(step))
+    while current < dstop:
+        # inefficient?
+        yield float(str(current))
+        current = current + dstep
+        if precision:
+            current = current.quantize(quantize)
+
+
+def decode_num(num):
+    """ decodes the num if hex encoded """
+    if isinstance(num, str):
+        return int(num, 16)
+    return int(num)

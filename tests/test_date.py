@@ -96,6 +96,15 @@ def test_date_center_date():
     _test_date_spec(spec, 'foo', 100, ['13-Feb-2050', '14-Feb-2050', '15-Feb-2050', '16-Feb-2050', '17-Feb-2050'])
 
 
+def test_date_center_iso_date():
+    config = {"center_date": "2050-02-15T12:00:00", "stddev_days": 5}
+    spec = _date_iso_spec(**config)
+    loader = Loader(spec)
+    supplier = loader.get('foo')
+    val = supplier.next(0)
+    assert val.startswith('2050-')
+
+
 def test_date_center_date_stddev_only():
     config = {"stddev_days": 5, "format": "%d-%b-%Y"}
     spec = _date_spec(**config)
@@ -106,6 +115,24 @@ def _test_date_spec(spec, key, iterations, expected):
     values = _get_unique_values(spec, key, iterations)
     for instance in expected:
         assert instance in values
+
+
+def test_date_start_doesnt_match_format():
+    # started to 7 Feb - 5 day offset gives center of 2 Feb +- 1 day
+    config = {"duration_days": 1, "start": "07-Feb-2050", "format": "%d-%M-%Y"}
+    spec = _date_spec(**config)
+    loader = Loader(spec)
+    with pytest.raises(ValueError):
+        loader.get('foo')
+
+
+def test_date_end_doesnt_match_format():
+    # started to 7 Feb - 5 day offset gives center of 2 Feb +- 1 day
+    config = {"duration_days": 1, "end": "07-Feb-2050", "format": "%d-%M-%Y"}
+    spec = _date_spec(**config)
+    loader = Loader(spec)
+    with pytest.raises(ValueError):
+        loader.get('foo')
 
 
 def _get_unique_values(spec, key, iterations=100):

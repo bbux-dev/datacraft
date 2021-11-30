@@ -5,6 +5,8 @@ Entry point for datagen tool
 import sys
 
 from . import cli
+from .exceptions import SpecException
+from .supplier.exceptions import SupplierException
 # this activates the decorators, so they will be discoverable
 from .preprocessor import *
 from .logging_handler import *
@@ -16,7 +18,7 @@ def wrap_main():
     """wraps main with try except for SpecException """
     try:
         main(sys.argv[1:])
-    except SpecException as exc:
+    except (SpecException, SupplierException) as exc:
         _log.error(str(exc))
 
 

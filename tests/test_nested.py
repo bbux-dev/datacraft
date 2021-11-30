@@ -101,7 +101,7 @@ def test_nested_field_groups():
         }
     }
     spec = datagen.parse_spec(raw_spec)
-    gen = spec.generator(iterations=2)
+    gen = spec.generator(iterations=2, enforce_schema=True)
     first = next(gen)["outer"]
     second = next(gen)["outer"]
     assert "two" not in first

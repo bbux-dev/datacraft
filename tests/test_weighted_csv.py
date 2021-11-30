@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 import datagen
 # to trigger registration
 from datagen import cli
@@ -52,11 +54,19 @@ def test_weighted_csv_from_builder():
         .weighted_csv('status', datafile='weighted.csv', column='status', weight_column='weight', headers=True) \
         .to_spec()
 
-    gen = spec.generator(1, data_dir=test_dir)
+    gen = spec.generator(1, enforce_schema=True, data_dir=test_dir)
 
     val = next(gen)
     assert 'status' in val
     assert val['status'].isnumeric()
+
+
+def test_weighted_csv_valid_invalid_indexed_column():
+    spec = _build_csv_spec('status', column=0, weight_column=2, headers=True)
+
+    gen = spec.generator(3, data_dir=test_dir)
+    with pytest.raises(datagen.SpecException):
+        next(gen)
 
 
 def _build_csv_spec(field_name, **config):

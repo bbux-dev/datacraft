@@ -21,8 +21,8 @@ from typing import Any, Union, Dict, List
 from typing import Generator
 
 from . import registries, utils
+from .loader import Loader, preprocess_spec
 from .supplier import key_suppliers
-from .loader import Loader
 from .supplier.model import DataSpec
 
 _log = logging.getLogger(__name__)
@@ -671,6 +671,20 @@ class Builder:
         all_list = all(isinstance(entry, list) for entry in self.field_groups)
         if all_list:
             spec['field_groups'] = self.field_groups
+
+
+def parse_spec(raw_spec: dict) -> DataSpec:
+    """
+    Parses the raw spec into a DataSpec object. Takes in specs that may contain shorthand specifications.
+
+    Args:
+        raw_spec: raw dictionary that conforms to JSON spec format
+
+    Returns:
+        the fully parsed and loaded spec
+    """
+    specs = preprocess_spec(raw_spec)
+    return _DataSpecImpl(specs)
 
 
 def spec_builder() -> Builder:

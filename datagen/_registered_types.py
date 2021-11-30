@@ -1,12 +1,10 @@
 """
-Internal module where the build in types are registered and configured
+Internal module where the built in types are registered and configured
 """
 import csv
 import datetime
-import decimal
 import json
 import logging
-import math
 import os
 import string
 from typing import Union, Dict
@@ -39,6 +37,7 @@ from .supplier.uuid import uuid_supplier
 ##############
 # Type Keys
 ##############
+
 _VALUES_KEY = 'values'
 _CALCULATE_KEY = 'calculate'
 _CHAR_CLASS_KEY = 'char_class'
@@ -69,9 +68,14 @@ _log = logging.getLogger('datagen.types')
 # values
 ##############
 @registries.registry.schemas(_VALUES_KEY)
-def _get_schema():
+def _get_values_schema():
     """ returns the values schema """
     return schemas.load(_VALUES_KEY)
+
+
+@registries.registry.types(_VALUES_KEY)
+def _handle_values_type(_, __):
+    """ placeholder as this is handled elsewhere """
 
 
 ##############
@@ -174,7 +178,7 @@ def _configure_char_class_supplier(spec, _):
     return suppliers.list_count_sampler(data, config)
 
 
-for class_key in _CLASS_MAPPING   :
+for class_key in _CLASS_MAPPING:
     @registries.registry.types("cc-" + class_key)
     def _configure_char_class_alias_supplier(spec, loader):
         """ configure the supplier for char_class alias types """
@@ -856,12 +860,12 @@ def _configure_supplier_for_data(field_spec, data):
         step = 1
     else:
         step = data[2]
-    if _any_is_float(data):
+    if utils.any_is_float(data):
         config = field_spec.get('config', {})
         precision = config.get('precision', None)
         if precision and not str(precision).isnumeric():
             raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
-        range_values = list(_float_range(float(start), float(end), float(step), precision))
+        range_values = list(utils.float_range(float(start), float(end), float(step), precision))
     else:
         range_values = list(range(start, end, step))
     return suppliers.values(range_values)
@@ -899,38 +903,6 @@ def _configure_rand_range_supplier(field_spec, loader):
     # config overrides third data element if specified
     precision = config.get('precision', precision)
     return suppliers.random_range(start, end, precision)
-
-
-def _any_is_float(data):
-    """ are any of the items floats """
-    for item in data:
-        if isinstance(item, float):
-            return True
-    return False
-
-
-def _float_range(start: float,
-                 stop: float,
-                 step: float,
-                 precision=None):
-    """
-    Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
-    stored
-    """
-    # attempt to defeat some rounding errors prevalent in python
-    current = decimal.Decimal(str(start))
-    if precision:
-        quantize = decimal.Decimal(str(1 / math.pow(10, int(precision))))
-        current = current.quantize(quantize)
-
-    dstop = decimal.Decimal(str(stop))
-    dstep = decimal.Decimal(str(step))
-    while current < dstop:
-        # inefficient?
-        yield float(str(current))
-        current = current + dstep
-        if precision:
-            current = current.quantize(quantize)
 
 
 ###################
@@ -1012,8 +984,6 @@ def _configure_select_list_subset_supplier(field_spec, loader):
 ###################
 # unicode_range
 ###################
-
-
 @registries.registry.schemas(_UNICODE_RANGE_KEY)
 def _get_unicode_range_schema():
     """ get the unicode range schema """
@@ -1032,15 +1002,15 @@ def _configure_unicode_range_supplier(spec, _):
                 spec))
     config = spec.get('config', {})
     if isinstance(data[0], list):
-        suppliers_list = [_single_range(sublist, config) for sublist in data]
+        suppliers_list = [_single_unicode_range(sublist, config) for sublist in data]
         return suppliers.from_list_of_suppliers(suppliers_list, True)
-    return _single_range(data, config)
+    return _single_unicode_range(data, config)
 
 
-def _single_range(data, config):
+def _single_unicode_range(data, config):
     """ creates a unicode supplier for a single unicode range """
     # supplies range of data as floats
-    range_data = list(range(_decode_num(data[0]), _decode_num(data[1]) + 1))
+    range_data = list(range(utils.decode_num(data[0]), utils.decode_num(data[1]) + 1))
     # casts the floats to ints
     if utils.any_key_exists(config, ['mean', 'stddev']):
         if 'as_list' not in config:
@@ -1049,13 +1019,6 @@ def _single_range(data, config):
     else:
         wrapped = suppliers.list_count_sampler(range_data, config)
     return unicode_range_supplier(wrapped)
-
-
-def _decode_num(num):
-    """ decodes the num if hex encoded """
-    if isinstance(num, str):
-        return int(num, 16)
-    return int(num)
 
 
 #################

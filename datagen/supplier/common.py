@@ -201,9 +201,10 @@ class WeightedValueSupplier(ValueSupplierInterface):
     Value supplier implementation for weighted values
     """
 
-    def __init__(self, choices: list,
+    def __init__(self,
+                 choices: list,
                  weights: list,
-                 count_supplier: Optional[ValueSupplierInterface]):
+                 count_supplier: ValueSupplierInterface):
         """
         Args:
             choices: list of choices to sample from
@@ -384,4 +385,6 @@ def weighted_values_explicit(choices: list,
     Returns:
         ValueSupplierInterface that supplies values from choices according to weights
     """
+    if count_supplier is None:
+        count_supplier = SingleValue(1)
     return WeightedValueSupplier(choices, weights, count_supplier)

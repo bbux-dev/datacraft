@@ -132,7 +132,7 @@ def _create_weighted_key_provider(field_groups: Dict) -> KeyProviderInterface:
     """Creates a weighted field group key provide for the supplied field_groups """
     keys = list(field_groups.keys())
     weights = [float(key) for key in keys]
-    supplier = weighted_values_explicit(keys, weights, SingleValue(1))
+    supplier = weighted_values_explicit(keys, weights)
     return _WeightedGroupKeyProvider(field_groups, supplier)
 
 

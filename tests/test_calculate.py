@@ -44,7 +44,7 @@ def test_calculate_valid_from_builder():
     formula = '{{a}} * 2'
     spec_builder.calculate('meaning_of_life', fields=mapping, formula=formula)
 
-    assert next(spec_builder.build().generator(1))['meaning_of_life'] == 42.0
+    assert next(spec_builder.build().generator(1, enforce_schema=True))['meaning_of_life'] == 42.0
 
 
 @pytest.mark.parametrize('keyword', ['for', 'if', 'else', 'in', 'elif'])
