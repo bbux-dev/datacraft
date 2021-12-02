@@ -177,34 +177,22 @@ Another way to specify a count is to use a count distribution. This is done with
 takes a string argument which is the distribution along with its required arguments in function call form with
 parameters explicitly named.  See the table below.
 
-.. list-table::
-   :header-rows: 1
+.. table::
+   :widths: 15 15 15 60
 
-   * - distribution
-     - required arguments
-     - optional args
-     - examples
-   * - uniform
-     - start,end
-     - 
-     - "uniform(start=10, end=30)"
-   * -
-     - 
-     - 
-     - "uniform(start=1, end=3)"
-   * - guass
-     - mean,stddev
-     - min,max
-     - "gauss(mean=2, stddev=1)"
-   * - guassian
-     - 
-     - 
-     - "guassian(mean=7, stddev=1, min=4)"
-   * - normal
-     - 
-     - 
-     - "normal(mean=25, stddev=10, max=40)"
-
+   +--------------+--------------------+---------------+--------------------------------------+
+   | distribution | required arguments | optional args | examples                             |
+   +==============+====================+===============+======================================+
+   | uniform      | start,end          |               | "uniform(start=10, end=30)"          |
+   +--------------+--------------------+---------------+--------------------------------------+
+   |              |                    |               | "uniform(start=1, end=3)"            |
+   +--------------+--------------------+---------------+--------------------------------------+
+   | guass        | mean,stddev        | min,max       | "gauss(mean=2, stddev=1)"            |
+   +--------------+--------------------+---------------+--------------------------------------+
+   | guassian     |                    |               | "guassian(mean=7, stddev=1, min=4)"  |
+   +--------------+--------------------+---------------+--------------------------------------+
+   | normal       |                    |               | "normal(mean=25, stddev=10, max=40)" |
+   +--------------+--------------------+---------------+--------------------------------------+
 
 ``normal``\ , ``guassian``\ , and ``gauss`` are all aliases for a
 `Normal Distribution <https://en.wikipedia.org/wiki/Normal_distribution>`_.
@@ -222,6 +210,8 @@ Example:
        }
      }
    }
+
+.. _custom_count_dist:
 
 Custom Count Distributions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -274,6 +264,8 @@ Custom distributions can be supplied using :ref:`custom code<custom_code>` loadi
          ['abigail', 'flora', 'bob']
          ['rob', 'abigail']
          ['bobby', 'roberta', 'fauna', 'bob', 'rob', 'flora']
+
+.. _casters:
 
 Casting Values
 ^^^^^^^^^^^^^^

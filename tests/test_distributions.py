@@ -1,6 +1,6 @@
 import pytest
 import datagen
-from datagen import distributions
+from datagen import distributions, builder
 
 
 def test_uniform_distribution():
@@ -66,3 +66,29 @@ def test_invalid_from_string(invalid_func_str):
     with pytest.raises(ValueError):
         dist = datagen.distributions.from_string(invalid_func_str)
         dist.next_value()
+
+
+valid_func_data = [
+    'uniform(start=5, end=10)',
+    'normal(mean=5, stddev=2)',
+    'gauss(mean=5, stddev=2)',
+    'gaussian(mean=5, stddev=2)',
+    'gaussian(mean=5, stddev=2, min=3, max=9)',
+    'gaussian(mean=33, stddev=5, max=50)',
+]
+
+
+@pytest.mark.parametrize("string_func", valid_func_data)
+def test_distribution_type(string_func):
+    spec = builder.single_field('dist', builder.distribution(data=string_func)).build()
+
+    val = next(spec.generator(1, enforce_schema=True))['dist']
+
+    assert isinstance(val, float)
+
+
+@pytest.mark.parametrize("invalid_func_str", invalid_funcs)
+def test_invalid_distribution_spec(invalid_func_str):
+    spec = builder.single_field('dist', builder.distribution(data=invalid_func_str)).build()
+    with pytest.raises(ValueError):
+        next(spec.generator(1, enforce_schema=True))

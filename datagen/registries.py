@@ -18,7 +18,7 @@ class registry:
             Types for field specs, registered functions for creating ValueSupplierInterface that will supply
             values for the given type
 
-            >>> @datagen.registry.types('special_sauce')
+            >>> @datagen.registry.registries('special_sauce')
             ... def _handle_special_type(field_spec: dict, loader: datagen.Loader) -> ValueSupplierInterface:
             ...    # return ValueSupplierInterface from spec config
 

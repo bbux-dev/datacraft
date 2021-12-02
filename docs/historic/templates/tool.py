@@ -158,9 +158,7 @@ def apply_template(data, template_name):
         autoescape=select_autoescape(['html', 'xml'])
     )
     template = env.get_template(template_name)
-    with open('..' + os.sep + 'FIELDSPECS.md', 'w', encoding='utf-8') as handle:
-        handle.write(template.render(data))
-    print('Updated ..' + os.sep + 'FIELDSPECS.md')
+    print(template.render(data))
 
 
 if __name__ == '__main__':
