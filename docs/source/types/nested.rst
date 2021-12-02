@@ -73,9 +73,12 @@ The same spec in a slightly more compact format
 
 Generates the following structure
 
-.. code-block:: console
+.. code-block:: shell
 
     datagen -s tweet-geo.json --log-level off -x -i 1 --format json-pretty
+
+.. code-block:: json
+
     {
         "id": "68092478-2234-41aa-bcc6-e679950770d7",
         "user": {

@@ -470,6 +470,20 @@ class Builder:
         """
         return self._add_field_spec(key, weighted_csv(**config))
 
+    def distribution(self, key: str, data: str, **config) -> FieldInfo:
+        """
+        creates distribution Field Spec and adds to Data Spec
+
+        Args:
+            key: name of ref/field
+            data: formula for distribution if func(param=val, ...) format
+            config: in kwargs format
+
+        Returns:
+            FieldInfo for the added distribution field
+        """
+        return self._add_field_spec(key, distribution(data, **config))
+
     def _add_field_spec(self, key, spec) -> FieldInfo:
         """
         adds the fieldspec and creates a FieldInfo object
@@ -1320,6 +1334,28 @@ def weighted_csv(**config) -> dict:
 
     spec = {
         "type": "weighted_csv"
+    }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def distribution(data: str = None, **config) -> dict:
+    """
+    Constructs a distribution Field Spec
+
+    Args:
+        data: distribution formula
+        config: in kwargs format
+
+    Returns:
+        the distribution spec
+    """
+
+    spec = {
+        "type": "distribution",
+        "data": data
     }  # type: Dict[str, Any]
 
     if len(config) > 0:

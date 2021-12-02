@@ -2,8 +2,9 @@ import os
 import pytest
 import datagen
 from datagen.loader import Loader
-import datagen.registries as types
+import datagen.registries as registries
 from datagen.utils import load_custom_code
+from datagen import casters
 
 spec = {
     'foo': {
@@ -37,7 +38,7 @@ def configure_supplier(field_spec, loader):
 def test_registry_from_local():
     loader = Loader(spec)
 
-    reg = types.registry
+    reg = registries.registry
     all_types = reg.types.get_all()
     handler = all_types.get('reverse_string')
 
@@ -52,7 +53,7 @@ def test_registry_from_file():
 
     loader = Loader(spec)
 
-    reg = types.registry
+    reg = registries.registry
     all_types = reg.types.get_all()
     handler = all_types.get('string_reverser')
 
@@ -65,3 +66,48 @@ def test_registry_error_case():
     with pytest.raises(FileNotFoundError):
         # string_reverser, same as above just different key
         load_custom_code(f'{test_dir}/custom_does_not_exist.py')
+
+
+type_schema_key_lookup_tests = [
+    ("uuid", True),
+    ("values", True),
+    ("spam", False),
+    ("seaweed", False),
+]
+
+
+@pytest.mark.parametrize("key, should_exist", type_schema_key_lookup_tests)
+def test_lookup_schema(key, should_exist):
+    schema = registries.lookup_schema(key)
+    if should_exist:
+        assert schema is not None
+    else:
+        assert schema is None
+
+
+@pytest.mark.parametrize("key, should_exist", type_schema_key_lookup_tests)
+def test_lookup_type(key, should_exist):
+    type_load_func = registries.lookup_type(key)
+    if should_exist:
+        assert type_load_func is not None
+    else:
+        assert type_load_func is None
+
+
+class TestCaster(datagen.CasterInterface):
+    def cast(self, value):
+        return value
+
+
+@datagen.registry.casters('test')
+def _test_registered_caster():
+    return TestCaster()
+
+
+def test_lookup_caster():
+    caster = registries.lookup_caster('test')
+    assert caster is not None
+    caster = registries.lookup_caster('not_registered')
+    assert caster is None
+    all_registered = registries.registered_casters()
+    assert all_registered == ['test']

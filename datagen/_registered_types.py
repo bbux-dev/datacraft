@@ -60,6 +60,7 @@ _WEIGHTED_REF_KEY = 'weighted_ref'
 _SELECT_LIST_SUBSET_KEY = 'select_list_subset'
 _UNICODE_RANGE_KEY = 'unicode_range'
 _UUID_KEY = 'uuid'
+_DISTRIBUTION_KEY = 'distribution'
 
 _log = logging.getLogger('datagen.types')
 
@@ -843,12 +844,12 @@ def _configure_range_supplier(field_spec, _):
             'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
     # we have the nested case
     if isinstance(data[0], list):
-        suppliers_list = [_configure_supplier_for_data(field_spec, subdata) for subdata in data]
+        suppliers_list = [_configure_range_supplier_for_data(field_spec, subdata) for subdata in data]
         return suppliers.from_list_of_suppliers(suppliers_list, True)
-    return _configure_supplier_for_data(field_spec, data)
+    return _configure_range_supplier_for_data(field_spec, data)
 
 
-def _configure_supplier_for_data(field_spec, data):
+def _configure_range_supplier_for_data(field_spec, data):
     """ configures the supplier based on the range data supplied """
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
@@ -1039,3 +1040,22 @@ def _configure_uuid_supplier(field_spec, loader):
     if variant not in [1, 3, 4, 5]:
         raise SpecException('Invalid variant for: ' + field_spec)
     return uuid_supplier(variant)
+
+
+###################
+# distribution
+###################
+@registries.registry.schemas(_DISTRIBUTION_KEY)
+def _get_distribution_schema():
+    """ get the schema for distribution type """
+    return schemas.load(_DISTRIBUTION_KEY)
+
+
+@registries.registry.types(_DISTRIBUTION_KEY)
+def _configure_distribution_supplier(field_spec, loader):
+    """ configure the supplier for distribution types """
+    if 'data' not in field_spec:
+        raise SpecException(
+            'required data element not defined for ' + _DISTRIBUTION_KEY + ' type : ' + json.dumps(field_spec))
+    distribution = distributions.from_string(field_spec['data'])
+    return suppliers.distribution_supplier(distribution)
