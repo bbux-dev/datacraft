@@ -1038,7 +1038,7 @@ def _configure_uuid_supplier(field_spec, loader):
     variant = int(config.get('variant', 4))
 
     if variant not in [1, 3, 4, 5]:
-        raise SpecException('Invalid variant for: ' + field_spec)
+        raise SpecException('Invalid variant for: ' + json.dumps(field_spec))
     return uuid_supplier(variant)
 
 

@@ -18,9 +18,9 @@ def uuid_supplier(variant) -> ValueSupplierInterface:
     """
     supplier_map = {
         1: _Uuid1(),
-        3: _Uuid1(),
-        4: _Uuid1(),
-        5: _Uuid1(),
+        3: _Uuid3(),
+        4: _Uuid4(),
+        5: _Uuid5(),
     }
     return supplier_map.get(variant)  # type: ignore
 
@@ -31,6 +31,9 @@ class _Uuid1(ValueSupplierInterface):
 
 
 class _Uuid3(ValueSupplierInterface):
+    def __init__(self):
+        self.namespace = uuid.uuid4()
+
     def next(self, iteration):
         return str(uuid.uuid3(self.namespace, str(iteration)))
 
@@ -41,5 +44,8 @@ class _Uuid4(ValueSupplierInterface):
 
 
 class _Uuid5(ValueSupplierInterface):
+    def __init__(self):
+        self.namespace = uuid.uuid4()
+
     def next(self, iteration):
         return str(uuid.uuid5(self.namespace, str(iteration)))
