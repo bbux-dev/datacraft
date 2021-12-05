@@ -56,6 +56,7 @@ _NET_MAC_KEY = 'net.mac'
 _RANGE_KEY = 'range'
 _RAND_RANGE_KEY = 'rand_range'
 _RAND_INT_RANGE_KEY = 'rand_int_range'
+_REF_KEY = 'ref'
 _WEIGHTED_REF_KEY = 'weighted_ref'
 _SELECT_LIST_SUBSET_KEY = 'select_list_subset'
 _UNICODE_RANGE_KEY = 'unicode_range'
@@ -68,13 +69,13 @@ _log = logging.getLogger('datagen.types')
 ##############
 # values
 ##############
-@registries.registry.schemas(_VALUES_KEY)
+@registries.Registry.schemas(_VALUES_KEY)
 def _get_values_schema():
     """ returns the values schema """
     return schemas.load(_VALUES_KEY)
 
 
-@registries.registry.types(_VALUES_KEY)
+@registries.Registry.types(_VALUES_KEY)
 def _handle_values_type(_, __):
     """ placeholder as this is handled elsewhere """
 
@@ -82,13 +83,13 @@ def _handle_values_type(_, __):
 ##############
 # calculate
 ##############
-@registries.registry.schemas(_CALCULATE_KEY)
+@registries.Registry.schemas(_CALCULATE_KEY)
 def _calculate_schema():
     """ get the schema for the calculate type """
     return schemas.load(_CALCULATE_KEY)
 
 
-@registries.registry.types(_CALCULATE_KEY)
+@registries.Registry.types(_CALCULATE_KEY)
 def _configure_calculate_supplier(field_spec: dict, loader: Loader):
     """ configures supplier for calculate type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
@@ -144,20 +145,20 @@ _CLASS_MAPPING = {
 }
 
 
-@registries.registry.schemas(_CHAR_CLASS_KEY)
+@registries.Registry.schemas(_CHAR_CLASS_KEY)
 def _get_char_class_schema():
     """ get the schema for the char_class type """
     return schemas.load(_CHAR_CLASS_KEY)
 
 
 for class_key in _CLASS_MAPPING:
-    @registries.registry.schemas("cc-" + class_key)
+    @registries.Registry.schemas("cc-" + class_key)
     def _get_char_class_alias_schema():
         """ get the schema for the char_class type """
         return schemas.load(_CHAR_CLASS_KEY)
 
 
-@registries.registry.types(_CHAR_CLASS_KEY)
+@registries.Registry.types(_CHAR_CLASS_KEY)
 def _configure_char_class_supplier(spec, _):
     """ configure the supplier for char_class types """
     if 'data' not in spec:
@@ -180,7 +181,7 @@ def _configure_char_class_supplier(spec, _):
 
 
 for class_key in _CLASS_MAPPING:
-    @registries.registry.types("cc-" + class_key)
+    @registries.Registry.types("cc-" + class_key)
     def _configure_char_class_alias_supplier(spec, loader):
         """ configure the supplier for char_class alias types """
         spec['data'] = class_key
@@ -190,19 +191,19 @@ for class_key in _CLASS_MAPPING:
 ############
 # combine
 ############
-@registries.registry.schemas(_COMBINE_KEY)
+@registries.Registry.schemas(_COMBINE_KEY)
 def _get_combine_schema():
     """ get the schema for the combine type """
     return schemas.load(_COMBINE_KEY)
 
 
-@registries.registry.schemas(_COMBINE_LIST_KEY)
+@registries.Registry.schemas(_COMBINE_LIST_KEY)
 def _get_combine_list_schema():
     """ get the schema for the combine_list type """
     return schemas.load(_COMBINE_LIST_KEY)
 
 
-@registries.registry.types(_COMBINE_KEY)
+@registries.Registry.types(_COMBINE_KEY)
 def _configure_combine_supplier(field_spec, loader):
     """ configures supplier for combine type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
@@ -215,7 +216,7 @@ def _configure_combine_supplier(field_spec, loader):
     return supplier
 
 
-@registries.registry.types(_COMBINE_LIST_KEY)
+@registries.Registry.types(_COMBINE_LIST_KEY)
 def _configure_combine_list_supplier(field_spec, loader):
     """ configures supplier for combine-list type """
     if 'refs' not in field_spec:
@@ -261,7 +262,7 @@ def _load_combine(combine_field_spec, keys, loader):
 ############
 # config_ref
 ############
-@registries.registry.types('config_ref')
+@registries.Registry.types('config_ref')
 def _config_ref_handler(_, __):
     """" Does nothing, just place holder """
 
@@ -276,7 +277,7 @@ _SMALL_ENOUGH_THRESHOLD = 250 * _ONE_MB
 _csv_data_cache: Dict[str, CsvData] = {}
 
 
-@registries.registry.types('csv')
+@registries.Registry.types('csv')
 def _configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
     config = utils.load_config(field_spec, loader)
@@ -289,13 +290,13 @@ def _configure_csv(field_spec, loader):
     return csv_supplier(count_supplier, csv_data, field_name, sample)
 
 
-@registries.registry.schemas('csv')
+@registries.Registry.schemas('csv')
 def _get_csv_schema():
     """ get the schema for the csv type """
     return schemas.load('csv')
 
 
-@registries.registry.types('weighted_csv')
+@registries.Registry.types('weighted_csv')
 def _configure_weighted_csv(field_spec, loader):
     """ Configures the weighted_csv value supplier for this field """
 
@@ -321,7 +322,7 @@ def _configure_weighted_csv(field_spec, loader):
     return weighted_values_explicit(choices, weights, count_supplier)
 
 
-@registries.registry.schemas('weighted_csv')
+@registries.Registry.schemas('weighted_csv')
 def _get_weighted_csv_schema():
     """ get the schema for the weighted_csv type """
     return schemas.load('weighted_csv')
@@ -404,20 +405,20 @@ _ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 _SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
 
 
-@registries.registry.schemas(_DATE_KEY)
+@registries.Registry.schemas(_DATE_KEY)
 def _get_date_schema():
     """ returns the schema for date types """
     return schemas.load(_DATE_KEY)
 
 
-@registries.registry.schemas(_DATE_ISO_KEY)
+@registries.Registry.schemas(_DATE_ISO_KEY)
 def _get_date_iso_schema():
     """ returns the schema for date.iso types """
     # NOTE: These all share a schema
     return schemas.load(_DATE_KEY)
 
 
-@registries.registry.schemas(_DATE_ISO_US_KEY)
+@registries.Registry.schemas(_DATE_ISO_US_KEY)
 def _get_date_iso_us_schema():
     """ returns the schema for date.iso.us types """
     # NOTE: These all share a schema
@@ -494,7 +495,7 @@ def _gauss_date_timestamp(
     return distributions.normal(mean=mean, stddev=stddev)
 
 
-@registries.registry.types(_DATE_KEY)
+@registries.Registry.types(_DATE_KEY)
 def _configure_date_supplier(field_spec: dict, loader: Loader):
     """ configures the date value supplier """
     config = utils.load_config(field_spec, loader)
@@ -525,13 +526,13 @@ def _create_uniform_date_supplier(config):
     return date_supplier(date_format, timestamp_distribution)
 
 
-@registries.registry.types(_DATE_ISO_KEY)
+@registries.Registry.types(_DATE_ISO_KEY)
 def _configure_supplier_iso(field_spec: dict, loader: Loader):
     """ configures the date.iso value supplier """
     return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_NO_MICRO)
 
 
-@registries.registry.types(_DATE_ISO_US_KEY)
+@registries.Registry.types(_DATE_ISO_US_KEY)
 def _configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
     """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
@@ -562,34 +563,34 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
 ############
 # geo
 ###########
-@registries.registry.schemas(_GEO_LAT_KEY)
+@registries.Registry.schemas(_GEO_LAT_KEY)
 def _get_geo_lat_schema():
     return schemas.load(_GEO_LAT_KEY)
 
 
-@registries.registry.schemas(_GEO_LONG_KEY)
+@registries.Registry.schemas(_GEO_LONG_KEY)
 def _get_geo_long_schema():
     return schemas.load(_GEO_LONG_KEY)
 
 
-@registries.registry.schemas(_GEO_PAIR_KEY)
+@registries.Registry.schemas(_GEO_PAIR_KEY)
 def _get_geo_pair_schema():
     return schemas.load(_GEO_PAIR_KEY)
 
 
-@registries.registry.types(_GEO_LAT_KEY)
+@registries.Registry.types(_GEO_LAT_KEY)
 def _configure_geo_lat(field_spec, loader):
     """ configures value supplier for geo.lat type """
     return _configure_lat_type(field_spec, loader)
 
 
-@registries.registry.types(_GEO_LONG_KEY)
+@registries.Registry.types(_GEO_LONG_KEY)
 def _configure_geo_long(field_spec, loader):
     """ configures value supplier for geo.long type """
     return _configure_long_type(field_spec, loader)
 
 
-@registries.registry.types(_GEO_PAIR_KEY)
+@registries.Registry.types(_GEO_PAIR_KEY)
 def _configure_geo_pair(field_spec, loader):
     """ configures value supplier for geo.pair type """
     config = utils.load_config(field_spec, loader)
@@ -647,12 +648,12 @@ def _get_start_end(config, default_start, default_end, suffix):
 ###########
 # nested
 ##########
-@registries.registry.schemas('nested')
+@registries.Registry.schemas('nested')
 def _get_nested_schema():
     return schemas.load('nested')
 
 
-@registries.registry.types('nested')
+@registries.Registry.types('nested')
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
@@ -681,38 +682,38 @@ def _configure_nested_supplier(spec, loader):
 ###########
 # network
 ###########
-@registries.registry.schemas(_IP_KEY)
+@registries.Registry.schemas(_IP_KEY)
 def _get_ip_schema():
     """ returns the schema for the ip types """
     return schemas.load(_IP_KEY)
 
 
-@registries.registry.schemas(_IPV4_KEY)
+@registries.Registry.schemas(_IPV4_KEY)
 def _get_ipv4_schema():
     """ returns the schema for the ipv4 types """
     # shares schema with ip
     return schemas.load(_IP_KEY)
 
 
-@registries.registry.schemas(_IP_PRECISE_KEY)
+@registries.Registry.schemas(_IP_PRECISE_KEY)
 def _get_ip_precise_schema():
     """ returns the schema for the ip.precise types """
     return schemas.load(_IP_PRECISE_KEY)
 
 
-@registries.registry.schemas(_NET_MAC_KEY)
+@registries.Registry.schemas(_NET_MAC_KEY)
 def _get_mac_addr_schema():
     """ returns the schema for the net.mac types """
     return schemas.load(_NET_MAC_KEY)
 
 
-@registries.registry.types(_IPV4_KEY)
+@registries.Registry.types(_IPV4_KEY)
 def _configure_ipv4(field_spec, _):
     """ configures value supplier for ipv4 type """
     return _configure_ip(field_spec, _)
 
 
-@registries.registry.types(_IP_KEY)
+@registries.Registry.types(_IP_KEY)
 def _configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = utils.load_config(field_spec, loader)
@@ -745,26 +746,27 @@ def _get_base_parts(config):
 
     if 'cidr' in config:
         cidr = config['cidr']
-        if '/' in cidr:
-            mask = cidr[cidr.index('/') + 1:]
-            if not mask.isdigit():
-                raise SpecException('Invalid Mask in cidr for config: ' + json.dumps(config))
-            if int(mask) not in [8, 16, 24]:
-                raise SpecException('Invalid Subnet Mask in cidr for config: ' + json.dumps(config)
-                                    + ' only one of /8 /16 or /24 supported')
-            ip_parts = cidr[0:cidr.index('/')].split('.')
-            if len(ip_parts) < 4 or not all(part.isdigit() for part in ip_parts):
-                raise SpecException('Invalid IP in cidr for config: ' + json.dumps(config))
-            if mask == '8':
-                parts = ip_parts[0:1]
-            if mask == '16':
-                parts = ip_parts[0:2]
-            if mask == '24':
-                parts = ip_parts[0:3]
-        else:
-            raise SpecException('Invalid Subnet Mask in cidr for config: ' + json.dumps(config)
-                                + ' only one of /8 /16 or /24 supported')
+        mask = _validate_and_extract_mask(cidr)
+        ip_parts = cidr[0:cidr.index('/')].split('.')
+        if len(ip_parts) < 4 or not all(part.isdigit() for part in ip_parts):
+            raise SpecException('Invalid IP in cidr for config: ' + json.dumps(config))
+        if mask == '8':
+            parts = ip_parts[0:1]
+        elif mask == '16':
+            parts = ip_parts[0:2]
+        elif mask == '24':
+            parts = ip_parts[0:3]
     return parts
+
+
+def _validate_and_extract_mask(cidr):
+    """ validates the cidr is on that can be used for ip type """
+    if '/' not in cidr:
+        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
+    mask = cidr[cidr.index('/') + 1:]
+    if not mask.isdigit() or int(mask) not in [8, 16, 24]:
+        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
+    return mask
 
 
 def _create_octet_supplier(parts, index, sample):
@@ -784,7 +786,7 @@ def _create_octet_supplier(parts, index, sample):
     return suppliers.values(spec)
 
 
-@registries.registry.types(_IP_PRECISE_KEY)
+@registries.Registry.types(_IP_PRECISE_KEY)
 def _configure_precise_ip(field_spec, _):
     """ configures value supplier for ip.precise type """
     config = field_spec.get('config')
@@ -797,7 +799,7 @@ def _configure_precise_ip(field_spec, _):
     return ip_precise(cidr, sample)
 
 
-@registries.registry.types(_NET_MAC_KEY)
+@registries.Registry.types(_NET_MAC_KEY)
 def _configure_mac_address_supplier(field_spec, loader):
     """ configures value supplier for net.mac type """
     config = utils.load_config(field_spec, loader)
@@ -812,27 +814,27 @@ def _configure_mac_address_supplier(field_spec, loader):
 ###################
 # range_suppliers
 ###################
-@registries.registry.schemas(_RANGE_KEY)
+@registries.Registry.schemas(_RANGE_KEY)
 def _get_range_schema():
     """ schema for range type """
     return schemas.load(_RANGE_KEY)
 
 
-@registries.registry.schemas(_RAND_RANGE_KEY)
+@registries.Registry.schemas(_RAND_RANGE_KEY)
 def _get_rand_range_schema():
     """ schema for rand range type """
     # This shares a schema with range
     return schemas.load(_RANGE_KEY)
 
 
-@registries.registry.schemas(_RAND_INT_RANGE_KEY)
+@registries.Registry.schemas(_RAND_INT_RANGE_KEY)
 def _get_rand_int_range_schema():
     """ schema for rand int range type """
     # This shares a schema with range
     return schemas.load(_RANGE_KEY)
 
 
-@registries.registry.types(_RANGE_KEY)
+@registries.Registry.types(_RANGE_KEY)
 def _configure_range_supplier(field_spec, _):
     """ configures the range value supplier """
     if 'data' not in field_spec:
@@ -872,7 +874,7 @@ def _configure_range_supplier_for_data(field_spec, data):
     return suppliers.values(range_values)
 
 
-@registries.registry.types(_RAND_INT_RANGE_KEY)
+@registries.Registry.types(_RAND_INT_RANGE_KEY)
 def _configure_rand_int_range_supplier(field_spec, loader):
     """ configures the random int range value supplier """
     config = utils.load_config(field_spec, loader)
@@ -881,7 +883,7 @@ def _configure_rand_int_range_supplier(field_spec, loader):
     return _configure_rand_range_supplier(field_spec, loader)
 
 
-@registries.registry.types(_RAND_RANGE_KEY)
+@registries.Registry.types(_RAND_RANGE_KEY)
 def _configure_rand_range_supplier(field_spec, loader):
     """ configures the random range value supplier """
     if 'data' not in field_spec:
@@ -909,12 +911,12 @@ def _configure_rand_range_supplier(field_spec, loader):
 ###################
 # refs
 ###################
-@registries.registry.schemas('ref')
+@registries.Registry.schemas(_REF_KEY)
 def _get_ref_schema():
-    return schemas.load('ref')
+    return schemas.load(_REF_KEY)
 
 
-@registries.registry.types('ref')
+@registries.Registry.types(_REF_KEY)
 def _configure_ref_supplier(field_spec: dict, loader: Loader):
     """ configures supplier for ref type """
     key = None
@@ -927,12 +929,12 @@ def _configure_ref_supplier(field_spec: dict, loader: Loader):
     return loader.get(key)
 
 
-@registries.registry.schemas(_WEIGHTED_REF_KEY)
+@registries.Registry.schemas(_WEIGHTED_REF_KEY)
 def _weighted_ref_schema():
     return schemas.load(_WEIGHTED_REF_KEY)
 
 
-@registries.registry.types(_WEIGHTED_REF_KEY)
+@registries.Registry.types(_WEIGHTED_REF_KEY)
 def _configure_weighted_ref_supplier(parent_field_spec, loader):
     """ configures supplier for weighted ref specs """
     config = utils.load_config(parent_field_spec, loader)
@@ -951,12 +953,12 @@ def _configure_weighted_ref_supplier(parent_field_spec, loader):
 ####################
 # select_list_subset
 ####################
-@registries.registry.schemas(_SELECT_LIST_SUBSET_KEY)
+@registries.Registry.schemas(_SELECT_LIST_SUBSET_KEY)
 def _select_list_subset_schema():
     return schemas.load(_SELECT_LIST_SUBSET_KEY)
 
 
-@registries.registry.types(_SELECT_LIST_SUBSET_KEY)
+@registries.Registry.types(_SELECT_LIST_SUBSET_KEY)
 def _configure_select_list_subset_supplier(field_spec, loader):
     """ configures supplier for select_list_subset type """
     config = utils.load_config(field_spec, loader)
@@ -967,7 +969,7 @@ def _configure_select_list_subset_supplier(field_spec, loader):
 
     if 'ref' in field_spec:
         ref_name = field_spec.get('ref')
-        field_spec = loader.get_ref_spec(ref_name)
+        field_spec = loader.get_ref(ref_name)
         if field_spec is None:
             raise SpecException('No ref with name %s found: %s' % (ref_name, json.dumps(field_spec)))
 
@@ -985,13 +987,13 @@ def _configure_select_list_subset_supplier(field_spec, loader):
 ###################
 # unicode_range
 ###################
-@registries.registry.schemas(_UNICODE_RANGE_KEY)
+@registries.Registry.schemas(_UNICODE_RANGE_KEY)
 def _get_unicode_range_schema():
     """ get the unicode range schema """
     return schemas.load(_UNICODE_RANGE_KEY)
 
 
-@registries.registry.types(_UNICODE_RANGE_KEY)
+@registries.Registry.types(_UNICODE_RANGE_KEY)
 def _configure_unicode_range_supplier(spec, _):
     """ configure the supplier for unicode_range types """
     if 'data' not in spec:
@@ -1025,13 +1027,13 @@ def _single_unicode_range(data, config):
 #################
 # uuid_handler
 #################
-@registries.registry.schemas(_UUID_KEY)
+@registries.Registry.schemas(_UUID_KEY)
 def _get_uuid_schema():
     """ get the schema for uuid type """
     return schemas.load(_UUID_KEY)
 
 
-@registries.registry.types(_UUID_KEY)
+@registries.Registry.types(_UUID_KEY)
 def _configure_uuid_supplier(field_spec, loader):
     """ configure the supplier for uuid types """
     config = utils.load_config(field_spec, loader)
@@ -1045,13 +1047,13 @@ def _configure_uuid_supplier(field_spec, loader):
 ###################
 # distribution
 ###################
-@registries.registry.schemas(_DISTRIBUTION_KEY)
+@registries.Registry.schemas(_DISTRIBUTION_KEY)
 def _get_distribution_schema():
     """ get the schema for distribution type """
     return schemas.load(_DISTRIBUTION_KEY)
 
 
-@registries.registry.types(_DISTRIBUTION_KEY)
+@registries.Registry.types(_DISTRIBUTION_KEY)
 def _configure_distribution_supplier(field_spec, loader):
     """ configure the supplier for distribution types """
     if 'data' not in field_spec:

@@ -11,7 +11,7 @@ from . import suppliers, utils
 from .exceptions import SpecException
 from .supplier.model import DataSpec
 from .schemas import validate_schema_for_spec
-from .registries import lookup_type, lookup_schema, registry
+from .registries import lookup_type, lookup_schema, Registry
 
 
 _log = logging.getLogger(__name__)
@@ -118,7 +118,7 @@ class Loader:
             supplier = suppliers.buffered(supplier, field_spec)
         return supplier
 
-    def get_ref_spec(self, key: str) -> dict:
+    def get_ref(self, key: str) -> dict:
         """
         returns the spec for the ref with the provided key
 
@@ -151,9 +151,9 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     """
     raw_spec = utils.get_raw_spec(data_spec)
     updated = dict(raw_spec)
-    preprocessors = registry.preprocessors.get_all()
+    preprocessors = Registry.preprocessors.get_all()
     for name in preprocessors:
-        preprocessor = registry.preprocessors.get(name)
+        preprocessor = Registry.preprocessors.get(name)
         processed = preprocessor(updated)
         if processed is None:
             _log.error('Invalid preprocessor %s, returned None instead of updated spec, skipping', name)

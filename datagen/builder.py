@@ -4,16 +4,17 @@ Module for building Data Specs programmatically.
 Examples:
     >>> import datagen
     >>> builder = datagen.spec_builder()
-    >>> builder.values('names', ['amy', 'bob', 'cat', 'dan', 'earl'])
+    >>> builder.values('names', ['amy', 'bob', 'cat','dan'])
     >>> builder.range_spec('ages', data=[22, 33])
-    {'names': {'type': 'values', 'data': ['amy', 'bob', 'cat', 'dan', 'earl']}, 'ages': {'type': 'range', 'data': [22, 33]}}
+    {'names': {'type': 'values', 'data': ['amy', 'bob', 'cat', 'dan']}, 'ages': {'type': 'range', 'data': [22, 33]}}
 
     >>> refs = spec_builder.refs()
     >>> one = refs.values('ONE', ["A", "B", "C"])
     >>> two = refs.values('TWO', [1, 2, 3])
     >>> builder.combine('combine', refs=[one, two])
     >>> builder.build()
-    {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}, 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
+    {'combine': {'type': 'combine', 'refs': ['ONE', 'TWO']}, 'refs': {'ONE': {'type': 'values', 'data': ['A', 'B', 'C']}
+    , 'TWO': {'type': 'values', 'data': [1, 2, 3]}}}
 """
 import json
 import logging
@@ -419,8 +420,7 @@ class Builder:
         # this must be a refs instance
         if self.refs_builder is None:
             return self._add_field_spec(key, config_ref(**config))
-        else:
-            return self.add_ref(key, config_ref(**config))
+        return self.add_ref(key, config_ref(**config))
 
     def calculate(self, key: str,
                   refs: dict = None,
@@ -455,7 +455,7 @@ class Builder:
         Returns:
             FieldInfo for the added ref field
         """
-        return self._add_field_spec(key, ref(ref_name, data, **config))
+        return self._add_field_spec(key, ref_spec(ref_name, data, **config))
 
     def weighted_csv(self, key: str, **config) -> FieldInfo:
         """
@@ -1295,7 +1295,7 @@ def calculate(refs: dict = None,
     return spec
 
 
-def ref(ref_name: str = None, data: str = None, **config) -> dict:
+def ref_spec(ref_name: str = None, data: str = None, **config) -> dict:
     """
     Constructs a ref Field Spec
 

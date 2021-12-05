@@ -13,7 +13,7 @@ _MAPPING = {
 }
 
 
-@registries.registry.logging('default')
+@registries.Registry.logging('default')
 def _configure_logging(loglevel: str):
     """
     Default Handler for Logging Configuration

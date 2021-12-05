@@ -12,7 +12,7 @@ from . import registries
 _log = logging.getLogger(__name__)
 
 
-@registries.registry.preprocessors('default')
+@registries.Registry.preprocessors('default')
 def _preprocess_spec(raw_spec):
     """
     Preprocesses the spec into a format that is easier to use.
@@ -40,7 +40,7 @@ def _preprocess_spec(raw_spec):
     return updated_specs
 
 
-@registries.registry.preprocessors('csv-select')
+@registries.Registry.preprocessors('csv-select')
 def _preprocess_csv_select(raw_spec):
     """
     Converts and csv-select elements into standard csv ones
@@ -81,7 +81,7 @@ def _preprocess_csv_select(raw_spec):
     return updated_specs
 
 
-@registries.registry.preprocessors('nested')
+@registries.Registry.preprocessors('nested')
 def _preprocess_nested(raw_spec):
     """
     Converts all nested elements
@@ -125,7 +125,7 @@ def _preprocess_nested(raw_spec):
     return updated_specs
 
 
-@registries.registry.preprocessors('type_check')
+@registries.Registry.preprocessors('type_check')
 def _preprocess_verify_types(raw_spec):
     """ log only checks """
     for key, field_spec in raw_spec.items():
@@ -210,8 +210,7 @@ def _convert_to_values_if_needed(spec, spectype):
             'type': 'values',
             'data': spec
         }
-    else:
-        return spec
+    return spec
 
 
 def _parse_key(field_name):

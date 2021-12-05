@@ -66,25 +66,25 @@ class BoundedDistribution(Distribution):
         return value
 
 
-@registries.registry.distribution('uniform')
+@registries.Registry.distribution('uniform')
 def uniform(start, end):
     """ uniform distribution for from start to end """
     return UniformDistribution(start, end)
 
 
-@registries.registry.distribution('normal')
+@registries.Registry.distribution('normal')
 def normal(mean, stddev, **kwargs):
     """ normal distribution for normal keyword """
     return _gaussian_distribution(mean, stddev, **kwargs)
 
 
-@registries.registry.distribution('gauss')
+@registries.Registry.distribution('gauss')
 def gauss(mean, stddev, **kwargs):
     """ normal distribution for gauss keyword """
     return _gaussian_distribution(mean, stddev, **kwargs)
 
 
-@registries.registry.distribution('gaussian')
+@registries.Registry.distribution('gaussian')
 def gaussian(mean, stddev, **kwargs):
     """ normal distribution for gaussian keyword """
     return _gaussian_distribution(mean, stddev, **kwargs)
@@ -126,7 +126,7 @@ def from_string(dist_func_str: str) -> Distribution:
         raise ValueError('Invalid function format: ' + dist_func_str)
 
     name = dist_func_str[0:open_paren]
-    dist_func = registries.registry.distribution.get(name)
+    dist_func = registries.Registry.distribution.get(name)
 
     args = dist_func_str[open_paren + 1:close_paren]
     kwargs = _convert_to_kwargs(args)

@@ -14,7 +14,9 @@ Module with functions that handle formatting specs in an orderly and consistent 
 """
 import logging
 from collections import OrderedDict
-
+from _ctypes import PyObj_FromPtr  # type: ignore
+import json
+import re
 import yaml
 
 _log = logging.getLogger('spec.formatter')
@@ -69,6 +71,7 @@ def _clean_semi_formatted_yaml(toclean: str):
 
 
 def _order_spec(raw_spec):
+    """ orders the spec by ordering the underlying fields """
     outer = {}
     for field, spec in raw_spec.items():
         if field == 'refs':
@@ -83,6 +86,7 @@ def _order_spec(raw_spec):
 
 
 def _order_field_spec(field_spec):
+    """ puts the spec fields into consistent order """
     if not isinstance(field_spec, dict):
         return _NoIndent(field_spec)
     ordered = OrderedDict()
@@ -96,6 +100,9 @@ def _order_field_spec(field_spec):
             ordered['refs'] = [_NoIndent(ref) for ref in refs]
         else:
             ordered['refs'] = _NoIndent(refs)
+    if 'fields' in field_spec:
+        fields = field_spec.pop('fields')
+        ordered['fields'] = _order_spec(fields)
     for key in ['config', 'ref', 'fields']:
         if key in field_spec:
             ordered[key] = field_spec[key]
@@ -105,15 +112,15 @@ def _order_field_spec(field_spec):
     return ordered
 
 
-##################################
-# from https://stackoverflow.com/questions/13249415/how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
-##################################
-from _ctypes import PyObj_FromPtr  # type: ignore
-import json
-import re
+"""
+JSON Custom formatting
+from
+https://stackoverflow.com/questions/13249415/
+how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
+"""
 
 
-class _NoIndent(object):
+class _NoIndent:
     """ Value wrapper. """
 
     def __init__(self, value):
@@ -128,6 +135,7 @@ class _NoIndent(object):
 
 
 class _MyEncoder(json.JSONEncoder):
+    """ custom encoder for JSON data """
     FORMAT_SPEC = '@@{}@@'
     regex = re.compile(FORMAT_SPEC.format(r'(\d+)'))
 
@@ -161,10 +169,13 @@ class _MyEncoder(json.JSONEncoder):
         return json_repr
 
 
-#########################
-# from https://til.simonwillison.net/python/style-yaml-dump
-# via: https://stackoverflow.com/a/8641732 and https://stackoverflow.com/a/16782282
-#########################
+"""
+YAML custom formatting
+from https://til.simonwillison.net/python/style-yaml-dump
+via: https://stackoverflow.com/a/8641732 and https://stackoverflow.com/a/16782282
+"""
+
+
 def _represent_ordered_dict(dumper, data):
     value = []
 

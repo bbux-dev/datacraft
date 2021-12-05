@@ -1,6 +1,6 @@
 from datagen.preprocessor import _preprocess_spec, _preprocess_csv_select, _preprocess_nested
 from datagen.preprocessor import _parse_key, _is_spec_data, _update_no_params
-from datagen import builder, SpecException
+from datagen import builder, cli, SpecException
 import pytest
 
 parse_key_tests = [

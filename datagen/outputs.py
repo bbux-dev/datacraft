@@ -6,8 +6,8 @@ from abc import ABC, abstractmethod
 import os
 import json
 import logging
-import catalogue  # type: ignore
 from pathlib import Path
+import catalogue  # type: ignore
 from . import template_engines, registries
 from .supplier.model import RecordProcessor, OutputHandlerInterface
 from .exceptions import SpecException
@@ -15,19 +15,19 @@ from .exceptions import SpecException
 _log = logging.getLogger(__name__)
 
 
-@registries.registry.formats('json')
+@registries.Registry.formats('json')
 def _format_json(record: dict) -> str:
     """formats the record as compressed json  """
     return json.dumps(record)
 
 
-@registries.registry.formats('json-pretty')
+@registries.Registry.formats('json-pretty')
 def _format_json_pretty(record: dict) -> str:
     """pretty prints the record as json  """
     return json.dumps(record, indent=int(registries.get_default('json_indent')))
 
 
-@registries.registry.formats('csv')
+@registries.Registry.formats('csv')
 def _format_csv(record: dict) -> str:
     """formats the values of the record as comma separated values  """
     return ','.join([str(val) for val in record.values()])
@@ -228,7 +228,7 @@ class _FormatProcessor(RecordProcessor):
     """A simple class that wraps a record formatting function"""
 
     def __init__(self, key):
-        self.format_func = registries.registry.formats.get(key)
+        self.format_func = registries.Registry.formats.get(key)
 
     def process(self, record: dict) -> str:
         """
@@ -259,7 +259,7 @@ def _for_format(key: str) -> _FormatProcessor:
     try:
         return _FormatProcessor(key)
     except catalogue.RegistryError as err:
-        raise SpecException(str(err))
+        raise SpecException(str(err)) from err
 
 
 def processor(template: Union[str, Path] = None, format_name: str = None) -> Union[None, RecordProcessor]:
@@ -278,27 +278,28 @@ def processor(template: Union[str, Path] = None, format_name: str = None) -> Uni
 
     Examples:
         >>> import datagen
-        >>> processor = datagen.outputs.processor(template='/path/to/template.jinja')
-        >>> processor = datagen.outputs.processor(template='{{ Inline: {{ variable }}')
-        >>> processor = datagen.outputs.processor(format_name='json')
-        >>> processor = datagen.outputs.processor(format_name='my_custom_registered_format')
+        >>> engine = datagen.outputs.processor(template='/path/to/template.jinja')
+        >>> engine = datagen.outputs.processor(template='{{ Inline: {{ variable }}')
+        >>> formatter = datagen.outputs.processor(format_name='json')
+        >>> formatter = datagen.outputs.processor(format_name='my_custom_registered_format')
     """
     if template and format_name:
         raise SpecException('Only one of template or format_name should be supplied')
-    processor = None
+    # so name doesn't shadow
+    _processor = None
     if template:
         _log.debug('Using template: %s', template)
         if os.path.exists(template):
-            processor = template_engines.for_file(template)
+            _processor = template_engines.for_file(template)
         elif '{{' in template:  # type: ignore
-            processor = template_engines.string(template)  # type: ignore
+            _processor = template_engines.string(template)  # type: ignore
         else:
             raise SpecException(f'Unable to determine how to handle template {template}, with type: {type(template)}')
     elif format_name:
         _log.debug('Using %s formatter for output', format_name)
-        processor = _for_format(format_name)
+        _processor = _for_format(format_name)
 
-    return processor
+    return _processor
 
 
 def get_writer(outdir: str = None,
@@ -350,4 +351,3 @@ def get_writer(outdir: str = None,
             _log.debug('Writing output to stdout')
             writer = stdout_writer()
     return writer
-

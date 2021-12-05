@@ -8,7 +8,7 @@ from . import builder
 # expose this at root too
 from .builder import spec_builder, parse_spec
 # registry decorators
-from .registries import registry
+from .registries import Registry as registry
 # exceptions and errors thrown
 from .exceptions import SpecException, ResourceError
 from .supplier.exceptions import SupplierException

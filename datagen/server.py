@@ -10,12 +10,21 @@ _log = logging.getLogger(__name__)
 
 
 class _Server:
+    """
+    Light weight Flask server
+    """
     def __init__(self, generator, endpoint, data_is_json):
         self.generator = generator
         self.endpoint = endpoint
         self.data_is_json = data_is_json
 
     def callback(self):
+        """
+        Callback for endpoint requests
+
+        Returns:
+            data as JSON or raw, until stop iteration, then 204 no more content
+        """
         # next generated record
         try:
             data = next(self.generator)
@@ -27,6 +36,7 @@ class _Server:
         return data
 
     def run(self):
+        """ run the Flask app """
         app = flask.Flask(__name__)
         _log.info('Adding endpoint to server: %s', self.endpoint)
         app.add_url_rule(self.endpoint, view_func=self.callback)
@@ -45,4 +55,3 @@ def run(generator: Generator, endpoint: str, data_is_json: bool):
     """
     server = _Server(generator, endpoint, data_is_json)
     server.run()
-    pass

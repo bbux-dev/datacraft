@@ -4,17 +4,17 @@ Entry point for datagen tool
 import argparse
 import os
 import sys
-
+import json
+import logging
 import yaml
 
 from . import outputs, utils
-from . import template_engines, builder, spec_formatters, loader
+from . import template_engines, builder, spec_formatters, loader, registries
 # this activates the decorators, so they will be discoverable
-from .preprocessor import *
-from .defaults import *
-from .distributions import *
+from .exceptions import SpecException
 
-# need to prime the core types for import
+# need to import this to trigger registration process
+from . import preprocessor, defaults, distributions
 from . import _registered_types
 
 _log = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ def process_args(args):
     or creates the generator from the provided args.
 
     Args:
-        args: from cli.parsargs
+        args: from parsargs
 
     Returns:
         The constructed record generator or None
@@ -114,19 +114,8 @@ def process_args(args):
     ###################
     # Default Overrides
     ###################
-    if args.defaults:
-        defaults = _load_json_or_yaml(args.defaults)
-        for key, value in defaults.items():
-            registries.set_default(key, value)
-    # command line takes precedence over config file
-    if args.set_defaults:
-        for setting in args.set_defaults:
-            parts = setting.split('=')
-            if len(parts) != 2:
-                _log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
-                             setting)
-                continue
-            registries.set_default(parts[0], parts[1])
+    _handle_defaults(args)
+
     # command line overrides any configs
     if args.sample_lists:
         registries.set_default('sample_mode', True)
@@ -134,8 +123,8 @@ def process_args(args):
     # print out the defaults as currently registered
     if args.debug_defaults:
         writer = outputs.get_writer(args.outdir, outfile='dataspec_defaults.json', overwrite=True)
-        defaults = registries.all_defaults()
-        writer.write(json.dumps(defaults, indent=4))
+        defaults_info = registries.all_defaults()
+        writer.write(json.dumps(defaults_info, indent=4))
         return None
 
     ###################
@@ -189,7 +178,25 @@ def process_args(args):
     return generator
 
 
+def _handle_defaults(args):
+    """ process and populate new/overridden defaults """
+    if args.defaults:
+        defaults_info = _load_json_or_yaml(args.defaults)
+        for key, value in defaults_info.items():
+            registries.set_default(key, value)
+    # command line takes precedence over config file
+    if args.set_defaults:
+        for setting in args.set_defaults:
+            parts = setting.split('=')
+            if len(parts) != 2:
+                _log.warning('Invalid default override: should be of form key=value or key="value with spaces": %s',
+                             setting)
+                continue
+            registries.set_default(parts[0], parts[1])
+
+
 def _get_writer(args):
+    """ get the write from the args """
     return outputs.get_writer(args.outdir,
                               outfileprefix=args.outfileprefix,
                               extension=args.extension,
@@ -199,6 +206,7 @@ def _get_writer(args):
 
 
 def _get_output(args, processor, writer):
+    """ get the output from the args, processor, and writer """
     if processor:
         return outputs.record_level(processor, writer)
 
@@ -272,6 +280,6 @@ def _configure_logging(args):
     """
     Use each logging element from the registry to configure logging
     """
-    for name in registries.registry.logging.get_all():
-        configure_function = registries.registry.logging.get(name)
+    for name in registries.Registry.logging.get_all():
+        configure_function = registries.Registry.logging.get(name)
         configure_function(args.log_level)

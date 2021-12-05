@@ -93,6 +93,7 @@ class _RoundCaster(CasterInterface):
         return self._round(value)
 
     def _round(self, value):
+        """ round value to configured digits """
         if self.digits is None:
             return round(float(value))
         return round(float(value), self.digits)
@@ -159,6 +160,7 @@ def from_config(config: dict):
 
 
 def _lookup_name(name):
+    """ lookup caster name in map or registry """
     if name in _CASTER_MAP:
         return _CASTER_MAP.get(name)
     # check registry

@@ -63,7 +63,7 @@ def load_config(field_spec: dict, loader, **kwargs) -> dict:
     config.update(kwargs)
     refkey = config.get('config_ref')
     if refkey:
-        config_ref = loader.get_ref_spec(refkey)
+        config_ref = loader.get_ref(refkey)
         config.update(config_ref.get('config', {}))
     return config
 

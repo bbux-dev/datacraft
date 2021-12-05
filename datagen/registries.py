@@ -9,7 +9,7 @@ import catalogue  # type: ignore
 _log = logging.getLogger(__name__)
 
 
-class registry:
+class Registry:
     """
     Catalogue registry for types, preprocessors, logging configuration, and others
 
@@ -102,9 +102,9 @@ def lookup_type(key):
     Returns:
         the type if found
     """
-    all_keys = list(registry.types.get_all().keys())
+    all_keys = list(Registry.types.get_all().keys())
     if key in all_keys:
-        func = registry.types.get(key)
+        func = Registry.types.get(key)
     else:
         _log.debug('No type found for key %s', key)
         return None
@@ -122,9 +122,9 @@ def lookup_schema(key):
     Returns:
         the schema if found
     """
-    all_keys = list(registry.schemas.get_all().keys())
+    all_keys = list(Registry.schemas.get_all().keys())
     if key in all_keys:
-        schema_load_function = registry.schemas.get(key)
+        schema_load_function = Registry.schemas.get(key)
     else:
         _log.debug('No schema found for type %s', key)
         return None
@@ -142,9 +142,9 @@ def lookup_caster(key):
     Returns:
         the caster if found
     """
-    all_keys = list(registry.casters.get_all().keys())
+    all_keys = list(Registry.casters.get_all().keys())
     if key in all_keys:
-        caster_load_function = registry.casters.get(key)
+        caster_load_function = Registry.casters.get(key)
     else:
         _log.debug('No caster found for key %s', key)
         return None
@@ -154,17 +154,17 @@ def lookup_caster(key):
 
 def registered_formats():
     """ list of registered formats """
-    return list(registry.formats.get_all().keys())
+    return list(Registry.formats.get_all().keys())
 
 
 def registered_types():
     """ list of registered types """
-    return list(registry.types.get_all().keys())
+    return list(Registry.types.get_all().keys())
 
 
 def registered_casters():
     """ list of registered casters """
-    return list(registry.casters.get_all().keys())
+    return list(Registry.casters.get_all().keys())
 
 
 def get_default(key):
@@ -178,7 +178,7 @@ def get_default(key):
         The default for thekey
     """
 
-    func = registry.defaults.get(key)
+    func = Registry.defaults.get(key)
     return func()
 
 
@@ -190,9 +190,9 @@ def set_default(key: str, value: Any):
         key: to set default for
         value: for the default
     """
-    registry.defaults.register(name=key, func=lambda *_: value)
+    Registry.defaults.register(name=key, func=lambda *_: value)
 
 
 def all_defaults():
     """ creates a dictionary of the current state of the registered defaults """
-    return {k: get_default(k) for k in registry.defaults.get_all()}
+    return {k: get_default(k) for k in Registry.defaults.get_all()}

@@ -57,13 +57,13 @@ def test_load_spec_weighted_ref():
         "NEGATIVE": 0.4,
         "NEUTRAL": 0.1
     }
-    weighted_ref_spec = builder.spec_builder() \
+    weighted_ref = builder.spec_builder() \
         .add_field('foo', builder.weighted_ref(ref_weights)) \
         .add_ref('POSITIVE', ['yes']) \
         .add_ref('NEGATIVE', ['no']) \
         .add_ref('NEUTRAL', ['meh']) \
         .build()
-    loader = datagen.Loader(weighted_ref_spec)
+    loader = datagen.Loader(weighted_ref)
     supplier = loader.get('foo')
 
     # expect mostly positive and negative values

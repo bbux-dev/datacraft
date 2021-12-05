@@ -38,7 +38,7 @@ def configure_supplier(field_spec, loader):
 def test_registry_from_local():
     loader = Loader(spec)
 
-    reg = registries.registry
+    reg = registries.Registry
     all_types = reg.types.get_all()
     handler = all_types.get('reverse_string')
 
@@ -53,7 +53,7 @@ def test_registry_from_file():
 
     loader = Loader(spec)
 
-    reg = registries.registry
+    reg = registries.Registry
     all_types = reg.types.get_all()
     handler = all_types.get('string_reverser')
 
