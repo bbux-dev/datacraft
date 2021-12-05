@@ -1,3 +1,6 @@
+"""
+Module for nested type implementations
+"""
 from typing import Dict, Any
 
 from .model import KeyProviderInterface, ValueSupplierInterface
@@ -56,6 +59,7 @@ class _NestedSupplier(ValueSupplierInterface):
         return vals
 
     def _single_pass(self, iteration: int) -> Dict[str, Any]:
+        """ get set of values for this iteration """
         _, keys = self.key_supplier.get()
         subset = {key: self.field_supplier_map.get(key) for key in keys}
         if any(val is None for val in subset.values()):

@@ -6,7 +6,18 @@ import datetime
 from .model import ValueSupplierInterface, Distribution
 
 
-def date_supplier(date_format, timestamp_distribution):
+def date_supplier(date_format: str,
+                  timestamp_distribution: Distribution) -> ValueSupplierInterface:
+    """
+    Creates a value supplier that provides dates with the given format
+
+    Args:
+        date_format: format string for dates
+        timestamp_distribution: distribution object that will provide the timestamps that will be formatted
+
+    Returns:
+        ValueSupplierInterface that supplies dates with the given format
+    """
     return _DateSupplier(timestamp_distribution, date_format)
 
 

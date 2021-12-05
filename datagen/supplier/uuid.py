@@ -26,11 +26,13 @@ def uuid_supplier(variant) -> ValueSupplierInterface:
 
 
 class _Uuid1(ValueSupplierInterface):
+    """ uuid1 supplier class """
     def next(self, _):
         return str(uuid.uuid1())
 
 
 class _Uuid3(ValueSupplierInterface):
+    """ uuid3 supplier class """
     def __init__(self):
         self.namespace = uuid.uuid4()
 
@@ -39,11 +41,13 @@ class _Uuid3(ValueSupplierInterface):
 
 
 class _Uuid4(ValueSupplierInterface):
+    """ uuid4 supplier class """
     def next(self, iteration):
         return str(uuid.uuid4())
 
 
 class _Uuid5(ValueSupplierInterface):
+    """ uuid5 supplier class """
     def __init__(self):
         self.namespace = uuid.uuid4()
 

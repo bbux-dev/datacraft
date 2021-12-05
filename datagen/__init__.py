@@ -14,3 +14,5 @@ from .exceptions import SpecException, ResourceError
 from .supplier.exceptions import SupplierException
 # commonly used by client code
 from .loader import Loader
+# to trigger registered functions
+from . import cli

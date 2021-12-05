@@ -2,13 +2,14 @@
 Module for storing package wide common functions
 """
 import decimal
-import math
-from typing import Union
-import os
 import importlib
 import logging
+import math
+import os
+from typing import Union
 
 from .supplier.model import DataSpec
+from .exceptions import ResourceError
 
 
 # not code hinted type, due to mypy issue recognising importlib.util
@@ -21,12 +22,15 @@ def load_custom_code(code_path):
     """
     if not os.path.exists(code_path):
         raise FileNotFoundError(f'Path to {code_path} not found.')
+    code_spec = importlib.util.spec_from_file_location("python_code", str(code_path))
+    if code_spec is None:
+        raise ResourceError(f"Couldn't load custom Python code from: {code_path}")
     try:
-        spec = importlib.util.spec_from_file_location("python_code", str(code_path))
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-    except Exception as exception:
-        logging.warning("Couldn't load custom Python code: %s: %s", code_path, str(exception))
+        module = importlib.util.module_from_spec(code_spec)
+        code_spec.loader.exec_module(module)
+    except Exception as exc:
+        logging.warning("Couldn't load custom Python code: %s: %s", code_path, str(exc))
+        raise ResourceError(f"Couldn't load custom Python code: {code_path}: {exc}") from exc
 
 
 def is_affirmative(key: str, config: dict, default=False) -> bool:

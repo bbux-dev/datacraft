@@ -366,6 +366,7 @@ class _ListValueSupplier(ValueSupplierInterface):
         return values
 
     def _value(self, iteration, i):
+        """ value for iteration i index i"""
         idx = (iteration + i) % len(self.values)
         return self.values[idx]
 

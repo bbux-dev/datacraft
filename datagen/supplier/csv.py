@@ -218,6 +218,7 @@ def load_csv_data(csv_path: str,
                   use_buffering: bool) -> CsvData:
     """
     Loads the csv appropriate CSVDataBase
+
     Args:
         csv_path: Path to CSV file to use
         delimiter: how items are separated
@@ -227,7 +228,7 @@ def load_csv_data(csv_path: str,
         use_buffering: if the source file is large enough that buffering should be employed
 
     Returns:
-        CsvDataBase to supply csv data from
+        CsvData to supply csv data from
     """
     if use_buffering:
         if sample_rows:
@@ -239,5 +240,20 @@ def load_csv_data(csv_path: str,
     return csv_data
 
 
-def csv_supplier(count_supplier: ValueSupplierInterface, csv_data, field_name, sample):
+def csv_supplier(field_name: str,
+                 csv_data: CsvData,
+                 count_supplier: ValueSupplierInterface,
+                 sample: bool) -> ValueSupplierInterface:
+    """
+    Creates csv supplier for the given field using the provided csv_data
+
+    Args:
+        field_name: name of field to supply data for
+        csv_data: csv data to use
+        count_supplier: supplier for counts
+        sample: if field should be sampled, if supported
+
+    Returns:
+        ValueSupplierInterface for csv field
+    """
     return _CsvSupplier(csv_data, field_name, sample, count_supplier)

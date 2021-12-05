@@ -1,9 +1,10 @@
 """
 Module for calculate type implementations
 """
+from typing import Dict
+
 import asteval  # type: ignore
 
-from typing import Dict
 from .model import ValueSupplierInterface, RecordProcessor
 
 

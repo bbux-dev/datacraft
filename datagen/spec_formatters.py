@@ -11,13 +11,24 @@ Module with functions that handle formatting specs in an orderly and consistent 
       "key": "value..."
     }
   }
+
+References:
+
+    JSON Custom formatting
+    https://stackoverflow.com/questions/13249415/
+    how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
+
+    YAML custom formatting
+    from https://til.simonwillison.net/python/style-yaml-dump
+    via: https://stackoverflow.com/a/8641732 and https://stackoverflow.com/a/16782282
 """
-import logging
-from collections import OrderedDict
-from _ctypes import PyObj_FromPtr  # type: ignore
 import json
+import logging
 import re
+from collections import OrderedDict
+
 import yaml
+from _ctypes import PyObj_FromPtr  # type: ignore
 
 _log = logging.getLogger('spec.formatter')
 
@@ -100,24 +111,18 @@ def _order_field_spec(field_spec):
             ordered['refs'] = [_NoIndent(ref) for ref in refs]
         else:
             ordered['refs'] = _NoIndent(refs)
+    if 'ref' in field_spec:
+        ordered['ref'] = field_spec['ref']
     if 'fields' in field_spec:
-        fields = field_spec.pop('fields')
+        fields = field_spec['fields']
+        # these should be full specs themselves
         ordered['fields'] = _order_spec(fields)
-    for key in ['config', 'ref', 'fields']:
-        if key in field_spec:
-            ordered[key] = field_spec[key]
+    if 'config' in field_spec:
+        ordered['config'] = field_spec['config']
     for key, val in field_spec.items():
         if key not in ['type', 'data', 'config', 'ref', 'refs', 'fields']:
             ordered[key] = val
     return ordered
-
-
-"""
-JSON Custom formatting
-from
-https://stackoverflow.com/questions/13249415/
-how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
-"""
 
 
 class _NoIndent:
@@ -142,41 +147,35 @@ class _MyEncoder(json.JSONEncoder):
     def __init__(self, **kwargs):
         # Save copy of any keyword argument values needed for use here.
         self.__sort_keys = kwargs.get('sort_keys', None)
-        super(_MyEncoder, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def default(self, obj):
         return (self.FORMAT_SPEC.format(id(obj)) if isinstance(obj, _NoIndent)
-                else super(_MyEncoder, self).default(obj))
+                else super().default(obj))
 
     def encode(self, obj):
         format_spec = self.FORMAT_SPEC  # Local var to expedite access.
-        json_repr = super(_MyEncoder, self).encode(obj)  # Default JSON.
+        json_repr = super().encode(obj)  # Default JSON.
 
         # Replace any marked-up object ids in the JSON repr with the
         # value returned from the json.dumps() of the corresponding
         # wrapped Python object.
         for match in self.regex.finditer(json_repr):
             # see https://stackoverflow.com/a/15012814/355230
-            id = int(match.group(1))
-            no_indent = PyObj_FromPtr(id)
+            _id = int(match.group(1))
+            no_indent = PyObj_FromPtr(_id)
             json_obj_repr = json.dumps(no_indent.value, sort_keys=self.__sort_keys)
 
             # Replace the matched id string with json formatted representation
             # of the corresponding Python object.
             json_repr = json_repr.replace(
-                '"{}"'.format(format_spec.format(id)), json_obj_repr)
+                '"{}"'.format(format_spec.format(_id)), json_obj_repr)
 
         return json_repr
 
 
-"""
-YAML custom formatting
-from https://til.simonwillison.net/python/style-yaml-dump
-via: https://stackoverflow.com/a/8641732 and https://stackoverflow.com/a/16782282
-"""
-
-
 def _represent_ordered_dict(dumper, data):
+    """ represent items for ordered dict """
     value = []
 
     for item_key, item_value in data.items():
@@ -192,6 +191,7 @@ yaml.add_representer(OrderedDict, _represent_ordered_dict)
 
 
 def _represent_noindent(dumper, data):
+    """ represent items for no indent nodes """
     if isinstance(data.value, list):
         return dumper.represent_sequence("tag:yaml.org,2002:list", data.value, flow_style=True)
     if isinstance(data.value, dict):

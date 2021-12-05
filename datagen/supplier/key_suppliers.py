@@ -11,7 +11,7 @@ import json
 
 from .model import DataSpec, KeyProviderInterface, ValueSupplierInterface
 from .exceptions import SupplierException
-from .common import weighted_values_explicit, SingleValue
+from .common import weighted_values_explicit
 
 _ROOT_KEYS = ['refs', 'field_groups']
 
@@ -141,7 +141,7 @@ def _create_rotating_lists_key_provider(field_groups: Union[List, Dict]) -> KeyP
     if isinstance(field_groups, list):
         keys = [('_'.join(keys_list), keys_list) for keys_list in field_groups]
     elif isinstance(field_groups, dict):
-        keys = [(key, value) for key, value in field_groups.items()]
+        keys = list(field_groups.items())
     else:
         raise ValueError('Invalid type for field_groups only one of list or dict allowed')
     return _RotatingKeyListProvider(keys)

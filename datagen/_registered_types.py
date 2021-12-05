@@ -287,7 +287,7 @@ def _configure_csv(field_spec, loader):
     count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
 
     csv_data = _load_csv_data(field_spec, config, loader.datadir)
-    return csv_supplier(count_supplier, csv_data, field_name, sample)
+    return csv_supplier(field_name, csv_data, count_supplier, sample)
 
 
 @registries.Registry.schemas('csv')
