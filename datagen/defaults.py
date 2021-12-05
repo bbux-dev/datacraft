@@ -1,7 +1,9 @@
 """
 Module for storing default settings across package
 """
+import logging
 from . import registries
+
 
 _LARGE_CSV_SIZE_MB = 250
 
@@ -86,7 +88,37 @@ def _default_mac_address_separator():
     return ':'
 
 
-@registries.Registry.defaults('outfileprefix')
-def _default_outfileprefix():
+@registries.Registry.defaults('outfile_prefix')
+def _default_outfile_prefix():
     """ default output file prefix """
-    return 'generated-'
+    return 'generated'
+
+
+@registries.Registry.defaults('outfile_extension')
+def _default_outfile_extension():
+    """ default output file extension """
+    return ''
+
+
+@registries.Registry.defaults('log_level')
+def _default_log_level():
+    """ default logging level """
+    return logging.INFO
+
+
+@registries.Registry.defaults('strict_mode')
+def _default_strict_mode():
+    """ default strict schema checking enabled """
+    return False
+
+
+@registries.Registry.defaults('exclude_internal')
+def _default_exclude_internal():
+    """ default if internal fields should be excluded from output """
+    return False
+
+
+@registries.Registry.defaults('sample_lists')
+def _default_sample_lists():
+    """ default if lists should be sampled """
+    return False

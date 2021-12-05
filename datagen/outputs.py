@@ -317,7 +317,7 @@ def get_writer(outdir: str = None,
         overwrite: Should existing files with the same name be overwritten
 
     Keyword Args:
-        outfileprefix: the prefix of the output files i.e. test-data-
+        outfile_prefix: the prefix of the output files i.e. test-data-
         extension: to append to the file name prefix i.e. .csv
         recordsperfile: how many records per file to write
         suppress_output: if output to stdout should be suppressed, only valid if outdir is None
@@ -330,7 +330,7 @@ def get_writer(outdir: str = None,
         >>> writer = datagen.outputs.get_writer('./output', outfileprefix='test-data-', extension='.csv')
     """
     if outdir:
-        _log.debug('Creating output file writer for dir: %s', outdir)
+        _log.debug('Creating output file writer for dir: %s, prefix: %s', outdir, kwargs.get('outfile_prefix'))
         if outfile:
             writer = single_file_writer(
                 outdir=outdir,
@@ -340,7 +340,7 @@ def get_writer(outdir: str = None,
         else:
             writer = incrementing_file_writer(
                 outdir=outdir,
-                outname=kwargs.get('outfileprefix', registries.get_default('outfileprefix')),
+                outname=kwargs.get('outfile_prefix', registries.get_default('outfile_prefix')),
                 extension=kwargs.get('extension'),
                 records_per_file=kwargs.get('recordsperfile', 1)
             )

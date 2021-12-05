@@ -42,7 +42,7 @@ Core Classes
 
 Registry Decorators
 -------------------
-.. autoclass:: datagen.registries.registry
+.. autoclass:: datagen.registries.Registry
    :members:
 
 .. _datagen_errors:
