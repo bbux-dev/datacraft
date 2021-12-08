@@ -49,8 +49,6 @@ def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
         # this supplier can handle the count param itself, so just return it
         return _value_list(data, config, do_sampling)
     if isinstance(data, dict):
-        if do_sampling:
-            raise SpecException('Cannot do sampling on weighted values: ' + json.dumps(spec))
         supplier = weighted_values(data)
     else:
         supplier = single_value(data)

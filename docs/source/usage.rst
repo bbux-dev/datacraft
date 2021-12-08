@@ -362,6 +362,81 @@ In the spec above, the number of users created will be weighted so that half the
 half there are three or four. NOTE: It is important to make sure that the ``count`` param is equal to the maximum number
 that will be indexed. If it is less, then there will be empty line items whenever the num_users exceeds the count.
 
+
+.. _templating_specs:
+
+Templating Specs
+----------------
+
+There may be parts of a spec that you want to be variable. You can use the jinja2 templating format to template the
+parts of the spec that should be variable. For example:
+
+.. code-block:: text
+
+   {
+     "prize": {
+       "type": "values",
+       "data": {
+         "ball": 0.4,
+         "gum": 0.3,
+         "big ball": 0.1,
+         "frisbee": 0.1,
+         "puppy": 0.05,
+         "diamond ring": 0.005,
+         "tesla": 0.0005
+       },
+       "config": {
+         "count": {{ prize_count | default(1, true) | int }}
+       }
+     }
+   }
+
+In this example the count for the the prize field is variable. The default is 1, but can be overridden from the
+command line by specifying a ``--var-file /path/to/vars.json`` or with the ``-vars key1=value1 key2=value2`` flags.
+Running the command with no vars specified:
+
+.. code-block:: shell
+
+   $ datagen -s vars_test.json -i 3 --log-level warn
+   ['frisbee']
+   ['ball']
+   ['gum']
+
+Now with ``prize_count`` set to 3
+
+.. code-block:: shell
+
+   $ datagen -s vars_test.json -i 3 --log-level warn -v prize_count=3
+   ['gum', 'big ball', 'ball']
+   ['puppy', 'big ball', 'gum']
+   ['gum', 'ball', 'tesla']
+
+NOTE: It is a good practice to use a default in case that a variable is not defined, or that the variable
+substitution flags are not specified. With no default, the value would become blank and render the JSON invalid.
+
+NOTE: If using a ``calculate`` spec with a ``formula`` specified, you will need to adjust the formula so that it is not
+interpreted by the Jinja2 templating engine.
+
+.. code-block:: json
+
+   {
+     "sum": {
+       "type": "calculate",
+       "formula": "{{one}} + {{two}}"
+     }
+   }
+
+Should become:
+
+.. code-block:: json
+
+   {
+     "sum": {
+       "type": "calculate",
+       "formula": "{{ '{{one}} + {{two}}' }}"
+     }
+   }
+
 .. _field_groups:
 
 Field Groups
@@ -471,6 +546,9 @@ to specify where the referenced csv files live. For example:
         }
       }
     }
+
+NOTE: If you don't want to hard code the names of the datafiles to use in the spec, you can make use of the
+:ref:`Spec Templating<templating_specs>` feature described above.
 
 .. code-block:: shell
 

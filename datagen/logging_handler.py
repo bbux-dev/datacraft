@@ -24,7 +24,7 @@ def _configure_logging(loglevel: str):
     if str(loglevel).lower() in ['off', 'stop', 'disable']:
         logging.disable(logging.CRITICAL)
     else:
-        level = _MAPPING.get(loglevel, logging.INFO)
+        level = _MAPPING.get(loglevel, registries.get_default('log_level'))
         logging.basicConfig(
             format='%(levelname)s [%(asctime)s] %(message)s',
             level=level,

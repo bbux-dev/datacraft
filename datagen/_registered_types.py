@@ -565,16 +565,19 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
 ###########
 @registries.Registry.schemas(_GEO_LAT_KEY)
 def _get_geo_lat_schema():
+    """ schema for geo.lat type """
     return schemas.load(_GEO_LAT_KEY)
 
 
 @registries.Registry.schemas(_GEO_LONG_KEY)
 def _get_geo_long_schema():
+    """ schema for geo.long type """
     return schemas.load(_GEO_LONG_KEY)
 
 
 @registries.Registry.schemas(_GEO_PAIR_KEY)
 def _get_geo_pair_schema():
+    """ schema for geo.pair type """
     return schemas.load(_GEO_PAIR_KEY)
 
 
@@ -609,14 +612,17 @@ def _configure_geo_pair(field_spec, loader):
 
 
 def _configure_long_type(spec, loader):
+    """ configures longitude type """
     return _configure_geo_type(spec, loader, -180.0, 180.0, '_long')
 
 
 def _configure_lat_type(spec, loader):
+    """ configures latitude type """
     return _configure_geo_type(spec, loader, -90.0, 90.0, '_lat')
 
 
 def _configure_geo_type(spec, loader, default_start, default_end, suffix):
+    """ configures geo type """
     config = utils.load_config(spec, loader)
     precision = config.get('precision', registries.get_default('geo_precision'))
     if not str(precision).isnumeric():
@@ -626,6 +632,7 @@ def _configure_geo_type(spec, loader, default_start, default_end, suffix):
 
 
 def _get_start_end(config, default_start, default_end, suffix):
+    """ determines the valid range, changes if bbox in config """
     if 'bbox' in config:
         bbox = config['bbox']
         if not isinstance(bbox, list) or len(bbox) != 4:
@@ -650,6 +657,7 @@ def _get_start_end(config, default_start, default_end, suffix):
 ##########
 @registries.Registry.schemas('nested')
 def _get_nested_schema():
+    """ schema for nested type """
     return schemas.load('nested')
 
 
@@ -913,6 +921,7 @@ def _configure_rand_range_supplier(field_spec, loader):
 ###################
 @registries.Registry.schemas(_REF_KEY)
 def _get_ref_schema():
+    """ schema for ref type """
     return schemas.load(_REF_KEY)
 
 
@@ -931,6 +940,7 @@ def _configure_ref_supplier(field_spec: dict, loader: Loader):
 
 @registries.Registry.schemas(_WEIGHTED_REF_KEY)
 def _weighted_ref_schema():
+    """ schema for weighted_ref type """
     return schemas.load(_WEIGHTED_REF_KEY)
 
 
@@ -955,6 +965,7 @@ def _configure_weighted_ref_supplier(parent_field_spec, loader):
 ####################
 @registries.Registry.schemas(_SELECT_LIST_SUBSET_KEY)
 def _select_list_subset_schema():
+    """ schema for select_list_subset type """
     return schemas.load(_SELECT_LIST_SUBSET_KEY)
 
 

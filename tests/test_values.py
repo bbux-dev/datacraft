@@ -69,12 +69,6 @@ def _get_most_common_keys(spec, iterations, num_keys_to_collect):
     return most_common_keys
 
 
-def test_sampling_mode_invalid_for_weighted_values():
-    # sampling is only valid for list based suppliers
-    spec = builder.single_field('foo?sample=True', {10: 0.5, 20: 0.3, 30: 0.2}).build()
-    _test_invalid_spec(spec, 'foo')
-
-
 def test_count_param_invalid():
     # the word two is not a valid count
     spec = {'foo?count=two': ['A', 'B', 'C', 'D']}

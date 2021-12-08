@@ -165,3 +165,53 @@ def test_server(tmpdir, mocker):
             '--inline', '{A: 1, B: [2, 4, 6], C: 3}',
             '-i', '5', '--server']
     dgmain.main(args)
+
+
+def test_var_file_not_there(tmpdir):
+    args = ['--format', 'json',
+            '--inline', '{ {{ first }}: 1, {{ second }}: [2, 4, 6], {{ third }}: 3}',
+            '-i', '5',
+            '-o', str(tmpdir),
+            '--var-file', '/cant/find/vars.json']
+    dgmain.main(args)
+    assert not os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
+def test_var_file(tmpdir):
+    args = ['--format', 'json',
+            '--inline', '{ {{ first }}: 1, {{ second }}: [2, 4, 6], {{ third }}: 3}',
+            '-i', '5',
+            '-o', str(tmpdir),
+            '--var-file', os.path.join(test_dir, 'vars.json')]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
+def test_var_args(tmpdir):
+    args = ['--format', 'json',
+            '--inline', '{ {{ first }}: 1, {{ second }}: [2, 4, 6], {{ third }}: 3}',
+            '-i', '5',
+            '-o', str(tmpdir),
+            '--vars', 'first=a', 'second=b', 'third=c']
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
+def test_var_args_not_all_defined(tmpdir):
+    args = ['--format', 'json',
+            '--inline', '{ {{ first }}: 1, {{ second }}: [2, 4, 6], {{ third }}: 3}',
+            '-i', '5',
+            '-o', str(tmpdir),
+            '--vars', 'first=a', 'third=c']  # missing second
+    with pytest.raises(datagen.SpecException):
+        dgmain.main(args)
+
+
+def test_var_args_not_all_defined_no_assignment(tmpdir):
+    args = ['--format', 'json',
+            '--inline', '{ {{ first }}: 1, {{ second }}: [2, 4, 6], {{ third }}: 3}',
+            '-i', '5',
+            '-o', str(tmpdir),
+            '--vars', 'first=a', 'second', 'third=c']  # missing second
+    with pytest.raises(datagen.SpecException):
+        dgmain.main(args)
