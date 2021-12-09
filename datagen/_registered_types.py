@@ -500,20 +500,21 @@ def _configure_date_supplier(field_spec: dict, loader: Loader):
     """ configures the date value supplier """
     config = utils.load_config(field_spec, loader)
     if 'center_date' in config or 'stddev_days' in config:
-        return _create_stats_based_date_supplier(config)
-    return _create_uniform_date_supplier(config)
+        return _create_stats_based_date_supplier(config, loader)
+    return _create_uniform_date_supplier(config, loader)
 
 
-def _create_stats_based_date_supplier(config: dict):
+def _create_stats_based_date_supplier(config: dict, loader: Loader):
     """ creates stats based date supplier from config """
     center_date = config.get('center_date')
     stddev_days = config.get('stddev_days', registries.get_default('date_stddev_days'))
     date_format = config.get('format', registries.get_default('date_format'))
     timestamp_distribution = _gauss_date_timestamp(center_date, float(stddev_days), date_format)
-    return date_supplier(date_format, timestamp_distribution)
+    hour_supplier = _hour_supplier(config, loader)
+    return date_supplier(date_format, timestamp_distribution, hour_supplier)
 
 
-def _create_uniform_date_supplier(config):
+def _create_uniform_date_supplier(config, loader: Loader):
     """ creates uniform based date supplier from config """
     duration_days = config.get('duration_days', 30)
     offset = int(config.get('offset', 0))
@@ -523,7 +524,15 @@ def _create_uniform_date_supplier(config):
     timestamp_distribution = _uniform_date_timestamp(start, end, offset, duration_days, date_format)
     if timestamp_distribution is None:
         raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
-    return date_supplier(date_format, timestamp_distribution)
+    hour_supplier = _hour_supplier(config, loader)
+    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+
+
+def _hour_supplier(config: dict, loader: Loader):
+    """ get hour supplier from config if present """
+    if 'hours' not in config:
+        return None
+    return loader.get_from_spec(config['hours'])
 
 
 @registries.Registry.types(_DATE_ISO_KEY)
@@ -556,8 +565,8 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     # End fixes to support iso
 
     if 'center_date' in config or 'stddev_days' in config:
-        return _create_stats_based_date_supplier(config)
-    return _create_uniform_date_supplier(config)
+        return _create_stats_based_date_supplier(config, loader)
+    return _create_uniform_date_supplier(config, loader)
 
 
 ############

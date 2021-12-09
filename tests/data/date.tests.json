@@ -14,7 +14,31 @@
       {"instance": {"type": "date", "config": {"duration_days": 1, "start": "15-Dec-2050", "end": "15-Dec-2051", "format": "%d-%b-%Y"}}},
       {"instance": {"type": "date", "config": {"center_date": "15-Dec-2050"}}},
       {"instance": {"type": "date", "config": {"center_date": "15-Dec-2050", "stddev_days": 30}}},
-      {"instance": {"type": "date", "config": {"stddev_days": 30}}}
+      {"instance": {"type": "date", "config": {"stddev_days": 30}}},
+      {
+        "instance": {
+          "type": "date",
+          "config": {
+            "hours": { "type": "values", "data": { "7": 0.3, "8": 0.2, "9": 0.1, "10": 0.2, "11": 0.2 } }
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "date",
+          "config": {
+            "hours": {"type": "rand_range", "data": [9, 17]}
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "date",
+          "config": {
+            "hours": {"type": "distribution", "data": "normal(mean=12, stddev=5, min=6, max=21)"}
+          }
+        }
+      }
     ],
     "invalid": [
       {"instance": {}, "note": "empty"},
