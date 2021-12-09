@@ -1432,3 +1432,12 @@ class _DataSpecImpl(DataSpec):
                 yield processor.process(record)
             else:
                 yield record
+
+    def to_pandas(self, iterations):
+        try:
+            import pandas  # type: ignore
+        except ModuleNotFoundError:
+            _log.error('pandas not installed, please pip/conda install pandas to allow conversion')
+            return None
+        records = list(self.generator(iterations))
+        return pandas.json_normalize(records)

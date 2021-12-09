@@ -68,6 +68,18 @@ class DataSpec(dict):
             Name: bob
         """
 
+    @abstractmethod
+    def to_pandas(self, iterations: int):
+        """
+        Converts iterations number of records into a pandas DataFrame
+
+        Args:
+            iterations: number of iterations to run / records to generate
+
+        Returns:
+            DataFrame with records as rows
+        """
+
 
 class Distribution(ABC):
     """
