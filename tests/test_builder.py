@@ -268,3 +268,19 @@ def test_distribution_as_count():
 
     single = next(spec.generator(1))
     assert 1 <= len(single['name']) < 3
+
+
+def test_to_pandas():
+    spec_builder = builder.spec_builder()
+    spec_builder.rand_range('id', [1, 100], cast='int')
+    spec_builder.geo_lat('lat')
+    spec_builder.geo_long('lon')
+
+    df = spec_builder.build().to_pandas(30)
+
+    assert len(df) == 30
+    assert sorted(list(df.columns)) == sorted(['id', 'lat', 'lon'])
+    assert df.lat.min() >= -90
+    assert df.lon.min() >= -180
+    assert df.lat.max() <= 90
+    assert df.lon.max() <= 180
