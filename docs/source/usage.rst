@@ -864,6 +864,62 @@ Example:
     # ['Name: bobby', 'Name: robert', 'Name: bobo', 'Name: bob']
 
 
+Pandas DataFrame
+^^^^^^^^^^^^^^^^
+
+The DataSpec object has a convenient to_pandas() method to that will convert the specified number of iterations into
+a pandas DataFrame with that many rows. **NOTE** The ``pandas`` module is not installed by default as one of the
+datagen dependencies. Please install it first with pip or conda. Example using the to_pandas() method:
+
+.. code-block:: python
+
+   import datagen
+
+   raw_spec = {
+     "http_code": {
+       "type": "weighted_ref",
+       "data": {"GOOD_CODES": 0.7, "BAD_CODES": 0.3}
+     },
+     "end_point": [ "/data", "/payment", "/login", "/users" ],
+     "refs": {
+       "GOOD_CODES": {
+         "200": 0.5,
+         "202": 0.3,
+         "203": 0.1,
+         "300": 0.1
+       },
+       "BAD_CODES": {
+         "400": 0.5,
+         "403": 0.3,
+         "404": 0.1,
+         "500": 0.1
+       }
+     }
+   }
+
+   spec = datagen.parse_spec(raw_spec)
+
+   # print single generated record
+   df = spec.to_pandas(10)
+
+   print(df.head())
+   #   http_code end_point
+   # 0       200     /data
+   # 1       203  /payment
+   # 2       400    /login
+   # 3       200    /users
+   # 4       202     /data
+   gb = df.groupby('http_code')[['end_point']].agg(set)
+
+   print(gb.head())
+   #                          end_point
+   # http_code
+   # 200                {/data, /users}
+   # 202        {/users, /data, /login}
+   # 203                     {/payment}
+   # 400             {/payment, /login}
+   # 500                     {/payment}
+
 REST Server
 -----------
 
