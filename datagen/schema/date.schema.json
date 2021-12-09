@@ -87,6 +87,15 @@
               "pattern": "[1-9][0-9]*"
             }
           ]
+        },
+        "hours": {
+          "type": "object",
+          "description": "Full spec describing what hours of the day should be included in the generated dates",
+          "examples": [
+            {"type": "values", "data": { "7": 0.3, "8": 0.2, "9": 0.1, "10": 0.2, "11": 0.2 }},
+            {"type": "rand_range", "data": [9, 17]},
+            {"type": "distribution", "data": "normal(mean=12, stddev=5, min=6, max=21)"}
+          ]
         }
       },
       "not": {

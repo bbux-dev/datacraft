@@ -1,5 +1,4 @@
 import datetime
-import re
 
 import pytest
 
@@ -151,3 +150,21 @@ def _date_iso_spec(**config):
 
 def _date_iso_us_spec(**config):
     return builder.spec_builder().add_field('foo', builder.date_iso_us(**config)).build()
+
+
+def test_date_restrict_hours():
+    date_format = "%d-%m-%Y %H"
+    config = {
+        "duration_days": 14, "format": date_format,
+        "hours": {
+            "type": "distribution",
+            "data": "normal(mean=12, stddev=5, min=6, max=21)"
+        }
+    }
+    spec = _date_spec(**config)
+    iterations = 100
+    gen = datagen.parse_spec(spec).generator(iterations)
+    for _ in range(iterations):
+        date = next(gen)['foo']
+        dt = datetime.datetime.strptime(date, date_format)
+        assert 6 <= dt.hour <= 21
