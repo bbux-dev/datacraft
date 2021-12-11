@@ -1,6 +1,6 @@
 Datacraft
 =========
-[![Build Status](https://travis-ci.com/bbux-dev/datacraft.svg?branch=main)](https://travis-ci.com/bbux-dev/datacraft)
+[![Build Status](https://app.travis-ci.com/bbux-dev/datacraft.svg?branch=main)](https://app.travis-ci.com/bbux-dev/datacraft)
 [![codecov](https://codecov.io/gh/bbux-dev/datacraft/branch/main/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/datacraft)
 
 Overview
