@@ -9,7 +9,7 @@ To use Datacraft, first install it using pip:
 
 .. code-block:: text
 
-   (.venv) $ pip install git+https://github.com/bbux-dev/datacraft.git
+   (.venv) $ pip install datacraft
 
    (.venv) $ datacraft -h # for command line usage
 
