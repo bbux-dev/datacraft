@@ -3,7 +3,7 @@
 .. _api:
 
 Datacraft API
-===========
+=============
 
 .. contents::
    :depth: 2
@@ -48,7 +48,7 @@ Registry Decorators
 .. _datacraft_errors:
 
 Datacraft Errors
---------------
+----------------
 .. autoclass:: datacraft.SpecException
    :members:
 

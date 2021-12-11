@@ -1,5 +1,5 @@
 Welcome to Datacraft's documentation!
-===================================
+=====================================
 
 **Datacraft**
 
