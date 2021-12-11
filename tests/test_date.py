@@ -2,11 +2,11 @@ import datetime
 
 import pytest
 
-import datagen
-from datagen.loader import Loader
-from datagen import builder
+import datacraft
+from datacraft.loader import Loader
+from datacraft import builder
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 def test_basic_spec():
@@ -65,7 +65,7 @@ def test_date_start_format_iso_microseconds():
 def test_date_end_before_start():
     config = {"start": "15-Feb-2050", "end": "01-Feb-2050", "format": "%d-%b-%Y"}
     spec = _date_spec(**config)
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         next(spec.generator(1))
 
 
@@ -163,7 +163,7 @@ def test_date_restrict_hours():
     }
     spec = _date_spec(**config)
     iterations = 100
-    gen = datagen.parse_spec(spec).generator(iterations)
+    gen = datacraft.parse_spec(spec).generator(iterations)
     for _ in range(iterations):
         date = next(gen)['foo']
         dt = datetime.datetime.strptime(date, date_format)

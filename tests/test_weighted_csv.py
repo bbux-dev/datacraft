@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-import datagen
+import datacraft
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
@@ -50,7 +50,7 @@ def test_weighted_csv_valid_no_header_indexed_column():
 
 
 def test_weighted_csv_from_builder():
-    spec = datagen.spec_builder() \
+    spec = datacraft.spec_builder() \
         .weighted_csv('status', datafile='weighted.csv', column='status', weight_column='weight', headers=True) \
         .to_spec()
 
@@ -65,7 +65,7 @@ def test_weighted_csv_valid_invalid_indexed_column():
     spec = _build_csv_spec('status', column=0, weight_column=2, headers=True)
 
     gen = spec.generator(3, data_dir=test_dir)
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         next(gen)
 
 
@@ -74,6 +74,6 @@ def _build_csv_spec(field_name, **config):
         "datafile": "weighted.csv"
     }
     base.update(config)
-    return datagen.spec_builder() \
-        .add_field(field_name, datagen.builder.weighted_csv(**base)) \
+    return datacraft.spec_builder() \
+        .add_field(field_name, datacraft.builder.weighted_csv(**base)) \
         .build()

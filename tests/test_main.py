@@ -3,14 +3,14 @@ import os
 import pytest
 
 import catalogue
-import datagen
-from datagen import __main__ as dgmain
+import datacraft
+from datacraft import __main__ as dgmain
 
 test_dir = f'{os.path.dirname(os.path.realpath(__file__))}/data'
 
 
 def test_parse_empty_args():
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         dgmain.main([])
 
 
@@ -18,7 +18,7 @@ def test_parse_custom_code():
     dgmain.main(['-c', os.path.join(test_dir, 'custom.py'), '--inline', '{}'])
 
     # verify string_reverser is now in registry
-    handler = datagen.registries.lookup_type('string_reverser')
+    handler = datacraft.registries.lookup_type('string_reverser')
     assert handler is not None
 
 
@@ -36,7 +36,7 @@ def test_parse_set_default_invalid_ignored():
     args = ['--set-defaults', 'incorrect_format', 'is_valid=should_exist', '--inline', '{}']
     dgmain.main(args)
     with pytest.raises(catalogue.RegistryError):
-        datagen.registries.get_default('incorrect_format')
+        datacraft.registries.get_default('incorrect_format')
 
 
 def test_parse_sample_mode():
@@ -45,11 +45,11 @@ def test_parse_sample_mode():
 
 
 def _test_default_is_changed(key, args, expected):
-    orig_value = datagen.registries.get_default(key)
+    orig_value = datacraft.registries.get_default(key)
     dgmain.main(args)
-    new_value = datagen.registries.get_default(key)
+    new_value = datacraft.registries.get_default(key)
     # reset default in registry
-    datagen.registries.set_default(key, orig_value)
+    datacraft.registries.set_default(key, orig_value)
     assert orig_value != new_value
     assert new_value == expected, f'{key} changed with args {args}, expected {expected}, but got {new_value}'
 
@@ -108,7 +108,7 @@ def test_parse_format_output(tmpdir):
 def test_parse_spec_and_inline_invalid():
     args = ['--spec', os.path.join(test_dir, 'spec.json'),
             '--inline', '{"A": 1, "B":2, "C": 3}']
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         dgmain.main(args)
 
 
@@ -120,7 +120,7 @@ def test_parse_spec_invalid_path():
 
 def test_parse_spec_not_json_or_yaml():
     args = ['--spec', os.path.join(test_dir, 'blank_file')]
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         dgmain.main(args)
 
 
@@ -144,7 +144,7 @@ def test_parse_inline_yaml(tmpdir):
 def test_parse_inline_yaml_blank_string():
     args = ['--format', 'json',
             '--inline', ' ']
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         dgmain.main(args)
 
 
@@ -160,7 +160,7 @@ def test_wrap_main(tmpdir):
 
 
 def test_server(tmpdir, mocker):
-    mocker.patch('datagen.server.run', side_effect=ModuleNotFoundError())
+    mocker.patch('datacraft.server.run', side_effect=ModuleNotFoundError())
     args = ['--format', 'json',
             '--inline', '{A: 1, B: [2, 4, 6], C: 3}',
             '-i', '5', '--server']
@@ -203,7 +203,7 @@ def test_var_args_not_all_defined(tmpdir):
             '-i', '5',
             '-o', str(tmpdir),
             '--vars', 'first=a', 'third=c']  # missing second
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         dgmain.main(args)
 
 
@@ -213,5 +213,5 @@ def test_var_args_not_all_defined_no_assignment(tmpdir):
             '-i', '5',
             '-o', str(tmpdir),
             '--vars', 'first=a', 'second', 'third=c']  # missing second
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         dgmain.main(args)

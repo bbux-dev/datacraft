@@ -2,9 +2,9 @@ import re
 
 import pytest
 
-from datagen import builder, Loader
+from datacraft import builder, Loader
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 UUID_REGEX = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', re.I)

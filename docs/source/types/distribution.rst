@@ -91,7 +91,7 @@ you need to make use of the ``cast`` config with a ``roundN`` :ref:`caster<caste
 
 .. code-block:: shell
 
-   $ datagen -s spec.json -i2 --log-level off --printkey
+   $ datacraft -s spec.json -i2 --log-level off --printkey
    values1 -> 29.7907
    values2 -> 18.9114
    values3 -> 13.5495

@@ -1,7 +1,7 @@
 Command Line Interface
 ======================
 
-There are several options when using ``datagen`` from the command line.
+There are several options when using ``datacraft`` from the command line.
 
 Inline JSON/YAML
 ----------------
@@ -11,7 +11,7 @@ since these work on both linux and windows based command prompts. Inline JSON is
 
 .. code-block:: shell
 
-    datagen --inline "{ handle: { type: cc-word, config: {min: 3, mean: 5 } } }" -i 5 --log-level off --printkey
+    datacraft --inline "{ handle: { type: cc-word, config: {min: 3, mean: 5 } } }" -i 5 --log-level off --printkey
 
 .. code-block:: shell
 
@@ -35,7 +35,7 @@ the value:
 
 .. code-block:: shell
 
-    datagen --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off
+    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off
 
 .. code-block:: shell
 
@@ -46,7 +46,7 @@ the value:
 
 .. code-block:: shell
 
-    datagen --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --printkey
+    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --printkey
 
 .. code-block:: shell
 
@@ -64,7 +64,7 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    datagen --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format json -x
+    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format json -x
 
 .. code-block:: shell
 
@@ -73,7 +73,7 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    datagen --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format json-pretty -x
+    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format json-pretty -x
 
 .. code-block:: shell
 
@@ -88,7 +88,7 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    datagen --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format csv -x
+    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format csv -x
 
 .. code-block:: shell
 
@@ -113,7 +113,7 @@ dump the spec as YAML.
 
 .. code-block:: shell
 
-    datagen --inline "geo:geo.pair?start_lat=-99.0: {}" --log-level off --debug-spec
+    datacraft --inline "geo:geo.pair?start_lat=-99.0: {}" --log-level off --debug-spec
 
 .. code-block:: shell
 
@@ -128,7 +128,7 @@ dump the spec as YAML.
 
 .. code-block:: shell
 
-    datagen --inline "geo:geo.pair?start_lat=-99.0: {}" --log-level off --debug-spec-yaml
+    datacraft --inline "geo:geo.pair?start_lat=-99.0: {}" --log-level off --debug-spec-yaml
 
 .. code-block:: shell
 
@@ -146,7 +146,7 @@ that have schemas defined. Examples:
 
 .. code-block:: shell
 
-    datagen --inline "geo:geo.pair?start_lat=-99.0: {}" --log-level info -i 2 --format json --strict
+    datacraft --inline "geo:geo.pair?start_lat=-99.0: {}" --log-level info -i 2 --format json --strict
 
 .. code-block:: shell
 
@@ -157,7 +157,7 @@ that have schemas defined. Examples:
 
 .. code-block:: shell
 
-    datagen --inline "{geo:geo.pair: {config: {start_lat: -99.0}}}" --log-level info -i 2 --format json --strict
+    datacraft --inline "{geo:geo.pair: {config: {start_lat: -99.0}}}" --log-level info -i 2 --format json --strict
 
 .. code-block:: shell
 
@@ -168,7 +168,7 @@ that have schemas defined. Examples:
 
 .. code-block:: shell
 
-    datagen --inline "demo:unicode_range: {}" -i 3 --strict
+    datacraft --inline "demo:unicode_range: {}" -i 3 --strict
 
 .. code-block:: shell
 
@@ -184,7 +184,7 @@ There are some default values used when a given spec does not provide them. Thes
 
 .. code-block:: shell
 
-    datagen --debug-defaults -l off
+    datacraft --debug-defaults -l off
 
 .. code-block:: shell
 
@@ -213,7 +213,7 @@ with ``--set-defaults key=value``.
 
 .. code-block:: shell
 
-    datagen --debug-defaults -l off --defaults /path/to/custom_defaults.json
+    datacraft --debug-defaults -l off --defaults /path/to/custom_defaults.json
 
 .. code-block:: shell
 
@@ -230,7 +230,7 @@ with ``--set-defaults key=value``.
 
 .. code-block:: shell
 
-    datagen --debug-defaults -l off --set-defaults date_format="%Y_%m_%d" sample_mode="true"
+    datacraft --debug-defaults -l off --set-defaults date_format="%Y_%m_%d" sample_mode="true"
 
 .. code-block:: shell
 

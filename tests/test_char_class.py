@@ -1,9 +1,9 @@
 import string
 import pytest
-from datagen import builder, Loader, SpecException, SupplierException
+from datacraft import builder, Loader, SpecException, SupplierException
 # to trigger registration
-from datagen import cli
-from datagen import _registered_types
+from datacraft import cli
+from datacraft import _registered_types
 
 
 def test_char_class_no_data_element():

@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/weighted_ref.schema.json",
+  "type": "object",
+  "required": ["type", "data"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^weighted_ref$"},
+    "data": {
+      "type":  "object",
+      "minProperties": 1,
+      "patternProperties":  {
+        "^.*$": {
+          "type": "number"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"}
+      }
+    }
+  }
+}

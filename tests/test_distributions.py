@@ -1,10 +1,10 @@
 import pytest
-import datagen
-from datagen import distributions, builder
+import datacraft
+from datacraft import distributions, builder
 
 
 def test_uniform_distribution():
-    dist_func = datagen.registry.distribution.get('uniform')
+    dist_func = datacraft.registry.distribution.get('uniform')
     distribution = dist_func(start=5, end=10)
 
     values = set([int(distribution.next_value()) for _ in range(1000)])
@@ -12,7 +12,7 @@ def test_uniform_distribution():
 
 
 def test_normal_distribution():
-    dist_func = datagen.registry.distribution.get('normal')
+    dist_func = datacraft.registry.distribution.get('normal')
     distribution = dist_func(mean=5, stddev=1)
 
     values = set([int(distribution.next_value()) for _ in range(1000)])
@@ -20,7 +20,7 @@ def test_normal_distribution():
 
 
 def test_bounded_normal_distribution():
-    dist_func = datagen.registry.distribution.get('normal')
+    dist_func = datacraft.registry.distribution.get('normal')
     distribution = dist_func(mean=5, stddev=1, min=2, max=7)
 
     values = set([int(distribution.next_value()) for _ in range(1000)])
@@ -40,7 +40,7 @@ valid_funcs = [
 
 @pytest.mark.parametrize("string_func,min_values_generated", valid_funcs)
 def test_from_string_normal(string_func, min_values_generated):
-    distribution = datagen.distributions.from_string(string_func)
+    distribution = datacraft.distributions.from_string(string_func)
 
     values = set([int(distribution.next_value()) for _ in range(100)])
     assert len(values) >= min_values_generated
@@ -64,7 +64,7 @@ invalid_funcs = [
 @pytest.mark.parametrize("invalid_func_str", invalid_funcs)
 def test_invalid_from_string(invalid_func_str):
     with pytest.raises(ValueError):
-        dist = datagen.distributions.from_string(invalid_func_str)
+        dist = datacraft.distributions.from_string(invalid_func_str)
         dist.next_value()
 
 

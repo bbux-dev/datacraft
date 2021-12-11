@@ -1,6 +1,6 @@
 import pytest
-from datagen import SpecException
-from datagen.casters import from_config
+from datacraft import SpecException
+from datacraft.casters import from_config
 
 
 def test_valid_key_forms():

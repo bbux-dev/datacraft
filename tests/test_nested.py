@@ -1,9 +1,9 @@
 import pytest
 
-import datagen
-from datagen import builder, Loader
+import datacraft
+from datacraft import builder, Loader
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 def test_single_nested():
@@ -100,7 +100,7 @@ def test_nested_field_groups():
             ]
         }
     }
-    spec = datagen.parse_spec(raw_spec)
+    spec = datacraft.parse_spec(raw_spec)
     gen = spec.generator(iterations=2, enforce_schema=True)
     first = next(gen)["outer"]
     second = next(gen)["outer"]
@@ -122,8 +122,8 @@ def test_nested_field_groups_invalid_name():
             ]
         }
     }
-    with pytest.raises(datagen.SupplierException):
-        spec = datagen.parse_spec(raw_spec)
+    with pytest.raises(datacraft.SupplierException):
+        spec = datacraft.parse_spec(raw_spec)
         gen = spec.generator(iterations=2)
         next(gen)  # no error
         next(gen)  # should trigger

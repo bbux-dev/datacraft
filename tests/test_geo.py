@@ -2,10 +2,10 @@ import decimal
 
 import pytest
 
-import datagen
-from datagen import builder, Loader
+import datacraft
+from datacraft import builder, Loader
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 def test_geo_lat_default_precision():
@@ -25,7 +25,7 @@ def test_geo_long_precision():
 
 def test_geo_long_invalid_precision():
     spec = _geo_long_spec(precision=3.3)
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         Loader(spec).get('long').next(0)
 
 
@@ -93,7 +93,7 @@ def test_geo_spec_pair_reduced_ranges_bbox():
 
 def test_geo_spec_pair_invalid_bbox():
     spec = _geo_pair_spec(bbox='1,2,3,4')
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         Loader(spec).get('pair').next(0)
 
 

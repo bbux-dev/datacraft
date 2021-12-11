@@ -1,8 +1,8 @@
 import pytest
 
-import datagen.suppliers
-from datagen import builder, SupplierException
-from datagen.supplier import key_suppliers
+import datacraft.suppliers
+from datacraft import builder, SupplierException
+from datacraft.supplier import key_suppliers
 
 
 def test_no_field_groups():
@@ -49,7 +49,7 @@ def test_weighted_field_groups():
 
 def test_weighted_field_groups_invalid_name():
     field_groups = {'one': ['A', 'B', 'C']}
-    key_provider = key_suppliers._WeightedGroupKeyProvider(field_groups, datagen.suppliers.values(['uno']))
+    key_provider = key_suppliers._WeightedGroupKeyProvider(field_groups, datacraft.suppliers.values(['uno']))
     # for coverage
     with pytest.raises(SupplierException):
         key_provider.get()

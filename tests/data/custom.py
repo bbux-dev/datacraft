@@ -1,4 +1,4 @@
-import datagen
+import datacraft
 
 
 class StringReverserSupplier:
@@ -10,7 +10,7 @@ class StringReverserSupplier:
         return value[::-1]
 
 
-@datagen.registry.types('string_reverser')
+@datacraft.registry.types('string_reverser')
 def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
     wrapped = loader.get(key)

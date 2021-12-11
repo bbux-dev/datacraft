@@ -1,8 +1,8 @@
 import pytest
-from datagen.loader import Loader
-from datagen import builder, SpecException
+from datacraft.loader import Loader
+from datacraft import builder, SpecException
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 def test_ip_v4_spec():

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/calculate.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^calculate$"
+    },
+    "config": {
+      "type": "object"
+    },
+    "refs": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ],
+      "examples": [
+        "{ \"ref_name\": \"alias\" }",
+        "[ \"ref1\", \"ref2\" ]"
+      ]
+    },
+    "fields": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ],
+      "examples": [
+        "{ \"field_name\": \"alias\" }",
+        "[ \"field1\", \"field2\" ]"
+      ]
+    },
+    "formula": {
+      "type": "string",
+      "examples": [
+        "{{a}} * {{b}}",
+        "{{a}} * 22.34",
+        "({{a}} + {{b}} - {{c}}) * ({{d}}^^2)",
+        "sqrt(exp({{ a }}))"
+      ]
+    }
+  },
+  "anyOf": [
+    {
+      "oneOf": [
+        {"required": ["refs", "formula"]},
+        {"required": ["fields", "formula"]}
+      ]
+    },
+    {
+      "oneOf": [
+        {"required": ["refs", "fields", "formula"]}
+      ]
+    }
+  ]
+
+}

@@ -1,7 +1,7 @@
-Welcome to Datagen's documentation!
+Welcome to Datacraft's documentation!
 ===================================
 
-**Datagen**
+**Datacraft**
 
 Check out the :doc:`usage` section for further information, including
 how to :ref:`install<installation>` the project.
@@ -20,7 +20,7 @@ structure that the data will populate. A single Data Spec could be used to gener
 field in the Data Spec has its own Field Spec that defines how the values for it should be created. There are a
 variety of core field types that are used to generate the data for each field. Where the built-in types are not
 sufficient, there is an easy way to create custom types and handlers for them using :ref:`Custom Code<custom_code>`
-Loading. The ``datagen`` tool supports templating using the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating
+Loading. The ``datacraft`` tool supports templating using the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating
 engine format.
 
 Data is a key part of any application. Synthetic data can be used to test and exercise a system while it is under

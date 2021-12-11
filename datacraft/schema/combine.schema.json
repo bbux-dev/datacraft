@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/combine.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^combine$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "join_with": {"$ref": "#/definitions/join_with"},
+        "as_list": {"$ref": "#/definitions/as_list"}
+      }
+    },
+    "refs": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "oneOf": [
+    {"required": ["refs"]},
+    {"required": ["fields"]}
+  ]
+}

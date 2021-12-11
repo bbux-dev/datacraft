@@ -75,7 +75,7 @@ Generates the following structure
 
 .. code-block:: shell
 
-    datagen -s tweet-geo.json --log-level off -x -i 1 --format json-pretty
+    datacraft -s tweet-geo.json --log-level off -x -i 1 --format json-pretty
 
 .. code-block:: json
 
