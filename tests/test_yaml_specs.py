@@ -1,9 +1,9 @@
 import yaml
 import json
 
-from datagen.loader import Loader
+from datacraft.loader import Loader
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 yaml_spec = '''

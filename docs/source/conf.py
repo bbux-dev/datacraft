@@ -1,10 +1,10 @@
 # Configuration file for the Sphinx documentation builder.
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../datagen/'))
+sys.path.insert(0, os.path.abspath('../../datacraft/'))
 # -- Project information
 
-project = 'Datagen'
+project = 'Datacraft'
 copyright = '2021, Brian Buxton'
 author = 'Brian Buxton'
 

@@ -1,8 +1,8 @@
 import string
 import pytest
-from datagen import builder, Loader, SpecException
+from datacraft import builder, Loader, SpecException
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 
 def test_unicode_no_data_element():

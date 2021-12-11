@@ -1,6 +1,6 @@
 import pytest
-import datagen.builder as builder
-from datagen import distributions, DataSpec, SpecException
+import datacraft.builder as builder
+from datacraft import distributions, DataSpec, SpecException
 
 
 def test_api_builder():

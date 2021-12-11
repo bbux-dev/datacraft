@@ -1,8 +1,8 @@
 import pytest
-from datagen import ResourceError, SpecException
-from datagen.schemas import load, validate_schema_for_spec
-from datagen import cli
-import datagen.registries as types
+from datacraft import ResourceError, SpecException
+from datacraft.schemas import load, validate_schema_for_spec
+from datacraft import cli
+import datacraft.registries as types
 
 
 def test_load_unknown_key():

@@ -217,7 +217,7 @@ Custom Count Distributions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Custom distributions can be supplied using :ref:`custom code<custom_code>` loading and the
-``@datagen.registry.distribution`` decorator:
+``@datacraft.registry.distribution`` decorator:
 
 .. tabs::
 
@@ -226,17 +226,17 @@ Custom distributions can be supplied using :ref:`custom code<custom_code>` loadi
       .. code-block:: python
 
          from scipy.stats import gamma
-         import datagen
+         import datacraft
 
-         class _GammaDist(datagen.Distribution):
+         class _GammaDist(datacraft.Distribution):
              def __init__(self, a: float):
                  self.a = a
 
              def next_value(self):
                  return gamma.rvs(self.a)
 
-         @datagen.registry.distribution('gamma')
-         def _gamma_distribution(a, **kwargs) -> datagen.Distribution:
+         @datacraft.registry.distribution('gamma')
+         def _gamma_distribution(a, **kwargs) -> datacraft.Distribution:
              """ example custom distribution """
              return _GammaDist(float(a))
 
@@ -260,7 +260,7 @@ Custom distributions can be supplied using :ref:`custom code<custom_code>` loadi
 
       .. code-block:: shell
 
-         $ datagen -s spec.json -c dist.py -i 3 --log-level off
+         $ datacraft -s spec.json -c dist.py -i 3 --log-level off
          ['abigail', 'flora', 'bob']
          ['rob', 'abigail']
          ['bobby', 'roberta', 'fauna', 'bob', 'rob', 'flora']
@@ -273,7 +273,7 @@ Casting Values
 The CasterInterface exists to modify the results of generated data in small ways. An example would be the
 ``rand_range`` type that produces floating point numbers within a given range. If you want an integer in the range
 provided by the supplier, you can use the ``"cast": "int"`` config param.  Below is a table of all of the built in
-caster types. Custom casters can be registered with the ``@datagen.registry.casters`` decorator as well.  See example
+caster types. Custom casters can be registered with the ``@datacraft.registry.casters`` decorator as well.  See example
 below.
 
 Built in Casters
@@ -356,7 +356,7 @@ Custom Value Casters
 ^^^^^^^^^^^^^^^^^^^^
 
 Custom casters can be supplied using :ref:`custom code<custom_code>` loading and the
-``@datagen.registry.casters`` decorator:
+``@datacraft.registry.casters`` decorator:
 
 .. tabs::
 
@@ -365,14 +365,14 @@ Custom casters can be supplied using :ref:`custom code<custom_code>` loading and
       .. code-block:: python
 
          from typeing import Any
-         import datagen
+         import datacraft
 
-         class _ReverseCaster(datagen.CasterInterface):
+         class _ReverseCaster(datacraft.CasterInterface):
              def cast(self, value: Any) -> str:
                  return str(value)[::-1]
 
-         @datagen.registry.casters('reverse')
-         def _reverse_caster() -> datagen.CasterInterface:
+         @datacraft.registry.casters('reverse')
+         def _reverse_caster() -> datacraft.CasterInterface:
              """ example custom caster """
              return _ReverseCaster()
 
@@ -394,7 +394,7 @@ Custom casters can be supplied using :ref:`custom code<custom_code>` loading and
 
       .. code-block:: shell
 
-         $ datagen -s cast.json -c cast.py -i 5  --log-level off
+         $ datacraft -s cast.json -c cast.py -i 5  --log-level off
          arbez
          amall
          yeknod

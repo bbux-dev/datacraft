@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/weighted_csv.schema.json",
+  "type": "object",
+  "required": ["type", "config"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^weighted_csv$"},
+    "config": {
+      "type": "object",
+      "anyOf": [
+        {"required": ["datafile"]},
+        {"required": ["config_ref", "column"]}
+      ],
+      "properties": {
+        "datafile": {
+          "type": "string",
+          "description": "Name of file in data directory that contains the data for this field",
+          "examples": [
+            "example.csv",
+            "subdir/example2.csv"
+          ]
+        },
+        "config_ref": {
+          "type": "string",
+          "description": "Name of config_ref to use to populate config for this field",
+          "examples": ["tabs_config", "common_csv_config"]
+        },
+        "headers": {
+          "description": "If the csv file has headers",
+          "default": false,
+          "$ref": "#/definitions/affirmative_check"
+        },
+        "column": {
+          "type": ["number", "string"],
+          "description": "1 based column number or field name if headers are present",
+          "default": 1,
+          "minimum": 1,
+          "examples": [
+            1,
+            "col_2",
+            "name"
+          ]
+        },
+        "weight_column": {
+          "type": ["number", "string"],
+          "description": "1 based column number or field name if headers are present where weights are defined",
+          "default": 2,
+          "minimum": 1,
+          "examples": [
+            1,
+            "col_2",
+            "name"
+          ]
+        },
+        "delimiter": {
+          "type": "string",
+          "description": "how values are separated in the csv file, default is comma",
+          "default": ",",
+          "examples": [
+            ",", "\t", ";", " "
+          ]
+        },
+        "quotechar": {
+          "type": "string",
+          "description": "how values are quoted, default is double quote",
+          "default": "\"",
+          "examples": [
+            ",", "\t", ";", " "
+          ]
+        },
+        "count": {
+          "$ref": "#/definitions/count",
+          "description": "Number of values in column to use for field",
+          "default": 1
+        },
+        "join_with": {"$ref": "#/definitions/join_with"},
+        "as_list": {"$ref": "#/definitions/as_list"}
+      }
+    }
+  }
+}

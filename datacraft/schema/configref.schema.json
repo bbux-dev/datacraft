@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/config_ref.schema.json",
+  "type": "object",
+  "description": "Type used to store configurations that are used across multiple fields",
+  "required": ["type", "config"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "pattern": "^config_ref$"
+    },
+    "config": {
+      "type": "object"
+    }
+  }
+}

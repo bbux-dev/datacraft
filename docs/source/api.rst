@@ -1,8 +1,8 @@
-.. py:currentmodule:: datagen
+.. py:currentmodule:: datacraft
 
 .. _api:
 
-Datagen API
+Datacraft API
 ===========
 
 .. contents::
@@ -15,78 +15,78 @@ Core Classes
 
 .. _data_spec_class:
 
-.. autoclass:: datagen.DataSpec
+.. autoclass:: datacraft.DataSpec
    :members:
 
 .. _value_supplier_interface:
 
-.. autoclass:: datagen.ValueSupplierInterface
+.. autoclass:: datacraft.ValueSupplierInterface
    :members:
 
-.. autoclass:: datagen.Loader
+.. autoclass:: datacraft.Loader
    :members:
 
-.. autoclass:: datagen.Distribution
+.. autoclass:: datacraft.Distribution
    :members:
 
-.. autoclass:: datagen.CasterInterface
+.. autoclass:: datacraft.CasterInterface
    :members:
 
-.. autoclass:: datagen.RecordProcessor
+.. autoclass:: datacraft.RecordProcessor
    :members:
 
-.. autoclass:: datagen.OutputHandlerInterface
+.. autoclass:: datacraft.OutputHandlerInterface
    :members:
 
 .. _registry_decorators:
 
 Registry Decorators
 -------------------
-.. autoclass:: datagen.registries.Registry
+.. autoclass:: datacraft.registries.Registry
    :members:
 
-.. _datagen_errors:
+.. _datacraft_errors:
 
-Datagen Errors
+Datacraft Errors
 --------------
-.. autoclass:: datagen.SpecException
+.. autoclass:: datacraft.SpecException
    :members:
 
-.. autoclass:: datagen.SupplierException
+.. autoclass:: datacraft.SupplierException
    :members:
 
-.. autoclass:: datagen.ResourceError
+.. autoclass:: datacraft.ResourceError
    :members:
 
 .. _builder_module:
 
 Builder Module
 --------------
-.. automodule:: datagen.builder
+.. automodule:: datacraft.builder
    :members:
 
 .. _supplier_module:
 
 Suppliers Module
 ----------------
-.. automodule:: datagen.suppliers
+.. automodule:: datacraft.suppliers
    :members:
 
 .. _outputs_module:
 
 Outputs Module
 --------------
-.. automodule:: datagen.outputs
+.. automodule:: datacraft.outputs
    :members:
 
 .. _template_engines_module:
 
 Template Engines
 ----------------
-.. automodule:: datagen.template_engines
+.. automodule:: datacraft.template_engines
    :members:
 
 Spec Formatters
 ---------------
-.. automodule:: datagen.spec_formatters
+.. automodule:: datacraft.spec_formatters
    :members:

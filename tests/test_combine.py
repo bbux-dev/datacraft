@@ -1,7 +1,7 @@
 import pytest
-from datagen.loader import Loader
-import datagen.suppliers as suppliers
-from datagen import builder, SpecException
+from datacraft.loader import Loader
+import datacraft.suppliers as suppliers
+from datacraft import builder, SpecException
 
 
 def test_neither_refs_nor_fields_specified():

@@ -1,8 +1,8 @@
 import pytest
-import datagen
-import datagen.supplier.calculate
+import datacraft
+import datacraft.supplier.calculate
 # to trigger registration
-from datagen import cli
+from datacraft import cli
 
 simple_calc_data = [
     (
@@ -30,15 +30,15 @@ simple_calc_data = [
 
 @pytest.mark.parametrize('alias_to_values, formula, expected_first_value', simple_calc_data)
 def test_simple_calculation(alias_to_values, formula, expected_first_value):
-    mapping = {key: datagen.suppliers.values(values) for key, values in alias_to_values.items()}
+    mapping = {key: datacraft.suppliers.values(values) for key, values in alias_to_values.items()}
 
-    supplier = datagen.supplier.calculate._CalculateSupplier(mapping, datagen.template_engines.string(formula))
+    supplier = datacraft.supplier.calculate._CalculateSupplier(mapping, datacraft.template_engines.string(formula))
 
     assert supplier.next(0) == expected_first_value
 
 
 def test_calculate_valid_from_builder():
-    spec_builder = datagen.spec_builder()
+    spec_builder = datacraft.spec_builder()
     spec_builder.values('field', 21)
     mapping = {'field': 'a'}
     formula = '{{a}} * 2'
@@ -49,7 +49,7 @@ def test_calculate_valid_from_builder():
 
 @pytest.mark.parametrize('keyword', ['for', 'if', 'else', 'in', 'elif'])
 def test_keywords_are_now_valid(keyword):
-    spec_builder = datagen.spec_builder()
+    spec_builder = datacraft.spec_builder()
     spec_builder.values('field', 84)
     mapping = {'field': keyword}
     formula = '{{%s}}/2' % keyword
@@ -70,8 +70,8 @@ missing_required_invalid_inputs = [
 
 @pytest.mark.parametrize('fields, refs, formula', missing_required_invalid_inputs)
 def test_calculate_missing_required(fields, refs, formula):
-    spec_builder = datagen.spec_builder()
+    spec_builder = datacraft.spec_builder()
     spec_builder.calculate('something_interesting', fields=fields, refs=refs, formula=formula)
 
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         next(spec_builder.build().generator(1))

@@ -71,7 +71,7 @@ Looking at some of the insults produced
 
 .. code-block:: text
 
-    datagen -s insults.json -i 100 | grep '1,' | tail
+    datacraft -s insults.json -i 100 | grep '1,' | tail
     1,You're incredibly ugly
     1,You're a idiot
     1,You are so stupid
@@ -223,7 +223,7 @@ If we run the spec as is this is an example of the data that is produced:
 
 .. code-block:: shell
 
-    $ datagen -s spec.json -d data -i 1 --log-level off -x --format json-pretty
+    $ datacraft -s spec.json -d data -i 1 --log-level off -x --format json-pretty
 
 .. code-block:: json
 
@@ -274,7 +274,7 @@ Running the earlier command and specifying this template produces:
 
 .. code-block:: shell
 
-    $ datagen -s spec.json -d data -i 1 --log-level off -x -t geojson.jinja
+    $ datacraft -s spec.json -d data -i 1 --log-level off -x -t geojson.jinja
 
 .. code-block:: json
 

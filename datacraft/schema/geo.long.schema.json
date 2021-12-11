@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/geo.lat.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^geo\\.long$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"},
+        "precision": {"$ref": "#/definitions/precision"},
+        "bbox": {"$ref": "#/definitions/bbox"},
+        "start_long": {"type": "number", "minimum": -180, "maximum": 180},
+        "end_long": {"type": "number", "minimum": -180, "maximum": 180}
+      },
+      "additionalProperties": false
+    },
+    "additionalProperties": false
+  }
+}

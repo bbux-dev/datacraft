@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-import datagen
-from datagen import outputs
-from datagen import template_engines as engines
+import datacraft
+from datacraft import outputs
+from datacraft import template_engines as engines
 
 test_dir = f'{os.path.dirname(os.path.realpath(__file__))}'
 outdir = f'{test_dir}/../build'
@@ -65,7 +65,7 @@ def test_format_csv():
 
 
 def test_for_unregistered_format():
-    with pytest.raises(datagen.SpecException):
+    with pytest.raises(datacraft.SpecException):
         outputs.processor(format_name='sparkle').process({'field': 'value'})
 
 

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/ip.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^ip(v4)?$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"},
+        "base": {
+          "description": "base of ip address",
+          "examples": ["192", "10.", "100.100", "192.168.", "10.10.10"],
+          "type": "string",
+          "pattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.?){1,4}$"
+        },
+        "cidr": {
+          "description": "cidr notation i.e. 192.168.0.0/16, only /8 /16 /24 supported",
+          "examples": ["192.168.0.0/24", "10.0.0.0/16", "100.0.0.0/8"],
+          "type": "string",
+          "pattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/(8|16|24)$"
+        }
+      },
+      "not": {
+        "description": "cidr and base should not both be specified",
+        "anyOf": [
+          {"required": ["cidr", "base"]}
+        ]
+      }
+    },
+    "additionalProperties": false
+  }
+}

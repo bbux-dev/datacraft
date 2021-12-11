@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/nested.schema.json",
+  "type": "object",
+  "required": ["type", "fields"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^nested?$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"}
+      }
+    },
+    "fields": {
+      "type": "object",
+      "description": "Field Specs for nested fields",
+      "examples": [
+        "any valid field spec"
+      ]
+    },
+    "field_groups": {"$ref": "#/definitions/field_groups"},
+    "additionalProperties": false
+  }
+}

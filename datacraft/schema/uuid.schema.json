@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/uuid.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^uuid$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"},
+        "variant": {
+          "type": "number",
+          "enum": [1, 3, 4, 5]
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}
