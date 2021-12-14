@@ -4,7 +4,7 @@ Module for csv supplier implementations
 import csv
 import random
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, Dict
 
 from .exceptions import SupplierException
 from .model import ValueSupplierInterface
@@ -210,6 +210,10 @@ class _CsvSupplier(ValueSupplierInterface):
         return self.csv_data.next(self.field_name, iteration, self.sample, count)
 
 
+# to keep from reloading the same CsvData
+_csv_data_cache: Dict[str, CsvData] = {}
+
+
 def load_csv_data(csv_path: str,
                   delimiter: str,
                   has_headers: bool,
@@ -230,6 +234,9 @@ def load_csv_data(csv_path: str,
     Returns:
         CsvData to supply csv data from
     """
+    if csv_path in _csv_data_cache:
+        return _csv_data_cache.get(csv_path)
+
     if use_buffering:
         if sample_rows:
             csv_data = _RowLevelSampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)  # type: ignore
@@ -237,6 +244,9 @@ def load_csv_data(csv_path: str,
             csv_data = _SampleEnabledCsv(csv_path, delimiter, quotechar, has_headers)  # type: ignore
     else:
         csv_data = _BufferedCsvData(csv_path, delimiter, quotechar, has_headers, _DEFAULT_BUFFER_SIZE)  # type: ignore
+
+    _csv_data_cache[csv_path] = csv_data
+
     return csv_data
 
 

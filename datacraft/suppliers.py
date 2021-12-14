@@ -1,18 +1,19 @@
 """
 Factory like module for core supplier related functions.
 """
-import json
+import os
 from typing import Union, List, Dict, Any, Optional
 
-from . import registries, casters, distributions, utils
-from .casters import from_config
+from . import registries, casters, distributions, utils, template_engines
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
                               BufferedValueSupplier, ListCountSamplerSupplier,
                               list_stats_sampler, list_value_supplier, weighted_values_explicit)
 from .supplier.combine import combine_supplier
+from .supplier.calculate import calculate_supplier
 from .supplier.model import Distribution, ValueSupplierInterface
+from .supplier.csv import load_csv_data, csv_supplier
 
 
 def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
@@ -94,7 +95,7 @@ def count_supplier_from_data(data: Union[int, List[int], Dict[str, float], Distr
     elif isinstance(data, dict):
         supplier = weighted_values(data)
     elif isinstance(data, Distribution):
-        supplier = cast_supplier(distribution_supplier(data), cast_to='int')
+        supplier = cast(distribution_supplier(data), cast_to='int')
     else:
         try:
             supplier = single_value(int(data))
@@ -194,6 +195,10 @@ def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
         >>> nice_pet_supplier = datacraft.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"])
         >>> mean_pet_supplier = datacraft.suppliers.values(["alligator", "cobra", "mongoose", "killer bee"])
         >>> pet_supplier = datacraft.suppliers.from_list_of_suppliers([nice_pet_supplier, mean_pet_supplier])
+        >>> pet_supplier.next(0)
+        'dog'
+        >>> pet_supplier.next(1)
+        'alligator'
     """
     return RotatingSupplierList(supplier_list, modulate_iteration)
 
@@ -328,7 +333,7 @@ def list_stat_sampler(data: Union[str, list],
     return list_stats_sampler(data, **config)
 
 
-def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
+def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
     """
     Samples N elements from data list based on config.  If count is provided,
     each iteration exactly count elements will be returned.  If only min is provided,
@@ -339,26 +344,34 @@ def list_count_sampler(data: list, config: dict) -> ValueSupplierInterface:
 
     Args:
         data: list to select subset from
-        config: with minimal of count or min and max supplied
+        **kwargs:
+
+    Keyword Args:
+        count: number of elements in list to use
+        count_dist: count distribution to use
+        min: minimum number of values to return
+        max: maximum number of values to return
+        join_with: value to join values with, default is None
 
     Returns:
         the supplier
 
     Examples:
         >>> import datacraft
-        >>> count_config = {"min": 2, "max": 5}
         >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
-        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_config)
+        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, min=2, max=5)
+        >>> new_pets = pet_supplier.next(0)
+        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,min=1,max=3)")
         >>> new_pets = pet_supplier.next(0)
     """
-    if 'count' in config or 'count_dist' in config:
-        count_supplier = count_supplier_from_config(config)
+    if 'count' in kwargs or 'count_dist' in kwargs:
+        count_supplier = count_supplier_from_config(kwargs)
     else:
-        min_cnt = int(config.get('min', 1))
-        max_cnt = int(config.get('max', len(data))) + 1
+        min_cnt = int(kwargs.get('min', 1))
+        max_cnt = int(kwargs.get('max', len(data))) + 1
         count_range = list(range(min_cnt, max_cnt))
         count_supplier = _value_list(count_range, None, True)
-    return ListCountSamplerSupplier(data, count_supplier, config.get('join_with', None))
+    return ListCountSamplerSupplier(data, count_supplier, kwargs.get('join_with', None))
 
 
 def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
@@ -376,75 +389,50 @@ def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
     return buffered(wrapped, {})
 
 
-def is_decorated(field_spec: dict) -> bool:
-    """
-    is this spec a decorated one
-
-    Args:
-        field_spec: to check
-
-    Returns:
-        true or false
-    """
-    if 'config' not in field_spec:
-        return False
-    config = field_spec['config']
-    return 'prefix' in config or 'suffix' in config or 'quote' in config
-
-
-def decorated(field_spec: dict, supplier: ValueSupplierInterface) -> ValueSupplierInterface:
+def decorated(supplier: ValueSupplierInterface, **kwargs) -> ValueSupplierInterface:
     """
     Creates a decorated supplier around the provided one
 
     Args:
-        field_spec: the spec
         supplier: the supplier to decorate
+        **kwargs
+
+    Keyword Args:
+        prefix (str): prefix to prepend to value, default is ''
+        suffix (str): suffix to append to value, default is ''
+        quote (str): string to both append and prepend to value, default is ''
 
     Returns:
         the decorated supplier
+
+    Examples:
+        >>> import datacraft
+        >>> nums = datacraft.suppliers.values([1, 2, 3, 4, 5])
+        >>> supplier = datacraft.suppliers.decorated(nums, prefix='you are number ')
+        >>> supplier.next(0)
+        you are number 1
+        >>> supplier = datacraft.suppliers.decorated(nums, suffix=' more minutes')
+        >>> supplier.next(0)
+        1 more minutes
+        >>> supplier = datacraft.suppliers.decorated(nums, quote='"')
+        >>> supplier.next(0)
+        "1"
     """
-    return DecoratedSupplier(field_spec.get('config', {}), supplier)
+    return DecoratedSupplier(supplier, **kwargs)
 
 
-def is_cast(field_spec: dict) -> bool:
+def cast(supplier: ValueSupplierInterface, cast_to: str) -> ValueSupplierInterface:
     """
-    is this spec requires casting
-
-    Args:
-        field_spec: to check
-
-    Returns:
-        true or false
-    """
-    if not isinstance(field_spec, dict):
-        return False
-    config = field_spec.get('config', {})
-    return 'cast' in config
-
-
-def cast_supplier(supplier: ValueSupplierInterface,
-                  field_spec: dict = None,
-                  cast_to: str = None) -> ValueSupplierInterface:
-    """
-    Provides a cast_supplier either from config or from explicit cast_to
+    Provides a cast supplier from explicit cast
 
     Args:
         supplier: to cast results of
-        field_spec: to look up cast config from
-        cast_to: explicit cast type to use
+        cast_to: type to cast values to
 
     Returns:
         the casting supplier
     """
-
-    if cast_to:
-        caster = casters.get(cast_to)
-    else:
-        if field_spec is None:
-            config = {}
-        else:
-            config = field_spec.get('config', {})
-        caster = from_config(config)
+    caster = casters.get(cast_to)
     return CastingSupplier(supplier, caster)
 
 
@@ -477,3 +465,102 @@ def buffered(wrapped: ValueSupplierInterface, field_spec: dict) -> ValueSupplier
     config = field_spec.get('config', {})
     buffer_size = int(config.get('buffer_size', 10))
     return BufferedValueSupplier(wrapped, buffer_size)
+
+
+def calculate(suppliers_map: Dict[str, ValueSupplierInterface], formula: str) -> ValueSupplierInterface:
+    """
+    Creates a calculate supplier
+
+    Args:
+        suppliers_map: map of name to supplier of values for that name
+        formula: to evaluate, should reference keys in suppliers_map
+
+    Returns:
+        ValueSupplierInterface with calculated values
+    """
+    engine = template_engines.string(formula)
+    return calculate_supplier(suppliers=suppliers_map, engine=engine)
+
+
+def character_class(data, **kwargs):
+    """
+    Creates a character class supplier for the given data
+
+    Args:
+        data: set of characters to supply as values
+        **kwargs:
+
+    Keyword Args:
+        join_with (str): string to join characters with, default is ''
+        exclude (str): set of characters to exclude from returned values
+        mean (float): mean number of characters to produce
+        stddev (float): standard deviation from the mean
+        count (int): number of elements in list to use
+        count_dist (str): count distribution to use
+        min (int): minimum number of characters to return
+        max (int): maximum number of characters to return
+
+    Returns:
+        ValueSupplierInterface for characters
+    """
+    if 'exclude' in kwargs:
+        for char_to_exclude in kwargs.get('exclude'):
+            data = data.replace(char_to_exclude, '')
+    if utils.any_key_exists(kwargs, ['mean', 'stddev']):
+        return list_stat_sampler(data, kwargs)
+    return list_count_sampler(data, **kwargs)
+
+
+def csv(csv_path, **kwargs):
+    """
+    Creates a csv supplier
+
+    Args:
+        csv_path: path to csv file to supply data from
+        **kwargs:
+
+    Keyword Args:
+
+    Returns:
+        ValueSupplierInterface for csv field
+    """
+    field_name = kwargs.get('column', 1)
+    sample = utils.is_affirmative('sample', kwargs)
+    count_supplier = count_supplier_from_data(kwargs.get('count', 1))
+
+    csv_data = _load_csv_data(csv_path, **kwargs)
+    return csv_supplier(field_name, csv_data, count_supplier, sample)
+
+
+_ONE_MB = 1024 * 1024
+_SMALL_ENOUGH_THRESHOLD = 250 * _ONE_MB
+
+
+def _load_csv_data(csv_path, **kwargs):
+    """
+    Creates the CsvData object, caches the object by file path so that we can share this object across fields
+
+    Args:
+        csv_path: path to csv file
+
+    Keyword Args:
+        delimiter (str): how items are separated, default is ','
+        quotechar (str): string used to quote values, default is '"'
+        headers (bool): if the CSV file has a header row
+        sample_rows (bool): if sampling should happen at a row level, not valid if buffering is set to true
+
+    Returns:
+        the configured CsvData object
+    """
+    delimiter = kwargs.get('delimiter', ',')
+    # in case tab came in as string
+    if delimiter == '\\t':
+        delimiter = '\t'
+    quotechar = kwargs.get('quotechar', '"')
+    has_headers = utils.is_affirmative('headers', kwargs)
+
+    size_in_bytes = os.stat(csv_path).st_size
+    max_csv_size = int(registries.get_default('large_csv_size_mb')) * _ONE_MB
+    sample_rows = utils.is_affirmative('sample_rows', kwargs)
+    buffer = size_in_bytes <= max_csv_size
+    return load_csv_data(csv_path, delimiter, has_headers, quotechar, sample_rows, buffer)

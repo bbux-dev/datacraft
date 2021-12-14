@@ -110,10 +110,12 @@ class Loader:
             if self.enforce_schema:
                 _validate_schema_for_spec(spec_type, field_spec)
             supplier = handler(field_spec, self)
-        if suppliers.is_cast(field_spec):
-            supplier = suppliers.cast_supplier(supplier, field_spec)
-        if suppliers.is_decorated(field_spec):
-            supplier = suppliers.decorated(field_spec, supplier)
+        if _is_cast(field_spec):
+            config = field_spec.get('config', {})
+            supplier = suppliers.cast(supplier, cast_to=config.get('cast'))
+        if _is_decorated(field_spec):
+            config = field_spec.get('config', {})
+            supplier = suppliers.decorated(supplier, **config)
         if suppliers.is_buffered(field_spec):
             supplier = suppliers.buffered(supplier, field_spec)
         return supplier
@@ -160,3 +162,35 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
             continue
         updated = processed
     return updated
+
+
+def _is_decorated(field_spec: dict) -> bool:
+    """
+    is this spec a decorated one
+
+    Args:
+        field_spec: to check
+
+    Returns:
+        true or false
+    """
+    if 'config' not in field_spec:
+        return False
+    config = field_spec['config']
+    return 'prefix' in config or 'suffix' in config or 'quote' in config
+
+
+def _is_cast(field_spec: dict) -> bool:
+    """
+    is this spec requires casting
+
+    Args:
+        field_spec: to check
+
+    Returns:
+        true or false
+    """
+    if not isinstance(field_spec, dict):
+        return False
+    config = field_spec.get('config', {})
+    return 'cast' in config

@@ -14,7 +14,7 @@ from .exceptions import SpecException
 from .loader import Loader
 from .supplier import key_suppliers
 # for calculate
-from .supplier.calculate import calculate_supplier
+from .suppliers import calculate
 # for combine
 from .supplier.combine import combine_supplier
 from .supplier.common import weighted_values_explicit
@@ -49,6 +49,8 @@ _GEO_LONG_KEY = 'geo.long'
 _GEO_PAIR_KEY = 'geo.pair'
 _COMBINE_KEY = 'combine'
 _COMBINE_LIST_KEY = 'combine-list'
+_CSV_TYPE = 'csv'
+_WEIGHTED_CSV = 'weighted_csv'
 _IP_KEY = 'ip'
 _IPV4_KEY = 'ipv4'
 _IP_PRECISE_KEY = 'ip.precise'
@@ -96,8 +98,8 @@ def _configure_calculate_supplier(field_spec: dict, loader: Loader):
         raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
     if 'refs' in field_spec and 'fields' in field_spec:
         raise SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
-    template = field_spec.get('formula')
-    if template is None:
+    formula = field_spec.get('formula')
+    if formula is None:
         raise SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
     mappings = _get_mappings(field_spec, 'refs')
@@ -111,8 +113,7 @@ def _configure_calculate_supplier(field_spec: dict, loader: Loader):
         supplier = loader.get(field_or_ref)
         suppliers_map[alias] = supplier
 
-    engine = template_engines.string(template)
-    return calculate_supplier(suppliers=suppliers_map, engine=engine)
+    return calculate(suppliers_map=suppliers_map, formula=formula)
 
 
 def _get_mappings(field_spec, lookup_key):
@@ -170,14 +171,11 @@ def _configure_char_class_supplier(spec, _):
     if isinstance(data, list):
         new_data = [_CLASS_MAPPING[datum] if datum in _CLASS_MAPPING else datum for datum in data]
         data = ''.join(new_data)
-    if 'exclude' in config:
-        for char_to_exclude in config.get('exclude'):
-            data = data.replace(char_to_exclude, '')
+
     if 'join_with' not in config:
         config['join_with'] = registries.get_default('char_class_join_with')
-    if utils.any_key_exists(config, ['mean', 'stddev']):
-        return suppliers.list_stat_sampler(data, config)
-    return suppliers.list_count_sampler(data, config)
+
+    return suppliers.character_class(data, **config)
 
 
 for class_key in _CLASS_MAPPING:
@@ -270,33 +268,27 @@ def _config_ref_handler(_, __):
 ########
 # csv
 #######
-_ONE_MB = 1024 * 1024
-_SMALL_ENOUGH_THRESHOLD = 250 * _ONE_MB
-
-# to keep from reloading the same CsvData
-_csv_data_cache: Dict[str, CsvData] = {}
 
 
-@registries.Registry.types('csv')
+@registries.Registry.types(_CSV_TYPE)
 def _configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
     config = utils.load_config(field_spec, loader)
+    datafile = config.get('datafile', registries.get_default('csv_file'))
+    csv_path = f'{loader.datadir}/{datafile}'
+    if not os.path.exists(csv_path):
+        raise SpecException(f'Unable to locate data file: {datafile} in data dir: {loader.datadir} for spec: '
+                            + json.dumps(field_spec))
+    return suppliers.csv(csv_path, **config)
 
-    field_name = config.get('column', 1)
-    sample = utils.is_affirmative('sample', config)
-    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
 
-    csv_data = _load_csv_data(field_spec, config, loader.datadir)
-    return csv_supplier(field_name, csv_data, count_supplier, sample)
-
-
-@registries.Registry.schemas('csv')
+@registries.Registry.schemas(_CSV_TYPE)
 def _get_csv_schema():
     """ get the schema for the csv type """
-    return schemas.load('csv')
+    return schemas.load(_CSV_TYPE)
 
 
-@registries.Registry.types('weighted_csv')
+@registries.Registry.types(_WEIGHTED_CSV)
 def _configure_weighted_csv(field_spec, loader):
     """ Configures the weighted_csv value supplier for this field """
 
@@ -322,10 +314,10 @@ def _configure_weighted_csv(field_spec, loader):
     return weighted_values_explicit(choices, weights, count_supplier)
 
 
-@registries.Registry.schemas('weighted_csv')
+@registries.Registry.schemas(_WEIGHTED_CSV)
 def _get_weighted_csv_schema():
     """ get the schema for the weighted_csv type """
-    return schemas.load('weighted_csv')
+    return schemas.load(_WEIGHTED_CSV)
 
 
 def _read_named_column(csv_path: str, column_name: str):
@@ -358,42 +350,6 @@ def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: b
         if skip_first:
             next(reader)
         return [float(val[column_index - 1]) for val in reader]
-
-
-def _load_csv_data(field_spec, config, datadir):
-    """
-    Creates the CsvData object, caches the object by file path so that we can share this object across fields
-
-    Args:
-        field_spec: that triggered the creation
-        config: to use to do the creation
-        datadir: where to look for data files
-
-    Returns:
-        the configured CsvData object
-    """
-    datafile = config.get('datafile', registries.get_default('csv_file'))
-    csv_path = f'{datadir}/{datafile}'
-    if csv_path in _csv_data_cache:
-        return _csv_data_cache.get(csv_path)
-
-    if not os.path.exists(csv_path):
-        raise SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
-                            + json.dumps(field_spec))
-    delimiter = config.get('delimiter', ',')
-    # in case tab came in as string
-    if delimiter == '\\t':
-        delimiter = '\t'
-    quotechar = config.get('quotechar', '"')
-    has_headers = utils.is_affirmative('headers', config)
-
-    size_in_bytes = os.stat(csv_path).st_size
-    max_csv_size = int(registries.get_default('large_csv_size_mb')) * _ONE_MB
-    sample_rows = utils.is_affirmative('sample_rows', config)
-    buffer = size_in_bytes <= max_csv_size
-    csv_data = load_csv_data(csv_path, delimiter, has_headers, quotechar, sample_rows, buffer)
-    _csv_data_cache[csv_path] = csv_data
-    return csv_data
 
 
 #######
@@ -1001,7 +957,7 @@ def _configure_select_list_subset_supplier(field_spec, loader):
         data = field_spec.get('data')
     if utils.any_key_exists(config, ['mean', 'stddev']):
         return suppliers.list_stat_sampler(data, config)
-    return suppliers.list_count_sampler(data, config)
+    return suppliers.list_count_sampler(data, **config)
 
 
 ###################
@@ -1040,7 +996,7 @@ def _single_unicode_range(data, config):
             config['as_list'] = 'true'
         wrapped = suppliers.list_stat_sampler(range_data, config)
     else:
-        wrapped = suppliers.list_count_sampler(range_data, config)
+        wrapped = suppliers.list_count_sampler(range_data, **config)
     return unicode_range_supplier(wrapped)
 
 

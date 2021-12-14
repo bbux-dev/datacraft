@@ -78,15 +78,15 @@ class DecoratedSupplier(ValueSupplierInterface):
     prefix or suffix or to surround the output with quotes
     """
 
-    def __init__(self, config: dict, supplier: ValueSupplierInterface):
+    def __init__(self, supplier: ValueSupplierInterface, **kwargs):
         """
         Args:
-            config: configuration
             supplier: to decorate
+            **kwargs
         """
-        self.prefix = config.get('prefix', '')
-        self.suffix = config.get('suffix', '')
-        self.quote = config.get('quote', '')
+        self.prefix = kwargs.get('prefix', '')
+        self.suffix = kwargs.get('suffix', '')
+        self.quote = kwargs.get('quote', '')
         self.wrapped = supplier
 
     def next(self, iteration):
