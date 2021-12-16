@@ -1,10 +1,13 @@
 """
 Factory like module for core supplier related functions.
 """
+import datetime
 import os
+import json
+import logging
 from typing import Union, List, Dict, Any, Optional
 
-from . import registries, casters, distributions, utils, template_engines
+from . import registries, casters, distributions, utils, template_engines, Distribution
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
@@ -12,8 +15,29 @@ from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSuppli
                               list_stats_sampler, list_value_supplier, weighted_values_explicit)
 from .supplier.combine import combine_supplier
 from .supplier.calculate import calculate_supplier
+from .supplier.date import date_supplier
 from .supplier.model import Distribution, ValueSupplierInterface
 from .supplier.csv import load_csv_data, csv_supplier
+
+_log = logging.getLogger(__name__)
+
+
+def constant(data: Any) -> ValueSupplierInterface:
+    """
+    Creates value supplier for the single value
+
+    Args:
+        data: constant data to return on every iteration
+
+    Returns:
+        value supplier for the single value
+    Examples:
+        >>> import datacraft
+        >>> single_int_supplier = datacraft.suppliers.constant(42)
+        >>> single_str_supplier = datacraft.suppliers.constant("42")
+        >>> single_float_supplier = datacraft.suppliers.constant(42.42)
+    """
+    return SingleValue(data)
 
 
 def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
@@ -52,11 +76,11 @@ def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
     if isinstance(data, dict):
         supplier = weighted_values(data)
     else:
-        supplier = single_value(data)
+        supplier = constant(data)
 
     # Check for count param
     if 'count' in config or 'count_dist' in config:
-        return MultipleValueSupplier(supplier, count_supplier_from_config(config))
+        return MultipleValueSupplier(supplier, count_supplier(**config))
     return supplier
 
 
@@ -67,45 +91,7 @@ def _data_not_in_spec(spec):
     return True
 
 
-def count_supplier_from_data(data: Union[int, List[int], Dict[str, float], Distribution]) -> ValueSupplierInterface:
-    """
-    generates a supplier for the count parameter based on the type of the data
-
-    valid data for counts:
-
-     * integer i.e. 1, 7, 99
-
-     * list of integers: [1, 7, 99], [1], [1, 2, 1, 2, 3]
-
-     * weighted map, where keys are numeric strings: {"1": 0.6, "2": 0.4}
-
-     * datacraft.Distribution i.e. normal, gauss
-
-    Args:
-        data: that specifies how the count should be generated
-
-    Returns:
-        a value supplier for the count
-
-    Raises:
-        SpecException if unable to determine the type of the data
-    """
-    if isinstance(data, list):
-        supplier = _value_list(data, None, False)
-    elif isinstance(data, dict):
-        supplier = weighted_values(data)
-    elif isinstance(data, Distribution):
-        supplier = cast(distribution_supplier(data), cast_to='int')
-    else:
-        try:
-            supplier = single_value(int(data))
-        except ValueError as value_error:
-            raise SpecException(f'Invalid count param: {data}') from value_error
-
-    return supplier
-
-
-def count_supplier_from_config(config: Optional[dict]) -> ValueSupplierInterface:
+def count_supplier(**kwargs) -> ValueSupplierInterface:
     """
     creates a count supplier from the config, if the count param is defined, otherwise uses default of 1
 
@@ -118,64 +104,65 @@ def count_supplier_from_config(config: Optional[dict]) -> ValueSupplierInterface
 
     count_dist will be interpreted as a distribution i.e:
 
-    Args:
-        config: to use
+    Keyword Args:
+        count: constant, list, or weighted map
+        data: alias for count
+        count_dist: distribution in named param function style format
 
     Returns:
         a count supplier
 
     Examples:
         >>> import datacraft
-        >>> config = {"count_dist": "uniform(start=10, end=100)"}
-        >>> count_supplier = datacraft.suppliers.count_supplier_from_config(config)
+        >>> counts = datacraft.suppliers.count_supplier(count_dist="uniform(start=10, end=100)")
     """
     data = 1  # type: Any
-    if config and 'count' in config:
-        data = config['count']
-    if config and 'count_dist' in config:
-        data = distributions.from_string(config['count_dist'])
-    return count_supplier_from_data(data)
+    if 'count' in kwargs:
+        data = kwargs['count']
+    if 'data' in kwargs:
+        data = kwargs['data']
+    if 'count_dist' in kwargs:
+        data = distributions.from_string(kwargs['count_dist'])
 
+    if isinstance(data, list):
+        supplier = _value_list(data, None, False)
+    elif isinstance(data, dict):
+        supplier = weighted_values(data)
+    elif isinstance(data, Distribution):
+        supplier = cast(distribution_supplier(data), cast_to='int')
+    else:
+        try:
+            supplier = constant(int(data))
+        except ValueError as value_error:
+            raise SpecException(f'Invalid count param: {data}') from value_error
 
-def single_value(data: Any) -> ValueSupplierInterface:
-    """
-    Creates value supplier for the single value
-
-    Args:
-        data: constant data to return on every iteration
-
-    Returns:
-        value supplier for the single value
-    Examples:
-        >>> import datacraft
-        >>> single_int_supplier = datacraft.suppliers.single_value(42)
-        >>> single_str_supplier = datacraft.suppliers.single_value("42")
-        >>> single_float_supplier = datacraft.suppliers.single_value(42.42)
-    """
-    return SingleValue(data)
+    return supplier
 
 
 def array_supplier(wrapped: ValueSupplierInterface,
-                   count_config: dict) -> ValueSupplierInterface:
+                   **kwargs) -> ValueSupplierInterface:
     """
     Wraps an existing supplier and always returns an array/list of elements, uses count config to determine
     number of items in the list
 
     Args:
         wrapped: the underlying supplier
-        count_config: how to determine the number of elements to include in the list
+
+    Keyword Args:
+        count: constant, list, or weighted map
+        data: alias for count
+        count_dist: distribution in named param function style format
 
     Returns:
         The value supplier
 
     Examples:
         >>> import datacraft
-        >>> config = {"count_dist": "normal(mean=2, stddev=1)"}
         >>> pet_supplier = datacraft.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"])
-        >>> returns_mostly_two = datacraft.suppliers.array_supplier(pet_supplier, config)
+        >>> returns_mostly_two = datacraft.suppliers.array_supplier(pet_supplier, count_dist="normal(mean=2, stddev=1)")
         >>> pet_array = returns_mostly_two.next(0)
     """
-    return MultipleValueSupplier(wrapped, count_supplier_from_config(count_config))
+    return MultipleValueSupplier(wrapped, count_supplier(**kwargs))
 
 
 def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
@@ -221,7 +208,7 @@ def _value_list(data: list,
     if config is None:
         config = {}
     as_list = utils.is_affirmative('as_list', config)
-    return list_value_supplier(data, count_supplier_from_config(config), do_sampling, as_list)
+    return list_value_supplier(data, count_supplier(**config), do_sampling, as_list)
 
 
 def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
@@ -246,11 +233,13 @@ def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
     """
     if len(data) == 0:
         raise SpecException('Invalid Weights, no values defined')
+    if config is None:
+        config = {}
     choices = list(data.keys())
     weights = list(data.values())
     if not isinstance(weights[0], float):
         raise SpecException('Invalid type for weights: ' + str(type(weights[0])))
-    return weighted_values_explicit(choices, weights, count_supplier_from_config(config))
+    return weighted_values_explicit(choices, weights, count_supplier(**config))
 
 
 def combine(suppliers, config=None):
@@ -303,7 +292,7 @@ def random_range(start: Union[str, int, float],
         >>> # should be between 5 and 25 with 3 decimal places
         >>> next_value = range_supplier.next(0))
     """
-    return RandomRangeSupplier(start, end, precision, count_supplier_from_data(count))
+    return RandomRangeSupplier(start, end, precision, count_supplier(data=count))
 
 
 def list_stat_sampler(data: Union[str, list],
@@ -365,13 +354,13 @@ def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
         >>> new_pets = pet_supplier.next(0)
     """
     if 'count' in kwargs or 'count_dist' in kwargs:
-        count_supplier = count_supplier_from_config(kwargs)
+        counts = count_supplier(**kwargs)
     else:
         min_cnt = int(kwargs.get('min', 1))
         max_cnt = int(kwargs.get('max', len(data))) + 1
         count_range = list(range(min_cnt, max_cnt))
-        count_supplier = _value_list(count_range, None, True)
-    return ListCountSamplerSupplier(data, count_supplier, kwargs.get('join_with', None))
+        counts = _value_list(count_range, None, True)
+    return ListCountSamplerSupplier(data, counts, kwargs.get('join_with', None))
 
 
 def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
@@ -526,10 +515,10 @@ def csv(csv_path, **kwargs):
     """
     field_name = kwargs.get('column', 1)
     sample = utils.is_affirmative('sample', kwargs)
-    count_supplier = count_supplier_from_data(kwargs.get('count', 1))
+    counts = count_supplier(**kwargs)
 
     csv_data = _load_csv_data(csv_path, **kwargs)
-    return csv_supplier(field_name, csv_data, count_supplier, sample)
+    return csv_supplier(field_name, csv_data, counts, sample)
 
 
 _ONE_MB = 1024 * 1024
@@ -564,3 +553,126 @@ def _load_csv_data(csv_path, **kwargs):
     sample_rows = utils.is_affirmative('sample_rows', kwargs)
     buffer = size_in_bytes <= max_csv_size
     return load_csv_data(csv_path, delimiter, has_headers, quotechar, sample_rows, buffer)
+
+
+def date(**kwargs) -> ValueSupplierInterface:
+    """
+    Creates supplier the provides date values according to specified format and ranges
+
+    Can use one of center_date or (start, end, offset, duration_days) etc.
+
+    Args:
+        **kwargs:
+
+    Keyword Args:
+        format (str): Format string for dates
+        center_date (str): Date matching format to center dates around
+        stddev_days (float): Standard deviation in days from center date
+        start (str): start date string
+        end (str): end date string
+        offset (int): number of days to shift the duration, positive is back negative is forward
+        duration_days (str): number of days after start, default is 30
+        date_format_string (str): format for parsing dates
+
+    Returns:
+        ValueSupplierInterface for dates
+    """
+    hour_supplier = kwargs.pop('hour_supplier')
+    if 'center_date' in kwargs or 'stddev_days' in kwargs:
+        return _create_stats_based_date_supplier(hour_supplier, **kwargs)
+    return _create_uniform_date_supplier(hour_supplier, **kwargs)
+
+
+def _create_stats_based_date_supplier(hour_supplier: ValueSupplierInterface, **kwargs):
+    """ creates stats based date supplier from config """
+    center_date = kwargs.get('center_date')
+    stddev_days = kwargs.get('stddev_days', registries.get_default('date_stddev_days'))
+    date_format = kwargs.get('format', registries.get_default('date_format'))
+    timestamp_distribution = gauss_date_timestamp(center_date, float(stddev_days), date_format)
+    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+
+
+def _create_uniform_date_supplier(hour_supplier: ValueSupplierInterface, **kwargs):
+    """ creates uniform based date supplier from config """
+    duration_days = kwargs.get('duration_days', registries.get_default('date_duration_days'))
+    offset = int(kwargs.get('offset', 0))
+    start = kwargs.get('start')
+    end = kwargs.get('end')
+    date_format = kwargs.get('format', registries.get_default('date_format'))
+    timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)
+    if timestamp_distribution is None:
+        raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(kwargs)}')
+    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+
+
+def uniform_date_timestamp(
+        start: str,
+        end: str,
+        offset: int,
+        duration: int,
+        date_format_string: str) -> Union[None, Distribution]:
+    """
+    Creates a uniform distribution for the start and end dates shifted by the offset
+
+    Args:
+        start: start date string
+        end: end date string
+        offset: number of days to shift the duration, positive is back negative is forward
+        duration: number of days after start
+        date_format_string: format for parsing dates
+
+    Returns:
+        Distribution that gives uniform seconds since epoch for the given params
+    """
+    offset_date = datetime.timedelta(days=offset)
+    if start:
+        try:
+            start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
+        except TypeError as err:
+            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
+    else:
+        start_date = datetime.datetime.now() - offset_date
+    if end:
+        # buffer end date by one to keep inclusive
+        try:
+            end_date = datetime.datetime.strptime(end, date_format_string) \
+                       + datetime.timedelta(days=1) - offset_date
+        except TypeError as err:
+            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
+    else:
+        # start date already include offset, don't include it here
+        end_date = start_date + datetime.timedelta(days=abs(int(duration)), seconds=1)
+
+    start_ts = int(start_date.timestamp())
+    end_ts = int(end_date.timestamp())
+    if end_ts < start_ts:
+        _log.warning("End date (%s) is before start date (%s)", start_date, end_date)
+        return None
+    return distributions.uniform(start=start_ts, end=end_ts)
+
+
+_SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
+
+
+def gauss_date_timestamp(
+        center_date_str: Union[str, None],
+        stddev_days: float,
+        date_format_string: str):
+    """
+    Creates a normally distributed date distribution around the center date
+
+    Args:
+        center_date_str: center date for distribution
+        stddev_days: standard deviation from center date in days
+        date_format_string: format for returned dates
+
+    Returns:
+        Distribution that gives normally distributed seconds since epoch for the given params
+    """
+    if center_date_str:
+        center_date = datetime.datetime.strptime(center_date_str, date_format_string)
+    else:
+        center_date = datetime.datetime.now()
+    mean = center_date.timestamp()
+    stddev = stddev_days * _SECONDS_IN_DAY
+    return distributions.normal(mean=mean, stddev=stddev)

@@ -52,6 +52,12 @@ def _default_date_format():
     return "%d-%m-%Y"
 
 
+@registries.Registry.defaults('date_duration_days')
+def _default_date_duration_days():
+    """ default date duration days """
+    return 30
+
+
 @registries.Registry.defaults('geo_precision')
 def _default_geo_type_precision():
     """ default digits after decimal for geo types """

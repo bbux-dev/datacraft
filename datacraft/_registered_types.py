@@ -296,7 +296,7 @@ def _configure_weighted_csv(field_spec, loader):
 
     field_name = config.get('column', 1)
     weight_column = config.get('weight_column', 2)
-    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
+    count_supplier = suppliers.count_supplier(**config)
 
     datafile = config.get('datafile', registries.get_default('csv_file'))
     csv_path = f'{loader.datadir}/{datafile}'
@@ -358,8 +358,6 @@ def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: b
 _ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
 _ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 
-_SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
-
 
 @registries.Registry.schemas(_DATE_KEY)
 def _get_date_schema():
@@ -381,107 +379,12 @@ def _get_date_iso_us_schema():
     return schemas.load(_DATE_KEY)
 
 
-def _uniform_date_timestamp(
-        start: str,
-        end: str,
-        offset: int,
-        duration: int,
-        date_format_string: str) -> Union[None, Distribution]:
-    """
-    Creates a uniform distribution for the start and end dates shifted by the offset
-
-    Args:
-        start: start date string
-        end: end date string
-        offset: number of days to shift the duration, positive is back negative is forward
-        duration: number of days after start
-        date_format_string: format for parsing dates
-
-    Returns:
-        Distribution that gives uniform seconds since epoch for the given params
-    """
-    offset_date = datetime.timedelta(days=offset)
-    if start:
-        try:
-            start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
-        except TypeError as err:
-            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
-    else:
-        start_date = datetime.datetime.now() - offset_date
-    if end:
-        # buffer end date by one to keep inclusive
-        try:
-            end_date = datetime.datetime.strptime(end, date_format_string) \
-                       + datetime.timedelta(days=1) - offset_date
-        except TypeError as err:
-            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
-    else:
-        # start date already include offset, don't include it here
-        end_date = start_date + datetime.timedelta(days=abs(int(duration)), seconds=1)
-
-    start_ts = int(start_date.timestamp())
-    end_ts = int(end_date.timestamp())
-    if end_ts < start_ts:
-        _log.warning("End date (%s) is before start date (%s)", start_date, end_date)
-        return None
-    return distributions.uniform(start=start_ts, end=end_ts)
-
-
-def _gauss_date_timestamp(
-        center_date_str: Union[str, None],
-        stddev_days: float,
-        date_format_string: str):
-    """
-    Creates a normally distributed date distribution around the center date
-
-    Args:
-        center_date_str: center date for distribution
-        stddev_days: standard deviation from center date in days
-        date_format_string: format for returned dates
-
-    Returns:
-        Distribution that gives normally distributed seconds since epoch for the given params
-    """
-    if center_date_str:
-        center_date = datetime.datetime.strptime(center_date_str, date_format_string)
-    else:
-        center_date = datetime.datetime.now()
-    mean = center_date.timestamp()
-    stddev = stddev_days * _SECONDS_IN_DAY
-    return distributions.normal(mean=mean, stddev=stddev)
-
-
 @registries.Registry.types(_DATE_KEY)
 def _configure_date_supplier(field_spec: dict, loader: Loader):
     """ configures the date value supplier """
     config = utils.load_config(field_spec, loader)
-    if 'center_date' in config or 'stddev_days' in config:
-        return _create_stats_based_date_supplier(config, loader)
-    return _create_uniform_date_supplier(config, loader)
-
-
-def _create_stats_based_date_supplier(config: dict, loader: Loader):
-    """ creates stats based date supplier from config """
-    center_date = config.get('center_date')
-    stddev_days = config.get('stddev_days', registries.get_default('date_stddev_days'))
-    date_format = config.get('format', registries.get_default('date_format'))
-    timestamp_distribution = _gauss_date_timestamp(center_date, float(stddev_days), date_format)
-    hour_supplier = _hour_supplier(config, loader)
-    return date_supplier(date_format, timestamp_distribution, hour_supplier)
-
-
-def _create_uniform_date_supplier(config, loader: Loader):
-    """ creates uniform based date supplier from config """
-    duration_days = config.get('duration_days', 30)
-    offset = int(config.get('offset', 0))
-    start = config.get('start')
-    end = config.get('end')
-    date_format = config.get('format', registries.get_default('date_format'))
-    timestamp_distribution = _uniform_date_timestamp(start, end, offset, duration_days, date_format)
-    if timestamp_distribution is None:
-        raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
-    hour_supplier = _hour_supplier(config, loader)
-    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+    config['hour_supplier'] = _hour_supplier(config, loader)
+    return suppliers.date(**config)
 
 
 def _hour_supplier(config: dict, loader: Loader):
@@ -506,7 +409,6 @@ def _configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     """ configures an iso based date supplier using the provided date format """
     config = utils.load_config(field_spec, loader)
-
     # make sure the start and end dates match the ISO format we are using
     start = config.get('start')
     end = config.get('end')
@@ -519,10 +421,8 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
         config['end'] = end_date.strftime(iso_date_format)
     config['format'] = iso_date_format
     # End fixes to support iso
-
-    if 'center_date' in config or 'stddev_days' in config:
-        return _create_stats_based_date_supplier(config, loader)
-    return _create_uniform_date_supplier(config, loader)
+    config['hour_supplier'] = _hour_supplier(config, loader)
+    return suppliers.date(**config)
 
 
 ############
@@ -632,7 +532,7 @@ def _configure_nested_supplier(spec, loader):
     fields = spec['fields']
     keys = [key for key in fields.keys() if key not in loader.RESERVED]
     config = utils.load_config(spec, loader)
-    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
+    count_supplier = suppliers.count_supplier(**config)
     if 'field_groups' in spec:
         key_supplier = key_suppliers.from_spec(spec)
     else:
@@ -921,7 +821,7 @@ def _configure_weighted_ref_supplier(parent_field_spec, loader):
         values_map[key] = supplier
     supplier = weighted_ref_supplier(key_supplier, values_map)
     if 'count' in config:
-        return suppliers.array_supplier(supplier, config)
+        return suppliers.array_supplier(supplier, **config)
     return supplier
 
 
