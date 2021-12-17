@@ -235,7 +235,7 @@ def load_csv_data(csv_path: str,
         CsvData to supply csv data from
     """
     if csv_path in _csv_data_cache:
-        return _csv_data_cache.get(csv_path)
+        return _csv_data_cache.get(csv_path)  # type: ignore
 
     if use_buffering:
         if sample_rows:

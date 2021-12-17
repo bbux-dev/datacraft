@@ -81,7 +81,7 @@ class DecoratedSupplier(ValueSupplierInterface):
     def __init__(self, supplier: ValueSupplierInterface, **kwargs):
         """
         Args:
-            supplier: to decorate
+            supplier: to enhance
             **kwargs
         """
         self.prefix = kwargs.get('prefix', '')

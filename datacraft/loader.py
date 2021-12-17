@@ -7,9 +7,9 @@ import json
 import logging
 from typing import Any, Dict, Union
 
-from . import suppliers, utils
+from . import utils, suppliers
 from .exceptions import SpecException
-from .supplier.model import DataSpec
+from .supplier.model import DataSpec, ValueSupplierInterface
 from .schemas import validate_schema_for_spec
 from .registries import lookup_type, lookup_schema, Registry
 
@@ -51,7 +51,7 @@ class Loader:
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
 
-    def get(self, key: str) -> suppliers.ValueSupplierInterface:
+    def get(self, key: str) -> ValueSupplierInterface:
         """
         Retrieve the value supplier for the given field or ref key
 
@@ -76,7 +76,7 @@ class Loader:
         self.cache[key] = supplier
         return supplier
 
-    def get_from_spec(self, field_spec: Any) -> suppliers.ValueSupplierInterface:
+    def get_from_spec(self, field_spec: Any) -> ValueSupplierInterface:
         """
         Retrieve the value supplier for the given field spec
 
@@ -110,15 +110,8 @@ class Loader:
             if self.enforce_schema:
                 _validate_schema_for_spec(spec_type, field_spec)
             supplier = handler(field_spec, self)
-        if _is_cast(field_spec):
-            config = field_spec.get('config', {})
-            supplier = suppliers.cast(supplier, cast_to=config.get('cast'))
-        if _is_decorated(field_spec):
-            config = field_spec.get('config', {})
-            supplier = suppliers.decorated(supplier, **config)
-        if suppliers.is_buffered(field_spec):
-            supplier = suppliers.buffered(supplier, field_spec)
-        return supplier
+        config = field_spec.get('config', {})
+        return suppliers.enhance(supplier, **config)
 
     def get_ref(self, key: str) -> dict:
         """
@@ -162,35 +155,3 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
             continue
         updated = processed
     return updated
-
-
-def _is_decorated(field_spec: dict) -> bool:
-    """
-    is this spec a decorated one
-
-    Args:
-        field_spec: to check
-
-    Returns:
-        true or false
-    """
-    if 'config' not in field_spec:
-        return False
-    config = field_spec['config']
-    return 'prefix' in config or 'suffix' in config or 'quote' in config
-
-
-def _is_cast(field_spec: dict) -> bool:
-    """
-    is this spec requires casting
-
-    Args:
-        field_spec: to check
-
-    Returns:
-        true or false
-    """
-    if not isinstance(field_spec, dict):
-        return False
-    config = field_spec.get('config', {})
-    return 'cast' in config

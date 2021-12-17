@@ -66,8 +66,8 @@ class Registry:
         defaults:
             Default values. Different types have different default values for some configs.  This provides a mechanism
             to override or to register other custom defaults. Read a default from the registry
-            with: ``datacraft.types.get_default('var_key')``. While ``datacraft.types.all_defaults()`` will give a mapping
-            of all registered default keys and values.
+            with: ``datacraft.types.get_default('var_key')``. While ``datacraft.types.all_defaults()`` will give a
+            mapping of all registered default keys and values.
 
             >>> @datacraft.registry.defaults('special_sauce_ingredient')
             ... def _default_special_sauce_ingredient():

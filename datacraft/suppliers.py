@@ -5,9 +5,9 @@ import datetime
 import os
 import json
 import logging
-from typing import Union, List, Dict, Any, Optional
+from typing import Union, List, Dict, Any
 
-from . import registries, casters, distributions, utils, template_engines, Distribution
+from . import registries, casters, distributions, utils, template_engines
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
@@ -188,6 +188,46 @@ def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
         'alligator'
     """
     return RotatingSupplierList(supplier_list, modulate_iteration)
+
+
+def enhance(supplier, **kwargs):
+    """
+
+    Args:
+        supplier: to enhance if configured to do so
+
+    Keyword Args:
+        cast (str): caster to apply
+        prefix (str): prefix to prepend to value, default is ''
+        suffix (str): suffix to append to value, default is ''
+        quote (str): string to both append and prepend to value, default is ''
+
+
+    Returns:
+
+    """
+    if _is_cast(**kwargs):
+        supplier = cast(supplier, cast_to=kwargs.get('cast'))
+    if _is_decorated(**kwargs):
+        supplier = decorated(supplier, **kwargs)
+    if _is_buffered(**kwargs):
+        supplier = buffered(supplier, **kwargs)
+    return supplier
+
+
+def _is_decorated(**kwargs) -> bool:
+    """ is this spec a decorated one """
+    return any(key in kwargs for key in ['prefix' ,'suffix' ,'quote'])
+
+
+def _is_cast(**kwargs) -> bool:
+    """ Does this spec requires casting """
+    return 'cast' in kwargs
+
+
+def _is_buffered(**kwargs) -> bool:
+    """ Should the values for this spec be buffered """
+    return 'buffer_size' in kwargs or utils.is_affirmative('buffer', kwargs)
 
 
 def _value_list(data: list,
@@ -375,7 +415,7 @@ def distribution_supplier(distribution: Distribution) -> ValueSupplierInterface:
     """
     wrapped = DistributionBackedSupplier(distribution)
     # buffer the values
-    return buffered(wrapped, {})
+    return buffered(wrapped)
 
 
 def decorated(supplier: ValueSupplierInterface, **kwargs) -> ValueSupplierInterface:
@@ -383,7 +423,7 @@ def decorated(supplier: ValueSupplierInterface, **kwargs) -> ValueSupplierInterf
     Creates a decorated supplier around the provided one
 
     Args:
-        supplier: the supplier to decorate
+        supplier: the supplier to enhance
         **kwargs
 
     Keyword Args:
@@ -425,34 +465,20 @@ def cast(supplier: ValueSupplierInterface, cast_to: str) -> ValueSupplierInterfa
     return CastingSupplier(supplier, caster)
 
 
-def is_buffered(field_spec: dict) -> bool:
-    """
-    Should the values for this spec be buffered
-
-    Args:
-        field_spec: to check
-
-    Returns:
-        true or false
-
-    """
-    config = field_spec.get('config', {})
-    return 'buffer_size' in config or utils.is_affirmative('buffer', config)
-
-
-def buffered(wrapped: ValueSupplierInterface, field_spec: dict) -> ValueSupplierInterface:
+def buffered(wrapped: ValueSupplierInterface, **kwargs) -> ValueSupplierInterface:
     """
     Creates a Value Supplier that buffers the results of the wrapped supplier allowing the retrieval
 
     Args:
         wrapped: the Value Supplier to buffer values for
-        field_spec: to check
+
+    Keyword Args:
+        buffer_size: number of produced values to buffer
 
     Returns:
         a buffered value supplier
     """
-    config = field_spec.get('config', {})
-    buffer_size = int(config.get('buffer_size', 10))
+    buffer_size = int(kwargs.get('buffer_size', 10))
     return BufferedValueSupplier(wrapped, buffer_size)
 
 
@@ -599,7 +625,7 @@ def _create_uniform_date_supplier(hour_supplier: ValueSupplierInterface, **kwarg
     start = kwargs.get('start')
     end = kwargs.get('end')
     date_format = kwargs.get('format', registries.get_default('date_format'))
-    timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)
+    timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)  # type: ignore
     if timestamp_distribution is None:
         raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(kwargs)}')
     return date_supplier(date_format, timestamp_distribution, hour_supplier)
@@ -676,3 +702,96 @@ def gauss_date_timestamp(
     mean = center_date.timestamp()
     stddev = stddev_days * _SECONDS_IN_DAY
     return distributions.normal(mean=mean, stddev=stddev)
+
+
+def geo_lat(**kwargs) -> ValueSupplierInterface:
+    """
+    configures geo latitude type
+
+    Keyword Args:
+        precision (int): number of digits after decimal place
+        start_lat (int): minimum value for latitude
+        end_lat (int): maximum value for latitude
+        bbox (list): list of size 4 with format: [min Longitude, min Latitude, max Longitude,  max Latitude]
+
+    Returns:
+        supplier for geo.lat type
+    """
+    return _configure_geo_type(-90.0, 90.0, '_lat', **kwargs)
+
+
+def geo_long(**kwargs) -> ValueSupplierInterface:
+    """
+    configures geo longitude type
+
+    Keyword Args:
+        precision (int): number of digits after decimal place
+        start_long (int): minimum value for longitude
+        end_long (int): maximum value for longitude
+        bbox (list): list of size 4 with format: [min Longitude, min Latitude, max Longitude,  max Latitude]
+
+    Returns:
+        supplier for geo.long type
+    """
+    return _configure_geo_type(-90.0, 90.0, '_long', **kwargs)
+
+
+def geo_pair(**kwargs):
+    """
+    Creates geo pair supplier
+
+    Keyword Args:
+        precision (int): number of digits after decimal place
+        lat_first (bool): if latitude should be populated before longitude
+        start_lat (int): minimum value for latitude
+        end_lat (int): maximum value for latitude
+        start_long (int): minimum value for longitude
+        end_long (int): maximum value for longitude
+        bbox (list): list of size 4 with format: [min Longitude, min Latitude, max Longitude,  max Latitude]
+        as_list (bool): if the values should be returned as a list
+        join_with (str): if the values should be joined with the provided string
+
+    Returns:
+        supplier for geo.pair type
+    """
+    long_supplier = geo_long(**kwargs)
+    lat_supplier = geo_lat(**kwargs)
+    join_with = kwargs.get('join_with', registries.get_default('geo_join_with'))
+    as_list = utils.is_affirmative('as_list', kwargs, registries.get_default('geo_as_list'))
+    lat_first = utils.is_affirmative('lat_first', kwargs, registries.get_default('geo_lat_first'))
+    combine_config = {
+        'join_with': join_with,
+        'as_list': as_list
+    }
+    if lat_first:
+        return combine([lat_supplier, long_supplier], combine_config)
+    return combine([long_supplier, lat_supplier], combine_config)
+
+
+def _configure_geo_type(default_start, default_end, suffix, **kwargs):
+    precision = kwargs.get('precision', registries.get_default('geo_precision'))
+    if not str(precision).isnumeric():
+        raise SpecException(f'precision for geo should be valid integer >= 0: {json.dumps(kwargs)}')
+    start, end = _get_start_end(default_start, default_end, suffix, **kwargs)
+    return random_range(start, end, precision)
+
+
+def _get_start_end(default_start, default_end, suffix, **kwargs):
+    """ determines the valid range, changes if bbox in config """
+    if 'bbox' in kwargs:
+        bbox = kwargs['bbox']
+        if not isinstance(bbox, list) or len(bbox) != 4:
+            raise SpecException(
+                'Bounding box must be list of size 4 with format: [min Longitude, min Latitude, max Longitude, '
+                'max Latitude]')
+        if 'lat' in suffix:
+            default_start = bbox[1]
+            default_end = bbox[3]
+        else:
+            default_start = bbox[0]
+            default_end = bbox[2]
+    # start_lat or start_long overrides bbox or defaults
+    start = kwargs.get('start' + suffix, default_start)
+    # end_lat or end_long overrides bbox or defaults
+    end = kwargs.get('end' + suffix, default_end)
+    return start, end
