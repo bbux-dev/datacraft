@@ -12,21 +12,19 @@ from . import distributions, suppliers, registries, schemas, utils
 from .exceptions import SpecException
 from .loader import Loader
 from .supplier import key_suppliers
-# for calculate
-from .suppliers import calculate
 # for combine
 from .supplier.combine import combine_supplier
 from .supplier.common import weighted_values_explicit
 # for nested
 from .supplier.nested import nested_supplier
-# for network
-from .supplier.network import ipv4, ip_precise, mac_address
 # for refs
 from .supplier.refs import weighted_ref_supplier
 # for unicode ranges
 from .supplier.unicode import unicode_range_supplier
 # for uuid
 from .supplier.uuid import uuid_supplier
+# for calculate
+from .suppliers import calculate
 
 ##############
 # Type Keys
@@ -524,82 +522,11 @@ def _get_mac_addr_schema():
 
 
 @registries.Registry.types(_IPV4_KEY)
-def _configure_ipv4(field_spec, _):
-    """ configures value supplier for ipv4 type """
-    return _configure_ip(field_spec, _)
-
-
 @registries.Registry.types(_IP_KEY)
 def _configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = utils.load_config(field_spec, loader)
-    if 'base' in config and 'cidr' in config:
-        raise SpecException('Must supply only one of base or cidr param: ' + json.dumps(field_spec))
-
-    parts = _get_base_parts(config)
-    # this is the same thing as a constant
-    if len(parts) == 4:
-        return suppliers.values('.'.join(parts))
-    sample = config.get('sample', 'yes')
-    octet_supplier_map = {
-        'first': _create_octet_supplier(parts, 0, sample),
-        'second': _create_octet_supplier(parts, 1, sample),
-        'third': _create_octet_supplier(parts, 2, sample),
-        'fourth': _create_octet_supplier(parts, 3, sample),
-    }
-    return ipv4(octet_supplier_map)
-
-
-def _get_base_parts(config):
-    """
-    Builds the base ip array for the first N octets based on
-    supplied base or on the /N subnet mask in the cidr
-    """
-    if 'base' in config:
-        parts = config.get('base').split('.')
-    else:
-        parts = []
-
-    if 'cidr' in config:
-        cidr = config['cidr']
-        mask = _validate_and_extract_mask(cidr)
-        ip_parts = cidr[0:cidr.index('/')].split('.')
-        if len(ip_parts) < 4 or not all(part.isdigit() for part in ip_parts):
-            raise SpecException('Invalid IP in cidr for config: ' + json.dumps(config))
-        if mask == '8':
-            parts = ip_parts[0:1]
-        elif mask == '16':
-            parts = ip_parts[0:2]
-        elif mask == '24':
-            parts = ip_parts[0:3]
-    return parts
-
-
-def _validate_and_extract_mask(cidr):
-    """ validates the cidr is on that can be used for ip type """
-    if '/' not in cidr:
-        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
-    mask = cidr[cidr.index('/') + 1:]
-    if not mask.isdigit() or int(mask) not in [8, 16, 24]:
-        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
-    return mask
-
-
-def _create_octet_supplier(parts, index, sample):
-    """ creates a value supplier for the index'th octet """
-    # this index is for a part that is static, create a single value supplier for that part
-    if len(parts) >= index + 1 and parts[index].strip() != '':
-        octet = parts[index].strip()
-        if not octet.isdigit():
-            raise SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
-        if not 0 <= int(octet) <= 255:
-            raise SpecException(
-                f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
-        return suppliers.values(octet)
-    # need octet range at this point
-    octet_range = list(range(0, 255))
-    spec = {'config': {'sample': sample}, 'data': octet_range}
-    return suppliers.values(spec)
+    return suppliers.ip_supplier(**config)
 
 
 @registries.Registry.types(_IP_PRECISE_KEY)
@@ -609,10 +536,10 @@ def _configure_precise_ip(field_spec, _):
     if config is None:
         raise SpecException('No config for: ' + json.dumps(field_spec) + ', param cidr required')
     cidr = config.get('cidr')
-    sample = config.get('sample', 'no').lower() in ['yes', 'true', 'on']
+    sample = utils.is_affirmative('sample', config, 'no')
     if cidr is None:
         raise SpecException('Invalid config for: ' + json.dumps(field_spec) + ', param cidr required')
-    return ip_precise(cidr, sample)
+    return suppliers.ip_precise(cidr, sample)
 
 
 @registries.Registry.types(_NET_MAC_KEY)
@@ -624,7 +551,7 @@ def _configure_mac_address_supplier(field_spec, loader):
     else:
         delim = registries.get_default('mac_addr_separator')
 
-    return mac_address(delim)
+    return suppliers.mac_address(delim)
 
 
 ###################

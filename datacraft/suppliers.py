@@ -13,11 +13,12 @@ from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSuppli
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
                               BufferedValueSupplier, ListCountSamplerSupplier,
                               list_stats_sampler, list_value_supplier, weighted_values_explicit)
+from .supplier.model import Distribution, ValueSupplierInterface
 from .supplier.combine import combine_supplier
 from .supplier.calculate import calculate_supplier
 from .supplier.date import date_supplier
-from .supplier.model import Distribution, ValueSupplierInterface
 from .supplier.csv import load_csv_data, csv_supplier
+from .supplier import network
 
 _log = logging.getLogger(__name__)
 
@@ -795,3 +796,142 @@ def _get_start_end(default_start, default_end, suffix, **kwargs):
     # end_lat or end_long overrides bbox or defaults
     end = kwargs.get('end' + suffix, default_end)
     return start, end
+
+
+def ip_supplier(**kwargs) -> ValueSupplierInterface:
+    """
+    Creates a value supplier for ipv v4 addresses
+
+    Keyword Args:
+        base (str): base of ip address, i.e. "192", "10." "100.100", "192.168.", "10.10.10"
+        cidr (str): cidr to use only one /8 /16 or /24, i.e. "192.168.0.0/24", "10.0.0.0/16", "100.0.0.0/8"
+
+    Returns:
+        ValueSupplierInterface for ip addresses
+
+    Raises:
+        SpecException if one of base or cidr is not provided
+
+    Examples:
+        >>> import datacraft
+        >>> ips = datacraft.suppliers.ip_supplier(base="192.168.1")
+        >>> ips.next(0)
+        '192.168.1.144'
+    """
+    if 'base' in kwargs and 'cidr' in kwargs:
+        raise SpecException('Must supply only one of base or cidr param: ' + json.dumps(kwargs))
+
+    parts = _get_base_parts(kwargs)
+    # this is the same thing as a constant
+    if len(parts) == 4:
+        return values('.'.join(parts))
+    sample = kwargs.get('sample', 'yes')
+    octet_supplier_map = {
+        'first': _create_octet_supplier(parts, 0, sample),
+        'second': _create_octet_supplier(parts, 1, sample),
+        'third': _create_octet_supplier(parts, 2, sample),
+        'fourth': _create_octet_supplier(parts, 3, sample),
+    }
+    return network.ipv4(octet_supplier_map)
+
+
+def _get_base_parts(config):
+    """
+    Builds the base ip array for the first N octets based on
+    supplied base or on the /N subnet mask in the cidr
+    """
+    if 'base' in config:
+        parts = config.get('base').split('.')
+    else:
+        parts = []
+
+    if 'cidr' in config:
+        cidr = config['cidr']
+        mask = _validate_and_extract_mask(cidr)
+        ip_parts = cidr[0:cidr.index('/')].split('.')
+        if len(ip_parts) < 4 or not all(part.isdigit() for part in ip_parts):
+            raise SpecException('Invalid IP in cidr for config: ' + json.dumps(config))
+        if mask == '8':
+            parts = ip_parts[0:1]
+        elif mask == '16':
+            parts = ip_parts[0:2]
+        elif mask == '24':
+            parts = ip_parts[0:3]
+    return parts
+
+
+def _validate_and_extract_mask(cidr):
+    """ validates the cidr is on that can be used for ip type """
+    if '/' not in cidr:
+        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
+    mask = cidr[cidr.index('/') + 1:]
+    if not mask.isdigit() or int(mask) not in [8, 16, 24]:
+        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
+    return mask
+
+
+def _create_octet_supplier(parts, index, sample):
+    """ creates a value supplier for the index'th octet """
+    # this index is for a part that is static, create a single value supplier for that part
+    if len(parts) >= index + 1 and parts[index].strip() != '':
+        octet = parts[index].strip()
+        if not octet.isdigit():
+            raise SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
+        if not 0 <= int(octet) <= 255:
+            raise SpecException(
+                f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
+        return values(octet)
+    # need octet range at this point
+    octet_range = list(range(0, 255))
+    return values(octet_range, sample=sample)
+
+
+def ip_precise(cidr: str, sample: bool = False) -> ValueSupplierInterface:
+    """
+    Creates a value supplier that produces precise ip address from the given cidr
+
+    Args:
+        cidr: notation specifying ip range
+        sample: if the ip addresses should be sampled from the available set
+
+    Returns:
+        ValueSupplierInterface for precise ip addresses
+
+    Examples:
+        >>> import datacraft
+        >>> ips = datacraft.suppliers.ip_precise(cidr="192.168.0.0/22", sample=False)
+        >>> ips.next(0)
+        '192.168.0.0'
+        >>> ips.next(1)
+        '192.168.0.1'
+        >>> ips = datacraft.suppliers.ip_precise(cidr="192.168.0.0/22", sample=True)
+        >>> ips.next(0)
+        '192.168.0.127'
+        >>> ips.next(1)
+        '192.168.0.196'
+    """
+    return network.ip_precise(cidr, sample)
+
+
+def mac_address(delimiter: str = None) -> ValueSupplierInterface:
+    """
+    Creates a value supplier that produces mac addresses
+
+    Args:
+        delimiter: how mac address pieces are separated, default is ':'
+
+    Returns:
+        ValueSupplierInterface for mac addresses
+
+    Examples:
+        >>> import datacraft
+        >>> macs = datacraft.suppliers.mac_address()
+        >>> macs.next(0)
+        '1E:D4:0F:59:41:FA'
+        >>> macs = datacraft.suppliers.mac_address('-')
+        >>> macs.next(0)
+        '4D-93-36-59-BD-09'
+    """
+    if delimiter is None:
+        delimiter = registries.get_default('mac_addr_separator')
+    return network.mac_address(delimiter)
