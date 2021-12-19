@@ -72,7 +72,9 @@ def _get_most_common_keys(spec, iterations, num_keys_to_collect):
 def test_count_param_invalid():
     # the word two is not a valid count
     spec = {'foo?count=two': ['A', 'B', 'C', 'D']}
-    _test_invalid_spec(spec, 'foo')
+    updated = preprocess_spec(spec)
+    with pytest.raises(ValueError):
+        suppliers.values(updated['foo'])
 
 
 def _test_invalid_spec(spec, key):

@@ -5,20 +5,22 @@ import datetime
 import os
 import json
 import logging
-from typing import Union, List, Dict, Any
+from typing import Union, List, Dict, Any, Generator
 
+import datacraft.supplier.ranges
 from . import registries, casters, distributions, utils, template_engines
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
                               BufferedValueSupplier, ListCountSamplerSupplier,
-                              list_stats_sampler, list_value_supplier, weighted_values_explicit)
-from .supplier.model import Distribution, ValueSupplierInterface
+                              list_stats_sampler, list_value_supplier, weighted_values_explicit, iter_supplier)
+from .supplier.model import Distribution, ValueSupplierInterface, ResettableIterator
 from .supplier.combine import combine_supplier
 from .supplier.calculate import calculate_supplier
-from .supplier.date import date_supplier
+from .supplier.date import date_supplier, uniform_date_timestamp
 from .supplier.csv import load_csv_data, csv_supplier
-from .supplier import network
+from .supplier.uuid import uuid_supplier
+from .supplier import network, ranges
 
 _log = logging.getLogger(__name__)
 
@@ -135,7 +137,7 @@ def count_supplier(**kwargs) -> ValueSupplierInterface:
         try:
             supplier = constant(int(data))
         except ValueError as value_error:
-            raise SpecException(f'Invalid count param: {data}') from value_error
+            raise ValueError(f'Invalid count param: {data}') from value_error
 
     return supplier
 
@@ -281,34 +283,6 @@ def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
     if not isinstance(weights[0], float):
         raise SpecException('Invalid type for weights: ' + str(type(weights[0])))
     return weighted_values_explicit(choices, weights, count_supplier(**config))
-
-
-def combine(suppliers, config=None):
-    """
-    Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
-    join the values with an empty string. Provide the join_with config param to specify a different string to
-    join the values with. Set as_list to true, if the values should be returned as a list and not joined
-
-
-    Args:
-        suppliers: to combine value for
-        config: for the combiner (Default value = None)
-
-    Returns:
-        the supplier
-
-    Examples:
-        >>> import datacraft
-        >>> pet_supplier = datacraft.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"], sample=True)
-        >>> job_supplier = datacraft.suppliers.values(["breeder", "trainer", "fighter", "wrestler"], sample=True)
-        >>> interesting_jobs = datacraft.suppliers.combine([pet_supplier, job_supplier], {'join_with': ' '})
-        >>> next_career = interesting_jobs.next(0)
-    """
-    if config is None:
-        config = {}
-    as_list = utils.is_affirmative('as_list', config)
-    join_with = config.get('join_with', registries.get_default('combine_join_with'))
-    return combine_supplier(suppliers, as_list, join_with)
 
 
 def random_range(start: Union[str, int, float],
@@ -615,7 +589,7 @@ def _create_stats_based_date_supplier(hour_supplier: ValueSupplierInterface, **k
     center_date = kwargs.get('center_date')
     stddev_days = kwargs.get('stddev_days', registries.get_default('date_stddev_days'))
     date_format = kwargs.get('format', registries.get_default('date_format'))
-    timestamp_distribution = gauss_date_timestamp(center_date, float(stddev_days), date_format)
+    timestamp_distribution = _gauss_date_timestamp(center_date, float(stddev_days), date_format)
     return date_supplier(date_format, timestamp_distribution, hour_supplier)
 
 
@@ -626,62 +600,17 @@ def _create_uniform_date_supplier(hour_supplier: ValueSupplierInterface, **kwarg
     start = kwargs.get('start')
     end = kwargs.get('end')
     date_format = kwargs.get('format', registries.get_default('date_format'))
-    timestamp_distribution = uniform_date_timestamp(start, end, offset, duration_days, date_format)  # type: ignore
-    if timestamp_distribution is None:
+    start_ts, end_ts = uniform_date_timestamp(start, end, offset, duration_days, date_format)  # type: ignore
+    if start_ts is None or end_ts is None:
         raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(kwargs)}')
+    timestamp_distribution = distributions.uniform(start=start_ts, end=end_ts)
     return date_supplier(date_format, timestamp_distribution, hour_supplier)
-
-
-def uniform_date_timestamp(
-        start: str,
-        end: str,
-        offset: int,
-        duration: int,
-        date_format_string: str) -> Union[None, Distribution]:
-    """
-    Creates a uniform distribution for the start and end dates shifted by the offset
-
-    Args:
-        start: start date string
-        end: end date string
-        offset: number of days to shift the duration, positive is back negative is forward
-        duration: number of days after start
-        date_format_string: format for parsing dates
-
-    Returns:
-        Distribution that gives uniform seconds since epoch for the given params
-    """
-    offset_date = datetime.timedelta(days=offset)
-    if start:
-        try:
-            start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
-        except TypeError as err:
-            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
-    else:
-        start_date = datetime.datetime.now() - offset_date
-    if end:
-        # buffer end date by one to keep inclusive
-        try:
-            end_date = datetime.datetime.strptime(end, date_format_string) \
-                       + datetime.timedelta(days=1) - offset_date
-        except TypeError as err:
-            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
-    else:
-        # start date already include offset, don't include it here
-        end_date = start_date + datetime.timedelta(days=abs(int(duration)), seconds=1)
-
-    start_ts = int(start_date.timestamp())
-    end_ts = int(end_date.timestamp())
-    if end_ts < start_ts:
-        _log.warning("End date (%s) is before start date (%s)", start_date, end_date)
-        return None
-    return distributions.uniform(start=start_ts, end=end_ts)
 
 
 _SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
 
 
-def gauss_date_timestamp(
+def _gauss_date_timestamp(
         center_date_str: Union[str, None],
         stddev_days: float,
         date_format_string: str):
@@ -765,8 +694,8 @@ def geo_pair(**kwargs):
         'as_list': as_list
     }
     if lat_first:
-        return combine([lat_supplier, long_supplier], combine_config)
-    return combine([long_supplier, lat_supplier], combine_config)
+        return combine([lat_supplier, long_supplier], **combine_config)
+    return combine([long_supplier, lat_supplier], **combine_config)
 
 
 def _configure_geo_type(default_start, default_end, suffix, **kwargs):
@@ -850,7 +779,7 @@ def _get_base_parts(config):
         mask = _validate_and_extract_mask(cidr)
         ip_parts = cidr[0:cidr.index('/')].split('.')
         if len(ip_parts) < 4 or not all(part.isdigit() for part in ip_parts):
-            raise SpecException('Invalid IP in cidr for config: ' + json.dumps(config))
+            raise ValueError('Invalid IP in cidr for config: ' + json.dumps(config))
         if mask == '8':
             parts = ip_parts[0:1]
         elif mask == '16':
@@ -863,10 +792,10 @@ def _get_base_parts(config):
 def _validate_and_extract_mask(cidr):
     """ validates the cidr is on that can be used for ip type """
     if '/' not in cidr:
-        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
+        raise ValueError(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
     mask = cidr[cidr.index('/') + 1:]
     if not mask.isdigit() or int(mask) not in [8, 16, 24]:
-        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
+        raise ValueError(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
     return mask
 
 
@@ -876,9 +805,9 @@ def _create_octet_supplier(parts, index, sample):
     if len(parts) >= index + 1 and parts[index].strip() != '':
         octet = parts[index].strip()
         if not octet.isdigit():
-            raise SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
+            raise ValueError(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
         if not 0 <= int(octet) <= 255:
-            raise SpecException(
+            raise ValueError(
                 f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
         return values(octet)
     # need octet range at this point
@@ -887,8 +816,7 @@ def _create_octet_supplier(parts, index, sample):
 
 
 def ip_precise(cidr: str, sample: bool = False) -> ValueSupplierInterface:
-    """
-    Creates a value supplier that produces precise ip address from the given cidr
+    """Creates a value supplier that produces precise ip address from the given cidr
 
     Args:
         cidr: notation specifying ip range
@@ -914,8 +842,7 @@ def ip_precise(cidr: str, sample: bool = False) -> ValueSupplierInterface:
 
 
 def mac_address(delimiter: str = None) -> ValueSupplierInterface:
-    """
-    Creates a value supplier that produces mac addresses
+    """Creates a value supplier that produces mac addresses
 
     Args:
         delimiter: how mac address pieces are separated, default is ':'
@@ -935,3 +862,88 @@ def mac_address(delimiter: str = None) -> ValueSupplierInterface:
     if delimiter is None:
         delimiter = registries.get_default('mac_addr_separator')
     return network.mac_address(delimiter)
+
+
+def combine(to_combine, join_with: str = None, as_list: bool = None):
+    """Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
+    join the values with an empty string. Provide the join_with config param to specify a different string to
+    join the values with. Set as_list to true, if the values should be returned as a list and not joined
+
+    Args:
+        to_combine: list of suppliers to combine in order of combination
+        as_list: if the results should be returned as a list
+        join_with: value to use to join the values
+
+    Returns:
+        ValueSupplierInterface for mac addresses
+
+    Examples:
+        >>> import datacraft
+        >>> pet_supplier = datacraft.suppliers.values(["dog", "cat", "hamster", "pig", "rabbit", "horse"], sample=True)
+        >>> job_supplier = datacraft.suppliers.values(["breeder", "trainer", "fighter", "wrestler"], sample=True)
+        >>> interesting_jobs = datacraft.suppliers.combine([pet_supplier, job_supplier], join_with=' ')
+        >>> next_career = interesting_jobs.next(0)
+        >>> next_career
+        'pig wrestler'
+    Returns:
+
+    """
+    if as_list is None:
+        as_list = registries.get_default('combine_as_list')
+    if join_with is None:
+        join_with = registries.get_default('combine_join_with')
+    return combine_supplier(to_combine, join_with, as_list)
+
+
+def uuid(variant: int = None) -> ValueSupplierInterface:
+    """
+    Creates a UUid Value Supplier
+
+    Args:
+        variant: of uuid to use, default is 4
+
+    Returns:
+        ValueSupplierInterface to supply uuids with
+    """
+    if variant is None:
+        variant = registries.get_default('uuid_variant')
+
+    if variant not in [1, 3, 4, 5]:
+        raise ValueError(f'Invalid variant {variant}')
+    return uuid_supplier(variant)
+
+
+def range_supplier(start: Union[int, float],
+                   end: Union[int, float],
+                   step: Union[int, float] = 1,
+                   **kwargs):
+    """
+    Creates a Value Supplier for given range of data
+
+    Args:
+        start: start of
+        end:
+        step:
+
+    Keyword Args:
+        precision (int): Number of decimal places to use, in case of floating point range
+
+    Returns:
+        ValueSupplierInterface to supply ranges of values with
+    """
+    if utils.any_is_float([start, end, step]):
+        range_values_gen = ranges.float_range(float(start), float(end), float(step), kwargs.get("precision"))
+        return resettable(range_values_gen)
+    return ranges.range_wrapped(range(start, end, step))  # type: ignore
+
+
+def resettable(iterator: ResettableIterator):
+    """Wraps a ResettableIterator to supply values from
+
+    Args:
+        iterator: iterator with reset() method
+
+    Returns:
+        ValueSupplierInterface to supply generated values with
+    """
+    return iter_supplier(iterator)

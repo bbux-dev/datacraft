@@ -12,8 +12,6 @@ from . import distributions, suppliers, registries, schemas, utils
 from .exceptions import SpecException
 from .loader import Loader
 from .supplier import key_suppliers
-# for combine
-from .supplier.combine import combine_supplier
 from .supplier.common import weighted_values_explicit
 # for nested
 from .supplier.nested import nested_supplier
@@ -21,8 +19,6 @@ from .supplier.nested import nested_supplier
 from .supplier.refs import weighted_ref_supplier
 # for unicode ranges
 from .supplier.unicode import unicode_range_supplier
-# for uuid
-from .supplier.uuid import uuid_supplier
 # for calculate
 from .suppliers import calculate
 
@@ -246,7 +242,7 @@ def _load_combine(combine_field_spec, keys, loader):
     config = combine_field_spec.get('config', {})
     as_list = config.get('as_list', registries.get_default('combine_as_list'))
     joiner = config.get('join_with', registries.get_default('combine_join_with'))
-    return combine_supplier(to_combine, as_list, joiner)
+    return suppliers.combine(to_combine, joiner, as_list)
 
 
 ############
@@ -526,7 +522,10 @@ def _get_mac_addr_schema():
 def _configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = utils.load_config(field_spec, loader)
-    return suppliers.ip_supplier(**config)
+    try:
+        return suppliers.ip_supplier(**config)
+    except ValueError as err:
+        raise SpecException(str(err)) from err
 
 
 @registries.Registry.types(_IP_PRECISE_KEY)
@@ -596,6 +595,11 @@ def _configure_range_supplier(field_spec, _):
 
 def _configure_range_supplier_for_data(field_spec, data):
     """ configures the supplier based on the range data supplied """
+    config = field_spec.get('config', {})
+    precision = config.get('precision', None)
+    if precision and not str(precision).isnumeric():
+        raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
+
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
     # more intuitive behavior
@@ -606,15 +610,10 @@ def _configure_range_supplier_for_data(field_spec, data):
         step = 1
     else:
         step = data[2]
-    if utils.any_is_float(data):
-        config = field_spec.get('config', {})
-        precision = config.get('precision', None)
-        if precision and not str(precision).isnumeric():
-            raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
-        range_values = list(utils.float_range(float(start), float(end), float(step), precision))
-    else:
-        range_values = list(range(start, end, step))
-    return suppliers.values(range_values)
+    try:
+        return suppliers.range_supplier(start, end, step, precision=precision)
+    except ValueError as err:
+        raise SpecException(str(err)) from err
 
 
 @registries.Registry.types(_RAND_INT_RANGE_KEY)
@@ -783,11 +782,11 @@ def _get_uuid_schema():
 def _configure_uuid_supplier(field_spec, loader):
     """ configure the supplier for uuid types """
     config = utils.load_config(field_spec, loader)
-    variant = int(config.get('variant', 4))
+    variant = int(config.get('variant', registries.get_default('uuid_variant')))
 
     if variant not in [1, 3, 4, 5]:
         raise SpecException('Invalid variant for: ' + json.dumps(field_spec))
-    return uuid_supplier(variant)
+    return suppliers.uuid(variant)
 
 
 ###################

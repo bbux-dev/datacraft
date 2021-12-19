@@ -2,7 +2,7 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Any, Generator
+from typing import Tuple, List, Any, Generator, Iterator
 
 
 class DataSpec(dict):
@@ -183,4 +183,12 @@ class CasterInterface(ABC):
 
         Raises:
             SpecException when unable to cast value
+        """
+
+
+class ResettableIterator(Iterator, ABC):
+    @abstractmethod
+    def reset(self):
+        """
+        After a StopIteration, this will reset the iterator to the initial state for another full round of iteration
         """

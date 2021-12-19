@@ -128,3 +128,9 @@ def _default_exclude_internal():
 def _default_sample_lists():
     """ default if lists should be sampled """
     return False
+
+
+@registries.Registry.defaults('uuid_variant')
+def _default_uuid_variant():
+    """ default uuid variant """
+    return 4

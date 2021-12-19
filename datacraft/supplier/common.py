@@ -8,7 +8,7 @@ from typing import List, Union, Optional
 import random
 from collections import deque
 
-from .model import ValueSupplierInterface, CasterInterface, Distribution
+from .model import ValueSupplierInterface, CasterInterface, Distribution, ResettableIterator
 
 
 class SingleValue(ValueSupplierInterface):
@@ -389,3 +389,26 @@ def weighted_values_explicit(choices: list,
     if count_supplier is None:
         count_supplier = SingleValue(1)
     return WeightedValueSupplier(choices, weights, count_supplier)
+
+
+def iter_supplier(iterator: ResettableIterator) -> ValueSupplierInterface:
+    """ Return ValueSupplierInterface for resettable iterator """
+    return ResettableIteratorWrappedValueSupplier(iterator)
+
+
+class ResettableIteratorWrappedValueSupplier(ValueSupplierInterface):
+    """ class that wraps a generator to supply values from """
+
+    def __init__(self, iterator: ResettableIterator):
+        """
+        Args:
+            iterator: to supply values from
+        """
+        self.iter = iterator
+
+    def next(self, iteration):
+        try:
+            return next(self.iter)
+        except StopIteration:
+            self.iter.reset()
+            return next(self.iter)

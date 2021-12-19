@@ -1,10 +1,8 @@
 """
 Module for storing package wide common functions
 """
-import decimal
 import importlib
 import logging
-import math
 import os
 from typing import Union
 
@@ -92,30 +90,6 @@ def any_is_float(data):
         if isinstance(item, float):
             return True
     return False
-
-
-def float_range(start: float,
-                stop: float,
-                step: float,
-                precision=None):
-    """
-    Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
-    stored
-    """
-    # attempt to defeat some rounding errors prevalent in python
-    current = decimal.Decimal(str(start))
-    if precision:
-        quantize = decimal.Decimal(str(1 / math.pow(10, int(precision))))
-        current = current.quantize(quantize)
-
-    dstop = decimal.Decimal(str(stop))
-    dstep = decimal.Decimal(str(step))
-    while current < dstop:
-        # inefficient?
-        yield float(str(current))
-        current = current + dstep
-        if precision:
-            current = current.quantize(quantize)
 
 
 def decode_num(num):

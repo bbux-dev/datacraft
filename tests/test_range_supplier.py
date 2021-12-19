@@ -56,3 +56,13 @@ def test_nested_range_lists_mixed_types_and_step_cast():
 
     assert supplier.next(0) == '0.5'
     assert supplier.next(1) == '20.01'
+
+
+def test_range_wrap_around():
+    data = [1, 3]
+    spec = builder.single_field("field:range", data).build()
+    supplier = Loader(spec).get('field')
+
+    vals = [supplier.next(i) for i in range(4)]
+    assert vals == [1, 2, 3, 1]
+

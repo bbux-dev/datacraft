@@ -19,7 +19,7 @@ def test_api_builder():
     domains = refs1.values('DOMAINS', domain_weights)
     animals = refs1.values('ANIMALS', animal_names)
     actions = refs1.values('ACTIONS', action_list, sample=True)
-    handles = refs1.combine('HANDLE', refs=[animals, actions], join_with='_')
+    handles = refs1.combine('HANDLE', join_with='_')
     builder1.combine('email', refs=[handles, domains])
 
     spec1 = builder1.build()
