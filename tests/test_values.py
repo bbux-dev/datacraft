@@ -48,6 +48,7 @@ def test_weighted_values_non_zero_count():
     supplier = suppliers.values(spec)
 
     data = supplier.next(0)
+
     assert isinstance(data, list)
     assert len(data) == 2
 

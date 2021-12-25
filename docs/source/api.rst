@@ -38,6 +38,9 @@ Core Classes
 .. autoclass:: datacraft.OutputHandlerInterface
    :members:
 
+.. autoclass:: datacraft.ResettableIterator
+   :members:
+
 .. _registry_decorators:
 
 Registry Decorators
@@ -58,18 +61,18 @@ Datacraft Errors
 .. autoclass:: datacraft.ResourceError
    :members:
 
-.. _builder_module:
-
-Builder Module
---------------
-.. automodule:: datacraft.builder
-   :members:
-
 .. _supplier_module:
 
 Suppliers Module
 ----------------
 .. automodule:: datacraft.suppliers
+   :members:
+
+.. _builder_module:
+
+Builder Module
+--------------
+.. automodule:: datacraft.builder
    :members:
 
 .. _outputs_module:

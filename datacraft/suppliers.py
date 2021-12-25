@@ -5,7 +5,7 @@ import datetime
 import os
 import json
 import logging
-from typing import Union, List, Dict, Any, Generator
+from typing import Union, List, Dict, Any
 
 import datacraft.supplier.ranges
 from . import registries, casters, distributions, utils, template_engines
@@ -13,13 +13,14 @@ from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
                               CastingSupplier, RandomRangeSupplier, DistributionBackedSupplier,
                               BufferedValueSupplier, ListCountSamplerSupplier,
-                              list_stats_sampler, list_value_supplier, weighted_values_explicit, iter_supplier)
+                              list_stats_sampler_supplier, list_value_supplier, weighted_values_explicit, iter_supplier)
 from .supplier.model import Distribution, ValueSupplierInterface, ResettableIterator
 from .supplier.combine import combine_supplier
 from .supplier.calculate import calculate_supplier
 from .supplier.date import date_supplier, uniform_date_timestamp
 from .supplier.csv import load_csv_data, csv_supplier
 from .supplier.uuid import uuid_supplier
+from .supplier.unicode import unicode_range_supplier
 from .supplier import network, ranges
 
 _log = logging.getLogger(__name__)
@@ -43,15 +44,20 @@ def constant(data: Any) -> ValueSupplierInterface:
     return SingleValue(data)
 
 
-def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
+def values(spec: Any, **kwargs) -> ValueSupplierInterface:
     """
     Based on data, return the appropriate values supplier. data can be a spec, constant, list, or dict.
     or just the raw data
 
     Args:
         spec: to load values from, or raw data itself
-        loader: if needed
         **kwargs: extra kwargs to add to config
+
+    Keyword Args:
+        as_list (bool): if data should be returned as a list
+        sample (bool): if the data should be sampled instead of iterated through incrementally
+        count: constant, list, or weighted map
+        count_dist (str): distribution in named param function style format
 
     Returns:
         the values supplier for the spec
@@ -67,23 +73,23 @@ def values(spec: Any, loader=None, **kwargs) -> ValueSupplierInterface:
     # shortcut notations no type, or data, the spec is the data
     if _data_not_in_spec(spec):
         data = spec
+        config = {}
     else:
-        data = spec['data']
-
-    config = utils.load_config(spec, loader, **kwargs)
-    do_sampling = utils.is_affirmative('sample', config, default=registries.get_default('sample_mode'))
+        data = spec.get('data')
+        config = spec.get('config', {})
+    kwargs.update(config)
 
     if isinstance(data, list):
         # this supplier can handle the count param itself, so just return it
-        return _value_list(data, config, do_sampling)
+        return list_values(data, **kwargs)
     if isinstance(data, dict):
         supplier = weighted_values(data)
     else:
         supplier = constant(data)
 
     # Check for count param
-    if 'count' in config or 'count_dist' in config:
-        return MultipleValueSupplier(supplier, count_supplier(**config))
+    if 'count' in kwargs or 'count_dist' in kwargs:
+        return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
 
 
@@ -110,7 +116,7 @@ def count_supplier(**kwargs) -> ValueSupplierInterface:
     Keyword Args:
         count: constant, list, or weighted map
         data: alias for count
-        count_dist: distribution in named param function style format
+        count_dist (str): distribution in named param function style format
 
     Returns:
         a count supplier
@@ -128,7 +134,7 @@ def count_supplier(**kwargs) -> ValueSupplierInterface:
         data = distributions.from_string(kwargs['count_dist'])
 
     if isinstance(data, list):
-        supplier = _value_list(data, None, False)
+        supplier = list_values(data)
     elif isinstance(data, dict):
         supplier = weighted_values(data)
     elif isinstance(data, Distribution):
@@ -233,25 +239,25 @@ def _is_buffered(**kwargs) -> bool:
     return 'buffer_size' in kwargs or utils.is_affirmative('buffer', kwargs)
 
 
-def _value_list(data: list,
-                config: dict = None,
-                do_sampling: bool = False) -> ValueSupplierInterface:
+def list_values(data: list, **kwargs) -> ValueSupplierInterface:
     """
-    creates a value list supplier
+    creates a Value supplier for the list of provided data
 
     Args:
         data: for the supplier
-        config: config with optional count param
-        do_sampling: if the data should be sampled instead of iterated through
+
+    Keyword Args:
+        as_list (bool): if data should be returned as a list
+        sample (bool): if the data should be sampled instead of iterated through incrementally
+        count: constant, list, or weighted map
+        count_dist (str): distribution in named param function style format
 
     Returns:
-        the supplier
-
+        the ValueSupplierInterface for the data list
     """
-    if config is None:
-        config = {}
-    as_list = utils.is_affirmative('as_list', config)
-    return list_value_supplier(data, count_supplier(**config), do_sampling, as_list)
+    as_list = utils.is_affirmative('as_list', kwargs)
+    sample = utils.is_affirmative('sample', kwargs, default=registries.get_default('sample_mode'))
+    return list_value_supplier(data, count_supplier(**kwargs), sample, as_list)
 
 
 def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
@@ -310,31 +316,36 @@ def random_range(start: Union[str, int, float],
     return RandomRangeSupplier(start, end, precision, count_supplier(data=count))
 
 
-def list_stat_sampler(data: Union[str, list],
-                      config: dict) -> ValueSupplierInterface:
+def list_stats_sampler(data: Union[str, list],
+                       **kwargs) -> ValueSupplierInterface:
     """
     sample from list (or string) with stats based params
 
     Args:
         data: list to select subset from
-        config: with minimal of mean specified
+
+    Keyword Args:
+        mean (float): mean number of items/characters to produce
+        stddev (float): standard deviation from the mean
+        count (int): number of elements in list/characters to use
+        count_dist (str): count distribution to use
+        min (int): minimum number of items/characters to return
+        max (int): maximum number of items/characters to return
 
     Returns:
         the supplier
 
     Examples:
         >>> import datacraft
-        >>> stats_config = {"mean": 2, "stddev": 1}
         >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
-        >>> pet_supplier = datacraft.suppliers.list_stat_sampler(pet_list, stats_config)
+        >>> pet_supplier = datacraft.suppliers.list_stats_sampler(pet_list, mean=2, stddev=1)
         >>> new_pets = pet_supplier.next(0)
 
         >>> char_config = {"min": 2, "mean": 4, "max": 8}
-        >>> char_supplier = datacraft.suppliers.list_stat_sampler("#!@#$%^&*()_-~", char_config)
+        >>> char_supplier = datacraft.suppliers.list_stats_sampler("#!@#$%^&*()_-~", min=2, mean=4, max=8)
         >>> two_to_eight_chars = char_supplier.next(0)
     """
-    config['as_list'] = utils.is_affirmative('as_list', config, False)
-    return list_stats_sampler(data, **config)
+    return list_stats_sampler_supplier(data, **kwargs)
 
 
 def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
@@ -348,7 +359,6 @@ def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
 
     Args:
         data: list to select subset from
-        **kwargs:
 
     Keyword Args:
         count: number of elements in list to use
@@ -374,7 +384,7 @@ def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
         min_cnt = int(kwargs.get('min', 1))
         max_cnt = int(kwargs.get('max', len(data))) + 1
         count_range = list(range(min_cnt, max_cnt))
-        counts = _value_list(count_range, None, True)
+        counts = list_values(count_range, sample=True)
     return ListCountSamplerSupplier(data, counts, kwargs.get('join_with', None))
 
 
@@ -478,7 +488,6 @@ def character_class(data, **kwargs):
 
     Args:
         data: set of characters to supply as values
-        **kwargs:
 
     Keyword Args:
         join_with (str): string to join characters with, default is ''
@@ -497,7 +506,7 @@ def character_class(data, **kwargs):
         for char_to_exclude in kwargs.get('exclude'):
             data = data.replace(char_to_exclude, '')
     if utils.any_key_exists(kwargs, ['mean', 'stddev']):
-        return list_stat_sampler(data, kwargs)
+        return list_stats_sampler(data, **kwargs)
     return list_count_sampler(data, **kwargs)
 
 
@@ -507,9 +516,16 @@ def csv(csv_path, **kwargs):
 
     Args:
         csv_path: path to csv file to supply data from
-        **kwargs:
 
     Keyword Args:
+        column (int): 1 based column number, default is 1
+        sample (bool): if the values for the column should be sampled, if supported
+        count: constant, list, or weighted map
+        count_dist: distribution in named param function style format
+        delimiter (str): how items are separated, default is ','
+        quotechar (str): string used to quote values, default is '"'
+        headers (bool): if the CSV file has a header row
+        sample_rows (bool): if sampling should happen at a row level, not valid if buffering is set to true
 
     Returns:
         ValueSupplierInterface for csv field
@@ -921,9 +937,9 @@ def range_supplier(start: Union[int, float],
     Creates a Value Supplier for given range of data
 
     Args:
-        start: start of
-        end:
-        step:
+        start: start of range
+        end: end of range
+        step: of range values
 
     Keyword Args:
         precision (int): Number of decimal places to use, in case of floating point range
@@ -947,3 +963,59 @@ def resettable(iterator: ResettableIterator):
         ValueSupplierInterface to supply generated values with
     """
     return iter_supplier(iterator)
+
+
+def select_list_subset(data: list, **kwargs):
+    """Creates a supplier that selects elements from the data list based on the supplier kwargs
+
+    Args:
+        data: list of data values to supply values from
+
+    Keyword Args:
+        mean (float): mean number of values to include in list
+        stddev (float): standard deviation from the mean
+
+    Returns:
+        ValueSupplierInterface to supply subsets of data list
+    """
+    if utils.any_key_exists(kwargs, ['mean', 'stddev']):
+        return list_stats_sampler(data, **kwargs)
+    return list_count_sampler(data, **kwargs)
+
+
+def unicode_range(data, **kwargs):
+    """Creates a unicode supplier for single or multiple unicode ranges
+
+    Args:
+        data: list of unicode ranges to sample from
+
+    Keyword Args:
+        mean (float): mean number of values to produce
+        stddev (float): standard deviation from the mean
+        count (int): number of unicode characters to produce
+        count_dist (str): count distribution to use
+        min (int): minimum number of characters to return
+        max (int): maximum number of characters to return
+        as_list (bool): if the results should be returned as a list
+        join_with (str): value to join values with, default is ''
+
+    Returns:
+        ValueSupplierInterface to supply subsets of data list
+    """
+    if isinstance(data[0], list):
+        suppliers_list = [_single_unicode_range(sublist, **kwargs) for sublist in data]
+        return from_list_of_suppliers(suppliers_list, True)
+    return _single_unicode_range(data, **kwargs)
+
+
+def _single_unicode_range(data, **kwargs):
+    # supplies range of data as floats
+    range_data = list(range(utils.decode_num(data[0]), utils.decode_num(data[1]) + 1))
+    # casts the floats to ints
+    if utils.any_key_exists(kwargs, ['mean', 'stddev']):
+        if 'as_list' not in kwargs:
+            kwargs['as_list'] = 'true'
+        wrapped = list_stats_sampler(range_data, **kwargs)
+    else:
+        wrapped = list_count_sampler(range_data, **kwargs)
+    return unicode_range_supplier(wrapped)

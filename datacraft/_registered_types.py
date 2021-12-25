@@ -66,8 +66,10 @@ def _get_values_schema():
 
 
 @registries.Registry.types(_VALUES_KEY)
-def _handle_values_type(_, __):
-    """ placeholder as this is handled elsewhere """
+def _handle_values_type(spec, loader):
+    """ handles values types """
+    config = utils.load_config(spec, loader)
+    return suppliers.values(spec, **config)
 
 
 ##############
@@ -454,6 +456,7 @@ def _configure_geo_pair(field_spec, loader):
     config = utils.load_config(field_spec, loader)
     return suppliers.geo_pair(**config)
 
+
 ###########
 # nested
 ##########
@@ -724,9 +727,7 @@ def _configure_select_list_subset_supplier(field_spec, loader):
             data = field_spec
     elif 'data' in field_spec:
         data = field_spec.get('data')
-    if utils.any_key_exists(config, ['mean', 'stddev']):
-        return suppliers.list_stat_sampler(data, config)
-    return suppliers.list_count_sampler(data, **config)
+    return suppliers.select_list_subset(data, **config)
 
 
 ###################
@@ -739,7 +740,7 @@ def _get_unicode_range_schema():
 
 
 @registries.Registry.types(_UNICODE_RANGE_KEY)
-def _configure_unicode_range_supplier(spec, _):
+def _configure_unicode_range_supplier(spec, loader):
     """ configure the supplier for unicode_range types """
     if 'data' not in spec:
         raise SpecException('data is Required Element for unicode_range specs: ' + json.dumps(spec))
@@ -748,25 +749,8 @@ def _configure_unicode_range_supplier(spec, _):
         raise SpecException(
             f'data should be a list or list of lists with two elements for {_UNICODE_RANGE_KEY} specs: ' + json.dumps(
                 spec))
-    config = spec.get('config', {})
-    if isinstance(data[0], list):
-        suppliers_list = [_single_unicode_range(sublist, config) for sublist in data]
-        return suppliers.from_list_of_suppliers(suppliers_list, True)
-    return _single_unicode_range(data, config)
-
-
-def _single_unicode_range(data, config):
-    """ creates a unicode supplier for a single unicode range """
-    # supplies range of data as floats
-    range_data = list(range(utils.decode_num(data[0]), utils.decode_num(data[1]) + 1))
-    # casts the floats to ints
-    if utils.any_key_exists(config, ['mean', 'stddev']):
-        if 'as_list' not in config:
-            config['as_list'] = 'true'
-        wrapped = suppliers.list_stat_sampler(range_data, config)
-    else:
-        wrapped = suppliers.list_count_sampler(range_data, **config)
-    return unicode_range_supplier(wrapped)
+    config = utils.load_config(spec, loader)
+    return suppliers.unicode_range(data, **config)
 
 
 #################

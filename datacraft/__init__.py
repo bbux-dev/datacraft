@@ -2,7 +2,8 @@
 
 # model classes that may be implemented externally
 from .supplier.model import (
-    DataSpec, ValueSupplierInterface, Distribution, CasterInterface, RecordProcessor, OutputHandlerInterface)
+    DataSpec, ValueSupplierInterface, Distribution, CasterInterface, RecordProcessor, OutputHandlerInterface,
+    ResettableIterator)
 # programmatic spec building
 from . import builder
 # expose this at root too

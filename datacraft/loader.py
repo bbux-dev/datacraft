@@ -99,10 +99,10 @@ class Loader:
 
         if spec_type == 'config_ref':
             raise SpecException(f'Cannot use config_ref as source of data: {json.dumps(field_spec)}')
-        if spec_type is None or spec_type == 'values':
+        if spec_type is None:
             if self.enforce_schema:
-                _validate_schema_for_spec(spec_type, field_spec)
-            supplier = suppliers.values(field_spec, self)
+                _validate_schema_for_spec('values', field_spec)
+            supplier = suppliers.values(field_spec)
         else:
             handler = lookup_type(spec_type)
             if handler is None:

@@ -53,7 +53,6 @@ class DataSpec(dict):
             Records or rendered template strings
 
         Examples:
-
             >>> import datacraft
             >>> builder = datacraft.spec_builder()
             >>> builder.values(['bob', 'bobby', 'robert', 'bobo']))
@@ -187,8 +186,9 @@ class CasterInterface(ABC):
 
 
 class ResettableIterator(Iterator, ABC):
+    """Iterator class that can be reset to the beginning of the iteration """
     @abstractmethod
     def reset(self):
         """
-        After a StopIteration, this will reset the iterator to the initial state for another full round of iteration
+        This will reset the iterator to the initial state for another full round of iteration
         """

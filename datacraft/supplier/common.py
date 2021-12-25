@@ -91,7 +91,12 @@ class DecoratedSupplier(ValueSupplierInterface):
 
     def next(self, iteration):
         value = self.wrapped.next(iteration)
+        if isinstance(value, list):
+            return [self._format(val) for val in value]
         # todo: cache for efficiency?
+        return self._format(value)
+
+    def _format(self, value):
         return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
 
 
@@ -250,8 +255,8 @@ class ListCountSamplerSupplier(ValueSupplierInterface):
         return data
 
 
-def list_stats_sampler(data: Union[str, list],
-                       **kwargs) -> ValueSupplierInterface:
+def list_stats_sampler_supplier(data: Union[str, list],
+                                **kwargs) -> ValueSupplierInterface:
     """
     Creates a List Sampler that uses a stats based approach
     Args:
