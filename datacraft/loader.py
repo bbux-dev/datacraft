@@ -111,7 +111,10 @@ class Loader:
                 _validate_schema_for_spec(spec_type, field_spec)
             supplier = handler(field_spec, self)
         config = field_spec.get('config', {})
-        return suppliers.enhance(supplier, **config)
+        # special case
+        if spec_type == 'nested':
+            return supplier
+        return suppliers.alter(supplier, **config)
 
     def get_ref(self, key: str) -> dict:
         """

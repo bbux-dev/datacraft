@@ -983,7 +983,10 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
 
     spec = {
         "type": "unicode_range",
-        "data": data
+        "data": data,
+        "config": {
+            "as_list": False,
+        }
     }  # type: Dict[str, Any]
 
     if len(config) > 0:

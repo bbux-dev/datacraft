@@ -31,6 +31,15 @@ def test_weighted_values():
     assert 'bar' in most_common_keys
 
 
+@pytest.mark.parametrize("null_marker_key", ['_NONE_', '_NULL_'])
+def test_weighted_values_special_none_marker(null_marker_key):
+    spec = {'data': {'foo': 0.5, null_marker_key: 0.4, 'baz': 0.1}}
+    most_common_keys = _get_most_common_keys(spec, 100, 2)
+
+    assert 'foo' in most_common_keys
+    assert None in most_common_keys
+
+
 def test_weighted_values_invalid_type():
     spec = {'foo': '0.5', 'bar': '0.4', 'baz': '0.1'}
     with pytest.raises(SpecException):
@@ -41,16 +50,6 @@ def test_weighted_values_empty():
     spec = {}
     with pytest.raises(SpecException):
         suppliers.weighted_values(spec)
-
-
-def test_weighted_values_non_zero_count():
-    spec = builder.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1}, count=2)
-    supplier = suppliers.values(spec)
-
-    data = supplier.next(0)
-
-    assert isinstance(data, list)
-    assert len(data) == 2
 
 
 def test_shortcut_notation():

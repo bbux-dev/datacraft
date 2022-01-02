@@ -14,6 +14,7 @@ def _default_list_sample_mode():
     return False
 
 
+@registries.Registry.defaults('unicode_join_with')
 @registries.Registry.defaults('char_class_join_with')
 @registries.Registry.defaults('combine_join_with')
 def _default_char_class_join_with():
