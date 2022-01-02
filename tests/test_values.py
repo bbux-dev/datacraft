@@ -43,16 +43,6 @@ def test_weighted_values_empty():
         suppliers.weighted_values(spec)
 
 
-def test_weighted_values_non_zero_count():
-    spec = builder.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1}, count=2)
-    supplier = suppliers.values(spec)
-
-    data = supplier.next(0)
-
-    assert isinstance(data, list)
-    assert len(data) == 2
-
-
 def test_shortcut_notation():
     # not type or data key, just what would have been the value for the data key
     spec = builder.values({'foo': 0.5, 'bar': 0.4, 'baz': 0.1})

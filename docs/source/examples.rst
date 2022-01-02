@@ -1,6 +1,49 @@
 Examples
 ========
 
+Unit Test Data
+--------------
+
+Datacraft is ideal for generating test data that conforms to a specific structure while minimizing the details of the
+values in the structure. A common way to externalize complex data from a unit test is by the use of fixtures. Below is
+an example pytest fixture that will create a Data Spec that can be used to generate multiple records. These records
+can then be passed to processing logic to verify functionality.  This is usually much more compact and flexible then
+hard coding a bunch of examples.  It is also easier to update the test data when the structure of the records changes.
+
+
+.. code-block:: python
+
+   @pytest.fixture
+   def example_good_record():
+       raw = {
+           "id": {"type": "uuid"},
+           "handle:ref": "HANDLE",
+           "joined": {"type": "date.iso"},
+           "follows:ref": {
+               "ref": "HANDLE",
+               "config": {
+                   "as_list": True,
+                   "count_dist": "normal(mean=10, stddev=5, min=1, max=100)"
+               }
+           },
+           "refs": {
+               "HANDLE": {
+                   "type": "rand_int_range",
+                   "data": [0, 1000],
+                   "config": {"prefix": "user"}
+               }
+           }
+       }
+       spec = datacraft.parse_spec(raw)
+       return spec
+
+
+   def test_good_record(example_good_record):
+       records = list(example_good_record.generator(10))
+       success = my_function(records)
+       assert success is True
+
+
 Generating Sentences
 --------------------
 

@@ -88,8 +88,8 @@ def values(spec: Any, **kwargs) -> ValueSupplierInterface:
         supplier = constant(data)
 
     # Check for count param
-    if 'count' in kwargs or 'count_dist' in kwargs:
-        return MultipleValueSupplier(supplier, count_supplier(**kwargs))
+        # if 'count' in kwargs or 'count_dist' in kwargs:
+        #     return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
 
 
@@ -136,7 +136,7 @@ def count_supplier(**kwargs) -> ValueSupplierInterface:
     if isinstance(data, list):
         supplier = list_values(data)
     elif isinstance(data, dict):
-        supplier = weighted_values(data)
+        supplier = cast(weighted_values(data), cast_to='int')
     elif isinstance(data, Distribution):
         supplier = cast(distribution_supplier(data), cast_to='int')
     else:
@@ -199,38 +199,49 @@ def from_list_of_suppliers(supplier_list: List[ValueSupplierInterface],
     return RotatingSupplierList(supplier_list, modulate_iteration)
 
 
-def enhance(supplier, **kwargs):
+def alter(supplier, **kwargs) -> ValueSupplierInterface:
     """
+    Covers multiple suppliers that alter values if configured to do so through kwargs: cast, buffer, and decorate
 
     Args:
-        supplier: to enhance if configured to do so
+        supplier: to alter if configured to do so
 
     Keyword Args:
         cast (str): caster to apply
         prefix (str): prefix to prepend to value, default is ''
         suffix (str): suffix to append to value, default is ''
         quote (str): string to both append and prepend to value, default is ''
-
+        buffer (bool): if the values should be buffered
+        buffer_size (int): size of buffer to use
 
     Returns:
-
+        supplier with alterations
     """
     if _is_cast(**kwargs):
-        supplier = cast(supplier, cast_to=kwargs.get('cast'))
+        supplier = cast(supplier, cast_to=kwargs.get('cast'))  # type: ignore
     if _is_decorated(**kwargs):
         supplier = decorated(supplier, **kwargs)
     if _is_buffered(**kwargs):
         supplier = buffered(supplier, **kwargs)
+    if _wrap_with_multiple_value(supplier, **kwargs):
+        return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
+
+
+def _wrap_with_multiple_value(supplier, **kwargs):
+    """ checks if this supplier should be wrapped with multiple values supplier """
+    has_count = 'count' in kwargs or 'count_dist' in kwargs
+    as_list = utils.is_affirmative('as_list', kwargs)
+    return has_count and as_list
 
 
 def _is_decorated(**kwargs) -> bool:
     """ is this spec a decorated one """
-    return any(key in kwargs for key in ['prefix' ,'suffix' ,'quote'])
+    return any(key in kwargs for key in ['prefix', 'suffix', 'quote'])
 
 
 def _is_cast(**kwargs) -> bool:
-    """ Does this spec requires casting """
+    """ Does this spec require casting """
     return 'cast' in kwargs
 
 
@@ -408,7 +419,7 @@ def decorated(supplier: ValueSupplierInterface, **kwargs) -> ValueSupplierInterf
     Creates a decorated supplier around the provided one
 
     Args:
-        supplier: the supplier to enhance
+        supplier: the supplier to alter
         **kwargs
 
     Keyword Args:
@@ -476,7 +487,7 @@ def calculate(suppliers_map: Dict[str, ValueSupplierInterface], formula: str) ->
         formula: to evaluate, should reference keys in suppliers_map
 
     Returns:
-        ValueSupplierInterface with calculated values
+        supplier with calculated values
     """
     engine = template_engines.string(formula)
     return calculate_supplier(suppliers=suppliers_map, engine=engine)
@@ -500,7 +511,7 @@ def character_class(data, **kwargs):
         max (int): maximum number of characters to return
 
     Returns:
-        ValueSupplierInterface for characters
+        supplier for characters
     """
     if 'exclude' in kwargs:
         for char_to_exclude in kwargs.get('exclude'):
@@ -528,7 +539,7 @@ def csv(csv_path, **kwargs):
         sample_rows (bool): if sampling should happen at a row level, not valid if buffering is set to true
 
     Returns:
-        ValueSupplierInterface for csv field
+        supplier for csv field
     """
     field_name = kwargs.get('column', 1)
     sample = utils.is_affirmative('sample', kwargs)
@@ -592,7 +603,7 @@ def date(**kwargs) -> ValueSupplierInterface:
         date_format_string (str): format for parsing dates
 
     Returns:
-        ValueSupplierInterface for dates
+        supplier for dates
     """
     hour_supplier = kwargs.pop('hour_supplier')
     if 'center_date' in kwargs or 'stddev_days' in kwargs:
@@ -752,7 +763,7 @@ def ip_supplier(**kwargs) -> ValueSupplierInterface:
         cidr (str): cidr to use only one /8 /16 or /24, i.e. "192.168.0.0/24", "10.0.0.0/16", "100.0.0.0/8"
 
     Returns:
-        ValueSupplierInterface for ip addresses
+        supplier for ip addresses
 
     Raises:
         SpecException if one of base or cidr is not provided
@@ -839,7 +850,7 @@ def ip_precise(cidr: str, sample: bool = False) -> ValueSupplierInterface:
         sample: if the ip addresses should be sampled from the available set
 
     Returns:
-        ValueSupplierInterface for precise ip addresses
+        supplier for precise ip addresses
 
     Examples:
         >>> import datacraft
@@ -864,7 +875,7 @@ def mac_address(delimiter: str = None) -> ValueSupplierInterface:
         delimiter: how mac address pieces are separated, default is ':'
 
     Returns:
-        ValueSupplierInterface for mac addresses
+        supplier for mac addresses
 
     Examples:
         >>> import datacraft
@@ -891,7 +902,7 @@ def combine(to_combine, join_with: str = None, as_list: bool = None):
         join_with: value to use to join the values
 
     Returns:
-        ValueSupplierInterface for mac addresses
+        supplier for mac addresses
 
     Examples:
         >>> import datacraft
@@ -919,7 +930,7 @@ def uuid(variant: int = None) -> ValueSupplierInterface:
         variant: of uuid to use, default is 4
 
     Returns:
-        ValueSupplierInterface to supply uuids with
+        supplier to supply uuids with
     """
     if variant is None:
         variant = registries.get_default('uuid_variant')
@@ -945,7 +956,7 @@ def range_supplier(start: Union[int, float],
         precision (int): Number of decimal places to use, in case of floating point range
 
     Returns:
-        ValueSupplierInterface to supply ranges of values with
+        supplier to supply ranges of values with
     """
     if utils.any_is_float([start, end, step]):
         range_values_gen = ranges.float_range(float(start), float(end), float(step), kwargs.get("precision"))
@@ -960,7 +971,7 @@ def resettable(iterator: ResettableIterator):
         iterator: iterator with reset() method
 
     Returns:
-        ValueSupplierInterface to supply generated values with
+        supplier to supply generated values with
     """
     return iter_supplier(iterator)
 
@@ -976,7 +987,7 @@ def select_list_subset(data: list, **kwargs):
         stddev (float): standard deviation from the mean
 
     Returns:
-        ValueSupplierInterface to supply subsets of data list
+        supplier to supply subsets of data list
     """
     if utils.any_key_exists(kwargs, ['mean', 'stddev']):
         return list_stats_sampler(data, **kwargs)
@@ -1000,7 +1011,7 @@ def unicode_range(data, **kwargs):
         join_with (str): value to join values with, default is ''
 
     Returns:
-        ValueSupplierInterface to supply subsets of data list
+        supplier to supply subsets of data list
     """
     if isinstance(data[0], list):
         suppliers_list = [_single_unicode_range(sublist, **kwargs) for sublist in data]
