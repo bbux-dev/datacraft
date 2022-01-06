@@ -8,6 +8,7 @@ import json
 import logging
 from pathlib import Path
 import catalogue  # type: ignore
+import yaml
 from . import template_engines, registries
 from .supplier.model import RecordProcessor, OutputHandlerInterface
 from .exceptions import SpecException
@@ -16,21 +17,34 @@ _log = logging.getLogger(__name__)
 
 
 @registries.Registry.formats('json')
-def _format_json(record: dict) -> str:
+def _format_json(record: Union[list, dict]) -> str:
     """formats the record as compressed json  """
     return json.dumps(record)
 
 
 @registries.Registry.formats('json-pretty')
-def _format_json_pretty(record: dict) -> str:
+def _format_json_pretty(record: Union[list, dict]) -> str:
     """pretty prints the record as json  """
     return json.dumps(record, indent=int(registries.get_default('json_indent')))
 
 
 @registries.Registry.formats('csv')
-def _format_csv(record: dict) -> str:
+def _format_csv(record: Union[list, dict]) -> str:
     """formats the values of the record as comma separated values  """
+    if isinstance(record, list):
+        lines = [_csv_line(item) for item in record]
+        return '\n'.join(lines)
+    return _csv_line(record)
+
+
+def _csv_line(record):
     return ','.join([str(val) for val in record.values()])
+
+
+@registries.Registry.formats('yaml')
+def _format_yaml(record: Union[list, dict]) -> str:
+    """formats the values of the record as YAML """
+    return yaml.dump(record, sort_keys=False, width=4096).strip()
 
 
 class WriterInterface(ABC):
@@ -75,28 +89,36 @@ class _SingleFieldOutput(OutputHandlerInterface):
     def finished_record(self, iteration=None, group_name=None, exclude_internal=False):
         pass
 
+    def finished_iterations(self):
+        pass
 
-def record_level(record_processor: RecordProcessor, writer: WriterInterface) -> OutputHandlerInterface:
+
+def record_level(record_processor: RecordProcessor,
+                 writer: WriterInterface,
+                 records_per_file: int = 1) -> OutputHandlerInterface:
     """
     Creates a OutputHandler for record level events
 
     Args:
         record_processor (RecordProcessor): to process the records into strings
         writer (WriterInterface): to write the processed records
+        records_per_file: number of records to accumulate before writing
 
     Returns:
         OutputHandlerInterface
     """
-    return _RecordLevelOutput(record_processor, writer)
+    return _RecordLevelOutput(record_processor, writer, records_per_file)
 
 
 class _RecordLevelOutput(OutputHandlerInterface):
     """Class that outputs after all fields have been generated"""
 
-    def __init__(self, record_processor, writer):
+    def __init__(self, record_processor, writer, records_per_file):
         self.record_processor = record_processor
         self.writer = writer
+        self.records_per_file = records_per_file
         self.current = {}
+        self.buffer = []
 
     def handle(self, key, value):
         self.current[key] = value
@@ -108,9 +130,22 @@ class _RecordLevelOutput(OutputHandlerInterface):
                 '_iteration': iteration,
                 '_field_group': group_name
             }
-        processed = self.record_processor.process(current)
+        if self.records_per_file == 1:
+            processed = self.record_processor.process(current)
+            self.writer.write(processed)
+            self.current.clear()
+        else:
+            self.buffer.append(current.copy())
+            self.current.clear()
+            if len(self.buffer) == self.records_per_file:
+                processed = self.record_processor.process(self.buffer)
+                self.writer.write(processed)
+                self.buffer.clear()
+
+    def finished_iterations(self):
+        processed = self.record_processor.process(self.buffer)
         self.writer.write(processed)
-        self.current.clear()
+        self.buffer.clear()
 
 
 def stdout_writer() -> WriterInterface:
@@ -177,26 +212,24 @@ class _SingleFileWriter(WriterInterface):
 
 def incrementing_file_writer(outdir: str,
                              outname: str,
-                             extension: str = None,
-                             records_per_file: int = 1) -> WriterInterface:
+                             extension: str = None) -> WriterInterface:
     """Creates a WriterInterface that increments the count in the file name once records_per_file have been written
 
     Args:
         outdir: output directory
         outname: output file name
         extension: to append to the file i.e. .csv
-        records_per_file: number of records to write before a new file is opened
 
     Returns:
         a Writer that increments the a count in the file name
     """
-    return _IncrementingFileWriter(outdir, outname, extension, records_per_file)
+    return _IncrementingFileWriter(outdir, outname, extension)
 
 
 class _IncrementingFileWriter(WriterInterface):
     """Writes processed output to disk and increments the file name with a count"""
 
-    def __init__(self, outdir, outname, extension=None, records_per_file=1):
+    def __init__(self, outdir, outname, extension=None):
         self.outdir = outdir
         self.outname = outname
         self.extension = extension
@@ -205,23 +238,14 @@ class _IncrementingFileWriter(WriterInterface):
         if not os.path.exists(outdir):
             os.makedirs(outdir)
         self.count = 0
-        self.records_per_file = records_per_file
-        self.record_count = 0
 
     def write(self, value):
         extension = self.extension if self.extension else ''
         outfile = '%s/%s-%d%s' % (self.outdir, self.outname, self.count, extension)
-        if self.record_count == 0:
-            mode = 'w'
-        else:
-            mode = 'a'
-        with open(outfile, mode) as handle:
+        self.count += 1
+        with open(outfile, 'w') as handle:
             handle.write(value)
             handle.write('\n')
-        self.record_count += 1
-        if self.record_count == self.records_per_file:
-            self.record_count = 0
-            self.count += 1
 
 
 class _FormatProcessor(RecordProcessor):
@@ -230,7 +254,7 @@ class _FormatProcessor(RecordProcessor):
     def __init__(self, key):
         self.format_func = registries.Registry.formats.get(key)
 
-    def process(self, record: dict) -> str:
+    def process(self, record: Union[list, dict]) -> str:
         """
         Processes the given record into the appropriate output string
 
@@ -319,7 +343,6 @@ def get_writer(outdir: str = None,
     Keyword Args:
         outfile_prefix: the prefix of the output files i.e. test-data-
         extension: to append to the file name prefix i.e. .csv
-        records_per_file: how many records per file to write
         suppress_output: if output to stdout should be suppressed, only valid if outdir is None
 
     Returns:
@@ -341,8 +364,7 @@ def get_writer(outdir: str = None,
             writer = incrementing_file_writer(
                 outdir=outdir,
                 outname=kwargs.get('outfile_prefix', registries.get_default('outfile_prefix')),
-                extension=kwargs.get('extension'),
-                records_per_file=kwargs.get('records_per_file', 1)
+                extension=kwargs.get('extension')
             )
     else:
         if kwargs.get('suppress_output'):

@@ -15,8 +15,7 @@ def test_outputs_single_field():
     writer = outputs._IncrementingFileWriter(
         outdir=outdir,
         outname='test_single',
-        extension='txt',
-        records_per_file=1
+        extension='txt'
     )
     output = outputs._SingleFieldOutput(writer, True)
     output.handle('key', 'value')
@@ -30,12 +29,11 @@ def test_outputs_record_level():
     writer = outputs._IncrementingFileWriter(
         outdir=outdir,
         outname='test_record',
-        extension='txt',
-        records_per_file=1
+        extension='txt'
     )
 
     engine = engines.for_file(f'{test_dir}/data/template.jinja')
-    output = outputs._RecordLevelOutput(engine, writer)
+    output = outputs._RecordLevelOutput(engine, writer, 1)
 
     # template looks like: A:{{ A }}, B:{{ B }}, C:{{ C }}
     output.handle('A', '1')
@@ -45,6 +43,7 @@ def test_outputs_record_level():
     output.finished_record(iteration=1,
                            group_name='TEST',
                            exclude_internal=True)
+    output.finished_iterations()
 
     _verify_output('test_record-0.txt', 'A:1, B:2, C:3\n')
 
