@@ -41,8 +41,11 @@ class _Jinja2Engine(RecordProcessor):
             autoescape=select_autoescape(['html', 'xml'])
         )
 
-    def process(self, record: dict) -> str:
+    def process(self, record: Union[list, dict]) -> str:
         template = self.env.get_template(self.template_name)
+        if isinstance(record, list):
+            parts = [template.render(item) for item in record]
+            return '\n'.join(parts)
         return template.render(record)
 
 
@@ -58,7 +61,7 @@ class _Jinja2StringEngine(RecordProcessor):
             autoescape=select_autoescape(['html', 'xml'])
         )
 
-    def process(self, record: dict) -> str:
+    def process(self, record: Union[list, dict]) -> str:
         """
         Render the template using the fields in the provided record
 
@@ -69,4 +72,7 @@ class _Jinja2StringEngine(RecordProcessor):
             The rendered template
         """
         template = self.env.from_string(self.template)
+        if isinstance(record, list):
+            parts = [template.render(item) for item in record]
+            return '\n'.join(parts)
         return template.render(record)

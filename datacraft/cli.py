@@ -210,7 +210,6 @@ def _get_writer(args):
     return outputs.get_writer(args.outdir,
                               outfile_prefix=args.outfile_prefix,
                               extension=args.outfile_extension,
-                              records_per_file=args.records_per_file,
                               server=args.server,
                               suppress_output=(args.suppress_output or args.server))
 
@@ -218,7 +217,7 @@ def _get_writer(args):
 def _get_output(args, processor, writer):
     """ get the output from the args, processor, and writer """
     if processor:
-        return outputs.record_level(processor, writer)
+        return outputs.record_level(processor, writer, args.records_per_file)
 
     return outputs.single_field(writer, args.printkey)
 
