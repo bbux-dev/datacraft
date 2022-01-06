@@ -319,7 +319,7 @@ def get_writer(outdir: str = None,
     Keyword Args:
         outfile_prefix: the prefix of the output files i.e. test-data-
         extension: to append to the file name prefix i.e. .csv
-        recordsperfile: how many records per file to write
+        records_per_file: how many records per file to write
         suppress_output: if output to stdout should be suppressed, only valid if outdir is None
 
     Returns:
@@ -342,7 +342,7 @@ def get_writer(outdir: str = None,
                 outdir=outdir,
                 outname=kwargs.get('outfile_prefix', registries.get_default('outfile_prefix')),
                 extension=kwargs.get('extension'),
-                records_per_file=kwargs.get('recordsperfile', 1)
+                records_per_file=kwargs.get('records_per_file', 1)
             )
     else:
         if kwargs.get('suppress_output'):
