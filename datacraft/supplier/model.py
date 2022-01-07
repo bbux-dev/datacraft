@@ -2,7 +2,7 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Any, Generator, Iterator
+from typing import Union, Tuple, List, Any, Generator, Iterator
 
 
 class DataSpec(dict):
@@ -124,7 +124,7 @@ class RecordProcessor(ABC):
     """A Class that takes in a generated record and returns it formatted as a string for output"""
 
     @abstractmethod
-    def process(self, record: dict) -> str:
+    def process(self, record: Union[list, dict]) -> str:
         """
         Processes the given record into the appropriate output string
 
@@ -162,6 +162,10 @@ class OutputHandlerInterface(ABC):
             group_name: group this record is apart of
             exclude_internal: if external fields should be excluded from output record
         """
+
+    @abstractmethod
+    def finished_iterations(self):
+        """This is called when all iterations have been completed"""
 
 
 class CasterInterface(ABC):

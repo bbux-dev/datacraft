@@ -24,7 +24,8 @@ from typing import Generator
 from . import registries, utils
 from .loader import Loader, preprocess_spec
 from .supplier import key_suppliers
-from .supplier.model import DataSpec
+from .supplier.model import DataSpec, RecordProcessor
+from .outputs import OutputHandlerInterface
 
 _log = logging.getLogger(__name__)
 
@@ -1411,11 +1412,11 @@ class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
-        processor = kwargs.get('processor')
+        processor: RecordProcessor = kwargs.get('processor', None)
         data_dir = kwargs.get('data_dir', registries.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
-        output = kwargs.get('output', None)
+        output: OutputHandlerInterface = kwargs.get('output', None)
         loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
         key_provider = key_suppliers.from_spec(loader.specs)
@@ -1430,7 +1431,8 @@ class _DataSpecImpl(DataSpec):
                 record[key] = value
             if output:
                 output.finished_record(i, group, exclude_internal)
-
+                if i == iterations - 1:
+                    output.finished_iterations()
             if processor is not None:
                 yield processor.process(record)
             else:
