@@ -143,6 +143,8 @@ class _RecordLevelOutput(OutputHandlerInterface):
                 self.buffer.clear()
 
     def finished_iterations(self):
+        if len(self.buffer) == 0:
+            return
         processed = self.record_processor.process(self.buffer)
         self.writer.write(processed)
         self.buffer.clear()

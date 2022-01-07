@@ -33,7 +33,7 @@ def test_outputs_record_level():
     )
 
     engine = engines.for_file(f'{test_dir}/data/template.jinja')
-    output = outputs._RecordLevelOutput(engine, writer, 1)
+    output = outputs.record_level(engine, writer, 1)
 
     # template looks like: A:{{ A }}, B:{{ B }}, C:{{ C }}
     output.handle('A', '1')
@@ -48,19 +48,45 @@ def test_outputs_record_level():
     _verify_output('test_record-0.txt', 'A:1, B:2, C:3\n')
 
 
-def test_format_json():
-    as_json = outputs.processor(format_name='json').process({'field': 'value'})
-    assert as_json == "{\"field\": \"value\"}"
+def test_outputs_record_level_more_than_one_per():
+    # for coverage
+    writer = outputs._IncrementingFileWriter(
+        outdir=outdir,
+        outname='test_record',
+        extension='txt'
+    )
+
+    engine = engines.for_file(f'{test_dir}/data/template.jinja')
+    output = outputs.record_level(engine, writer, 2)
+
+    # template looks like: A:{{ A }}, B:{{ B }}, C:{{ C }}
+    for i in range(3):
+        output.handle('A', str(i * 3 + 1))
+        output.handle('B', str(i * 3 + 2))
+        output.handle('C', str(i * 3 + 3))
+        output.finished_record(iteration=i,
+                               group_name='TEST',
+                               exclude_internal=True)
+    output.finished_iterations()
+
+    _verify_output('test_record-0.txt', 'A:1, B:2, C:3\nA:4, B:5, C:6\n')
+    _verify_output('test_record-1.txt', 'A:7, B:8, C:9\n')
 
 
-def test_format_json_pretty():
-    as_json = outputs.processor(format_name='json-pretty').process({'field': 'value'})
-    assert as_json == "{\n    \"field\": \"value\"\n}"
+format_tests = [
+    ('json', {'field': 'value'}, "{\"field\": \"value\"}"),
+    ('json', [{'field': 'value'}], "[{\"field\": \"value\"}]"),
+    ('json-pretty', {'field': 'value'}, "{\n    \"field\": \"value\"\n}"),
+    ('csv', {'field1': 'value1', 'field2': 'value2'}, "value1,value2"),
+    ('csv', [{'field1': 'value1', 'field2': 'value2'}], "value1,value2"),
+    ('yaml', [{'field1': 'value1', 'field2': 'value2'}], "- field1: value1\n  field2: value2"),
+]
 
 
-def test_format_csv():
-    as_csv = outputs.processor(format_name='csv').process({'field1': 'value1', 'field2': 'value2'})
-    assert as_csv == "value1,value2"
+@pytest.mark.parametrize("format_name,record,expected", format_tests)
+def test_format(format_name, record, expected):
+    formatted = outputs.processor(format_name=format_name).process(record)
+    assert formatted == expected
 
 
 def test_for_unregistered_format():
