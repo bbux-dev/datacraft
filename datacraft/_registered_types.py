@@ -52,6 +52,7 @@ _SELECT_LIST_SUBSET_KEY = 'select_list_subset'
 _UNICODE_RANGE_KEY = 'unicode_range'
 _UUID_KEY = 'uuid'
 _DISTRIBUTION_KEY = 'distribution'
+_TEMPLATED_KEY = 'templated'
 
 _log = logging.getLogger('datacraft.types')
 
@@ -84,26 +85,44 @@ def _calculate_schema():
 @registries.Registry.types(_CALCULATE_KEY)
 def _configure_calculate_supplier(field_spec: dict, loader: Loader):
     """ configures supplier for calculate type """
-    if 'refs' not in field_spec and 'fields' not in field_spec:
-        raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
-    if 'refs' in field_spec and 'fields' in field_spec:
-        raise SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
+
     formula = field_spec.get('formula')
     if formula is None:
         raise SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
+    suppliers_map = _build_suppliers_map(field_spec, loader)
+
+    return calculate(suppliers_map=suppliers_map, formula=formula)
+
+
+@registries.Registry.schemas(_TEMPLATED_KEY)
+def _templated_schema():
+    return schemas.load(_TEMPLATED_KEY)
+
+
+@registries.Registry.types(_TEMPLATED_KEY)
+def _configure_templated_type(field_spec, loader):
+    if 'data' not in field_spec:
+        raise SpecException(f'data is required field for templated specs: {json.dumps(field_spec)}')
+    suppliers_map = _build_suppliers_map(field_spec, loader)
+
+    return suppliers.templated(suppliers_map, field_spec.get('data', None))
+
+
+def _build_suppliers_map(field_spec, loader):
+    if 'refs' not in field_spec and 'fields' not in field_spec:
+        raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
+    if 'refs' in field_spec and 'fields' in field_spec:
+        raise SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
     mappings = _get_mappings(field_spec, 'refs')
     mappings.update(_get_mappings(field_spec, 'fields'))
-
     if len(mappings) < 1:
         raise SpecException('fields or refs empty: %s' % json.dumps(field_spec))
-
     suppliers_map = {}
     for field_or_ref, alias in mappings.items():
         supplier = loader.get(field_or_ref)
         suppliers_map[alias] = supplier
-
-    return calculate(suppliers_map=suppliers_map, formula=formula)
+    return suppliers_map
 
 
 def _get_mappings(field_spec, lookup_key):
@@ -150,11 +169,11 @@ for class_key in _CLASS_MAPPING:
 
 
 @registries.Registry.types(_CHAR_CLASS_KEY)
-def _configure_char_class_supplier(spec, _):
+def _configure_char_class_supplier(spec, loader):
     """ configure the supplier for char_class types """
     if 'data' not in spec:
         raise SpecException(f'Data is required field for char_class type: {json.dumps(spec)}')
-    config = spec.get('config', {})
+    config = utils.load_config(spec, loader)
     data = spec['data']
     if isinstance(data, str) and data in _CLASS_MAPPING:
         data = _CLASS_MAPPING[data]
@@ -790,3 +809,4 @@ def _configure_distribution_supplier(field_spec, loader):
             'required data element not defined for ' + _DISTRIBUTION_KEY + ' type : ' + json.dumps(field_spec))
     distribution = distributions.from_string(field_spec['data'])
     return suppliers.distribution_supplier(distribution)
+

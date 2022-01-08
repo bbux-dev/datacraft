@@ -485,6 +485,26 @@ class Builder:
         """
         return self._add_field_spec(key, distribution(data, **config))
 
+    def templated(self, key: str,
+                  data: str,
+                  refs: Union[List[str], List[FieldInfo]] = None,
+                  fields: Union[List[str], List[FieldInfo]] = None,
+                  **config) -> FieldInfo:
+        """
+        creates templated Field Spec and adds to Data Spec
+
+        Args:
+            key: name of ref/field
+            data: template string
+            refs: references to inject values from
+            fields: to inject values from
+            config: in kwargs format
+
+        Returns:
+            FieldInfo for the added templated field
+        """
+        return self._add_field_spec(key, templated(data, refs, fields, **config))
+
     def _add_field_spec(self, key, spec) -> FieldInfo:
         """
         adds the fieldspec and creates a FieldInfo object
@@ -1361,6 +1381,37 @@ def distribution(data: str = None, **config) -> dict:
         "type": "distribution",
         "data": data
     }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def templated(data: str,
+              refs: Union[List[str], List[FieldInfo]] = None,
+              fields: Union[List[str], List[FieldInfo]] = None,
+              **config) -> dict:
+    """
+    Constructs a combine Field Spec
+
+    Args:
+        data: template string
+        refs: refs to combine
+        fields: fields to combine
+        config: in kwargs format
+
+    Returns:
+        the combine spec
+    """
+
+    spec = {
+        "type": "templated",
+        "data": data
+    }  # type: Dict[str, Any]
+    if refs is not None:
+        spec['refs'] = _create_key_list(refs)
+    if fields is not None:
+        spec['fields'] = _create_key_list(fields)
 
     if len(config) > 0:
         spec['config'] = config

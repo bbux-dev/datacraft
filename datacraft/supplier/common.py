@@ -249,7 +249,7 @@ class ListCountSamplerSupplier(ValueSupplierInterface):
 
     def next(self, iteration):
         count = self.count_supplier.next(iteration)
-        data = random.sample(self.values, count)
+        data = [random.sample(self.values, 1)[0] for _ in range(count)]
         if self.join_with is not None:
             return self.join_with.join([str(elem) for elem in data])
         return data

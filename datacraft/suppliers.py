@@ -21,6 +21,7 @@ from .supplier.date import date_supplier, uniform_date_timestamp
 from .supplier.csv import load_csv_data, csv_supplier
 from .supplier.uuid import uuid_supplier
 from .supplier.unicode import unicode_range_supplier
+from .supplier.templated import templated_supplier
 from .supplier import network, ranges
 
 _log = logging.getLogger(__name__)
@@ -1030,3 +1031,27 @@ def _single_unicode_range(data, **kwargs):
     else:
         wrapped = list_count_sampler(range_data, **kwargs)
     return unicode_range_supplier(wrapped)
+
+
+def templated(supplier_map: Dict[str, ValueSupplierInterface],
+              template_str) -> ValueSupplierInterface:
+    """
+    Creates a supplier that populates the template string from the supplier map
+
+    Args:
+        supplier_map: map of field name -> value supplier for it
+        template_str: templated string to populate
+
+    Returns:
+        value supplier for template
+
+    Examples:
+        >>> from datacraft import suppliers
+        >>> supplier_map = { 'char': suppliers.values(['a', 'b', 'c']), 'num': suppliers.values([1, 2, 3]) }
+        >>> template_str = 'letter {{ char }}, number {{ num }}'
+        >>> supplier = suppliers.templated(supplier_map, template_str)
+        >>> supplier.next(0)
+        'letter a, nummber 1'
+    """
+    engine = template_engines.string(template_str)
+    return templated_supplier(supplier_map, engine)
