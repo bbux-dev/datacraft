@@ -23,7 +23,7 @@ Examples:
 
     {"field_constant": {"type": "values", "data": 42}}
 
-.. code-block:: json
+.. code-block:: python
 
     {"field_list": {"type": "values", "data": [1, 2, 3, 5, 8, 13, None]}}
 
