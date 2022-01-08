@@ -15,10 +15,7 @@ Prototype:
         "data": "string with {{ jinja2 }} syntax fields",
         "fields": ["valid field name1", "valid field name2"],
         OR
-        "refs": ["valid ref1", "valid ref2"],
-        "config": {
-          "join_with": "<optional string to use to join fields or refs, default is none>"
-        }
+        "refs": ["valid ref1", "valid ref2"]
       }
     }
 

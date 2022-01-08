@@ -414,15 +414,29 @@ Now with ``prize_count`` set to 3
 NOTE: It is a good practice to use a default in case that a variable is not defined, or that the variable
 substitution flags are not specified. With no default, the value would become blank and render the JSON invalid.
 
-NOTE: If using a ``calculate`` spec with a ``formula`` specified, you will need to adjust the formula so that it is not
-interpreted by the Jinja2 templating engine.
+NOTE: If using a ``calculate`` spec with a ``formula`` specified, or a ``templated`` spec, you will need to adjust the
+formula and data elements so they are correctly interpreted by the Jinja2 templating engine. The template will need
+to be wrapped in a quoted literal with the existing value in it. i.e ``"{{ field }}other stuff"`` becomes
+``"{{ '{{ field }}other stuff' }}"``
 
 .. code-block:: json
 
    {
      "sum": {
        "type": "calculate",
-       "formula": "{{one}} + {{two}}"
+       "formula": "{{one}} + {{two}}",
+       "refs": ["one", "two"]
+     },
+     "system": {
+       "type": "templated",
+       "data": "p{{var1}}.53.{{var2}}.01",
+       "refs": ["var1", "var2"]
+     },
+     "refs": {
+       "one": [1, 1.0, 1.0000001],
+       "two": [2, 2.0, 2.0000001],
+       "var1:rand_int_range": [0, 100],
+       "var2:rand_int_range": [0, 100]
      }
    }
 
@@ -433,7 +447,19 @@ Should become:
    {
      "sum": {
        "type": "calculate",
-       "formula": "{{ '{{one}} + {{two}}' }}"
+       "formula": "{{ '{{one}} + {{two}}' }}",
+       "refs": ["one", "two"]
+     },
+     "system": {
+       "type": "templated",
+       "data": "{{ 'p{{var1}}.53.{{var2}}.01' }}",
+       "refs": ["var1", "var2"]
+     },
+     "refs": {
+       "one": [1, 1.0, 1.0000001],
+       "two": [2, 2.0, 2.0000001],
+       "var1:rand_int_range": [0, 100],
+       "var2:rand_int_range": [0, 100]
      }
    }
 

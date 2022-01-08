@@ -97,3 +97,9 @@ def decode_num(num):
     if isinstance(num, str):
         return int(num, 16)
     return int(num)
+
+
+def load_file_as_string(data_path: str) -> str:
+    """ Loads the file at the given path as a string"""
+    with open(data_path, 'r') as handle:
+        return handle.read()
