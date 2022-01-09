@@ -9,6 +9,9 @@ class DataSpec(dict):
     """
     Class representing a DataSpec object
     """
+    def __init__(self, raw_spec: dict):
+        super().__init__()
+        self.raw_spec = raw_spec
 
     def __delitem__(self, key):
         return self.raw_spec.__delitem__(key)
@@ -28,12 +31,23 @@ class DataSpec(dict):
     def __str__(self):
         return str(self.raw_spec)
 
-    def pop(self, key):
-        return self.raw_spec.pop(key)
+    def __len__(self):
+        return len(self.raw_spec)
 
-    def __init__(self, raw_spec):
-        super().__init__()
-        self.raw_spec = raw_spec
+    def get(self, *args, **kwargs):
+        return self.raw_spec.get(*args, **kwargs)
+
+    def items(self):
+        return self.raw_spec.items()
+
+    def keys(self):
+        return self.raw_spec.keys()
+
+    def values(self):
+        return self.raw_spec.values()
+
+    def pop(self, k, d=None):
+        return self.raw_spec.pop(k, d)
 
     def generator(self, iterations: int, **kwargs) -> Generator:
         """

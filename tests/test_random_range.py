@@ -23,7 +23,7 @@ valid_tests = [
 def test_random_range_parameterized(field_type, data, lower, upper):
     builder = datacraft.spec_builder()
     spec = builder.add_field('test', {'type': field_type, 'data': data}).build()
-    val = next(spec.generator(1))['test']
+    val = next(spec.generator(1, enforce_schema=True))['test']
     assert lower <= float(val) <= upper
 
 

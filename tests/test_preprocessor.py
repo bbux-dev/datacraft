@@ -129,6 +129,20 @@ def test_preprocess_csv_select(input_spec, expected_output_spec):
     assert updated == expected_output_spec
 
 
+def _builder_nested(outer_key, inner_key, inner_spec):
+    """
+    First part builds
+
+    { innerkey: { some: spec } }
+
+    Second part wraps first in
+
+    { outerkey: { type: nested, fields: { innerkey: { some: spec } } } }
+    """
+    inner = builder.single_field(inner_key, inner_spec).build()
+    return builder.single_field(outer_key, builder.nested(inner)).build()
+
+
 nested_transform_tests = [
     (
         {
@@ -221,17 +235,14 @@ nested_transform_tests = [
         }
     ),
     (
-        builder.single_field('enemies', builder.nested(
-            builder.single_field('inner', ['bat', 'slime', 'orc']).build())).build(),
-        builder.single_field('enemies', builder.nested(
-            builder.single_field('inner', builder.values(['bat', 'slime', 'orc'])).build())).build(),
+        _builder_nested('enemies', 'inner', ['bat', 'slime', 'orc']),
+        _builder_nested('enemies', 'inner', builder.values(['bat', 'slime', 'orc'])).raw_spec,
     )
 ]
 
 
 @pytest.mark.parametrize("input_spec,expected_output_spec", nested_transform_tests)
 def test_preprocess_nested(input_spec, expected_output_spec):
-    # need first layer of pre-processing done
     updated = _preprocess_spec(input_spec)
     updated = _preprocess_nested(updated)
     assert updated == expected_output_spec

@@ -27,3 +27,11 @@ def test_ref_missing_required():
     generator = spec_builder.build().generator(1)
     with pytest.raises(datacraft.SpecException):
         next(generator)
+
+
+def test_config_ref_in_refs():
+    spec_builder = datacraft.spec_builder()
+    spec_builder.refs().config_ref('test', key1='value1', key2='value2')
+    spec = spec_builder.build()
+    assert 'refs' in spec
+    assert spec['refs'].get('test') == {'type': 'config_ref', 'config': {'key1': 'value1', 'key2': 'value2'}}

@@ -12,12 +12,12 @@ outdir = f'{test_dir}/../build'
 
 def test_outputs_single_field():
     # for coverage
-    writer = outputs._IncrementingFileWriter(
+    writer = outputs.incrementing_file_writer(
         outdir=outdir,
-        outname='test_single',
-        extension='txt'
+        engine=outputs.file_name_engine(prefix='test_single', extension='.txt')
     )
-    output = outputs._SingleFieldOutput(writer, True)
+
+    output = outputs.single_field(writer, True)
     output.handle('key', 'value')
     output.finished_record()
 
@@ -26,10 +26,9 @@ def test_outputs_single_field():
 
 def test_outputs_record_level():
     # for coverage
-    writer = outputs._IncrementingFileWriter(
+    writer = outputs.incrementing_file_writer(
         outdir=outdir,
-        outname='test_record',
-        extension='txt'
+        engine=outputs.file_name_engine(prefix='test_record', extension='.txt')
     )
 
     engine = engines.for_file(f'{test_dir}/data/template.jinja')
@@ -50,10 +49,9 @@ def test_outputs_record_level():
 
 def test_outputs_record_level_more_than_one_per():
     # for coverage
-    writer = outputs._IncrementingFileWriter(
+    writer = outputs.incrementing_file_writer(
         outdir=outdir,
-        outname='test_record',
-        extension='txt'
+        engine=outputs.file_name_engine(prefix='test_record', extension='.txt')
     )
 
     engine = engines.for_file(f'{test_dir}/data/template.jinja')
@@ -131,3 +129,9 @@ def _verify_output(fild_name, expected_content):
         content = handle.read()
 
     assert expected_content == content
+
+
+def test_file_name_engine():
+    engine = outputs.file_name_engine('prefix', '.test')
+    assert engine.process({'count': 0}) == 'prefix-0.test'
+    assert engine.process({'count': 1}) == 'prefix-1.test'

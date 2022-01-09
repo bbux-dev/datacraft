@@ -144,10 +144,10 @@ def test_default_delim_mac_address():
 
 
 def test_mac_address_dashes():
-    spec = builder.spec_builder() \
-        .add_field('mac', builder.mac(dashes='true')) \
-        .build()
-    value = next(spec.generator(1))['mac']
+    spec_builder = builder.spec_builder()
+    spec_builder.mac('mac', dashes='true')
+    spec = spec_builder.build()
+    value = next(spec.generator(1,enforce_schema=True))['mac']
     assert len(value) == 17
     assert '-' in value, f'No dashes in: {value}'
 

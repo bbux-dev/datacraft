@@ -213,37 +213,31 @@ class _SingleFileWriter(WriterInterface):
 
 
 def incrementing_file_writer(outdir: str,
-                             outname: str,
-                             extension: str = None) -> WriterInterface:
+                             engine: RecordProcessor) -> WriterInterface:
     """Creates a WriterInterface that increments the count in the file name once records_per_file have been written
 
     Args:
         outdir: output directory
-        outname: output file name
-        extension: to append to the file i.e. .csv
+        engine: to generate file names with
 
     Returns:
         a Writer that increments the a count in the file name
     """
-    return _IncrementingFileWriter(outdir, outname, extension)
+    return _IncrementingFileWriter(outdir, engine)
 
 
 class _IncrementingFileWriter(WriterInterface):
     """Writes processed output to disk and increments the file name with a count"""
 
-    def __init__(self, outdir, outname, extension=None):
+    def __init__(self, outdir, engine: RecordProcessor):
         self.outdir = outdir
-        self.outname = outname
-        self.extension = extension
-        if self.extension and not extension.startswith('.'):
-            self.extension = '.' + extension
+        self.engine = engine
         if not os.path.exists(outdir):
             os.makedirs(outdir)
         self.count = 0
 
     def write(self, value):
-        extension = self.extension if self.extension else ''
-        outfile = '%s/%s-%d%s' % (self.outdir, self.outname, self.count, extension)
+        outfile = os.path.join(self.outdir, self.engine.process({'count': self.count}))
         self.count += 1
         with open(outfile, 'w') as handle:
             handle.write(value)
@@ -363,10 +357,12 @@ def get_writer(outdir: str = None,
                 overwrite=overwrite
             )
         else:
+            prefix = kwargs.get('outfile_prefix', registries.get_default('outfile_prefix'))
+            extension = kwargs.get('extension', registries.get_default('outfile_extension'))
+            engine = file_name_engine(prefix, extension)
             writer = incrementing_file_writer(
                 outdir=outdir,
-                outname=kwargs.get('outfile_prefix', registries.get_default('outfile_prefix')),
-                extension=kwargs.get('extension')
+                engine=engine
             )
     else:
         if kwargs.get('suppress_output'):
@@ -375,3 +371,19 @@ def get_writer(outdir: str = None,
             _log.debug('Writing output to stdout')
             writer = stdout_writer()
     return writer
+
+
+def file_name_engine(prefix: str, extension: str) -> RecordProcessor:
+    """
+    creates a templating engine that will produce file names based on the count
+
+    Args:
+        prefix: prefix for file name
+        extension: suffix for file name
+
+    Returns:
+        template engine for producing file names
+    """
+    template_str = prefix + "-{{count}}" + extension
+    engine = template_engines.string(template_str)
+    return engine

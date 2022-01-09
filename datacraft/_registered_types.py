@@ -489,7 +489,7 @@ def _get_nested_schema():
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
-    keys = [key for key in fields.keys() if key not in loader.RESERVED]
+    keys = [key for key in fields.keys()]
     config = utils.load_config(spec, loader)
     count_supplier = suppliers.count_supplier(**config)
     if 'field_groups' in spec:

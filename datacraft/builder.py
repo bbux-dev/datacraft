@@ -50,6 +50,9 @@ class FieldInfo:
         """
         return self.builder.build()
 
+    def __str__(self):
+        return f'key:{self.key}, type: {self.type_name}'
+
 
 class Builder:
     """
@@ -554,11 +557,11 @@ class Builder:
             >>> builder.add_field("field1", builder.some_spec(with_args))
             >>> builder.add_field("field2", builder.another_spec(with_args))
         """
+        if isinstance(key, FieldInfo):
+            key = key.key
         if key in self.keys:
             _log.warning('%s key already defined, overwriting with %s',
                          key, json.dumps(spec))
-        if isinstance(key, FieldInfo):
-            key = key.key
         self.keys.add(key)
         self.fields[key] = spec
         return self
