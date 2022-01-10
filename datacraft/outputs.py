@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 import catalogue  # type: ignore
 import yaml
-from . import template_engines, registries
+from . import template_engines, registries, utils
 from .supplier.model import RecordProcessor, OutputHandlerInterface
 from .exceptions import SpecException
 
@@ -19,13 +19,14 @@ _log = logging.getLogger(__name__)
 @registries.Registry.formats('json')
 def _format_json(record: Union[list, dict]) -> str:
     """formats the record as compressed json  """
-    return json.dumps(record)
+    return json.dumps(record, ensure_ascii=registries.get_default('format_json_ascii'))
 
 
 @registries.Registry.formats('json-pretty')
 def _format_json_pretty(record: Union[list, dict]) -> str:
     """pretty prints the record as json  """
-    return json.dumps(record, indent=int(registries.get_default('json_indent')))
+    format_json_ascii = utils.is_affirmative(None, {}, registries.get_default('format_json_ascii'))
+    return json.dumps(record, indent=int(registries.get_default('json_indent')), ensure_ascii=format_json_ascii)
 
 
 @registries.Registry.formats('csv')

@@ -53,6 +53,8 @@ _UNICODE_RANGE_KEY = 'unicode_range'
 _UUID_KEY = 'uuid'
 _DISTRIBUTION_KEY = 'distribution'
 _TEMPLATED_KEY = 'templated'
+_NESTED_KEY = 'nested'
+_CONFIG_REF_KEY = 'config_ref'
 
 _log = logging.getLogger('datacraft.types')
 
@@ -269,7 +271,7 @@ def _load_combine(combine_field_spec, keys, loader):
 ############
 # config_ref
 ############
-@registries.Registry.types('config_ref')
+@registries.Registry.types(_CONFIG_REF_KEY)
 def _config_ref_handler(_, __):
     """" Does nothing, just place holder """
 
@@ -479,13 +481,13 @@ def _configure_geo_pair(field_spec, loader):
 ###########
 # nested
 ##########
-@registries.Registry.schemas('nested')
+@registries.Registry.schemas(_NESTED_KEY)
 def _get_nested_schema():
     """ schema for nested type """
-    return schemas.load('nested')
+    return schemas.load(_NESTED_KEY)
 
 
-@registries.Registry.types('nested')
+@registries.Registry.types(_NESTED_KEY)
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
@@ -503,7 +505,7 @@ def _configure_nested_supplier(spec, loader):
     # each non reserved key should have a valid spec as a value
     for key in keys:
         nested_spec = fields[key]
-        if 'type' in nested_spec and nested_spec.get('type') == 'nested':
+        if 'type' in nested_spec and nested_spec.get('type') == _NESTED_KEY:
             supplier = _configure_nested_supplier(nested_spec, loader)
         else:
             supplier = loader.get_from_spec(nested_spec)

@@ -135,3 +135,9 @@ def _default_sample_lists():
 def _default_uuid_variant():
     """ default uuid variant """
     return 4
+
+
+@registries.Registry.defaults('format_json_ascii')
+def _default_format_json_ascii():
+    """ if the JSON formatted data should be ascii """
+    return False
