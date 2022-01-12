@@ -13,13 +13,14 @@ _log = logging.getLogger(__name__)
 
 
 @registries.Registry.preprocessors('default')
-def _preprocess_spec(raw_spec):
+def _preprocess_spec(raw_spec: dict, is_refs: bool = False) -> dict:
     """
     Preprocesses the spec into a format that is easier to use.
     Pushes all url params in keys into config object. Converts shorthand specs into full specs
 
     Args:
         raw_spec: to preprocess
+        is_refs: is this the refs section of the spec
 
     Returns:
         the reformatted spec
@@ -27,7 +28,7 @@ def _preprocess_spec(raw_spec):
     updated_specs = {}
     for key, spec in raw_spec.items():
         if key == 'refs':
-            updated_specs[key] = _preprocess_spec(raw_spec[key])
+            updated_specs[key] = _preprocess_spec(raw_spec[key], True)
             continue
         if key == 'field_groups':
             updated_specs[key] = spec
@@ -41,25 +42,34 @@ def _preprocess_spec(raw_spec):
 
 
 @registries.Registry.preprocessors('csv-select')
-def _preprocess_csv_select(raw_spec):
+def _preprocess_csv_select(raw_spec: dict, is_refs: bool = False) -> dict:
     """
     Converts and csv-select elements into standard csv ones
 
     Args:
         raw_spec: to process
+        is_refs: is this the refs section of the spec
 
     Returns:
         converted spec
     """
     updated_specs = {}
     for key, spec in raw_spec.items():
+        if key == 'refs':
+            # run preprocessors on refs too
+            updated_specs['refs'] = _preprocess_csv_select(spec, True)
         if 'type' in spec and spec['type'] == 'csv_select':
             config_ref_name = f'{key}_config_ref'
+            # convention is that refs have upper case names
+            if is_refs:
+                config_ref_name = config_ref_name.upper()
             config_ref = {
                 'type': 'config_ref',
                 'config': spec.get('config', {})
             }
-            if 'refs' not in raw_spec:
+            if is_refs:
+                updated_specs[config_ref_name] = config_ref
+            elif 'refs' not in raw_spec:
                 updated_specs['refs'] = {config_ref_name: config_ref}
             else:
                 updated_specs['refs'][config_ref_name] = config_ref
@@ -82,12 +92,13 @@ def _preprocess_csv_select(raw_spec):
 
 
 @registries.Registry.preprocessors('nested')
-def _preprocess_nested(raw_spec):
+def _preprocess_nested(raw_spec: dict, is_refs: bool = False) -> dict:
     """
     Converts all nested elements
 
     Args:
         raw_spec: to process
+        is_refs: is this the refs section of the spec
 
     Returns:
         converted spec
@@ -95,16 +106,16 @@ def _preprocess_nested(raw_spec):
     updated_specs = {}
     if 'refs' in raw_spec:
         if 'refs' in updated_specs:
-            updated_specs['refs'].update(_preprocess_spec(raw_spec['refs']))
+            updated_specs['refs'].update(_preprocess_spec(raw_spec['refs'], True))
         else:
-            updated_specs['refs'] = _preprocess_spec(raw_spec['refs'])
+            updated_specs['refs'] = _preprocess_spec(raw_spec['refs'], True)
     for key, spec in raw_spec.items():
         if key == 'refs':
             # run preprocessors on refs too
-            updated_refs = _preprocess_spec(spec)
-            updated_refs = _preprocess_csv_select(updated_refs)
+            updated_refs = _preprocess_spec(spec, True)
+            updated_refs = _preprocess_csv_select(updated_refs, True)
             # in case we have nested nested elements
-            updated_refs = _preprocess_nested(updated_refs)
+            updated_refs = _preprocess_nested(updated_refs, True)
             updated_specs['refs'] = updated_refs
             continue
 
@@ -126,7 +137,7 @@ def _preprocess_nested(raw_spec):
 
 
 @registries.Registry.preprocessors('type_check')
-def _preprocess_verify_types(raw_spec):
+def _preprocess_verify_types(raw_spec: dict, is_refs: bool = False) -> dict:
     """ log only checks """
     for key, field_spec in raw_spec.items():
         if key == 'refs':

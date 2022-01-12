@@ -171,18 +171,17 @@ the ``refs`` section of the spec and use a ``config_ref`` to store the common co
           "type": "csv",
           "config": {
             "config_ref": "CITY_FILE_CONFIG",
-            "column": 1,
-            "quote": "\""
+            "column": 1
           }
         },
         "LAT:csv?config_ref=CITY_FILE_CONFIG&column=3&cast=float": {},
         "LONG:csv?config_ref=CITY_FILE_CONFIG&column=4&cast=float": {},
-        "COUNTRY:csv?config_ref=CITY_FILE_CONFIG&column=5&quote=\"": {},
+        "COUNTRY:csv?config_ref=CITY_FILE_CONFIG&column=5": {},
         "POP:csv?config_ref=CITY_FILE_CONFIG&column=10&cast=int": {},
         "CITY_FILE_CONFIG": {
           "type": "config_ref",
           "config": {
-            "datafile": "worldcities.csv",
+            "datafile": "{{ csv_file }}",
             "headers": true,
             "sample_rows": true
           }
@@ -194,7 +193,9 @@ The NAME field is defined using the full spec format, while there rest are defin
 Notice for the LAT and LONG, fields that they are cast to floating point values, since by default all csv data is
 read in as a string.  We define a CITY_FILE_CONFIG reference that holds the name of the datafile that contains the csv
 data values. The ``sample_rows`` configuration parameter will ensure that the cities are selected at random from our
-csv file, but are consistent across rows in the file.
+csv file, but are consistent across rows in the file. We also template the name of the datafile to use. This
+simplifies testing the spec by allowing us to specify different csv files to use for data population.  The ``-v`` or
+``--vars csv_file=filename.csv`` command line args must be specified in order for this value to be properly populated.
 
 The next thing that needs to be done is define the features field.  This is a nested field that has two sub fields:
 ``geometry`` and ``properties``, which are also nested fields:
@@ -202,6 +203,7 @@ The next thing that needs to be done is define the features field.  This is a ne
 .. code-block:: json
 
     {
+      "type": "FeatureCollection",
       "features": {
         "type": "nested",
         "config": {
@@ -233,7 +235,7 @@ for those two refs:
       "refs": {
         "GEOMETRY:nested": {
           "fields": {
-            "geo_type": "Point",
+            "type": "Point",
             "lat:ref": "LAT",
             "long:ref": "LONG"
           }
@@ -253,8 +255,7 @@ for those two refs:
       }
     }
 
-Both ``GEOMETRY`` and ``PROPERTIES`` are nested fields. The ``geometry`` element has a field called type.  ``type`` is
-currently a reserved key word in DataSpecs, so can't be used as a field name. The field is named geo_type instead and
+Both ``GEOMETRY`` and ``PROPERTIES`` are nested fields. The ``geometry`` element has a field called type and
 the value is set to a constant value "Point". There are other types of geometry, but for this demo we are only
 producing points. The lat and long field are supplied from the csv fie using the references that were defined earlier.
 The properties values also come from the references defined earlier.  The ``PROPERTIES`` reference is a nested type
@@ -266,150 +267,134 @@ If we run the spec as is this is an example of the data that is produced:
 
 .. code-block:: shell
 
-    $ datacraft -s spec.json -d data -i 1 --log-level off -x --format json-pretty
+    $ datacraft -s spec.json -d data -i 1 --log-level off -x --format json-pretty -v csv_file=worldcities.csv
 
 .. code-block:: json
 
-    {
-        "features": [
-            {
-                "geometry": {
-                    "geo_type": "Point",
-                    "lat": 52.6624,
-                    "long": 5.2
-                },
-                "properties": {
-                    "name": "\"Venhuizen\"",
-                    "country": "\"Netherlands\"",
-                    "population": 7828
-                }
-            }
-        ]
-    }
-
-This is close to the desired GeoJSON format but not quite.  We need to use this data to populate a template. The art
-of writing `Jinja2 <https://pypi.org/project/Jinja2/>`_ templates is beyond the scope of this example.  Below is our
-template for creating GeoJSON from our example Data Spec:
-
-.. code-block:: python
-
-    {
-      "type": "FeatureCollection",
-      "features": [
-    {%- for feature in features %}
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "{{ feature['geometry']['geo_type'] }}",
-            "coordinates": [{{ feature['geometry']['long'] }}, {{ feature['geometry']['lat'] }}]
-          },
-          "properties": {
-      {%- for key, value in feature['properties'].items() %}
-            "{{ key }}": {{ value }}{% if not loop.last %},{% endif %}
-      {%- endfor %}
-          }
-        }{% if not loop.last %},{% endif %}
-    {%- endfor %}
-      ]
-    }
-
-Running the earlier command and specifying this template produces:
+   [
+       {
+           "type": "FeatureCollection",
+           "features": [
+               {
+                   "geometry": {
+                       "type": "Point",
+                       "lat": 43.2342,
+                       "long": 11.5608
+                   },
+                   "properties": {
+                       "name": "Asciano",
+                       "country": "Italy",
+                       "population": 7076
+                   }
+               }
+           ]
+       }
+   ]
 
 .. code-block:: shell
 
-    $ datacraft -s spec.json -d data -i 1 --log-level off -x -t geojson.jinja
+    $ datacraft -s spec.json -d data -i 1 -r 1 --log-level off -x --format json-pretty
 
 .. code-block:: json
 
-    {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [13.2167, 46.2167]
-          },
-          "properties": {
-            "name": "Tarcento",
-            "country": "Italy",
-            "population": 8964
-          }
-        },
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [174.95, -37.2667]
-          },
-          "properties": {
-            "name": "Tuakau",
-            "country": "New Zealand",
-            "population": 5390
-          }
-        }
-      ]
-    }
+   {
+       "type": "FeatureCollection",
+       "features": [
+           {
+               "geometry": {
+                   "type": "Point",
+                   "lat": 22.9958,
+                   "long": -98.9447
+               },
+               "properties": {
+                   "name": "Xicoténcatl",
+                   "country": "Mexico"
+               }
+           },
+           {
+               "geometry": {
+                   "type": "Point",
+                   "lat": 40.7186,
+                   "long": -4.2478
+               },
+               "properties": {
+                   "name": "El Espinar",
+                   "country": "Spain",
+                   "population": 9086
+               }
+           }
+       ]
+   }
+
+This is exactly the format we want.  You can use the ``--server`` command line flag to stand up a Flask REST end
+point that will return the GeoJSON. Be sure to set the python encoding to UTF-8 when serving up the data
+(``export PYTHONUTF8=1`` or ``set PYTHONUTF8=1``). If using powershell this may mean setting the encoding on the
+shell itself to UTF-8.
+
+
+.. code-block:: shell
+
+    $ datacraft -s spec.json -d data -i 1 -r 1 --log-level off -x --format json-pretty --server
+
 
 .. collapse:: Full Version of Data Spec
 
   .. code-block:: json
 
-    {
-      "features": {
-        "type": "nested",
-        "config": {
-          "as_list": true,
-          "count": {
-            "1": 0.6,
-            "2": 0.3,
-            "3": 0.1
-          }
-        },
-        "fields": {
-          "geometry:ref": "GEOMETRY",
-          "properties:ref": "PROPERTIES"
-        }
-      },
-      "refs": {
-        "GEOMETRY:nested": {
-          "fields": {
-            "geo_type:values": "Point",
-            "lat:ref": "LAT",
-            "long:ref": "LONG"
-          }
-        },
-        "PROPERTIES:nested": {
-          "fields": {
-            "name:ref": "NAME",
-            "country:ref": "COUNTRY",
-            "population:ref": "POP"
-          },
-          "field_groups": {
-            "0.8": ["name", "country", "population"],
-            "0.2": ["name", "country"],
-          }
-        },
-        "NAME": {
-          "type": "csv",
-          "config": {
-            "config_ref": "CITY_FILE_CONFIG",
-            "column": 1,
-            "quote": "\""
-          }
-        },
-        "NAME2:csv?config_ref=CITY_FILE_CONFIG&column=1&quote=\"": {},
-        "LAT:csv?config_ref=CITY_FILE_CONFIG&column=3&cast=float": {},
-        "LONG:csv?config_ref=CITY_FILE_CONFIG&column=4&cast=float": {},
-        "COUNTRY:csv?config_ref=CITY_FILE_CONFIG&column=5&quote=\"": {},
-        "POP:csv?config_ref=CITY_FILE_CONFIG&column=10&cast=int": {},
-        "CITY_FILE_CONFIG": {
-          "type": "config_ref",
-          "config": {
-            "datafile": "worldcities.csv",
-            "headers": true,
-            "sample_rows": true
-          }
-        }
-      }
-    }
+   {
+     "type": "FeatureCollection",
+     "features": {
+       "type": "nested",
+       "config": {
+         "as_list": true,
+         "count": {
+           "1": 0.6,
+           "2": 0.3,
+           "3": 0.1
+         }
+       },
+       "fields": {
+         "geometry:ref": "GEOMETRY",
+         "properties:ref": "PROPERTIES"
+       }
+     },
+     "refs": {
+       "GEOMETRY:nested": {
+         "fields": {
+           "type": "Point",
+           "lat:ref": "LAT",
+           "long:ref": "LONG"
+         }
+       },
+       "PROPERTIES:nested": {
+         "fields": {
+           "name:ref": "NAME",
+           "country:ref": "COUNTRY",
+           "population:ref": "POP"
+         },
+         "field_groups": {
+           "0.8": ["name", "country", "population"],
+           "0.2": ["name", "country"],
+         }
+       },
+       "NAME": {
+         "type": "csv",
+         "config": {
+           "config_ref": "CITY_FILE_CONFIG",
+           "column": 1
+         }
+       },
+       "LAT:csv?config_ref=CITY_FILE_CONFIG&column=3&cast=float": {},
+       "LONG:csv?config_ref=CITY_FILE_CONFIG&column=4&cast=float": {},
+       "COUNTRY:csv?config_ref=CITY_FILE_CONFIG&column=5": {},
+       "POP:csv?config_ref=CITY_FILE_CONFIG&column=10&cast=int": {},
+       "CITY_FILE_CONFIG": {
+         "type": "config_ref",
+         "config": {
+           "datafile": "worldcities.csv",
+           "headers": true,
+           "sample_rows": true
+         }
+       }
+     }
+   }
