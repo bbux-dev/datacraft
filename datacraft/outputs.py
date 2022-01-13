@@ -25,7 +25,7 @@ def _format_json(record: Union[list, dict]) -> str:
 @registries.Registry.formats('json-pretty')
 def _format_json_pretty(record: Union[list, dict]) -> str:
     """pretty prints the record as json  """
-    format_json_ascii = utils.is_affirmative(None, {}, registries.get_default('format_json_ascii'))
+    format_json_ascii = utils.is_affirmative('', {}, registries.get_default('format_json_ascii'))
     return json.dumps(record, indent=int(registries.get_default('json_indent')), ensure_ascii=format_json_ascii)
 
 

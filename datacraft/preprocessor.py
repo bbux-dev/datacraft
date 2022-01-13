@@ -103,7 +103,7 @@ def _preprocess_nested(raw_spec: dict, is_refs: bool = False) -> dict:
     Returns:
         converted spec
     """
-    updated_specs = {}
+    updated_specs = {} # type: ignore
     if 'refs' in raw_spec:
         if 'refs' in updated_specs:
             updated_specs['refs'].update(_preprocess_spec(raw_spec['refs'], True))
