@@ -1,6 +1,11 @@
 import pytest
 import datacraft
-from datacraft import distributions, builder
+from datacraft import distributions
+
+
+@pytest.fixture()
+def builder():
+    return datacraft.spec_builder()
 
 
 def test_uniform_distribution():
@@ -79,8 +84,9 @@ valid_func_data = [
 
 
 @pytest.mark.parametrize("string_func", valid_func_data)
-def test_distribution_type(string_func):
-    spec = builder.single_field('dist', builder.distribution(data=string_func)).build()
+def test_distribution_type(string_func, builder):
+    builder.distribution('dist', data=string_func)
+    spec = builder.build()
 
     val = next(spec.generator(1, enforce_schema=True))['dist']
 
@@ -88,7 +94,8 @@ def test_distribution_type(string_func):
 
 
 @pytest.mark.parametrize("invalid_func_str", invalid_funcs)
-def test_invalid_distribution_spec(invalid_func_str):
-    spec = builder.single_field('dist', builder.distribution(data=invalid_func_str)).build()
+def test_invalid_distribution_spec(invalid_func_str, builder):
+    builder.distribution('dist', data=invalid_func_str)
+    spec = builder.build()
     with pytest.raises(ValueError):
         next(spec.generator(1, enforce_schema=True))

@@ -4,8 +4,12 @@ Module for numeric distributions such as uniform or gaussian
 from typing import Union
 import random
 import inspect
+import logging
+
 from . import registries
 from .supplier.model import Distribution
+
+_log = logging.getLogger(__name__)
 
 
 class UniformDistribution(Distribution):
@@ -142,7 +146,11 @@ def _invalid_args_for_func(dist_func, kwargs):
     argspec = inspect.getfullargspec(dist_func)
     expected_args = argspec.args
     actual_args = list(set(kwargs.keys()) - {'min', 'max'})
-    return sorted(actual_args) != sorted(expected_args)
+    if sorted(actual_args) != sorted(expected_args):
+        _log.warning('expected args: %s, actual: %s', expected_args, actual_args)
+        return True
+    # args are not invalid
+    return False
 
 
 def _convert_to_kwargs(args: str) -> Union[dict, None]:

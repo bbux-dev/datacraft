@@ -1,4 +1,7 @@
+import json
 import pytest
+
+import datacraft
 import datacraft.builder as builder
 from datacraft import distributions, DataSpec, SpecException
 
@@ -19,7 +22,7 @@ def test_api_builder():
     domains = refs1.values('DOMAINS', domain_weights)
     animals = refs1.values('ANIMALS', animal_names)
     actions = refs1.values('ACTIONS', action_list, sample=True)
-    handles = refs1.combine('HANDLE', refs=[animals, actions], join_with='_')
+    handles = refs1.combine('HANDLE', join_with='_')
     builder1.combine('email', refs=[handles, domains])
 
     spec1 = builder1.build()
@@ -113,6 +116,8 @@ full_spec_build_tests = [
      {"name": {"type": "combine", "fields": ["ONE", "TWO"], "config": {"join_with": "-"}}}),
     (builder.spec_builder().combine_list('name', refs=[["A", "B"], ["A", "B", "C"]], join_with=","),
      {"name": {"type": "combine-list", "config": {"join_with": ","}, "refs": [["A", "B"], ["A", "B", "C"]]}}),
+    (builder.spec_builder().combine_list('name', refs=None, join_with=","),
+     {"name": {"type": "combine-list", "config": {"join_with": ","}, "refs": []}}),
     (builder.spec_builder().range_spec('name', [1, 5, 1], as_list=True, count=2),
      {"name": {"type": "range", "config": {"as_list": True, "count": 2}, "data": [1, 5, 1]}}),
     (builder.spec_builder().rand_range('name', [20, 44], count=[2, 3, 4]),
@@ -157,13 +162,34 @@ full_spec_build_tests = [
      {"name": {"type": "csv_select", "config": {"headers": False}, "data": {"one": 1, "two": 2}}}),
     (builder.spec_builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
      {"name": {"type": "nested", "fields": {"one": {"type": "values", "data": 1}}}}),
+    (builder.spec_builder().calculate('name', refs=['ONE', 'TWO'], formula='{{ ONE }} + {{ TWO }}'),
+     {"name": {"type": "calculate", "refs": ["ONE", "TWO"], "formula": "{{ ONE }} + {{ TWO }}"}}),
+    (builder.spec_builder().calculate('name', refs=['A'], formula='{{A}} * 42', set="something"),
+     {
+         "name": {
+             "type": "calculate", "refs": ["A"], "formula": "{{A}} * 42", "config": {"set": "something"}
+         }
+     }),
+    (builder.spec_builder().distribution('name', 'normal(mean=2,stddev=1)'),
+     {"name": {"type": "distribution", "data": "normal(mean=2,stddev=1)"}}),
+    (builder.spec_builder().distribution('name', 'normal(mean=2,stddev=1)', set="something"),
+     {"name": {"type": "distribution", "data": "normal(mean=2,stddev=1)", "config": {"set": "something"}}}),
+    (builder.spec_builder().templated('name', refs=['VALUE'], data='{{ VALUE }} degrees'),
+     {"name": {"type": "templated", "refs": ["VALUE"], "data": "{{ VALUE }} degrees"}}),
+    (builder.spec_builder().templated('name', refs=['VALUE'], data='{{ VALUE }} degrees', set="something"),
+     {
+         "name": {
+             "type": "templated", "refs": ["VALUE"], "data": "{{ VALUE }} degrees", "config": {"set": "something"}
+         }
+     }),
 ]
 
 
 @pytest.mark.parametrize("field_info,expected_spec", full_spec_build_tests)
 def test_full_spec_builder(field_info, expected_spec):
-    generated_spec = field_info.builder.build().raw_spec
-    assert generated_spec == expected_spec
+    spec = field_info.builder.build()
+    generated_spec = spec.raw_spec
+    assert generated_spec == expected_spec, f'no match:\n{json.dumps(generated_spec)}\n{json.dumps(expected_spec)}'
 
 
 invalid_spec_build_tests = [
@@ -185,10 +211,16 @@ invalid_spec_build_tests = [
     builder.spec_builder().geo_pair('name', join_with=":", precision="yes"),  # invalid precision
     builder.spec_builder().ip('name', base="192.1680"),  # type in base
     builder.spec_builder().ipv4('name', cidr="2.22.222.0/22"),  # not one of supported bases
+    builder.spec_builder().ip_precise('name'),  # no cidr specified
     builder.spec_builder().select_list_subset('name', ref_name="LIST", mean=5, stddev=2),  # ref not defined
     builder.spec_builder().weighted_ref('name', {"One": 0.5, "Two": 0.3, "Three": 0.2}),
     builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
     builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
+    builder.spec_builder().calculate('name', refs=["A"], formula='{{ A }} * 1.4532'),  # no refs defined
+    builder.spec_builder().calculate('name', fields=["A"], formula='{{ A }} * 1.4532'),  # no refs defined
+    builder.spec_builder().templated('name', refs=["POINT"], data='{{ POINT }} degrees'),  # no refs defined
+    builder.spec_builder().templated('name', fields=["POINT"], data='{{ POINT }} degrees'),  # no refs defined
+    builder.spec_builder().templated('name', fields=["POINT"], data=None, set='value'),  # no data defined
 ]
 
 
@@ -218,6 +250,7 @@ def test_api_change():
     animals = refs.values('ANIMALS', data=animal_names)
     actions = refs.values('ACTIONS', data=action_list)
     domains = refs.values('DOMAINS', data=domain_weights)
+
     # combines ANIMALS and ACTIONS
     handles = refs.combine('HANDLE', refs=[animals, actions], join_with='_')
 
@@ -284,3 +317,56 @@ def test_to_pandas():
     assert df.lon.min() >= -180
     assert df.lat.max() <= 90
     assert df.lon.max() <= 180
+
+
+def test_add_fields():
+    spec_builder = builder.spec_builder()
+    spec_builder.add_fields(
+        foo=builder.templated('{{first}}: {{last}}'),
+        bar=builder.values([1, 2, 3])
+    )
+    spec = spec_builder.build()
+    assert 'foo' in spec
+    assert 'bar' in spec
+
+
+def test_add_field_edge_cases():
+    spec_builder = builder.spec_builder()
+    foo = spec_builder.templated('foo', data='{{first}}: {{last}}')
+    spec_builder.add_field(foo, builder.templated('{{first}}: {{last}}'))
+    spec = spec_builder.build()
+    assert 'foo' in spec
+
+
+def test_add_refs():
+    spec_builder = builder.spec_builder()
+    spec_builder.add_refs(
+        foo=builder.values(['bob', 'joe', 'bobby joe']),
+        bar=builder.values([1, 2, 3])
+    )
+    spec = spec_builder.build()
+    assert 'foo' in spec.get('refs', [])
+    assert 'bar' in spec.get('refs', [])
+
+
+def test_add_refs_edge_cases():
+    spec_builder = builder.spec_builder()
+    spec_builder.templated('foo', data='{{first}}: {{last}}')
+    spec_builder.add_ref('foo', builder.templated('{{first}}: {{last}}'))
+    spec = spec_builder.build()
+    assert 'foo' in spec
+
+
+def test_spec_like_dict():
+    raw = {
+        "one": ["a", "b", "c"],
+        "two": [1, 2, 3]
+    }
+    spec = datacraft.parse_spec(raw)
+
+    assert len(spec) == 2
+    assert spec["one"] is not None
+    assert spec.get("two") is not None
+    assert spec.pop("one") is not None
+    assert len(spec) == 1
+    assert len(spec.items()) == 1

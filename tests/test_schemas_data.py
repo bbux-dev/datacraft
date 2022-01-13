@@ -18,87 +18,32 @@ root_dir = os.path.dirname(os.path.realpath(__file__))
 schema_dir = os.path.realpath(os.sep.join([root_dir, '..', 'datacraft', 'schema']))
 tests_dir = os.sep.join([root_dir, 'data'])
 
-
-def test_values_schema():
-    _test_run_validation("values.tests.json")
-
-
-def test_range_schema():
-    _test_run_validation("range.tests.json")
-
-
-def test_combine_schema():
-    _test_run_validation("combine.tests.json")
-
-
-def test_combine_list_schema():
-    _test_run_validation("combine_list.tests.json")
-
-
-def test_uuid_schema():
-    _test_run_validation("uuid.tests.json")
-
-
-def test_char_class_schema():
-    _test_run_validation("char_class.tests.json")
-
-
-def test_date_schema():
-    _test_run_validation("date.tests.json")
+TEST_FILES = [
+    "values.tests.json",
+    "range.tests.json",
+    "combine.tests.json",
+    "combine_list.tests.json",
+    "uuid.tests.json",
+    "char_class.tests.json",
+    "date.tests.json",
+    "geo.lat.tests.json",
+    "geo.long.tests.json",
+    "geo.pair.tests.json",
+    "unicode_range.tests.json",
+    "ip.tests.json",
+    "select_list_subset.tests.json",
+    "calculate.tests.json",
+    "csv.tests.json",
+    "weighted_csv.tests.json",
+    "nested.tests.json",
+    "ref.tests.json",
+    "weighted_ref.tests.json",
+    "distribution.tests.json",
+    "templated.tests.json"
+]
 
 
-def test_geo_lat_schema():
-    _test_run_validation("geo.lat.tests.json")
-
-
-def test_geo_long_schema():
-    _test_run_validation("geo.long.tests.json")
-
-
-def test_geo_pair_schema():
-    _test_run_validation("geo.pair.tests.json")
-
-
-def test_unicode_range_schema():
-    _test_run_validation("unicode_range.tests.json")
-
-
-def test_ip_schema():
-    _test_run_validation("ip.tests.json")
-
-
-def test_select_list_subset():
-    _test_run_validation("select_list_subset.tests.json")
-
-
-def test_calculate():
-    _test_run_validation("calculate.tests.json")
-
-
-def test_csv():
-    _test_run_validation("csv.tests.json")
-
-
-def test_weighted_csv():
-    _test_run_validation("weighted_csv.tests.json")
-
-
-def test_nested():
-    _test_run_validation("nested.tests.json")
-
-
-def test_ref():
-    _test_run_validation("ref.tests.json")
-
-
-def test_weighted_ref():
-    _test_run_validation("weighted_ref.tests.json")
-
-
-def test_distribution():
-    _test_run_validation("distribution.tests.json")
-
-
+@pytest.mark.parametrize("test_file_name", TEST_FILES)
 def _test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)

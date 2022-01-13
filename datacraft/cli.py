@@ -210,7 +210,6 @@ def _get_writer(args):
     return outputs.get_writer(args.outdir,
                               outfile_prefix=args.outfile_prefix,
                               extension=args.outfile_extension,
-                              records_per_file=args.records_per_file,
                               server=args.server,
                               suppress_output=(args.suppress_output or args.server))
 
@@ -218,7 +217,7 @@ def _get_writer(args):
 def _get_output(args, processor, writer):
     """ get the output from the args, processor, and writer """
     if processor:
-        return outputs.record_level(processor, writer)
+        return outputs.record_level(processor, writer, args.records_per_file)
 
     return outputs.single_field(writer, args.printkey)
 
@@ -270,9 +269,12 @@ def _load_json_or_yaml(data_path, template_vars):
         _log.error('Unable to load data from path: %s', data_path)
         return None
 
-    _log.debug('Applying %s template vars to raw spec', len(template_vars))
-    spec_str = template_engines.for_file(data_path).process(template_vars)
-    _log.debug('Attempting to load data as JSON')
+    if len(template_vars) > 0:
+        _log.debug('Applying %s template vars to raw spec', len(template_vars))
+        spec_str = template_engines.for_file(data_path).process(template_vars)
+        _log.debug('Attempting to load data as JSON')
+    else:
+        spec_str = utils.load_file_as_string(data_path)
     try:
         return json.loads(spec_str)
     except json.decoder.JSONDecodeError:
@@ -296,7 +298,8 @@ def _parse_spec_string(inline: str, template_vars: dict) -> dict:
     Returns:
         the parsed spec as a Dictionary
     """
-    inline = template_engines.string(inline).process(template_vars)
+    if len(template_vars) > 0:
+        inline = template_engines.string(inline).process(template_vars)
     if inline is None or inline.strip() == "":
         raise SpecException(f'Unable to load spec from empty string: {inline}, Please verify it is valid JSON or YAML')
     try:

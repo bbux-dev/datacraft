@@ -8,7 +8,7 @@ from typing import List, Union, Optional
 import random
 from collections import deque
 
-from .model import ValueSupplierInterface, CasterInterface, Distribution
+from .model import ValueSupplierInterface, CasterInterface, Distribution, ResettableIterator
 
 
 class SingleValue(ValueSupplierInterface):
@@ -78,20 +78,25 @@ class DecoratedSupplier(ValueSupplierInterface):
     prefix or suffix or to surround the output with quotes
     """
 
-    def __init__(self, config: dict, supplier: ValueSupplierInterface):
+    def __init__(self, supplier: ValueSupplierInterface, **kwargs):
         """
         Args:
-            config: configuration
-            supplier: to decorate
+            supplier: to alter
+            **kwargs
         """
-        self.prefix = config.get('prefix', '')
-        self.suffix = config.get('suffix', '')
-        self.quote = config.get('quote', '')
+        self.prefix = kwargs.get('prefix', '')
+        self.suffix = kwargs.get('suffix', '')
+        self.quote = kwargs.get('quote', '')
         self.wrapped = supplier
 
     def next(self, iteration):
         value = self.wrapped.next(iteration)
+        if isinstance(value, list):
+            return [self._format(val) for val in value]
         # todo: cache for efficiency?
+        return self._format(value)
+
+    def _format(self, value):
         return f'{self.quote}{self.prefix}{value}{self.suffix}{self.quote}'
 
 
@@ -244,14 +249,14 @@ class ListCountSamplerSupplier(ValueSupplierInterface):
 
     def next(self, iteration):
         count = self.count_supplier.next(iteration)
-        data = random.sample(self.values, count)
+        data = [random.sample(self.values, 1)[0] for _ in range(count)]
         if self.join_with is not None:
             return self.join_with.join([str(elem) for elem in data])
         return data
 
 
-def list_stats_sampler(data: Union[str, list],
-                       **kwargs) -> ValueSupplierInterface:
+def list_stats_sampler_supplier(data: Union[str, list],
+                                **kwargs) -> ValueSupplierInterface:
     """
     Creates a List Sampler that uses a stats based approach
     Args:
@@ -389,3 +394,26 @@ def weighted_values_explicit(choices: list,
     if count_supplier is None:
         count_supplier = SingleValue(1)
     return WeightedValueSupplier(choices, weights, count_supplier)
+
+
+def iter_supplier(iterator: ResettableIterator) -> ValueSupplierInterface:
+    """ Return ValueSupplierInterface for resettable iterator """
+    return ResettableIteratorWrappedValueSupplier(iterator)
+
+
+class ResettableIteratorWrappedValueSupplier(ValueSupplierInterface):
+    """ class that wraps a generator to supply values from """
+
+    def __init__(self, iterator: ResettableIterator):
+        """
+        Args:
+            iterator: to supply values from
+        """
+        self.iter = iterator
+
+    def next(self, iteration):
+        try:
+            return next(self.iter)
+        except StopIteration:
+            self.iter.reset()
+            return next(self.iter)

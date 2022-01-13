@@ -36,14 +36,17 @@ class _Jinja2Engine(RecordProcessor):
     def __init__(self, template_file: Union[str, Path]):
         template_dir = os.path.dirname(template_file)
         self.template_name = os.path.basename(template_file)
-        self.env = Environment(
+        env = Environment(
             loader=FileSystemLoader(template_dir),
             autoescape=select_autoescape(['html', 'xml'])
         )
+        self.template = env.get_template(self.template_name)
 
-    def process(self, record: dict) -> str:
-        template = self.env.get_template(self.template_name)
-        return template.render(record)
+    def process(self, record: Union[list, dict]) -> str:
+        if isinstance(record, list):
+            parts = [self.template.render(item) for item in record]
+            return '\n'.join(parts)
+        return self.template.render(record)
 
 
 class _Jinja2StringEngine(RecordProcessor):
@@ -51,14 +54,14 @@ class _Jinja2StringEngine(RecordProcessor):
     A Jinja2 Templating Engine for String Templates
     """
 
-    def __init__(self, template):
-        self.template = template
-        self.env = Environment(
+    def __init__(self, template_str):
+        env = Environment(
             loader=BaseLoader(),
             autoescape=select_autoescape(['html', 'xml'])
         )
+        self.template = env.from_string(template_str)
 
-    def process(self, record: dict) -> str:
+    def process(self, record: Union[list, dict]) -> str:
         """
         Render the template using the fields in the provided record
 
@@ -68,5 +71,7 @@ class _Jinja2StringEngine(RecordProcessor):
         Returns:
             The rendered template
         """
-        template = self.env.from_string(self.template)
-        return template.render(record)
+        if isinstance(record, list):
+            parts = [self.template.render(item) for item in record]
+            return '\n'.join(parts)
+        return self.template.render(record)

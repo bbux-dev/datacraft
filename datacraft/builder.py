@@ -24,7 +24,8 @@ from typing import Generator
 from . import registries, utils
 from .loader import Loader, preprocess_spec
 from .supplier import key_suppliers
-from .supplier.model import DataSpec
+from .supplier.model import DataSpec, RecordProcessor
+from .outputs import OutputHandlerInterface
 
 _log = logging.getLogger(__name__)
 
@@ -48,6 +49,9 @@ class FieldInfo:
             the Data Spec
         """
         return self.builder.build()
+
+    def __str__(self):
+        return f'key:{self.key}, type: {self.type_name}'
 
 
 class Builder:
@@ -484,6 +488,26 @@ class Builder:
         """
         return self._add_field_spec(key, distribution(data, **config))
 
+    def templated(self, key: str,
+                  data: str,
+                  refs: Union[List[str], List[FieldInfo]] = None,
+                  fields: Union[List[str], List[FieldInfo]] = None,
+                  **config) -> FieldInfo:
+        """
+        creates templated Field Spec and adds to Data Spec
+
+        Args:
+            key: name of ref/field
+            data: template string
+            refs: references to inject values from
+            fields: to inject values from
+            config: in kwargs format
+
+        Returns:
+            FieldInfo for the added templated field
+        """
+        return self._add_field_spec(key, templated(data, refs, fields, **config))
+
     def _add_field_spec(self, key, spec) -> FieldInfo:
         """
         adds the fieldspec and creates a FieldInfo object
@@ -533,11 +557,11 @@ class Builder:
             >>> builder.add_field("field1", builder.some_spec(with_args))
             >>> builder.add_field("field2", builder.another_spec(with_args))
         """
+        if isinstance(key, FieldInfo):
+            key = key.key
         if key in self.keys:
             _log.warning('%s key already defined, overwriting with %s',
                          key, json.dumps(spec))
-        if isinstance(key, FieldInfo):
-            key = key.key
         self.keys.add(key)
         self.fields[key] = spec
         return self
@@ -983,7 +1007,10 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
 
     spec = {
         "type": "unicode_range",
-        "data": data
+        "data": data,
+        "config": {
+            "as_list": False,
+        }
     }  # type: Dict[str, Any]
 
     if len(config) > 0:
@@ -1363,6 +1390,37 @@ def distribution(data: str = None, **config) -> dict:
     return spec
 
 
+def templated(data: str,
+              refs: Union[List[str], List[FieldInfo]] = None,
+              fields: Union[List[str], List[FieldInfo]] = None,
+              **config) -> dict:
+    """
+    Constructs a combine Field Spec
+
+    Args:
+        data: template string
+        refs: refs to combine
+        fields: fields to combine
+        config: in kwargs format
+
+    Returns:
+        the combine spec
+    """
+
+    spec = {
+        "type": "templated",
+        "data": data
+    }  # type: Dict[str, Any]
+    if refs is not None:
+        spec['refs'] = _create_key_list(refs)
+    if fields is not None:
+        spec['fields'] = _create_key_list(fields)
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
 def _create_key_list(entries):
     """
     Checks if entries are from FieldInfo objects and extracts keys
@@ -1408,11 +1466,11 @@ class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
-        processor = kwargs.get('processor')
+        processor: RecordProcessor = kwargs.get('processor', None)
         data_dir = kwargs.get('data_dir', registries.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
-        output = kwargs.get('output', None)
+        output: OutputHandlerInterface = kwargs.get('output', None)
         loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
         key_provider = key_suppliers.from_spec(loader.specs)
@@ -1427,7 +1485,8 @@ class _DataSpecImpl(DataSpec):
                 record[key] = value
             if output:
                 output.finished_record(i, group, exclude_internal)
-
+                if i == iterations - 1:
+                    output.finished_iterations()
             if processor is not None:
                 yield processor.process(record)
             else:

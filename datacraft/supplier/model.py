@@ -2,13 +2,16 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Any, Generator
+from typing import Union, Tuple, List, Any, Generator, Iterator
 
 
 class DataSpec(dict):
     """
     Class representing a DataSpec object
     """
+    def __init__(self, raw_spec: dict):
+        super().__init__()
+        self.raw_spec = raw_spec
 
     def __delitem__(self, key):
         return self.raw_spec.__delitem__(key)
@@ -28,12 +31,23 @@ class DataSpec(dict):
     def __str__(self):
         return str(self.raw_spec)
 
-    def pop(self, key):
-        return self.raw_spec.pop(key)
+    def __len__(self):
+        return len(self.raw_spec)
 
-    def __init__(self, raw_spec):
-        super().__init__()
-        self.raw_spec = raw_spec
+    def get(self, *args, **kwargs):
+        return self.raw_spec.get(*args, **kwargs)
+
+    def items(self):
+        return self.raw_spec.items()
+
+    def keys(self):
+        return self.raw_spec.keys()
+
+    def values(self):
+        return self.raw_spec.values()
+
+    def pop(self, k, d=None):
+        return self.raw_spec.pop(k, d)
 
     def generator(self, iterations: int, **kwargs) -> Generator:
         """
@@ -53,7 +67,6 @@ class DataSpec(dict):
             Records or rendered template strings
 
         Examples:
-
             >>> import datacraft
             >>> builder = datacraft.spec_builder()
             >>> builder.values(['bob', 'bobby', 'robert', 'bobo']))
@@ -125,7 +138,7 @@ class RecordProcessor(ABC):
     """A Class that takes in a generated record and returns it formatted as a string for output"""
 
     @abstractmethod
-    def process(self, record: dict) -> str:
+    def process(self, record: Union[list, dict]) -> str:
         """
         Processes the given record into the appropriate output string
 
@@ -164,6 +177,10 @@ class OutputHandlerInterface(ABC):
             exclude_internal: if external fields should be excluded from output record
         """
 
+    @abstractmethod
+    def finished_iterations(self):
+        """This is called when all iterations have been completed"""
+
 
 class CasterInterface(ABC):
     """
@@ -183,4 +200,13 @@ class CasterInterface(ABC):
 
         Raises:
             SpecException when unable to cast value
+        """
+
+
+class ResettableIterator(Iterator, ABC):
+    """Iterator class that can be reset to the beginning of the iteration """
+    @abstractmethod
+    def reset(self):
+        """
+        This will reset the iterator to the initial state for another full round of iteration
         """

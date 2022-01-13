@@ -68,7 +68,7 @@ def test_combine_lists():
     s2 = suppliers.values({'data': [1, 2, 3, 4, 5]})
     s3 = suppliers.values({'data': ['foo', 'bar', 'baz', 'bin', 'oof']})
 
-    combo = suppliers.combine([s1, s2, s3], config={'join_with': ''})
+    combo = suppliers.combine([s1, s2, s3])
 
     assert combo.next(0) == 'a1foo'
     assert combo.next(1) == 'b2bar'

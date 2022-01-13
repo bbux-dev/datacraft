@@ -50,10 +50,10 @@ def test_buffered_supplier_size_one():
 
 def test_is_buffered():
     values_spec = builder.values(['a', 'b', 'c', 'd', 'e', 'f', 'g'], sample=True, buffer="on")
-    assert suppliers.is_buffered(values_spec)
+    assert suppliers._is_buffered(**values_spec['config'])
 
     values_spec = builder.values(['a', 'b', 'c', 'd', 'e', 'f', 'g'], sample=True, buffer_size="20")
-    assert suppliers.is_buffered(values_spec)
+    assert suppliers._is_buffered(**values_spec['config'])
 
 
 def test_buffered_supplier_from_spec():
@@ -61,7 +61,7 @@ def test_buffered_supplier_from_spec():
     Tests interpreting specs for buffering
     """
     values_spec = builder.values(['a', 'b', 'c', 'd', 'e', 'f', 'g'], sample=True, buffer_size="20")
-    assert suppliers.is_buffered(values_spec)
+    assert suppliers._is_buffered(**values_spec['config'])
 
     data_spec = builder.single_field('field', values_spec).build()
     loader = Loader(data_spec)

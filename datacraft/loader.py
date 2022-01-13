@@ -7,9 +7,9 @@ import json
 import logging
 from typing import Any, Dict, Union
 
-from . import suppliers, utils
+from . import utils, suppliers
 from .exceptions import SpecException
-from .supplier.model import DataSpec
+from .supplier.model import DataSpec, ValueSupplierInterface
 from .schemas import validate_schema_for_spec
 from .registries import lookup_type, lookup_schema, Registry
 
@@ -51,7 +51,7 @@ class Loader:
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
 
-    def get(self, key: str) -> suppliers.ValueSupplierInterface:
+    def get(self, key: str) -> ValueSupplierInterface:
         """
         Retrieve the value supplier for the given field or ref key
 
@@ -76,7 +76,7 @@ class Loader:
         self.cache[key] = supplier
         return supplier
 
-    def get_from_spec(self, field_spec: Any) -> suppliers.ValueSupplierInterface:
+    def get_from_spec(self, field_spec: Any) -> ValueSupplierInterface:
         """
         Retrieve the value supplier for the given field spec
 
@@ -99,10 +99,10 @@ class Loader:
 
         if spec_type == 'config_ref':
             raise SpecException(f'Cannot use config_ref as source of data: {json.dumps(field_spec)}')
-        if spec_type is None or spec_type == 'values':
+        if spec_type is None:
             if self.enforce_schema:
-                _validate_schema_for_spec(spec_type, field_spec)
-            supplier = suppliers.values(field_spec, self)
+                _validate_schema_for_spec('values', field_spec)
+            supplier = suppliers.values(field_spec)
         else:
             handler = lookup_type(spec_type)
             if handler is None:
@@ -110,13 +110,11 @@ class Loader:
             if self.enforce_schema:
                 _validate_schema_for_spec(spec_type, field_spec)
             supplier = handler(field_spec, self)
-        if suppliers.is_cast(field_spec):
-            supplier = suppliers.cast_supplier(supplier, field_spec)
-        if suppliers.is_decorated(field_spec):
-            supplier = suppliers.decorated(field_spec, supplier)
-        if suppliers.is_buffered(field_spec):
-            supplier = suppliers.buffered(supplier, field_spec)
-        return supplier
+        config = field_spec.get('config', {})
+        # special case
+        if spec_type == 'nested':
+            return supplier
+        return suppliers.alter(supplier, **config)
 
     def get_ref(self, key: str) -> dict:
         """
@@ -154,7 +152,7 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     preprocessors = Registry.preprocessors.get_all()
     for name in preprocessors:
         preprocessor = Registry.preprocessors.get(name)
-        processed = preprocessor(updated)
+        processed = preprocessor(updated, False)
         if processed is None:
             _log.error('Invalid preprocessor %s, returned None instead of updated spec, skipping', name)
             continue

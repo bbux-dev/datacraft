@@ -41,4 +41,6 @@ These are the built in field spec types.
 
 .. include:: types/distribution.rst
 
+.. include:: types/templated.rst
+
 

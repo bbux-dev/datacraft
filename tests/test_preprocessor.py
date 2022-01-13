@@ -1,7 +1,8 @@
-from datacraft.preprocessor import _preprocess_spec, _preprocess_csv_select, _preprocess_nested
-from datacraft.preprocessor import _parse_key, _is_spec_data, _update_no_params
-from datacraft import builder, cli, SpecException
 import pytest
+
+from datacraft import builder, loader, SpecException
+from datacraft.preprocessor import _parse_key, _is_spec_data, _update_no_params
+from datacraft.preprocessor import _preprocess_spec, _preprocess_nested
 
 parse_key_tests = [
     (
@@ -117,6 +118,48 @@ csv_select_transform_tests = [
                 "placeholder_config_ref": {"type": "config_ref", "config": {"datafile": "not_real.csv", "headers": "no"}}
             }
         }
+    ),
+    (
+        {
+            "field:ref": "CSV_ONE",
+            "refs": {
+                "ONE": "Test Conflict",
+                "CSV": {
+                    "type": "csv_select",
+                    "data": {"ONE": 1, "TWO": 2},
+                    "config": {"datafile": "{{ injected }}"}
+                }
+            }
+        },
+        {
+          "field": {"type": "ref", "data": "CSV_ONE"},
+          "refs": {
+            "ONE": {
+              "type": "values",
+              "data": "Test Conflict"
+            },
+            "CSV_CONFIG_REF": {
+              "type": "config_ref",
+              "config": {
+                "datafile": "{{ injected }}"
+              }
+            },
+            "ONE-1": {
+              "type": "csv",
+              "config": {
+                "column": 1,
+                "config_ref": "CSV_CONFIG_REF"
+              }
+            },
+            "TWO": {
+              "type": "csv",
+              "config": {
+                "column": 2,
+                "config_ref": "CSV_CONFIG_REF"
+              }
+            }
+          }
+        }
     )
 ]
 
@@ -124,9 +167,22 @@ csv_select_transform_tests = [
 @pytest.mark.parametrize("input_spec,expected_output_spec", csv_select_transform_tests)
 def test_preprocess_csv_select(input_spec, expected_output_spec):
     # need first layer of pre-processing done
-    updated = _preprocess_spec(input_spec)
-    updated = _preprocess_csv_select(updated)
+    updated = loader.preprocess_spec(input_spec)
     assert updated == expected_output_spec
+
+
+def _builder_nested(outer_key, inner_key, inner_spec):
+    """
+    First part builds
+
+    { innerkey: { some: spec } }
+
+    Second part wraps first in
+
+    { outerkey: { type: nested, fields: { innerkey: { some: spec } } } }
+    """
+    inner = builder.single_field(inner_key, inner_spec).build()
+    return builder.single_field(outer_key, builder.nested(inner)).build()
 
 
 nested_transform_tests = [
@@ -221,20 +277,29 @@ nested_transform_tests = [
         }
     ),
     (
-        builder.single_field('enemies', builder.nested(
-            builder.single_field('inner', ['bat', 'slime', 'orc']).build())).build(),
-        builder.single_field('enemies', builder.nested(
-            builder.single_field('inner', builder.values(['bat', 'slime', 'orc'])).build())).build(),
+        _builder_nested('enemies', 'inner', ['bat', 'slime', 'orc']),
+        _builder_nested('enemies', 'inner', builder.values(['bat', 'slime', 'orc'])).raw_spec,
     )
 ]
 
 
 @pytest.mark.parametrize("input_spec,expected_output_spec", nested_transform_tests)
 def test_preprocess_nested(input_spec, expected_output_spec):
-    # need first layer of pre-processing done
     updated = _preprocess_spec(input_spec)
     updated = _preprocess_nested(updated)
     assert updated == expected_output_spec
+
+
+def test_preprocess_nested_no_fields():
+    spec = {
+        "geo": {
+            "type": "nested",
+            "config": {"as_list": "true"},
+            "refs": {"lat": 55.5, "long": 99.9}  # <- invalid should be fields
+        }
+    }
+    with pytest.raises(SpecException):
+        loader.preprocess_spec(spec)
 
 
 def test_is_spec_data_positive_examples():

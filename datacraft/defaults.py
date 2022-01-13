@@ -14,6 +14,7 @@ def _default_list_sample_mode():
     return False
 
 
+@registries.Registry.defaults('unicode_join_with')
 @registries.Registry.defaults('char_class_join_with')
 @registries.Registry.defaults('combine_join_with')
 def _default_char_class_join_with():
@@ -50,6 +51,12 @@ def _default_date_stddev_days():
 def _default_date_format():
     """ default date format """
     return "%d-%m-%Y"
+
+
+@registries.Registry.defaults('date_duration_days')
+def _default_date_duration_days():
+    """ default date duration days """
+    return 30
 
 
 @registries.Registry.defaults('geo_precision')
@@ -121,4 +128,16 @@ def _default_exclude_internal():
 @registries.Registry.defaults('sample_lists')
 def _default_sample_lists():
     """ default if lists should be sampled """
+    return False
+
+
+@registries.Registry.defaults('uuid_variant')
+def _default_uuid_variant():
+    """ default uuid variant """
+    return 4
+
+
+@registries.Registry.defaults('format_json_ascii')
+def _default_format_json_ascii():
+    """ if the JSON formatted data should be ascii """
     return False

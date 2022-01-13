@@ -18,7 +18,7 @@ class Registry:
             Types for field specs, registered functions for creating ValueSupplierInterface that will supply
             values for the given type
 
-            >>> @datacraft.registry.registries('special_sauce')
+            >>> @datacraft.registry.types('special_sauce')
             ... def _handle_special_type(field_spec: dict, loader: datacraft.Loader) -> ValueSupplierInterface:
             ...    # return ValueSupplierInterface from spec config
 
@@ -36,7 +36,7 @@ class Registry:
             this is where you would register that pre-processor.
 
             >>> @datacraft.registry.preprocessors('custom-preprocessing')
-            ... def _preprocess_spec_to_some_end(raw_spec: dict) -> dict:
+            ... def _preprocess_spec_to_some_end(raw_spec: dict, is_refs: bool) -> dict:
             ...    # return spec with any modification
 
         logging:
@@ -66,8 +66,8 @@ class Registry:
         defaults:
             Default values. Different types have different default values for some configs.  This provides a mechanism
             to override or to register other custom defaults. Read a default from the registry
-            with: ``datacraft.types.get_default('var_key')``. While ``datacraft.types.all_defaults()`` will give a mapping
-            of all registered default keys and values.
+            with: ``datacraft.types.get_default('var_key')``. While ``datacraft.types.all_defaults()`` will give a
+            mapping of all registered default keys and values.
 
             >>> @datacraft.registry.defaults('special_sauce_ingredient')
             ... def _default_special_sauce_ingredient():

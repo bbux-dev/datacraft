@@ -7,32 +7,20 @@ import json
 import logging
 import os
 import string
-from typing import Union, Dict
 
-from . import distributions, suppliers, registries, template_engines, schemas, utils
+from . import distributions, suppliers, registries, schemas, utils
 from .exceptions import SpecException
 from .loader import Loader
 from .supplier import key_suppliers
-# for calculate
-from .supplier.calculate import calculate_supplier
-# for combine
-from .supplier.combine import combine_supplier
 from .supplier.common import weighted_values_explicit
-# for csv
-from .supplier.csv import CsvData, load_csv_data, csv_supplier
-# for date
-from .supplier.date import date_supplier
-from .supplier.model import Distribution
 # for nested
 from .supplier.nested import nested_supplier
-# for network
-from .supplier.network import ipv4, ip_precise, mac_address
 # for refs
 from .supplier.refs import weighted_ref_supplier
 # for unicode ranges
 from .supplier.unicode import unicode_range_supplier
-# for uuid
-from .supplier.uuid import uuid_supplier
+# for calculate
+from .suppliers import calculate
 
 ##############
 # Type Keys
@@ -49,6 +37,8 @@ _GEO_LONG_KEY = 'geo.long'
 _GEO_PAIR_KEY = 'geo.pair'
 _COMBINE_KEY = 'combine'
 _COMBINE_LIST_KEY = 'combine-list'
+_CSV_TYPE = 'csv'
+_WEIGHTED_CSV = 'weighted_csv'
 _IP_KEY = 'ip'
 _IPV4_KEY = 'ipv4'
 _IP_PRECISE_KEY = 'ip.precise'
@@ -62,6 +52,9 @@ _SELECT_LIST_SUBSET_KEY = 'select_list_subset'
 _UNICODE_RANGE_KEY = 'unicode_range'
 _UUID_KEY = 'uuid'
 _DISTRIBUTION_KEY = 'distribution'
+_TEMPLATED_KEY = 'templated'
+_NESTED_KEY = 'nested'
+_CONFIG_REF_KEY = 'config_ref'
 
 _log = logging.getLogger('datacraft.types')
 
@@ -76,8 +69,10 @@ def _get_values_schema():
 
 
 @registries.Registry.types(_VALUES_KEY)
-def _handle_values_type(_, __):
-    """ placeholder as this is handled elsewhere """
+def _handle_values_type(spec, loader):
+    """ handles values types """
+    config = utils.load_config(spec, loader)
+    return suppliers.values(spec, **config)
 
 
 ##############
@@ -92,27 +87,44 @@ def _calculate_schema():
 @registries.Registry.types(_CALCULATE_KEY)
 def _configure_calculate_supplier(field_spec: dict, loader: Loader):
     """ configures supplier for calculate type """
+
+    formula = field_spec.get('formula')
+    if formula is None:
+        raise SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
+
+    suppliers_map = _build_suppliers_map(field_spec, loader)
+
+    return calculate(suppliers_map=suppliers_map, formula=formula)
+
+
+@registries.Registry.schemas(_TEMPLATED_KEY)
+def _templated_schema():
+    return schemas.load(_TEMPLATED_KEY)
+
+
+@registries.Registry.types(_TEMPLATED_KEY)
+def _configure_templated_type(field_spec, loader):
+    if 'data' not in field_spec:
+        raise SpecException(f'data is required field for templated specs: {json.dumps(field_spec)}')
+    suppliers_map = _build_suppliers_map(field_spec, loader)
+
+    return suppliers.templated(suppliers_map, field_spec.get('data', None))
+
+
+def _build_suppliers_map(field_spec, loader):
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
     if 'refs' in field_spec and 'fields' in field_spec:
         raise SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
-    template = field_spec.get('formula')
-    if template is None:
-        raise SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
-
     mappings = _get_mappings(field_spec, 'refs')
     mappings.update(_get_mappings(field_spec, 'fields'))
-
     if len(mappings) < 1:
         raise SpecException('fields or refs empty: %s' % json.dumps(field_spec))
-
     suppliers_map = {}
     for field_or_ref, alias in mappings.items():
         supplier = loader.get(field_or_ref)
         suppliers_map[alias] = supplier
-
-    engine = template_engines.string(template)
-    return calculate_supplier(suppliers=suppliers_map, engine=engine)
+    return suppliers_map
 
 
 def _get_mappings(field_spec, lookup_key):
@@ -159,25 +171,22 @@ for class_key in _CLASS_MAPPING:
 
 
 @registries.Registry.types(_CHAR_CLASS_KEY)
-def _configure_char_class_supplier(spec, _):
+def _configure_char_class_supplier(spec, loader):
     """ configure the supplier for char_class types """
     if 'data' not in spec:
         raise SpecException(f'Data is required field for char_class type: {json.dumps(spec)}')
-    config = spec.get('config', {})
+    config = utils.load_config(spec, loader)
     data = spec['data']
     if isinstance(data, str) and data in _CLASS_MAPPING:
         data = _CLASS_MAPPING[data]
     if isinstance(data, list):
         new_data = [_CLASS_MAPPING[datum] if datum in _CLASS_MAPPING else datum for datum in data]
         data = ''.join(new_data)
-    if 'exclude' in config:
-        for char_to_exclude in config.get('exclude'):
-            data = data.replace(char_to_exclude, '')
+
     if 'join_with' not in config:
         config['join_with'] = registries.get_default('char_class_join_with')
-    if utils.any_key_exists(config, ['mean', 'stddev']):
-        return suppliers.list_stat_sampler(data, config)
-    return suppliers.list_count_sampler(data, config)
+
+    return suppliers.character_class(data, **config)
 
 
 for class_key in _CLASS_MAPPING:
@@ -256,13 +265,13 @@ def _load_combine(combine_field_spec, keys, loader):
     config = combine_field_spec.get('config', {})
     as_list = config.get('as_list', registries.get_default('combine_as_list'))
     joiner = config.get('join_with', registries.get_default('combine_join_with'))
-    return combine_supplier(to_combine, as_list, joiner)
+    return suppliers.combine(to_combine, joiner, as_list)
 
 
 ############
 # config_ref
 ############
-@registries.Registry.types('config_ref')
+@registries.Registry.types(_CONFIG_REF_KEY)
 def _config_ref_handler(_, __):
     """" Does nothing, just place holder """
 
@@ -270,33 +279,27 @@ def _config_ref_handler(_, __):
 ########
 # csv
 #######
-_ONE_MB = 1024 * 1024
-_SMALL_ENOUGH_THRESHOLD = 250 * _ONE_MB
-
-# to keep from reloading the same CsvData
-_csv_data_cache: Dict[str, CsvData] = {}
 
 
-@registries.Registry.types('csv')
+@registries.Registry.types(_CSV_TYPE)
 def _configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
     config = utils.load_config(field_spec, loader)
+    datafile = config.get('datafile', registries.get_default('csv_file'))
+    csv_path = f'{loader.datadir}/{datafile}'
+    if not os.path.exists(csv_path):
+        raise SpecException(f'Unable to locate data file: {datafile} in data dir: {loader.datadir} for spec: '
+                            + json.dumps(field_spec))
+    return suppliers.csv(csv_path, **config)
 
-    field_name = config.get('column', 1)
-    sample = utils.is_affirmative('sample', config)
-    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
 
-    csv_data = _load_csv_data(field_spec, config, loader.datadir)
-    return csv_supplier(field_name, csv_data, count_supplier, sample)
-
-
-@registries.Registry.schemas('csv')
+@registries.Registry.schemas(_CSV_TYPE)
 def _get_csv_schema():
     """ get the schema for the csv type """
-    return schemas.load('csv')
+    return schemas.load(_CSV_TYPE)
 
 
-@registries.Registry.types('weighted_csv')
+@registries.Registry.types(_WEIGHTED_CSV)
 def _configure_weighted_csv(field_spec, loader):
     """ Configures the weighted_csv value supplier for this field """
 
@@ -304,7 +307,7 @@ def _configure_weighted_csv(field_spec, loader):
 
     field_name = config.get('column', 1)
     weight_column = config.get('weight_column', 2)
-    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
+    count_supplier = suppliers.count_supplier(**config)
 
     datafile = config.get('datafile', registries.get_default('csv_file'))
     csv_path = f'{loader.datadir}/{datafile}'
@@ -322,10 +325,10 @@ def _configure_weighted_csv(field_spec, loader):
     return weighted_values_explicit(choices, weights, count_supplier)
 
 
-@registries.Registry.schemas('weighted_csv')
+@registries.Registry.schemas(_WEIGHTED_CSV)
 def _get_weighted_csv_schema():
     """ get the schema for the weighted_csv type """
-    return schemas.load('weighted_csv')
+    return schemas.load(_WEIGHTED_CSV)
 
 
 def _read_named_column(csv_path: str, column_name: str):
@@ -360,49 +363,11 @@ def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: b
         return [float(val[column_index - 1]) for val in reader]
 
 
-def _load_csv_data(field_spec, config, datadir):
-    """
-    Creates the CsvData object, caches the object by file path so that we can share this object across fields
-
-    Args:
-        field_spec: that triggered the creation
-        config: to use to do the creation
-        datadir: where to look for data files
-
-    Returns:
-        the configured CsvData object
-    """
-    datafile = config.get('datafile', registries.get_default('csv_file'))
-    csv_path = f'{datadir}/{datafile}'
-    if csv_path in _csv_data_cache:
-        return _csv_data_cache.get(csv_path)
-
-    if not os.path.exists(csv_path):
-        raise SpecException(f'Unable to locate data file: {datafile} in data dir: {datadir} for spec: '
-                            + json.dumps(field_spec))
-    delimiter = config.get('delimiter', ',')
-    # in case tab came in as string
-    if delimiter == '\\t':
-        delimiter = '\t'
-    quotechar = config.get('quotechar', '"')
-    has_headers = utils.is_affirmative('headers', config)
-
-    size_in_bytes = os.stat(csv_path).st_size
-    max_csv_size = int(registries.get_default('large_csv_size_mb')) * _ONE_MB
-    sample_rows = utils.is_affirmative('sample_rows', config)
-    buffer = size_in_bytes <= max_csv_size
-    csv_data = load_csv_data(csv_path, delimiter, has_headers, quotechar, sample_rows, buffer)
-    _csv_data_cache[csv_path] = csv_data
-    return csv_data
-
-
 #######
 # date
 #######
 _ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
 _ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
-
-_SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
 
 
 @registries.Registry.schemas(_DATE_KEY)
@@ -425,107 +390,12 @@ def _get_date_iso_us_schema():
     return schemas.load(_DATE_KEY)
 
 
-def _uniform_date_timestamp(
-        start: str,
-        end: str,
-        offset: int,
-        duration: int,
-        date_format_string: str) -> Union[None, Distribution]:
-    """
-    Creates a uniform distribution for the start and end dates shifted by the offset
-
-    Args:
-        start: start date string
-        end: end date string
-        offset: number of days to shift the duration, positive is back negative is forward
-        duration: number of days after start
-        date_format_string: format for parsing dates
-
-    Returns:
-        Distribution that gives uniform seconds since epoch for the given params
-    """
-    offset_date = datetime.timedelta(days=offset)
-    if start:
-        try:
-            start_date = datetime.datetime.strptime(start, date_format_string) - offset_date
-        except TypeError as err:
-            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {start}") from err
-    else:
-        start_date = datetime.datetime.now() - offset_date
-    if end:
-        # buffer end date by one to keep inclusive
-        try:
-            end_date = datetime.datetime.strptime(end, date_format_string) \
-                       + datetime.timedelta(days=1) - offset_date
-        except TypeError as err:
-            raise SpecException(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
-    else:
-        # start date already include offset, don't include it here
-        end_date = start_date + datetime.timedelta(days=abs(int(duration)), seconds=1)
-
-    start_ts = int(start_date.timestamp())
-    end_ts = int(end_date.timestamp())
-    if end_ts < start_ts:
-        _log.warning("End date (%s) is before start date (%s)", start_date, end_date)
-        return None
-    return distributions.uniform(start=start_ts, end=end_ts)
-
-
-def _gauss_date_timestamp(
-        center_date_str: Union[str, None],
-        stddev_days: float,
-        date_format_string: str):
-    """
-    Creates a normally distributed date distribution around the center date
-
-    Args:
-        center_date_str: center date for distribution
-        stddev_days: standard deviation from center date in days
-        date_format_string: format for returned dates
-
-    Returns:
-        Distribution that gives normally distributed seconds since epoch for the given params
-    """
-    if center_date_str:
-        center_date = datetime.datetime.strptime(center_date_str, date_format_string)
-    else:
-        center_date = datetime.datetime.now()
-    mean = center_date.timestamp()
-    stddev = stddev_days * _SECONDS_IN_DAY
-    return distributions.normal(mean=mean, stddev=stddev)
-
-
 @registries.Registry.types(_DATE_KEY)
 def _configure_date_supplier(field_spec: dict, loader: Loader):
     """ configures the date value supplier """
     config = utils.load_config(field_spec, loader)
-    if 'center_date' in config or 'stddev_days' in config:
-        return _create_stats_based_date_supplier(config, loader)
-    return _create_uniform_date_supplier(config, loader)
-
-
-def _create_stats_based_date_supplier(config: dict, loader: Loader):
-    """ creates stats based date supplier from config """
-    center_date = config.get('center_date')
-    stddev_days = config.get('stddev_days', registries.get_default('date_stddev_days'))
-    date_format = config.get('format', registries.get_default('date_format'))
-    timestamp_distribution = _gauss_date_timestamp(center_date, float(stddev_days), date_format)
-    hour_supplier = _hour_supplier(config, loader)
-    return date_supplier(date_format, timestamp_distribution, hour_supplier)
-
-
-def _create_uniform_date_supplier(config, loader: Loader):
-    """ creates uniform based date supplier from config """
-    duration_days = config.get('duration_days', 30)
-    offset = int(config.get('offset', 0))
-    start = config.get('start')
-    end = config.get('end')
-    date_format = config.get('format', registries.get_default('date_format'))
-    timestamp_distribution = _uniform_date_timestamp(start, end, offset, duration_days, date_format)
-    if timestamp_distribution is None:
-        raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(config)}')
-    hour_supplier = _hour_supplier(config, loader)
-    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+    config['hour_supplier'] = _hour_supplier(config, loader)
+    return suppliers.date(**config)
 
 
 def _hour_supplier(config: dict, loader: Loader):
@@ -550,7 +420,6 @@ def _configure_supplier_iso_microseconds(field_spec: dict, loader: Loader):
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     """ configures an iso based date supplier using the provided date format """
     config = utils.load_config(field_spec, loader)
-
     # make sure the start and end dates match the ISO format we are using
     start = config.get('start')
     end = config.get('end')
@@ -563,10 +432,8 @@ def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
         config['end'] = end_date.strftime(iso_date_format)
     config['format'] = iso_date_format
     # End fixes to support iso
-
-    if 'center_date' in config or 'stddev_days' in config:
-        return _create_stats_based_date_supplier(config, loader)
-    return _create_uniform_date_supplier(config, loader)
+    config['hour_supplier'] = _hour_supplier(config, loader)
+    return suppliers.date(**config)
 
 
 ############
@@ -593,90 +460,40 @@ def _get_geo_pair_schema():
 @registries.Registry.types(_GEO_LAT_KEY)
 def _configure_geo_lat(field_spec, loader):
     """ configures value supplier for geo.lat type """
-    return _configure_lat_type(field_spec, loader)
+    config = utils.load_config(field_spec, loader)
+    return suppliers.geo_lat(**config)
 
 
 @registries.Registry.types(_GEO_LONG_KEY)
 def _configure_geo_long(field_spec, loader):
     """ configures value supplier for geo.long type """
-    return _configure_long_type(field_spec, loader)
+    config = utils.load_config(field_spec, loader)
+    return suppliers.geo_long(**config)
 
 
 @registries.Registry.types(_GEO_PAIR_KEY)
 def _configure_geo_pair(field_spec, loader):
     """ configures value supplier for geo.pair type """
     config = utils.load_config(field_spec, loader)
-    long_supplier = _configure_long_type(field_spec, loader)
-    lat_supplier = _configure_lat_type(field_spec, loader)
-    join_with = config.get('join_with', registries.get_default('geo_join_with'))
-    as_list = utils.is_affirmative('as_list', config, registries.get_default('geo_as_list'))
-    lat_first = utils.is_affirmative('lat_first', config, registries.get_default('geo_lat_first'))
-    combine_config = {
-        'join_with': join_with,
-        'as_list': as_list
-    }
-    if lat_first:
-        return suppliers.combine([lat_supplier, long_supplier], combine_config)
-    return suppliers.combine([long_supplier, lat_supplier], combine_config)
-
-
-def _configure_long_type(spec, loader):
-    """ configures longitude type """
-    return _configure_geo_type(spec, loader, -180.0, 180.0, '_long')
-
-
-def _configure_lat_type(spec, loader):
-    """ configures latitude type """
-    return _configure_geo_type(spec, loader, -90.0, 90.0, '_lat')
-
-
-def _configure_geo_type(spec, loader, default_start, default_end, suffix):
-    """ configures geo type """
-    config = utils.load_config(spec, loader)
-    precision = config.get('precision', registries.get_default('geo_precision'))
-    if not str(precision).isnumeric():
-        raise SpecException(f'precision for geo should be valid integer >= 0: {json.dumps(spec)}')
-    start, end = _get_start_end(config, default_start, default_end, suffix)
-    return suppliers.random_range(start, end, precision)
-
-
-def _get_start_end(config, default_start, default_end, suffix):
-    """ determines the valid range, changes if bbox in config """
-    if 'bbox' in config:
-        bbox = config['bbox']
-        if not isinstance(bbox, list) or len(bbox) != 4:
-            raise SpecException(
-                'Bounding box must be list of size 4 with format: [min Longitude, min Latitude, max Longitude, '
-                'max Latitude]')
-        if 'lat' in suffix:
-            default_start = bbox[1]
-            default_end = bbox[3]
-        else:
-            default_start = bbox[0]
-            default_end = bbox[2]
-    # start_lat or start_long overrides bbox or defaults
-    start = config.get('start' + suffix, default_start)
-    # end_lat or end_long overrides bbox or defaults
-    end = config.get('end' + suffix, default_end)
-    return start, end
+    return suppliers.geo_pair(**config)
 
 
 ###########
 # nested
 ##########
-@registries.Registry.schemas('nested')
+@registries.Registry.schemas(_NESTED_KEY)
 def _get_nested_schema():
     """ schema for nested type """
-    return schemas.load('nested')
+    return schemas.load(_NESTED_KEY)
 
 
-@registries.Registry.types('nested')
+@registries.Registry.types(_NESTED_KEY)
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
-    keys = [key for key in fields.keys() if key not in loader.RESERVED]
+    keys = [key for key in fields.keys()]
     config = utils.load_config(spec, loader)
-    count_supplier = suppliers.count_supplier_from_data(config.get('count', 1))
+    count_supplier = suppliers.count_supplier(**config)
     if 'field_groups' in spec:
         key_supplier = key_suppliers.from_spec(spec)
     else:
@@ -688,7 +505,7 @@ def _configure_nested_supplier(spec, loader):
     # each non reserved key should have a valid spec as a value
     for key in keys:
         nested_spec = fields[key]
-        if 'type' in nested_spec and nested_spec.get('type') == 'nested':
+        if 'type' in nested_spec and nested_spec.get('type') == _NESTED_KEY:
             supplier = _configure_nested_supplier(nested_spec, loader)
         else:
             supplier = loader.get_from_spec(nested_spec)
@@ -725,82 +542,14 @@ def _get_mac_addr_schema():
 
 
 @registries.Registry.types(_IPV4_KEY)
-def _configure_ipv4(field_spec, _):
-    """ configures value supplier for ipv4 type """
-    return _configure_ip(field_spec, _)
-
-
 @registries.Registry.types(_IP_KEY)
 def _configure_ip(field_spec, loader):
     """ configures value supplier for ip type """
     config = utils.load_config(field_spec, loader)
-    if 'base' in config and 'cidr' in config:
-        raise SpecException('Must supply only one of base or cidr param: ' + json.dumps(field_spec))
-
-    parts = _get_base_parts(config)
-    # this is the same thing as a constant
-    if len(parts) == 4:
-        return suppliers.values('.'.join(parts))
-    sample = config.get('sample', 'yes')
-    octet_supplier_map = {
-        'first': _create_octet_supplier(parts, 0, sample),
-        'second': _create_octet_supplier(parts, 1, sample),
-        'third': _create_octet_supplier(parts, 2, sample),
-        'fourth': _create_octet_supplier(parts, 3, sample),
-    }
-    return ipv4(octet_supplier_map)
-
-
-def _get_base_parts(config):
-    """
-    Builds the base ip array for the first N octets based on
-    supplied base or on the /N subnet mask in the cidr
-    """
-    if 'base' in config:
-        parts = config.get('base').split('.')
-    else:
-        parts = []
-
-    if 'cidr' in config:
-        cidr = config['cidr']
-        mask = _validate_and_extract_mask(cidr)
-        ip_parts = cidr[0:cidr.index('/')].split('.')
-        if len(ip_parts) < 4 or not all(part.isdigit() for part in ip_parts):
-            raise SpecException('Invalid IP in cidr for config: ' + json.dumps(config))
-        if mask == '8':
-            parts = ip_parts[0:1]
-        elif mask == '16':
-            parts = ip_parts[0:2]
-        elif mask == '24':
-            parts = ip_parts[0:3]
-    return parts
-
-
-def _validate_and_extract_mask(cidr):
-    """ validates the cidr is on that can be used for ip type """
-    if '/' not in cidr:
-        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
-    mask = cidr[cidr.index('/') + 1:]
-    if not mask.isdigit() or int(mask) not in [8, 16, 24]:
-        raise SpecException(f'Invalid Subnet Mask in cidr: {cidr}, only one of /8 /16 or /24 supported')
-    return mask
-
-
-def _create_octet_supplier(parts, index, sample):
-    """ creates a value supplier for the index'th octet """
-    # this index is for a part that is static, create a single value supplier for that part
-    if len(parts) >= index + 1 and parts[index].strip() != '':
-        octet = parts[index].strip()
-        if not octet.isdigit():
-            raise SpecException(f'Octet: {octet} invalid for base, Invalid Input: ' + '.'.join(parts))
-        if not 0 <= int(octet) <= 255:
-            raise SpecException(
-                f'Each octet: {octet} must be in range of 0 to 255, Invalid Input: ' + '.'.join(parts))
-        return suppliers.values(octet)
-    # need octet range at this point
-    octet_range = list(range(0, 255))
-    spec = {'config': {'sample': sample}, 'data': octet_range}
-    return suppliers.values(spec)
+    try:
+        return suppliers.ip_supplier(**config)
+    except ValueError as err:
+        raise SpecException(str(err)) from err
 
 
 @registries.Registry.types(_IP_PRECISE_KEY)
@@ -810,10 +559,10 @@ def _configure_precise_ip(field_spec, _):
     if config is None:
         raise SpecException('No config for: ' + json.dumps(field_spec) + ', param cidr required')
     cidr = config.get('cidr')
-    sample = config.get('sample', 'no').lower() in ['yes', 'true', 'on']
+    sample = utils.is_affirmative('sample', config, 'no')
     if cidr is None:
         raise SpecException('Invalid config for: ' + json.dumps(field_spec) + ', param cidr required')
-    return ip_precise(cidr, sample)
+    return suppliers.ip_precise(cidr, sample)
 
 
 @registries.Registry.types(_NET_MAC_KEY)
@@ -825,7 +574,7 @@ def _configure_mac_address_supplier(field_spec, loader):
     else:
         delim = registries.get_default('mac_addr_separator')
 
-    return mac_address(delim)
+    return suppliers.mac_address(delim)
 
 
 ###################
@@ -870,6 +619,11 @@ def _configure_range_supplier(field_spec, _):
 
 def _configure_range_supplier_for_data(field_spec, data):
     """ configures the supplier based on the range data supplied """
+    config = field_spec.get('config', {})
+    precision = config.get('precision', None)
+    if precision and not str(precision).isnumeric():
+        raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
+
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
     # more intuitive behavior
@@ -880,15 +634,10 @@ def _configure_range_supplier_for_data(field_spec, data):
         step = 1
     else:
         step = data[2]
-    if utils.any_is_float(data):
-        config = field_spec.get('config', {})
-        precision = config.get('precision', None)
-        if precision and not str(precision).isnumeric():
-            raise SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
-        range_values = list(utils.float_range(float(start), float(end), float(step), precision))
-    else:
-        range_values = list(range(start, end, step))
-    return suppliers.values(range_values)
+    try:
+        return suppliers.range_supplier(start, end, step, precision=precision)
+    except ValueError as err:
+        raise SpecException(str(err)) from err
 
 
 @registries.Registry.types(_RAND_INT_RANGE_KEY)
@@ -965,7 +714,7 @@ def _configure_weighted_ref_supplier(parent_field_spec, loader):
         values_map[key] = supplier
     supplier = weighted_ref_supplier(key_supplier, values_map)
     if 'count' in config:
-        return suppliers.array_supplier(supplier, config)
+        return suppliers.array_supplier(supplier, **config)
     return supplier
 
 
@@ -999,9 +748,7 @@ def _configure_select_list_subset_supplier(field_spec, loader):
             data = field_spec
     elif 'data' in field_spec:
         data = field_spec.get('data')
-    if utils.any_key_exists(config, ['mean', 'stddev']):
-        return suppliers.list_stat_sampler(data, config)
-    return suppliers.list_count_sampler(data, config)
+    return suppliers.select_list_subset(data, **config)
 
 
 ###################
@@ -1014,7 +761,7 @@ def _get_unicode_range_schema():
 
 
 @registries.Registry.types(_UNICODE_RANGE_KEY)
-def _configure_unicode_range_supplier(spec, _):
+def _configure_unicode_range_supplier(spec, loader):
     """ configure the supplier for unicode_range types """
     if 'data' not in spec:
         raise SpecException('data is Required Element for unicode_range specs: ' + json.dumps(spec))
@@ -1023,25 +770,8 @@ def _configure_unicode_range_supplier(spec, _):
         raise SpecException(
             f'data should be a list or list of lists with two elements for {_UNICODE_RANGE_KEY} specs: ' + json.dumps(
                 spec))
-    config = spec.get('config', {})
-    if isinstance(data[0], list):
-        suppliers_list = [_single_unicode_range(sublist, config) for sublist in data]
-        return suppliers.from_list_of_suppliers(suppliers_list, True)
-    return _single_unicode_range(data, config)
-
-
-def _single_unicode_range(data, config):
-    """ creates a unicode supplier for a single unicode range """
-    # supplies range of data as floats
-    range_data = list(range(utils.decode_num(data[0]), utils.decode_num(data[1]) + 1))
-    # casts the floats to ints
-    if utils.any_key_exists(config, ['mean', 'stddev']):
-        if 'as_list' not in config:
-            config['as_list'] = 'true'
-        wrapped = suppliers.list_stat_sampler(range_data, config)
-    else:
-        wrapped = suppliers.list_count_sampler(range_data, config)
-    return unicode_range_supplier(wrapped)
+    config = utils.load_config(spec, loader)
+    return suppliers.unicode_range(data, **config)
 
 
 #################
@@ -1057,11 +787,11 @@ def _get_uuid_schema():
 def _configure_uuid_supplier(field_spec, loader):
     """ configure the supplier for uuid types """
     config = utils.load_config(field_spec, loader)
-    variant = int(config.get('variant', 4))
+    variant = int(config.get('variant', registries.get_default('uuid_variant')))
 
     if variant not in [1, 3, 4, 5]:
         raise SpecException('Invalid variant for: ' + json.dumps(field_spec))
-    return uuid_supplier(variant)
+    return suppliers.uuid(variant)
 
 
 ###################
@@ -1081,3 +811,4 @@ def _configure_distribution_supplier(field_spec, loader):
             'required data element not defined for ' + _DISTRIBUTION_KEY + ' type : ' + json.dumps(field_spec))
     distribution = distributions.from_string(field_spec['data'])
     return suppliers.distribution_supplier(distribution)
+

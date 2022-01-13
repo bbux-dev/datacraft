@@ -97,9 +97,9 @@ def test_load_ref_by_name():
     assert loader.get('TWO').next(0) == 'dos'
 
 
-def test_registered_invalid_prepocessor():
+def test_registered_invalid_preprocessor():
     @datacraft.registry.preprocessors('test_invalid')
-    def _do_stuff(_):
+    def _do_stuff(_, __):
         return None
     raw_spec = {
         'foo': {'type': 'values', 'data': 42},

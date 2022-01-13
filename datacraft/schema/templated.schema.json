@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/templated.schema.json",
+  "type": "object",
+  "required": ["type", "data"],
+  "properties": {
+    "type": {"type": "string", "pattern": "^templated$"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"}
+      }
+    },
+    "data": {
+      "description": "Templated string to substitute values into",
+      "type": "string",
+      "examples": [
+        "prefix {{ field1 }} joins with {{ field2 }} suffix",
+        "Mozilla/5.0 ({{ system-information }}) {{ platform }} ( {{ platform-details }} ) {{ extensions }}"
+      ]
+    },
+    "refs": {
+      "description": "The fields or references to inject into the template string",
+      "type": "array",
+      "uniqueItems": false,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "fields": {
+      "description": "The fields or references to inject into the template string",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "oneOf": [
+    {"required": ["refs"]},
+    {"required": ["fields"]}
+  ]
+}
