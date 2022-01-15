@@ -1,7 +1,5 @@
 # build
 setuptools~=45.2.0
-# test
-pytest~=6.2.1
 # config
 pyyaml~=5.1
 # custom code
