@@ -1,6 +1,6 @@
 Datacraft
 =========
-[![Build Status](https://circleci.com/gh/bbux-dev/datacraft/tree/develop.svg?style=svg)](https://circleci.com/gh/bbux-dev/datacraft/tree/main)
+[![Build Status](https://circleci.com/gh/bbux-dev/datacraft/tree/develop.svg?style=shield)](https://circleci.com/gh/bbux-dev/datacraft/tree/main)
 [![codecov](https://codecov.io/gh/bbux-dev/datacraft/branch/develop/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/datacraft)
 
 Overview
