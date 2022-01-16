@@ -24,17 +24,17 @@ Examples:
 .. code-block:: json
 
     {
-      "templated": {
+      "user_agent": {
         "type": "templated",
         "data": "Mozilla/5.0 ({{ system }}) {{ platform }}",
-        "refs": ["first", "last"],
+        "refs": ["system", "platform"],
       },
       "refs": {
         "system": {
           "type": "values",
           "data": [
-            "(Windows NT 6.1; Win64; x64; rv:47.0)",
-            "(Macintosh; Intel Mac OS X x.y; rv:42.0)"
+            "Windows NT 6.1; Win64; x64; rv:47.0",
+            "Macintosh; Intel Mac OS X x.y; rv:42.0"
           ]
         },
         "platform": {
