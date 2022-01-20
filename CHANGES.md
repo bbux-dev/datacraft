@@ -2,7 +2,7 @@ v0.2.0
 ------
 
  * Added new `templated` type 
-(see [templated type](https://datacraft.readthedocs.io/en/latest/coretypes.html#templated])) e.g:
+(see [templated type](https://datacraft.readthedocs.io/en/latest/coretypes.html#templated)) e.g:
 ```json
 {"filled_in": {"type":  "templated", "data": "{{one}} and {{two}} and a ...", "refs": ["one", "two"]}}
 ```
