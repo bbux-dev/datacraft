@@ -166,13 +166,13 @@ the ``refs`` section of the spec using a ``csv_select`` type to store the common
 .. code-block:: json
 
     {
-      "refs": {,
+      "refs": {
         "CITIES_CSV": {
           "type": "csv_select",
           "data": {
             "NAME": 2,
-            "LATITUDE": 3,
-            "LONGITUDE": 4,
+            "LATITUDE:float": 3,
+            "LONGITUDE": { "col": 4, "cast": "float" },
             "COUNTRY": 5,
             "POPULATION": 10
           },
@@ -230,15 +230,17 @@ for those two refs:
         "GEOMETRY:nested": {
           "fields": {
             "type": "Point",
-            "lat:ref?cast=float": "LATITUDE",
-            "long:ref?cast=float": "LONGITUDE"
+            "coordinates:combine": {
+              "refs": [ "LONGITUDE", "LATITUDE" ],
+              "config": { "as_list": true }
+            }
           }
         },
         "PROPERTIES:nested": {
           "fields": {
             "name:ref": "NAME",
             "country:ref": "COUNTRY",
-            "population:ref?cast=int": "POPULATION"
+            "population:ref": "POPULATION"
           },
           "field_groups": {
             "0.8": ["name", "country", "population"],
@@ -252,11 +254,9 @@ for those two refs:
 Both ``GEOMETRY`` and ``PROPERTIES`` are nested fields. The ``geometry`` element has a field called type and
 the value is set to a constant value "Point". There are other types of geometry, but for this demo we are only
 producing points. The lat and long field are supplied from the csv file using the references that were defined
-earlier. These values need to be cast to floating point numbers, which we do by specifying: ``?cast=float``.
-The properties values also come from the references defined earlier.  The ``PROPERTIES`` reference is a nested type
-and has another property defined ``field_groups``.  These are explained in detail in :ref:`FieldGroups<field_groups>`
-The type here is a weighted one. 80% of the records will contain all three fields in the properties and 20% of the
-time there will only be two.
+earlier.  The ``PROPERTIES`` reference is a nested type and has another property defined ``field_groups``.  These are
+explained in detail in :ref:`FieldGroups<field_groups>` The type here is a weighted one. 80% of the records will
+contain all three fields in the properties and 20% of the time there will only be two.
 
 When running datacraft for this spec, set the ``-i`` or ``--iterations`` argument to 1, since the complete
 structure is encapsulated in a single record.  By default, when writing the output as JSON, the records are
@@ -266,7 +266,16 @@ is produced:
 
 .. code-block:: shell
 
-    $ datacraft -s spec.json -d data -i 1 -r 1 --log-level off -x --format json-pretty -v csv_file=worldcities.csv
+    # Command explanation
+    # datacraft                   - the cli tool
+    # -s geo-json-spec.json       - Run against GeoJSON spec
+    # -i 1                        - a single iteration
+    # -r 1                        - a single record per iterations, i.e. don't output as a list of records
+    # --log-level off             - turn off logging
+    # -x                          - exclude internal fields, not related to the data
+    # --format json-pretty        - output resulting records as indented JSON data
+    # -v csv_file=worldcities.csv - fills in the {{ csv_file }} template arg in the spec
+    $ datacraft -s geo-json-spec.json -d data -i 1 -r 1 --log-level off -x --format json-pretty -v csv_file=worldcities.csv
 
 .. code-block:: json
 
@@ -276,24 +285,29 @@ is produced:
            {
                "geometry": {
                    "type": "Point",
-                   "lat": 22.9958,
-                   "long": -98.9447
+                   "coordinates": [
+                       5.4325,
+                       43.4311
+                   ]
                },
                "properties": {
-                   "name": "Xicoténcatl",
-                   "country": "Mexico"
+                   "name": "Simiane-Collongue",
+                   "country": "France",
+                   "population": 5699
                }
            },
            {
                "geometry": {
                    "type": "Point",
-                   "lat": 40.7186,
-                   "long": -4.2478
+                   "coordinates": [
+                       75.0,
+                       46.85
+                   ]
                },
                "properties": {
-                   "name": "El Espinar",
-                   "country": "Spain",
-                   "population": 9086
+                   "name": "Balqash",
+                   "country": "Kazakhstan",
+                   "population": 78002
                }
            }
        ]
@@ -307,59 +321,61 @@ shell itself to UTF-8.
 
 .. code-block:: shell
 
-    $ datacraft -s spec.json -d data -i 1 -r 1 --log-level off -x --format json-pretty -v csv_file=worldcities.csv --server
+    $ datacraft --server -s geo-json-spec.json-d data -i 1 -r 1 --log-level off -x --format json-pretty -v csv_file=worldcities.csv
 
 
 .. collapse:: Full Version of Data Spec
 
   .. code-block:: json
 
-   {
-     "type": "FeatureCollection",
-     "features": {
-       "type": "nested",
-       "config": {
-         "as_list": true,
-         "count": { "1": 0.6, "2": 0.3, "3": 0.1 }
-       },
-       "fields": {
-         "geometry:ref": "GEOMETRY",
-         "properties:ref": "PROPERTIES"
-       }
-     },
-     "refs": {
-       "GEOMETRY:nested": {
-         "fields": {
-           "type": "Point",
-           "lat:ref?cast=float": "LATITUDE",
-           "long:ref?cast=float": "LONGITUDE"
-         }
-       },
-       "PROPERTIES:nested": {
-         "fields": {
-           "name:ref": "NAME",
-           "country:ref": "COUNTRY",
-           "population:ref?cast=int": "POPULATION"
-         },
-         "field_groups": {
-           "0.8": ["name", "country", "population"],
-           "0.2": ["name", "country"]
-         }
-       },
-       "CITIES_CSV": {
-         "type": "csv_select",
-         "data": {
-           "NAME": 2,
-           "LATITUDE": 3,
-           "LONGITUDE": 4,
-           "COUNTRY": 5,
-           "POPULATION": 10
-         },
-         "config": {
-           "datafile": "{{ csv_file }}",
-           "headers": true,
-           "sample_rows": true
-         }
-       }
-     }
-   }
+    {
+      "type": "FeatureCollection",
+      "features": {
+        "type": "nested",
+        "config": {
+          "as_list": true,
+          "count": { "1": 0.6, "2": 0.3, "3": 0.1 }
+        },
+        "fields": {
+          "geometry:ref": "GEOMETRY",
+          "properties:ref": "PROPERTIES"
+        }
+      },
+      "refs": {
+        "GEOMETRY:nested": {
+          "fields": {
+            "type": "Point",
+            "coordinates:combine": {
+              "refs": [ "LONGITUDE", "LATITUDE" ],
+              "config": { "as_list": true }
+            }
+          }
+        },
+        "PROPERTIES:nested": {
+          "fields": {
+            "name:ref": "NAME",
+            "country:ref": "COUNTRY",
+            "population:ref": "POPULATION"
+          },
+          "field_groups": {
+            "0.8": ["name", "country", "population"],
+            "0.2": ["name", "country"]
+          }
+        },
+        "CITIES_CSV": {
+          "type": "csv_select",
+          "data": {
+            "NAME": 2,
+            "LATITUDE:float": 3,
+            "LONGITUDE": { "col": 4, "cast": "float" },
+            "COUNTRY": 5,
+            "POPULATION:int": 10
+          },
+          "config": {
+            "datafile": "{{ csv_file }}",
+            "headers": true,
+            "sample_rows": true
+          }
+        }
+      }
+    }

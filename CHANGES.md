@@ -1,3 +1,21 @@
+v0.2.1
+------
+* Added typing support to ``csv_select`` field definitions: i.e.
+```json
+{
+   "multiple_csv_fields": {
+      "type": "csv_select",
+      "data": {
+         "one:float": 1,
+         "tre": 3,
+         "svn": {"col": 7, "cast": "int"}
+      },
+      "config": {"datafile": "{{ input_csv }}"}
+   }
+}
+```
+* Fixes for GeoJSON example documentation
+
 v0.2.0
 ------
 
