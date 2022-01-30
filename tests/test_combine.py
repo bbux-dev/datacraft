@@ -119,6 +119,12 @@ def test_combine_list_spec_valid_normal():
     assert supplier.next(2) == 'tresuno'
 
 
+def test_combine_as_list():
+    spec = _combine_spec_refs(["one", "two"], as_list=True)
+    vals = list(spec.generator(1))
+    assert vals[0] == {'field': ['one', 'two']}
+
+
 def _combine_spec_refs(ref_names, **config):
     build = builder.spec_builder() \
         .add_field("field", builder.combine(refs=ref_names, **config))

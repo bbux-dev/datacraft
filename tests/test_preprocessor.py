@@ -160,6 +160,42 @@ csv_select_transform_tests = [
             }
           }
         }
+    ),
+    (
+        {
+            "field": {
+                "type": "csv_select",
+                "data": {
+                    "ONE:float": 1,
+                    "TWO": {"col": 2, "cast": "int"}
+                },
+                "config": {"datafile": "{{ the_name }}"}
+            }
+        },
+        {
+            "ONE": {
+                "type": "csv",
+                "config": {
+                    "cast": "float",
+                    "column": 1,
+                    "config_ref": "field_config_ref"
+                }
+            },
+            "TWO": {
+                "type": "csv",
+                "config": {
+                    "cast": "int",
+                    "column": 2,
+                    "config_ref": "field_config_ref"
+                }
+            },
+            "refs": {
+                "field_config_ref": {
+                    "type": "config_ref",
+                    "config": {"datafile": "{{ the_name }}"}
+                }
+            },
+        }
     )
 ]
 
@@ -169,6 +205,18 @@ def test_preprocess_csv_select(input_spec, expected_output_spec):
     # need first layer of pre-processing done
     updated = loader.preprocess_spec(input_spec)
     assert updated == expected_output_spec
+
+
+specs_missing_config = [
+    {"field": {"type": "csv_select", "data": {"ONE": 1, "TRE": 3}}},
+    {"field": {"type": "csv_select", "data": {"ONE": 1, "TRE": 3}, "config": {}}},
+]
+
+
+@pytest.mark.parametrize("input_spec", specs_missing_config)
+def test_preprocess_csv_select_missing_config(input_spec):
+    with pytest.raises(SpecException):
+        loader.preprocess_spec(input_spec)
 
 
 def _builder_nested(outer_key, inner_key, inner_spec):

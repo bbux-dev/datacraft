@@ -90,9 +90,19 @@ Prototype:
     {
       "<field name>": {
         "type": "csv_select",
-        "data": {"<field_one>": <1 based column index for field 1>, ..., "<field n>": }
+        "data": {
+          "<field_one>": <1 based column index for field 1>,
+          "<field_two>:<cast>": <1 based column index for field 2>,
+          "<field_tre>": {
+            "col": <1 based column index for field 3>,
+            "cast": "<valid cast value i.e. int, float, etc"
+          },
+          ...,
+          "<field n>":
+          }
+        },
         "config": {
-          "datafile": "filename in datedir",
+          "datafile": "filename in datedir, or templated name i.e. {{ to_be_filled }}",
           "headers": "yes, on, true for affirmative",
           "delimiter": "how values are separated, default is comma",
           "quotechar": "how values are quoted, default is double quote"
@@ -107,7 +117,14 @@ Examples:
     {
       "placeholder": {
         "type": "csv_select",
-        "data": {"geonameid": 1, "name": 2, "latitude": 5, "longitude": 6, "country_code": 9, "population": 15},
+        "data": {
+          "geonameid": 1,
+          "name": 2,
+          "latitude:float": 5,
+          "longitude": { "col": 6, "cast": "float" },
+          "country_code": 9,
+          "population:int": 15
+        },
         "config": {
           "datafile": "allCountries.txt",
           "headers": false,
@@ -116,6 +133,8 @@ Examples:
       }
     }
 
+In the example above, the latitude and longitude columns are both cast to floating point numbers and the population
+is cast to an integer. See :ref:`casters` for details on available casting types.
 
 weighted_csv
 ^^^^^^^^^^^^

@@ -59,36 +59,58 @@ def _preprocess_csv_select(raw_spec: dict, is_refs: bool = False) -> dict:
             # run preprocessors on refs too
             updated_specs['refs'] = _preprocess_csv_select(spec, True)
         if 'type' in spec and spec['type'] == 'csv_select':
-            config_ref_name = f'{key}_config_ref'
             # convention is that refs have upper case names
-            if is_refs:
-                config_ref_name = config_ref_name.upper()
-            config_ref = {
-                'type': 'config_ref',
-                'config': spec.get('config', {})
-            }
-            if is_refs:
-                updated_specs[config_ref_name] = config_ref
-            elif 'refs' not in raw_spec:
-                updated_specs['refs'] = {config_ref_name: config_ref}
-            else:
-                updated_specs['refs'][config_ref_name] = config_ref
+            config_ref_name = _add_config_ref_if_needed(key, is_refs, raw_spec, spec, updated_specs)
+            if config_ref_name is None:
+                raise SpecException(f'field {key} in csv_select has invalid configuration for csv type data: {spec}')
             for name, column in spec.get('data', {}).items():
+                cast = None
+                if isinstance(column, dict):
+                    column_number = column.get('col')
+                    cast = column.get('cast', None)
+                else:
+                    column_number = column
+                if ':' in name:
+                    name, cast = name.split(':', 2)
                 spec_for_column = {
                     'type': 'csv',
                     'config': {
-                        'column': column,
+                        'column': column_number,
                         'config_ref': config_ref_name
                     }
                 }
+                if cast:
+                    spec_for_column['config']['cast'] = cast  # type: ignore
                 if name not in raw_spec:
                     updated_specs[name] = spec_for_column
                 else:
-                    alt_name = f'{name}-{column}'
+                    alt_name = f'{name}-{column_number}'
                     updated_specs[alt_name] = spec_for_column
         else:
             updated_specs[key] = spec
     return updated_specs
+
+
+def _add_config_ref_if_needed(key, is_refs, raw_spec, spec, updated_specs):
+    """ adds in the config ref element to appropriate location if it is required.
+    If required return name of config ref, if config is empty returns None for name """
+    config_ref_name = f'{key}_config_ref'
+    if is_refs:
+        config_ref_name = config_ref_name.upper()
+    config = spec.get('config')
+    if config is None or len(config) == 0:
+        return None
+    config_ref = {
+        'type': 'config_ref',
+        'config': config
+    }
+    if is_refs:
+        updated_specs[config_ref_name] = config_ref
+    elif 'refs' not in raw_spec:
+        updated_specs['refs'] = {config_ref_name: config_ref}
+    else:
+        updated_specs['refs'][config_ref_name] = config_ref
+    return config_ref_name
 
 
 @registries.Registry.preprocessors('nested')
