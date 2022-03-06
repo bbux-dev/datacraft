@@ -228,10 +228,10 @@ with the ``--debug-spec`` command line argument. If we run this spec from the co
 Templating
 ----------
 
-The datacraft tool supports templating using the Jinja2 templating engine format. To populate a template file or string
-with the generated values for each iteration, pass the -t /path/to/template (or template string) arg to the datacraft
-command. We use the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine under the hood. The basic format
-is to put the field names in {{ field name }} notation wherever they should be substituted. For example the following
+The datacraft tool supports templating using the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine
+format. To populate a template file or string with the generated values for each iteration, pass the
+``-t /path/to/template`` (or template string) arg to the datacraft command. The basic format for a template is to put
+the field names in ``{{ field name }}`` notation wherever they should be substituted. For example the following
 is a template for bulk indexing data into Elasticsearch.
 
 .. code-block:: json
@@ -239,15 +239,16 @@ is a template for bulk indexing data into Elasticsearch.
    {"index": {"_index": "test", "_id": "{{ id }}"}}
    {"doc": {"name": "{{ name }}", "age": "{{ age }}", "gender": "{{ gender }}"}}
 
-We could then create a spec to populate the id, name, age, and gender fields.
-Such as:
+We could then create a spec to populate the id, name, age, and gender fields. Such as:
 
 .. code-block:: json
 
    {
      "id": {"type": "range", "data": [1, 10]},
      "gender": {"M": 0.48, "F": 0.52},
-     "name": ["bob", "rob", "bobby", "bobo", "robert", "roberto", "bobby joe", "roby", "robi", "steve"],
+     "name": [
+         "bob", "rob", "bobby", "bobo", "robert", "roberto", "bobby joe", "roby", "robi", "steve"
+     ],
      "age": {"type": "range", "data": [22, 44, 2]}
    }
 
@@ -627,8 +628,8 @@ By default, the rows of a CSV file are iterated through in order.  It is possibl
 basis by setting the ``sample`` config value to one of on, yes, or true. If you want to sample a csv file at the row
 level, you need to set the config param ``sample_rows`` to one of on, yes, or true. If this value is set for the
 first csv field from the same file defined, it will be inherited by the rest. If it is not configured on the first
-field, it will not be enabled, even if set on a later field. It is safest to define the field in a config_ref that all
-of the fields share, as illustrated in the above example.
+field, it will not be enabled, even if set on a later field. It is safest to define the sample_rows param in a
+config_ref that all of the fields share, as illustrated in the above example.
 
 Processing Large CSVs
 ^^^^^^^^^^^^^^^^^^^^^
@@ -771,8 +772,6 @@ validation in your code.
 
 See the :ref:`Registry Decorators<registry_decorators>` for the complete list of components that can be expanded or
 registered.
-
-
 
 
 Programmatic Usage
@@ -949,6 +948,7 @@ datacraft dependencies. Please install it first with pip or conda. Example using
 REST Server
 -----------
 
+<<<<<<< HEAD
 Datacraft comes with a lightweight Flask server to use to retrieve generated data. Use the ``--server`` with the optional
 ``--server-endpoint /someendpoint`` flags to launch this server.  The default end point will be found at
 http://127.0.0.1:5000/data. If using a template, each call to the endpoint will return the results of applying a
@@ -964,7 +964,8 @@ For this example we use the inline yaml spec: ``{id:uuid: {}, ts:date.iso: {}}``
 endpoint. The command below will spin up a flask server that will format the record using the json-pretty formatter.
 The records contain a uuid and a timestamp field.
 
-Sever side of the transaction:
+The code block below is the server side of the transaction. Here the tool is serving up data formatted using the
+json-pretty formatter. The records contain a uuid and a timestamp field.
 
 .. code-block:: shell
 
@@ -980,7 +981,8 @@ Sever side of the transaction:
     No more iterations available
     127.0.0.1 - - [23/Nov/2050 20:48:46] "GET /data HTTP/1.1" 204 -
 
-Client side of the transaction:
+
+Here is the client side of the transaction, where we perform a GET request on the /data endpoint.
 
 .. code-block:: bash
 
