@@ -3,8 +3,6 @@ import pytest
 import datacraft
 import datacraft.supplier.calculate
 
-# to trigger registration
-
 simple_calc_data = [
     (
         {'a': 2, 'b': 2},

@@ -83,6 +83,8 @@ def _clean_semi_formatted_yaml(toclean: str):
 
 def _order_spec(raw_spec):
     """ orders the spec by ordering the underlying fields """
+    if isinstance(raw_spec, list):
+        return sorted(raw_spec)
     outer = {}
     for field, spec in raw_spec.items():
         if field == 'refs':
@@ -115,7 +117,7 @@ def _order_field_spec(field_spec):
         ordered['ref'] = field_spec['ref']
     if 'fields' in field_spec:
         fields = field_spec['fields']
-        # these should be full specs themselves
+        # these should be full specs themselves, or possibly lists for case of calculate
         ordered['fields'] = _order_spec(fields)
     if 'config' in field_spec:
         ordered['config'] = field_spec['config']

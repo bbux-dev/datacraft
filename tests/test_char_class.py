@@ -2,7 +2,6 @@ import string
 
 import pytest
 
-# to trigger registration
 from datacraft import builder, field_loader, SpecException
 from datacraft._registered_types.char_class import _CLASS_MAPPING
 

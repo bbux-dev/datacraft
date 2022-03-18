@@ -2,8 +2,6 @@ import yaml
 
 from datacraft.loader import field_loader
 
-# to trigger registration
-
 yaml_spec = '''
 ---
 foo:

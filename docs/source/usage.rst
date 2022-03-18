@@ -1039,17 +1039,6 @@ For this example we use the inline yaml spec: ``{id:uuid: {}, ts:date.iso: {}}``
 endpoint. The command below will spin up a flask server that will format the record using the json-pretty formatter.
 The records contain a uuid and a timestamp field.
 
-=======
-Datacraft comes with a lightweight Flask server to use to retrieve data generated from a Data Spec. Use the
-``--server`` flag to launch this server. Use the optional ``--server-endpoint /someendpoint`` to customize the endpoint.
-The default end point will be found at http://127.0.0.1:5000/data. If using a template, each call to the endpoint will
-return the results of applying a single record to the template. If you specify one of the ``--format`` flags, the
-formatted records will be returned. If neither a formatter or a template are applied, the record for each iteration
-will be returned.
-
-The code block below is the server side of the transaction. Here the tool is serving up data formatted using the
-json-pretty formatter. The records contain a uuid and a timestamp field.
-
 .. code-block:: shell
 
     $ datacraft --inline "{id:uuid: {}, ts:date.iso: {}}" -i 2 --log-level debug --format json-pretty --server

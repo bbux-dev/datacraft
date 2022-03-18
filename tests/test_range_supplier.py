@@ -1,9 +1,6 @@
 from datacraft import builder, field_loader
 
 
-# to trigger registration
-
-
 def test_rand_range():
     spec = builder.spec_builder() \
         .add_field("field", builder.rand_range([100.9, 109.9], cast="int")) \

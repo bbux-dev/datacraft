@@ -6,9 +6,6 @@ import datacraft
 from datacraft import builder, field_loader
 
 
-# to trigger registration
-
-
 def test_geo_lat_default_precision():
     spec = _geo_lat_spec()
     _test_geo_spec_falls_in_range(spec, 'lat', -90.0, 90.0, -4)

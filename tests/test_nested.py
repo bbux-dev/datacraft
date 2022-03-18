@@ -4,9 +4,6 @@ import datacraft
 from datacraft import builder, field_loader
 
 
-# to trigger registration
-
-
 def test_single_nested():
     # Geo
     # - Place

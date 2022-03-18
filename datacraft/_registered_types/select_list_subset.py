@@ -6,14 +6,18 @@ from . import schemas
 
 _log = logging.getLogger(__name__)
 _SELECT_LIST_SUBSET_KEY = 'select_list_subset'
+# alias
+_SAMPLE_KEY = 'sample'
 
 
+@datacraft.registry.schemas(_SAMPLE_KEY)
 @datacraft.registry.schemas(_SELECT_LIST_SUBSET_KEY)
 def _select_list_subset_schema():
     """ schema for select_list_subset type """
     return schemas.load(_SELECT_LIST_SUBSET_KEY)
 
 
+@datacraft.registry.types(_SAMPLE_KEY)
 @datacraft.registry.types(_SELECT_LIST_SUBSET_KEY)
 def _configure_select_list_subset_supplier(field_spec, loader):
     """ configures supplier for select_list_subset type """
