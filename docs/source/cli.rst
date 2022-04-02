@@ -68,8 +68,7 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    {"id": "549e418c-ade0-4995-befb-0149b3566e5e", "ts": "14-11-2050"}
-    {"id": "def0be82-2469-433b-a207-1eff54f3ba2c", "ts": "14-11-2050"}
+    [{"id": "732376df-9adc-413e-8493-73555fae51f9", "ts": "21-04-2022"}, {"id": "d826774a-1eeb-4e35-8253-0b00a514c0d1", "ts": "02-04-2022"}]
 
 .. code-block:: shell
 
@@ -77,14 +76,16 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    {
-        "id": "6f05c635-bf2c-4096-95ef-c3fa15bedbb3",
-        "ts": "29-11-2050"
-    }
-    {
-        "id": "8420ff4a-92ca-4218-b399-edcb8954f822",
-        "ts": "28-11-2050"
-    }
+   [
+       {
+           "id": "4a75d0fc-46b7-4c9b-82f1-c87dcee13674",
+           "ts": "09-04-2022"
+       },
+       {
+           "id": "62db293b-d8f8-4c9a-8653-6dba8713bab9",
+           "ts": "13-04-2022"
+       }
+   ]
 
 .. code-block:: shell
 
@@ -94,6 +95,29 @@ separated value line. Examples:
 
     f8b87f46-ebda-4364-a042-21e6ac117762,09-12-2050
     3b0c236c-3882-4242-9f3b-053ab3da4be8,12-12-2050
+
+Records Per File
+----------------
+
+When writing results to a file, the default behavior is to write all records to a single file. You can modify this
+by specifying the ``-r`` or ``--records-per-file`` command line argument. The behavior is different when hosting the
+generated data with the ``--server`` option. In this case the default is to return a single record at a time. Use the
+same ``--records-per-file`` command line argument to return more that one record per request.
+
+Examples:
+
+.. code-block:: shell
+
+   datacraft --inline "{timestamp:date: {}}" -i 4 -r 2 --log-level off --format json -x
+   [{"timestamp": "25-04-2022"}, {"timestamp": "06-04-2022"}]
+   [{"timestamp": "09-04-2022"}, {"timestamp": "09-04-2022"}]
+
+
+.. code-block:: shell
+
+   datacraft --inline "{timestamp:date: {}}" -i 4  --log-level off --format json -x
+   [{"timestamp": "22-04-2022"}, {"timestamp": "03-04-2022"}, {"timestamp": "10-04-2022"}, {"timestamp": "06-04-2022"}]
+
 
 Apply Raw
 ---------

@@ -2,7 +2,8 @@
 Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
-from typing import Union, Tuple, List, Any, Generator, Iterator
+from collections.abc import Iterator
+from typing import Union, Tuple, List, Any, Generator
 
 
 class DataSpec(dict):

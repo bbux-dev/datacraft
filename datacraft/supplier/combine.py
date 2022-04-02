@@ -6,7 +6,9 @@ from typing import List
 from .model import ValueSupplierInterface
 
 
-def combine_supplier(suppliers_list: List[ValueSupplierInterface], join_with: str, as_list: bool) -> ValueSupplierInterface:
+def combine_supplier(suppliers_list: List[ValueSupplierInterface],
+                     join_with: str,
+                     as_list: bool) -> ValueSupplierInterface:
     """
     Args:
         suppliers_list: list of suppliers to combine in order of combination

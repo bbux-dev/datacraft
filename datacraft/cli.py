@@ -46,7 +46,7 @@ def parseargs(argv):
                         help='Extension to add to generated files, default is none')
     parser.add_argument('-t', '--template',
                         help='Path to template to populate, or template inline as a string')
-    parser.add_argument('-r', '--records-per-file', dest='records_per_file', default=sys.maxsize, type=int,
+    parser.add_argument('-r', '--records-per-file', dest='records_per_file', default=None, type=int,
                         help='Number of records to place in each file, default is all, requires -o to be specified')
     parser.add_argument('-k', '--printkey', action='store_true', default=False,
                         help='When printing to stdout field name should be printed along with value')
@@ -217,7 +217,10 @@ def _get_writer(args):
 def _get_output(args, processor, writer):
     """ get the output from the args, processor, and writer """
     if processor:
-        return outputs.record_level(processor, writer, args.records_per_file)
+        records_per_file = args.records_per_file
+        if records_per_file is None:
+            records_per_file = sys.maxsize
+        return outputs.record_level(processor, writer, records_per_file)
 
     return outputs.single_field(writer, args.printkey)
 

@@ -8,7 +8,7 @@ Examples:
     >>> builder.range_spec('ages', data=[22, 33])
     {'names': {'type': 'values', 'data': ['amy', 'bob', 'cat', 'dan']}, 'ages': {'type': 'range', 'data': [22, 33]}}
 
-    >>> refs = spec_builder.refs()
+    >>> refs = builder.refs()
     >>> one = refs.values('ONE', ["A", "B", "C"])
     >>> two = refs.values('TWO', [1, 2, 3])
     >>> builder.combine('combine', refs=[one, two])
@@ -533,6 +533,7 @@ class Builder:
             self for chaining invocations
 
         Examples:
+            >>> import datacraft
             >>> builder = datacraft.spec_buider()
             >>> builder.add_fields(FIELDNAME1=builder.some_spec(with_args), FIELDNAME2=builder.another_spec(with_args)
         )
@@ -553,6 +554,7 @@ class Builder:
             self for chaining invocations
 
         Examples:
+            >>> import datacraft
             >>> builder = datacraft.spec_buider()
             >>> builder.add_field("field1", builder.some_spec(with_args))
             >>> builder.add_field("field2", builder.another_spec(with_args))
@@ -577,6 +579,7 @@ class Builder:
             self for chaining invocations
 
         Examples:
+            >>> import datacraft
             >>> builder = datacraft.spec_buider()
             >>> builder.add_refs(
             ...     REFNAME1=builder.some_spec(with_args),
@@ -598,6 +601,7 @@ class Builder:
             self for chaining invocations
 
         Examples:
+            >>> import datacraft
             >>> builder = datacraft.spec_builder()
             >>> builder.add_ref("ref1", builder.some_spec(with_args))
             >>> builder.add_ref("ref2", builder.another_spec(with_args))
