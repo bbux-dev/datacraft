@@ -76,11 +76,11 @@ number between 1 and 100 that is cast to an integer. If we run this spec and spe
 .. code-block:: shell
 
     $ datacraft -s demo.json --log-level off -i 5 --format json -x
-    {"id": "706bf38c-02a8-4087-bf41-62cdf4963f0b", "timestamp": "2021-11-30T05:21:14", "count": 59}
-    {"id": "d96bad3e-45c3-424e-9d4e-1233f9ed6ab5", "timestamp": "2021-11-09T20:21:03", "count": 61}
-    {"id": "ff3b8d87-ab3d-4ebe-af35-a081ee5098b5", "timestamp": "2021-11-05T08:24:05", "count": 36}
-    {"id": "b6fbd17f-286b-4d58-aede-01901ae7a1d7", "timestamp": "2021-11-10T09:37:47", "count": 16}
-    {"id": "f4923efa-28c5-424a-8560-49914dd2b2ac", "timestamp": "2021-11-19T17:28:13", "count": 29}
+    {"id": "706bf38c-02a8-4087-bf41-62cdf4963f0b", "timestamp": "2050-11-30T05:21:14", "count": 59}
+    {"id": "d96bad3e-45c3-424e-9d4e-1233f9ed6ab5", "timestamp": "2050-11-09T20:21:03", "count": 61}
+    {"id": "ff3b8d87-ab3d-4ebe-af35-a081ee5098b5", "timestamp": "2050-11-05T08:24:05", "count": 36}
+    {"id": "b6fbd17f-286b-4d58-aede-01901ae7a1d7", "timestamp": "2050-11-10T09:37:47", "count": 16}
+    {"id": "f4923efa-28c5-424a-8560-49914dd2b2ac", "timestamp": "2050-11-19T17:28:13", "count": 29}
 
 There are other output formats available and a mechanism to register custom formatters. If a csv file is more suited
 for your needs:
@@ -88,11 +88,11 @@ for your needs:
 .. code-block:: shell
 
     $ datacraft -s demo.json --log-level off -i 5 --format csv -x
-    1ad0b69b-0843-4c0d-90a3-d7b77574a3af,2021-11-21T21:24:44,2
-    b504d688-6f02-4d41-8b05-f55a681b940a,2021-11-14T15:29:59,76
-    11502944-dacb-4812-8d73-e4ba693f2c05,2021-11-24T00:17:55,98
-    8370f761-66b1-488e-9327-92a7b8d795b0,2021-11-08T02:55:11,4
-    ff3d9f36-6560-4f26-8627-e18dea66e26b,2021-11-15T07:33:42,89
+    1ad0b69b-0843-4c0d-90a3-d7b77574a3af,2050-11-21T21:24:44,2
+    b504d688-6f02-4d41-8b05-f55a681b940a,2050-11-14T15:29:59,76
+    11502944-dacb-4812-8d73-e4ba693f2c05,2050-11-24T00:17:55,98
+    8370f761-66b1-488e-9327-92a7b8d795b0,2050-11-08T02:55:11,4
+    ff3d9f36-6560-4f26-8627-e18dea66e26b,2050-11-15T07:33:42,89
 
 Spec Formats
 ------------
@@ -952,40 +952,48 @@ REST Server
 Datacraft comes with a lightweight Flask server to use to retrieve generated data. Use the ``--server`` with the optional
 ``--server-endpoint /someendpoint`` flags to launch this server.  The default end point will be found at
 http://127.0.0.1:5000/data. If using a template, each call to the endpoint will return the results of applying a
-single record to the template data. If you specify one of the ``--format`` flags, the formatted record will be returned.
-If neither a formatter or a template are applied, the record for each itertion will be returned.
+single record to the template data. If you specify one of the ``--format`` flags, the formatted record will be returned
+as a string. If neither a formatter or a template are applied, the record for each iteration will be returned as JSON.
+Note that using the ``--records-per-file`` with a number greater than one and a --format of json or json-pretty, will
+produce escaped JSON, which is probably not what you want.
 
-Server side of the transaction, serving up data formatted using the json-pretty formatter. The records contain a
-uuid and a timestamp field.
+Example
+^^^^^^^
+
+For this example we use the inline yaml spec: ``{id:uuid: {}, ts:date.iso: {}}`` as the data we want returned from our
+endpoint. The command below will spin up a flask server that will format the record using the json-pretty formatter.
+The records contain a uuid and a timestamp field.
+
+Sever side of the transaction:
 
 .. code-block:: shell
 
-    $ datacraft --inline "{id:uuid: {}, ts:date: {}}" -i 2 --log-level debug --format json-pretty --server
+    $ datacraft --inline "{id:uuid: {}, ts:date.iso: {}}" -i 2 --log-level debug --format json-pretty --server
      * Serving Flask app 'datacraft.server' (lazy loading)
      * Environment: production
        WARNING: This is a development server. Do not use it in a production deployment.
        Use a production WSGI server instead.
      * Debug mode: off
      * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-    127.0.0.1 - - [23/Nov/2021 20:48:41] "GET /data HTTP/1.1" 200 -
-    127.0.0.1 - - [23/Nov/2021 20:48:44] "GET /data HTTP/1.1" 200 -
+    127.0.0.1 - - [23/Nov/2050 20:48:41] "GET /data HTTP/1.1" 200 -
+    127.0.0.1 - - [23/Nov/2050 20:48:44] "GET /data HTTP/1.1" 200 -
     No more iterations available
-    127.0.0.1 - - [23/Nov/2021 20:48:46] "GET /data HTTP/1.1" 204 -
+    127.0.0.1 - - [23/Nov/2050 20:48:46] "GET /data HTTP/1.1" 204 -
 
-Client side of the transaction
+Client side of the transaction:
 
 .. code-block:: bash
 
     $ curl -s -w "\n%{http_code}\n%" http://127.0.0.1:5000/data
     {
-        "id": "505b62d6-0d21-4965-92a7-f719463fdb0b",
-        "ts": "03-12-2050"
+        "id": "b614698e-1429-4ff7-ac6a-223b26e18b31",
+        "ts": "2050-04-25T08:11:41"
     }
     200
     $ curl -s -w "\n%{http_code}\n%" http://127.0.0.1:5000/data
     {
-        "id": "51e5d07b-4d46-48d7-9523-e1e0ecf723f3",
-        "ts": "09-12-2050"
+       "id": "116a0531-0062-42bc-9224-27774851022b",
+       "ts": "2050-04-27T16:53:04"
     }
     200
     $ curl -s -w "\n%{http_code}\n%" http://127.0.0.1:5000/data

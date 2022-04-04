@@ -4,12 +4,12 @@ Entry point for datacraft tool
 """
 import sys
 
-from . import cli
-from .exceptions import SpecException
+from . import cli, suppliers
 from .supplier.exceptions import SupplierException
 # this activates the decorators, so they will be discoverable
 from .preprocessor import *
 from .logging_handler import *
+
 
 _log = logging.getLogger(__name__)
 
@@ -33,7 +33,13 @@ def main(argv):
         try:
             from . import server
             using_template_or_formatter = args.template or args.format
-            server.run(generator, args.endpoint, data_is_json=(not using_template_or_formatter))
+            records_per_file = args.records_per_file
+            if records_per_file is None:
+                records_per_file = 1
+            server.run(generator,
+                       args.endpoint,
+                       data_is_json=(not using_template_or_formatter),
+                       count_supplier=suppliers.count_supplier(count=records_per_file))
         except ModuleNotFoundError:
             _log.warning('--server mode requires flask, pip/conda install flask and rerun command')
     else:

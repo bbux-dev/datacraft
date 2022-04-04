@@ -17,8 +17,6 @@ from .supplier.common import weighted_values_explicit
 from .supplier.nested import nested_supplier
 # for refs
 from .supplier.refs import weighted_ref_supplier
-# for unicode ranges
-from .supplier.unicode import unicode_range_supplier
 # for calculate
 from .suppliers import calculate
 
@@ -731,6 +729,7 @@ def _select_list_subset_schema():
 def _configure_select_list_subset_supplier(field_spec, loader):
     """ configures supplier for select_list_subset type """
     config = utils.load_config(field_spec, loader)
+    data = None
     if config is None or ('mean' not in config and 'count' not in config):
         raise SpecException('Config with mean or count defined must be provided: %s' % json.dumps(field_spec))
     if 'ref' in field_spec and 'data' in field_spec:
@@ -748,6 +747,9 @@ def _configure_select_list_subset_supplier(field_spec, loader):
             data = field_spec
     elif 'data' in field_spec:
         data = field_spec.get('data')
+    if data is None:
+        raise SpecException(
+            'Unable to identify data for ' + _SELECT_LIST_SUBSET_KEY + ' for spec: ' + json.dumps(field_spec))
     return suppliers.select_list_subset(data, **config)
 
 

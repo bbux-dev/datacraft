@@ -38,7 +38,7 @@ def calculate_supplier(suppliers: Dict[str, ValueSupplierInterface], engine: Rec
         >>> formula = "{{ft}} * 30.48"
         >>> suppliers = { "ft": suppliers.values([4, 5, 6]) }
         >>> calculate = _CalculateSupplier(suppliers=suppliers, formula=formula)
-        >>> asssert calculate.next(0) == 121.92
+        >>> assert calculate.next(0) == 121.92
     """
     return _CalculateSupplier(suppliers, engine)
 
