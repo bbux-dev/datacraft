@@ -773,6 +773,80 @@ validation in your code.
 See the :ref:`Registry Decorators<registry_decorators>` for the complete list of components that can be expanded or
 registered.
 
+Custom Types Entry Point
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Datacraft provides a way to discover registered types using the `datacraft.custom_type_loader` entry point. At load
+time all the entry points for this key are loaded. This allows you users to create their own libraries and packages
+that use the `@datacraft.registry.*` decorators. To add an entry point to your setup.cfg or setup.py for the
+`datacraft.custom_type_loader`:
+
+.. tabs::
+
+   .. tab:: setup.cfg
+
+      .. code-block::
+
+         [options.entry_points]
+         datacraft.custom_type_loader =
+             mycustomstuff = mypackage:load_custom
+
+   .. tab:: setup.py
+
+      .. code-block:: python
+
+         from setuptools import setup
+
+         setup(
+             name='toolname',
+             version='0.0.1',
+             packages=['mypackage'],
+             # ...
+             entry_points={
+                 'datacraft.custom_type_loader': ['mycustomstuff=mypackage:load_custom']
+             }
+         )
+
+Then in the `mypackage` `__init__.py` you can define `load_custom`:
+
+.. code-block:: python
+
+   import datacraft
+
+   class ReverseStringSupplier(datacraft.ValueSupplierInterface):
+       def __init__(self, wrapped):
+           self.wrapped = wrapped
+
+       def next(self, iteration):
+           # value from the wrapped supplier
+           value = str(self.wrapped.next(iteration))
+           # python way to reverse a string, hehe
+           return value[::-1]
+
+   def load_custom():
+      @datacraft.registry.types('reverse_string')
+      def configure_supplier(field_spec: dict,
+                             loader: datacraft.Loader) -> datacraft.ValueSupplierInterface:
+          # load the supplier for the given ref
+          key = field_spec.get('ref')
+          wrapped = loader.get(key)
+          # wrap this with our custom reverse string supplier
+          return ReverseStringSupplier(wrapped)
+
+      @datacraft.registry.schemas('reverse_string')
+      def get_reverse_string_schema():
+          return {
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "$id": "reverse_string.schema.json",
+              "type": "object",
+              "required": ["type", "ref"],
+              "properties": {
+                  "type": {"type": "string", "pattern": "^reverse_string$"},
+                  "ref": {"type": "string"}
+              }
+          }
+
+Note that the decorated functions are defined nested inside the load_custom() function.
 
 Programmatic Usage
 ------------------
