@@ -1,6 +1,6 @@
 import string
 import pytest
-from datacraft import builder, Loader, SpecException, SupplierException
+from datacraft import builder, field_loader, SpecException, SupplierException
 # to trigger registration
 from datacraft import cli
 from datacraft import _registered_types
@@ -11,35 +11,35 @@ def test_char_class_no_data_element():
     spec['name'].pop('data')
 
     with pytest.raises(SpecException):
-        Loader(spec).get('name')
+        field_loader(spec).get('name')
 
 
 def test_char_class_special_exclude():
     exclude = "&?!."
     spec = _char_class_spec(data="special", min=1, max=5, exclude=exclude)
 
-    supplier = Loader(spec).get('name')
+    supplier = field_loader(spec).get('name')
     _verify_values(supplier, 1, 5, exclude)
 
 
 def test_char_class_word():
     spec = _char_class_spec(data="special", count=4)
 
-    supplier = Loader(spec).get('name')
+    supplier = field_loader(spec).get('name')
     _verify_values(supplier, 4, 4)
 
 
 def test_char_class_stats_config():
     spec = _char_class_spec(data="word", mean=5, stddev=2, min=3, max=8)
 
-    supplier = Loader(spec).get('name')
+    supplier = field_loader(spec).get('name')
     _verify_values(supplier, 3, 8)
 
 
 def test_char_class_printable():
     spec = _cc_abbrev_spec(abbrev="printable", mean=3, stddev=2, min=1, max=5)
 
-    supplier = Loader(spec).get('name')
+    supplier = field_loader(spec).get('name')
     _verify_values(supplier, 1, 5)
 
 
@@ -49,7 +49,7 @@ def test_char_class_abbreviations():
     for abbreviation in abbreviations:
         spec = _cc_abbrev_spec(abbrev=abbreviation, count=7)
 
-        supplier = Loader(spec).get('name')
+        supplier = field_loader(spec).get('name')
         _verify_values(supplier, 7, 7)
 
 
@@ -57,7 +57,7 @@ def test_char_class_multiple_classes():
     exclude = "CUSTOM"
     spec = _char_class_spec(data=["lower", "digits", "CUSTOM"], exclude=exclude)
 
-    supplier = Loader(spec).get('name')
+    supplier = field_loader(spec).get('name')
     value = supplier.next(0)
     assert isinstance(value, str)
     for char in value:

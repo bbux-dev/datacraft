@@ -1,6 +1,6 @@
 import string
 import pytest
-from datacraft import builder, Loader, SpecException
+from datacraft import builder, field_loader, SpecException
 # to trigger registration
 from datacraft import cli
 
@@ -10,19 +10,19 @@ def test_unicode_no_data_element():
     spec['field'].pop('data')
 
     with pytest.raises(SpecException):
-        Loader(spec).get("field")
+        field_loader(spec).get("field")
 
 
 def test_unicode_data_is_not_list():
     spec = builder.single_field("field", builder.unicode_range(data="0x3040,0x309f")).build()
     with pytest.raises(SpecException):
-        Loader(spec).get("field")
+        field_loader(spec).get("field")
 
 
 def test_unicode_range_single_range_as_hex():
     field_spec = builder.unicode_range(data=[0x3040, 0x309f], count=5)
     spec = builder.single_field("text", field_spec).build()
-    supplier = Loader(spec).get('text')
+    supplier = field_loader(spec).get('text')
     first = supplier.next(0)
     for c in first:
         assert 0x3040 <= ord(c) <= 0x309f
@@ -31,7 +31,7 @@ def test_unicode_range_single_range_as_hex():
 def test_unicode_range_single_range_as_hex_strings():
     field_spec = builder.unicode_range(data=[0x3040, 0x309f], mean=5, stddev=2, min=2, max=7)
     spec = builder.single_field("text", field_spec).build()
-    supplier = Loader(spec).get('text')
+    supplier = field_loader(spec).get('text')
     first = supplier.next(0)
     assert 2 <= len(first) <= 7
     for c in first:
@@ -46,7 +46,7 @@ def test_unicode_multiple_ranges():
     field_spec = builder.unicode_range(data=data, min=3, max=7)
     spec = builder.single_field("text", field_spec).build()
 
-    supplier = Loader(spec).get('text')
+    supplier = field_loader(spec).get('text')
     first = supplier.next(0)
     assert 3 <= len(first) <= 7
     for c in first:

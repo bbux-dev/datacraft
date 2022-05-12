@@ -1,7 +1,7 @@
 import pytest
 
 import datacraft
-from datacraft import builder, Loader
+from datacraft import builder, field_loader
 # to trigger registration
 from datacraft import cli
 
@@ -17,7 +17,7 @@ def test_single_nested():
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build())) \
         .build()
-    supplier = Loader(spec).get('geo')
+    supplier = field_loader(spec).get('geo')
 
     first = supplier.next(0)
     assert isinstance(first, dict)
@@ -39,7 +39,7 @@ def test_multi_nested():
         .add_field("id:uuid", {}) \
         .add_field("user", builder.nested(fields=user_spec.build())) \
         .build()
-    supplier = Loader(spec).get('user')
+    supplier = field_loader(spec).get('user')
 
     first = supplier.next(0)
     assert isinstance(first, dict)
@@ -61,7 +61,7 @@ def test_single_nested_as_list():
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build(), as_list=True)) \
         .build()
-    supplier = Loader(spec).get('geo')
+    supplier = field_loader(spec).get('geo')
 
     first = supplier.next(0)
     assert isinstance(first, list)

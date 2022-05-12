@@ -1,7 +1,7 @@
 import os
 import pytest
 import datacraft
-from datacraft.loader import Loader
+from datacraft.loader import field_loader
 import datacraft.registries as registries
 from datacraft.utils import load_custom_code
 from datacraft import casters
@@ -36,7 +36,7 @@ def configure_supplier(field_spec, loader):
 
 
 def test_registry_from_local():
-    loader = Loader(spec)
+    loader = field_loader(spec)
 
     reg = registries.Registry
     all_types = reg.types.get_all()
@@ -51,7 +51,7 @@ def test_registry_from_file():
     # string_reverser, same as above just different key
     load_custom_code(os.path.join(test_dir, 'custom.py'))
 
-    loader = Loader(spec)
+    loader = field_loader(spec)
 
     reg = registries.Registry
     all_types = reg.types.get_all()

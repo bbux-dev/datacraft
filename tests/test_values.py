@@ -1,4 +1,4 @@
-from datacraft import Loader
+from datacraft import field_loader
 import datacraft.suppliers as suppliers
 from datacraft.loader import preprocess_spec
 from datacraft.exceptions import SpecException
@@ -99,14 +99,14 @@ def test_config_ref_for_values():
     spec = builder.single_field("name?config_ref=quoteit", ["bob", "joe", "ann", "sue"]) \
         .add_ref("quoteit", builder.config_ref(quote="\"")) \
         .build()
-    supplier = Loader(spec).get('name')
+    supplier = field_loader(spec).get('name')
     assert supplier.next(0) == '"bob"'
 
 
 def test_values_list_order():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spec = builder.single_field('field', data).build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     values = [supplier.next(i) for i in range(10)]
     assert values == data
@@ -115,7 +115,7 @@ def test_values_list_order():
 def test_values_count_as_list():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spec = builder.single_field('field', builder.values(data, count=[2, 3])).build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     first = supplier.next(0)
     assert isinstance(first, list) and len(first) == 2

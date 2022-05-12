@@ -1,7 +1,7 @@
 # to trigger registration
 import pytest
 
-from datacraft import builder, suppliers, Loader, SupplierException
+from datacraft import builder, suppliers, field_loader, SupplierException
 from datacraft.supplier.refs import weighted_ref_supplier
 # to trigger registration
 from datacraft import cli
@@ -40,7 +40,7 @@ def test_weighed_ref_count_as_list():
         .add_ref('tre', 'tres') \
         .build()
 
-    loader = Loader(spec)
+    loader = field_loader(spec)
     supplier = loader.get('field')
     first = supplier.next(0)
 

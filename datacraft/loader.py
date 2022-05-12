@@ -6,13 +6,13 @@ delegating the handling of various data types.
 import json
 import logging
 from typing import Any, Dict, Union
+from abc import ABC, abstractmethod
 
-from . import utils, suppliers
+from . import utils, suppliers, entrypoints
 from .exceptions import SpecException
 from .supplier.model import DataSpec, ValueSupplierInterface
 from .schemas import validate_schema_for_spec
 from .registries import lookup_type, lookup_schema, Registry
-
 
 _log = logging.getLogger(__name__)
 
@@ -39,9 +39,74 @@ class Refs:
         return self.refspec.get(key)
 
 
-class Loader:
+class Loader(ABC):
     """Parent object for loading value suppliers from specs """
-    RESERVED = ['type', 'data', 'ref', 'refs', 'config']
+
+    @property
+    @abstractmethod
+    def spec(self):
+        """get the preprocessed field specs for this loader"""
+
+    @abstractmethod
+    def get(self, key: str) -> ValueSupplierInterface:
+        """
+        Retrieve the value supplier for the given field or ref key
+
+        Args:
+            key: key to for field or ref name
+
+        Returns:
+            the Value Supplier for the given key
+
+        Raises:
+            SpecException if key not found
+        """
+
+    @abstractmethod
+    def get_from_spec(self, field_spec: Any) -> ValueSupplierInterface:
+        """
+        Retrieve the value supplier for the given field spec
+
+        Args:
+            field_spec: dictionary spec or literal values
+
+        Returns:
+            the Value Supplier for the given spec
+
+        Raises:
+            SpecException if unable to resolve the spec with appropriate handler for the type
+        """
+
+    @abstractmethod
+    def get_ref(self, key: str) -> dict:
+        """
+        returns the spec for the ref with the provided key
+
+        Args:
+             key: key to lookup ref by
+
+        Returns:
+            Ref for key
+        """
+
+
+def field_loader(data_spec, data_dir='./data', enforce_schema=False) -> Loader:
+    """Loader for loading fields suppliers from data spec
+
+    Args:
+        data_spec: to use for loading
+        data_dir: where to look for external data files
+        enforce_schema: if schemas should be enforced
+
+    Returns:
+
+    """
+    entrypoints.load_eps()
+    return _LoaderImpl(data_spec, data_dir, enforce_schema)
+
+
+class _LoaderImpl(Loader):
+    """Field loader implementation """
 
     def __init__(self, data_spec, data_dir='./data', enforce_schema=False):
         raw_spec = utils.get_raw_spec(data_spec)
@@ -50,6 +115,10 @@ class Loader:
         self.enforce_schema = enforce_schema
         self.cache = {}
         self.refs = Refs(self.specs.get('refs'))
+
+    @property
+    def spec(self):
+        return self.specs
 
     def get(self, key: str) -> ValueSupplierInterface:
         """

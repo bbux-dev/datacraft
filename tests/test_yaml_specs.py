@@ -1,7 +1,7 @@
 import yaml
 import json
 
-from datacraft.loader import Loader
+from datacraft.loader import field_loader
 # to trigger registration
 from datacraft import cli
 
@@ -35,7 +35,7 @@ refs:
 
 def test_load_yaml():
     spec = yaml.load(yaml_spec, Loader=yaml.FullLoader)
-    loader = Loader(spec)
+    loader = field_loader(spec)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == 'dog'
@@ -45,7 +45,7 @@ def test_load_yaml():
 
 def test_load_yaml_shorthand():
     spec = yaml.load(yaml_shorthand_spec, Loader=yaml.FullLoader)
-    loader = Loader(spec)
+    loader = field_loader(spec)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == '"dog"'
