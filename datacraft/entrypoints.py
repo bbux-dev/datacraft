@@ -20,7 +20,7 @@ _eps_loaded = _EpsLoadedMark()
 def load_eps():
     """initiate any custom entry points"""
     if _eps_loaded.mark:
-        _log.debug('Mark Already Set')
+        _log.debug('Entry Points already loaded')
         return
     eps = metadata.entry_points().get('datacraft.custom_type_loader', [])
 
