@@ -1,6 +1,6 @@
 import pytest
 
-from datacraft import builder, Loader, SpecException
+from datacraft import builder, field_loader, SpecException
 # to trigger registration
 from datacraft import cli
 
@@ -9,7 +9,7 @@ def test_rand_range():
     spec = builder.spec_builder() \
         .add_field("field", builder.rand_range([100.9, 109.9], cast="int")) \
         .build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     first = supplier.next(0)
     assert str(first).isnumeric()
@@ -23,7 +23,7 @@ def test_nested_range_lists_simple():
         [20, 30]
     ]
     spec = builder.single_field("field:range", data).build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     first = supplier.next(0)
     assert 0 <= first <= 10
@@ -37,7 +37,7 @@ def test_nested_range_lists_mixed_types_and_step():
         [20.0, 30.0]
     ]
     spec = builder.single_field("field:range", data).build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     first = supplier.next(0)
     assert first % 2 == 0
@@ -52,7 +52,7 @@ def test_nested_range_lists_mixed_types_and_step_cast():
         [20.01234, 30.56789]
     ]
     spec = builder.single_field("field:range?cast=str&precision=2", data).build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     assert supplier.next(0) == '0.5'
     assert supplier.next(1) == '20.01'
@@ -61,7 +61,7 @@ def test_nested_range_lists_mixed_types_and_step_cast():
 def test_range_wrap_around():
     data = [1, 3]
     spec = builder.single_field("field:range", data).build()
-    supplier = Loader(spec).get('field')
+    supplier = field_loader(spec).get('field')
 
     vals = [supplier.next(i) for i in range(4)]
     assert vals == [1, 2, 3, 1]

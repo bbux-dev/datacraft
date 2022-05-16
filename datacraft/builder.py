@@ -22,7 +22,7 @@ from typing import Any, Union, Dict, List
 from typing import Generator
 
 from . import registries, utils
-from .loader import Loader, preprocess_spec
+from .loader import preprocess_spec, field_loader
 from .supplier import key_suppliers
 from .supplier.model import DataSpec, RecordProcessor
 from .outputs import OutputHandlerInterface
@@ -1475,9 +1475,9 @@ class _DataSpecImpl(DataSpec):
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
         output: OutputHandlerInterface = kwargs.get('output', None)
-        loader = Loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
+        loader = field_loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
-        key_provider = key_suppliers.from_spec(loader.specs)
+        key_provider = key_suppliers.from_spec(loader.spec)
 
         for i in range(0, iterations):
             group, keys = key_provider.get()

@@ -12,3 +12,5 @@ jsonschema~=3.2.0
 asteval~=0.9.25
 # for 3.6 builds
 importlib-resources~=5.2.2
+# for custom code loading
+importlib-metadata~=4.8.2

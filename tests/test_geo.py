@@ -3,7 +3,7 @@ import decimal
 import pytest
 
 import datacraft
-from datacraft import builder, Loader
+from datacraft import builder, field_loader
 # to trigger registration
 from datacraft import cli
 
@@ -26,7 +26,7 @@ def test_geo_long_precision():
 def test_geo_long_invalid_precision():
     spec = _geo_long_spec(precision=3.3)
     with pytest.raises(datacraft.SpecException):
-        Loader(spec).get('long').next(0)
+        field_loader(spec).get('long').next(0)
 
 
 def test_geo_long_precision_shorthand():
@@ -35,14 +35,14 @@ def test_geo_long_precision_shorthand():
 
 
 def _test_geo_spec_falls_in_range(spec, key, start, end, exponent):
-    supplier = Loader(spec).get(key)
+    supplier = field_loader(spec).get(key)
     value = supplier.next(0)
     _verify_in_range_and_has_precision(value, start, end, exponent)
 
 
 def test_geo_spec_pair_default_order():
     spec = _geo_pair_spec(precision=1)
-    supplier = Loader(spec).get('pair')
+    supplier = field_loader(spec).get('pair')
     value = supplier.next(0)
     parts = value.split(',')
     _verify_long(parts[0], -1)
@@ -51,7 +51,7 @@ def test_geo_spec_pair_default_order():
 
 def test_geo_spec_pair_lat_first():
     spec = _geo_pair_spec(precision=2, lat_first="yes")
-    supplier = Loader(spec).get('pair')
+    supplier = field_loader(spec).get('pair')
     value = supplier.next(0)
     parts = value.split(',')
     _verify_long(parts[1], -2)
@@ -69,7 +69,7 @@ def test_geo_spec_pair_reduced_ranges():
         start_long=start_long,
         end_long=end_long)
 
-    supplier = Loader(spec).get('pair')
+    supplier = field_loader(spec).get('pair')
     value = supplier.next(0)
     parts = value.split(',')
     _verify_in_range_and_has_precision(parts[0], start_long, end_long, -4)
@@ -84,7 +84,7 @@ def test_geo_spec_pair_reduced_ranges_bbox():
 
     spec = _geo_pair_spec(bbox=[start_long, start_lat, end_long, end_lat])
 
-    supplier = Loader(spec).get('pair')
+    supplier = field_loader(spec).get('pair')
     value = supplier.next(0)
     parts = value.split(',')
     _verify_in_range_and_has_precision(parts[0], start_long, end_long, -4)
@@ -94,7 +94,7 @@ def test_geo_spec_pair_reduced_ranges_bbox():
 def test_geo_spec_pair_invalid_bbox():
     spec = _geo_pair_spec(bbox='1,2,3,4')
     with pytest.raises(datacraft.SpecException):
-        Loader(spec).get('pair').next(0)
+        field_loader(spec).get('pair').next(0)
 
 
 def test_geo_pair_as_list():
@@ -105,7 +105,7 @@ def test_geo_pair_as_list():
 
     spec = _geo_pair_spec(bbox=[start_long, start_lat, end_long, end_lat], as_list=True)
     
-    supplier = Loader(spec).get('pair')
+    supplier = field_loader(spec).get('pair')
     value = supplier.next(0)
     assert isinstance(value, list)
     _verify_in_range_and_has_precision(value[0], start_long, end_long, -4)

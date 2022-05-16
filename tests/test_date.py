@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 import datacraft
-from datacraft.loader import Loader
+from datacraft.loader import field_loader
 from datacraft import builder
 # to trigger registration
 from datacraft import cli
@@ -70,7 +70,7 @@ def test_date_end_before_start():
 
 
 def _test_date_start_format_iso_type(spec):
-    loader = Loader(spec)
+    loader = field_loader(spec)
     supplier = loader.get('foo')
     # only the date portion of the iso date
     values = list(set([_date_only(supplier.next(i)) for i in range(100)]))
@@ -98,7 +98,7 @@ def test_date_center_date():
 def test_date_center_iso_date():
     config = {"center_date": "2050-02-15T12:00:00", "stddev_days": 5}
     spec = _date_iso_spec(**config)
-    loader = Loader(spec)
+    loader = field_loader(spec)
     supplier = loader.get('foo')
     val = supplier.next(0)
     assert val.startswith('2050-')
@@ -120,7 +120,7 @@ def test_date_start_doesnt_match_format():
     # started to 7 Feb - 5 day offset gives center of 2 Feb +- 1 day
     config = {"duration_days": 1, "start": "07-Feb-2050", "format": "%d-%M-%Y"}
     spec = _date_spec(**config)
-    loader = Loader(spec)
+    loader = field_loader(spec)
     with pytest.raises(ValueError):
         loader.get('foo')
 
@@ -129,13 +129,13 @@ def test_date_end_doesnt_match_format():
     # started to 7 Feb - 5 day offset gives center of 2 Feb +- 1 day
     config = {"duration_days": 1, "end": "07-Feb-2050", "format": "%d-%M-%Y"}
     spec = _date_spec(**config)
-    loader = Loader(spec)
+    loader = field_loader(spec)
     with pytest.raises(ValueError):
         loader.get('foo')
 
 
 def _get_unique_values(spec, key, iterations=100):
-    loader = Loader(spec)
+    loader = field_loader(spec)
     supplier = loader.get(key)
     return list(set([supplier.next(i) for i in range(iterations)]))
 

@@ -1,7 +1,7 @@
 import pytest
 
 import datacraft.supplier.common
-from datacraft import builder, suppliers, Loader
+from datacraft import builder, suppliers, field_loader
 
 
 def test_buffered_supplier_one_behind():
@@ -64,7 +64,7 @@ def test_buffered_supplier_from_spec():
     assert suppliers._is_buffered(**values_spec['config'])
 
     data_spec = builder.single_field('field', values_spec).build()
-    loader = Loader(data_spec)
+    loader = field_loader(data_spec)
 
     supplier = loader.get('field')
 

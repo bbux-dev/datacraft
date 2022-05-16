@@ -14,7 +14,7 @@ spec = datacraft.builder.spec_builder() \
 
 
 def test_load_spec_invalid_key():
-    loader = datacraft.Loader(spec)
+    loader = datacraft.field_loader(spec)
     with pytest.raises(datacraft.SpecException):
         loader.get('unknown')
 
@@ -25,7 +25,7 @@ def test_load_spec_missing_type_defaults_to_values():
             'data': ['one', 'two', 'tre']
         }
     }
-    loader = datacraft.Loader(spec_missing_type)
+    loader = datacraft.field_loader(spec_missing_type)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == 'one'
@@ -37,13 +37,13 @@ def test_load_spec_undefined_refs():
     spec_undefined_refs = builder.spec_builder() \
         .add_field('foo', builder.combine(['ONE', 'TWO'])) \
         .build()
-    loader = datacraft.Loader(spec_undefined_refs)
+    loader = datacraft.field_loader(spec_undefined_refs)
     with pytest.raises(datacraft.SpecException):
         loader.get('foo')
 
 
 def test_load_spec_valid():
-    loader = datacraft.Loader(spec)
+    loader = datacraft.field_loader(spec)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == 'dog'
@@ -63,7 +63,7 @@ def test_load_spec_weighted_ref():
         .add_ref('NEGATIVE', ['no']) \
         .add_ref('NEUTRAL', ['meh']) \
         .build()
-    loader = datacraft.Loader(weighted_ref)
+    loader = datacraft.field_loader(weighted_ref)
     supplier = loader.get('foo')
 
     # expect mostly positive and negative values
@@ -80,7 +80,7 @@ def test_shortcut_notation_config_in_key():
     config_in_key_spec = {
         'foo?prefix=TEST': [1, 2, 3, 4, 5]
     }
-    loader = datacraft.Loader(config_in_key_spec)
+    loader = datacraft.field_loader(config_in_key_spec)
     supplier = loader.get('foo')
 
     _verify_expected_values(supplier, 5, ['TEST1', 'TEST2', 'TEST3', 'TEST4', 'TEST5'])
@@ -92,7 +92,7 @@ def test_load_ref_by_name():
         .add_ref('TWO', 'dos') \
         .build()
 
-    loader = datacraft.Loader(refs_only_spec)
+    loader = datacraft.field_loader(refs_only_spec)
     assert loader.get('ONE').next(0) == 'uno'
     assert loader.get('TWO').next(0) == 'dos'
 
