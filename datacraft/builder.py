@@ -1443,6 +1443,26 @@ def _create_key_list(entries):
     return entries
 
 
+def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
+    """
+    Creates n entries from the provided spec
+
+    Args:
+        raw_spec: to create generator for
+        iterations: number of iterations before max
+
+    Keyword Args:
+        processor: (RecordProcessor): For any Record Level transformations such templating or formatters
+        output: (OutputHandlerInterface): For any field or record level output
+        data_dir (str): path the data directory with csv files and such
+        enforce_schema (bool): If schema validation should be applied where possible
+
+    Returns:
+        the list of N entries
+    """
+    return list(generator(raw_spec, iterations, **kwargs))
+
+
 def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator:
     """
     Creates a generator for the raw spec for the specified iterations

@@ -9,7 +9,7 @@ from .supplier.model import (
 # programmatic spec building
 from . import builder
 # expose this at root too
-from .builder import spec_builder, parse_spec
+from .builder import spec_builder, parse_spec, entries
 # registry decorators
 from .registries import Registry as registry
 # exceptions and errors thrown
@@ -22,5 +22,3 @@ from . import suppliers, distributions, outputs
 from . import cli
 
 _log = logging.getLogger('datacraft.init')
-
-

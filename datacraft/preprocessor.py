@@ -7,9 +7,16 @@ import json
 import logging
 from urllib.parse import parse_qs
 from .exceptions import SpecException
-from . import registries
+from . import registries, entrypoints
 
 _log = logging.getLogger(__name__)
+
+
+@registries.Registry.preprocessors('load-entry-points')
+def _load_entry_points(raw_spec: dict, is_refs: bool = False) -> dict:
+    """load the entry points then return original spec"""
+    entrypoints.load_eps()
+    return raw_spec
 
 
 @registries.Registry.preprocessors('default')

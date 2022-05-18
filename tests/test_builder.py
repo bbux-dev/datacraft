@@ -370,3 +370,8 @@ def test_spec_like_dict():
     assert spec.pop("one") is not None
     assert len(spec) == 1
     assert len(spec.items()) == 1
+
+
+def test_entries():
+    entries = datacraft.entries({'foo': ['one', 'two']}, 2)
+    assert entries == [{'foo': 'one'}, {'foo': 'two'}]

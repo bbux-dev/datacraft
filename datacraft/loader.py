@@ -99,9 +99,8 @@ def field_loader(data_spec, data_dir='./data', enforce_schema=False) -> Loader:
         enforce_schema: if schemas should be enforced
 
     Returns:
-
+        Loader for this spec
     """
-    entrypoints.load_eps()
     return _LoaderImpl(data_spec, data_dir, enforce_schema)
 
 
