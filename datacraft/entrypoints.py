@@ -1,12 +1,12 @@
 """module for managing entry point loading"""
-from functools import cache
+from functools import lru_cache
 import logging
 import importlib_metadata as metadata
 
 _log = logging.getLogger(__name__)
 
 
-@cache
+@lru_cache()
 def load_eps():
     """initiate any custom entry points"""
     eps = metadata.entry_points().get('datacraft.custom_type_loader', [])

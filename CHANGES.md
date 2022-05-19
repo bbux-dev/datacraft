@@ -1,3 +1,7 @@
+v0.3.2
+--------
+* Switched to lru_cache for pre python 3.9 compatibility
+
 v0.3.1
 ------
 
