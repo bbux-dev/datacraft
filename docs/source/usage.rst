@@ -846,7 +846,9 @@ Then in the `mypackage` `__init__.py` you can define `load_custom`:
               }
           }
 
-Note that the decorated functions are defined nested inside the load_custom() function.
+Note that the decorated functions are not required to be defined inside the load_custom() function. If your package
+is installed with pip or another package manager, your custom registered suppliers and other functions will be
+automatically discovered and loaded by the datacraft tooling at run time.
 
 Programmatic Usage
 ------------------

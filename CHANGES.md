@@ -1,3 +1,46 @@
+v0.3.1
+------
+
+* Fix for custom types not loading when datacraft used programmatically.
+* Addition of `datacraft.entries` function for quickly generating records from a given spec
+
+```python
+import datacraft
+
+spec = {
+   "super_power": {
+      "type": "values",
+      "config": { "sample": True },
+      "data": {
+         "fast reader": 0.5,
+         "wordle expert": 0.4,
+         "super strength": 0.05,
+         "super speed": 0.01,
+         "invisibility": 0.01,
+         "indestructible": 0.01,
+         "laser eyes": 0.01,
+         "teleportation": 0.00000000001
+      }
+   }
+}
+records = datacraft.entries(spec, 5)
+```
+
+v0.3.0
+------
+* Introduced `datacraft.custom_type_loader` entrypoint for discovering and loading `@datacraft.registry.*` functions.
+
+Add to setup.cfg:
+
+```yaml
+[options.entry_points]
+datacraft.custom_type_loader =
+    mycustomstuff = mypackage:load_custom
+```
+
+See [custom-types-entry-point](https://datacraft.readthedocs.io/en/latest/usage.html#custom-types-entry-point) for
+details
+
 v0.2.1
 ------
 * Added typing support to ``csv_select`` field definitions: i.e.

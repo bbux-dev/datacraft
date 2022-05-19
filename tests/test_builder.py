@@ -372,6 +372,27 @@ def test_spec_like_dict():
     assert len(spec.items()) == 1
 
 
-def test_entries():
+def test_entries_1():
     entries = datacraft.entries({'foo': ['one', 'two']}, 2)
     assert entries == [{'foo': 'one'}, {'foo': 'two'}]
+
+
+def test_entries_2():
+    spec = {
+        "super_power": {
+            "type": "values",
+            "config": {"sample": True},
+            "data": {
+                "fast reader": 0.5,
+                "wordle expert": 0.4,
+                "super strength": 0.05,
+                "super speed": 0.01,
+                "invisibility": 0.01,
+                "indestructible": 0.01,
+                "laser eyes": 0.01,
+                "teleportation": 0.00000000001
+            }
+        }
+    }
+    records = datacraft.entries(spec, 5)
+    assert len(records) == 5
