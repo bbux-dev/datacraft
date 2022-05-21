@@ -17,8 +17,9 @@ def build_cli_help(included_types: list = None):
     Returns:
         Formatted usage string from types
     """
+    registered_types = registries.registered_types()
     if included_types is None:
-        included_types = registries.registered_types()
+        included_types = registered_types
     usage_keys = registries.registered_usage()
 
     width = max(len(key) for key in included_types)
@@ -30,6 +31,8 @@ def build_cli_help(included_types: list = None):
             description = func()
 
             entries.append(f'{type_key.ljust(width)} | {description}')
+        elif type_key not in registered_types:
+            entries.append(f'{type_key.ljust(width)} | unknown type')
         else:
             entries.append(f'{type_key.ljust(width)} | no usage defined')
         entries.append(_TYPE_BREAK)

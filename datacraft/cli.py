@@ -158,7 +158,7 @@ def process_args(args):
             writer.write(registered_type)
         return None
     if args.type_help:
-        writer = _get_writer(args)
+        writer = outputs.get_writer(args.outdir, outfile='type-help.txt', overwrite=True)
         entrypoints.load_eps()
         usage_str = usage.build_cli_help(args.type_filter)
         writer.write(usage_str)
