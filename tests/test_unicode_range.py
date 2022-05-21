@@ -1,8 +1,11 @@
-import string
 import pytest
 from datacraft import builder, field_loader, SpecException
+import pytest
+
+from datacraft import builder, field_loader, SpecException
+
+
 # to trigger registration
-from datacraft import cli
 
 
 def test_unicode_no_data_element():

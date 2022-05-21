@@ -3,6 +3,8 @@ from functools import lru_cache
 import logging
 import importlib_metadata as metadata
 
+import datacraft._registered_types.schemas
+
 _log = logging.getLogger(__name__)
 
 

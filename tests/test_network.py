@@ -1,8 +1,10 @@
 import pytest
-from datacraft.loader import field_loader
+
 from datacraft import builder, SpecException
+from datacraft.loader import field_loader
+
+
 # to trigger registration
-from datacraft import cli
 
 
 def test_ip_v4_spec():
@@ -147,7 +149,7 @@ def test_mac_address_dashes():
     spec_builder = builder.spec_builder()
     spec_builder.mac('mac', dashes='true')
     spec = spec_builder.build()
-    value = next(spec.generator(1,enforce_schema=True))['mac']
+    value = next(spec.generator(1, enforce_schema=True))['mac']
     assert len(value) == 17
     assert '-' in value, f'No dashes in: {value}'
 

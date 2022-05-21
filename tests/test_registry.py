@@ -1,10 +1,11 @@
 import os
+
 import pytest
+
 import datacraft
-from datacraft.loader import field_loader
 import datacraft.registries as registries
+from datacraft.loader import field_loader
 from datacraft.utils import load_custom_code
-from datacraft import casters
 
 spec = {
     'foo': {

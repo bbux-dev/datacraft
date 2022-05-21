@@ -1,42 +1,175 @@
 {
   "nested.schema.json": {
     "valid": [
-      {"instance": {"type": "nested", "fields": {"one": 1}}},
-      {"instance": {"type": "nested", "fields": {"one": 1, "two": [2, 4]}}},
-      {"instance": {"type": "nested", "fields": {"one": 1, "two": [2, 4]}, "field_groups": [["one", "two"]]}},
-      {"instance": {"type": "nested", "fields": {"one": 1, "two": [2, 4]}, "field_groups": [["one"],["one", "two"]]}},
       {
         "instance": {
-          "type": "nested", "fields": {"one": 1, "two": [2, 4]}, "field_groups": {"0.4": ["one"], "0.6": ["one", "two"]}
+          "type": "nested",
+          "fields": {
+            "one": 1
+          }
         }
       },
       {
         "instance": {
-          "type": "nested", "fields": {"one": 1, "two": [2, 4]}, "field_groups": {"a": ["one"], "b": ["one", "two"]}
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": [
+            [
+              "one",
+              "two"
+            ]
+          ]
+        }
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": [
+            [
+              "one"
+            ],
+            [
+              "one",
+              "two"
+            ]
+          ]
+        }
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": {
+            "0.4": [
+              "one"
+            ],
+            "0.6": [
+              "one",
+              "two"
+            ]
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": {
+            "a": [
+              "one"
+            ],
+            "b": [
+              "one",
+              "two"
+            ]
+          }
         }
       }
     ],
     "invalid": [
-      {"instance": {}, "note": "empty"},
-      {"instance": {"type": "nesteds"}, "note": "misspelled"},
-      {"instance": {"type": "nested"}, "note":  "no fields"},
       {
-        "instance": {
-          "type": "nested", "fields": {"one": 1, "two": [2, 4]}, "field_groups": ["one", "two"]
-        },
-        "note":  "Lists is not List of Lists"
+        "instance": {},
+        "note": "empty"
       },
       {
         "instance": {
-          "type": "nested", "fields": {"one": 1, "two": [2, 4]}, "field_groups": { "0.4": "one", "0.6": "two"}
+          "type": "nesteds"
         },
-        "note":  "Values of weighted should be lists"
+        "note": "misspelled"
       },
       {
         "instance": {
-          "type": "nested","fields": {"one": 1, "two": [2, 4]}, "field_groups": { "a": "one", "b": "two"}
+          "type": "nested"
         },
-        "note":  "Values of named should be lists"
+        "note": "no fields"
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": [
+            "one",
+            "two"
+          ]
+        },
+        "note": "Lists is not List of Lists"
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": {
+            "0.4": "one",
+            "0.6": "two"
+          }
+        },
+        "note": "Values of weighted should be lists"
+      },
+      {
+        "instance": {
+          "type": "nested",
+          "fields": {
+            "one": 1,
+            "two": [
+              2,
+              4
+            ]
+          },
+          "field_groups": {
+            "a": "one",
+            "b": "two"
+          }
+        },
+        "note": "Values of named should be lists"
       }
     ]
   }

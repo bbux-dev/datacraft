@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
+
 import datacraft
 
 
 def test_generator_string_template():
     names = ['bob', 'bobby', 'robert', 'bobo']
-    spec =datacraft. builder.single_field('name', datacraft. builder.values(names)).build()
+    spec = datacraft.builder.single_field('name', datacraft.builder.values(names)).build()
 
     template = 'Name: {{ name }}'
     processor = datacraft.outputs.processor(template=template)
@@ -35,7 +36,7 @@ def test_generator_path_template():
 
 def test_generator_no_template():
     names = ['bob', 'bobby', 'robert', 'bobo']
-    spec =datacraft. builder.single_field('name', datacraft. builder.values(names)).build()
+    spec = datacraft.builder.single_field('name', datacraft.builder.values(names)).build()
 
     gen = spec.generator(
         iterations=4,
@@ -46,7 +47,7 @@ def test_generator_no_template():
 
 
 def build_spec(data):
-    spec_builder =datacraft. builder.spec_builder()
+    spec_builder = datacraft.builder.spec_builder()
     for key, value in data.items():
         spec_builder.add_field(key, value)
     return spec_builder.build()

@@ -1,10 +1,11 @@
+from collections import Counter
+
+import pytest
+
 import datacraft
 from datacraft import builder
 
-from collections import Counter
-import pytest
 # to trigger registration
-from datacraft import cli
 
 spec = datacraft.builder.spec_builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \
@@ -101,6 +102,7 @@ def test_registered_invalid_preprocessor():
     @datacraft.registry.preprocessors('test_invalid')
     def _do_stuff(_, __):
         return None
+
     raw_spec = {
         'foo': {'type': 'values', 'data': 42},
         # this one doesn't exist, so should get logged as such

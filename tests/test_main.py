@@ -1,8 +1,8 @@
 import os
 
+import catalogue
 import pytest
 
-import catalogue
 import datacraft
 from datacraft import __main__ as dgmain
 

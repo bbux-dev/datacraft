@@ -1,10 +1,11 @@
 import os
+
 import pytest
 
 import datacraft
 import datacraft.supplier.csv
+
 # to trigger registration
-from datacraft import cli
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 

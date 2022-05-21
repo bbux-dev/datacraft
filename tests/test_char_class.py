@@ -1,9 +1,10 @@
 import string
+
 import pytest
-from datacraft import builder, field_loader, SpecException, SupplierException
+
 # to trigger registration
-from datacraft import cli
-from datacraft import _registered_types
+from datacraft import builder, field_loader, SpecException
+from datacraft._registered_types.char_class import _CLASS_MAPPING
 
 
 def test_char_class_no_data_element():
@@ -44,7 +45,7 @@ def test_char_class_printable():
 
 
 def test_char_class_abbreviations():
-    abbreviations = ['cc-' + key for key in _registered_types._CLASS_MAPPING.keys()]
+    abbreviations = ['cc-' + key for key in _CLASS_MAPPING.keys()]
 
     for abbreviation in abbreviations:
         spec = _cc_abbrev_spec(abbrev=abbreviation, count=7)

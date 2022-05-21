@@ -1,5 +1,7 @@
 import decimal
+
 import pytest
+
 import datacraft
 
 

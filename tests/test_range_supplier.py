@@ -1,8 +1,7 @@
-import pytest
+from datacraft import builder, field_loader
 
-from datacraft import builder, field_loader, SpecException
+
 # to trigger registration
-from datacraft import cli
 
 
 def test_rand_range():
@@ -65,4 +64,3 @@ def test_range_wrap_around():
 
     vals = [supplier.next(i) for i in range(4)]
     assert vals == [1, 2, 3, 1]
-

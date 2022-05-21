@@ -1,17 +1,76 @@
 {
   "weighted_ref.schema.json": {
     "valid": [
-      {"instance": {"type": "weighted_ref", "data": {"one": 1.0}}},
-      {"instance": {"type": "weighted_ref", "data": {"one": 0.5, "two":  0.5}}},
-      {"instance": {"type": "weighted_ref", "data": {"one": 0.33, "two":  0.33, "tre":  0.33}}}
+      {
+        "instance": {
+          "type": "weighted_ref",
+          "data": {
+            "one": 1.0
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "weighted_ref",
+          "data": {
+            "one": 0.5,
+            "two": 0.5
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "weighted_ref",
+          "data": {
+            "one": 0.33,
+            "two": 0.33,
+            "tre": 0.33
+          }
+        }
+      }
     ],
     "invalid": [
-      {"instance": {}, "note": "empty"},
-      {"instance": {"type": "weighted_refs"}, "note": "misspelled"},
-      {"instance": {"type": "weighted_ref"}, "note":  "no data supplied"},
-      {"instance": {"type": "weighted_ref", "data": {}}, "note":  "data is empty"},
-      {"instance": {"type": "weighted_ref", "data": {"foo":  "bar"}}, "note":  "value is not number"},
-      {"instance": {"type": "weighted_ref", "data": ["one"]}, "note":  "wrong type for data"}
+      {
+        "instance": {},
+        "note": "empty"
+      },
+      {
+        "instance": {
+          "type": "weighted_refs"
+        },
+        "note": "misspelled"
+      },
+      {
+        "instance": {
+          "type": "weighted_ref"
+        },
+        "note": "no data supplied"
+      },
+      {
+        "instance": {
+          "type": "weighted_ref",
+          "data": {}
+        },
+        "note": "data is empty"
+      },
+      {
+        "instance": {
+          "type": "weighted_ref",
+          "data": {
+            "foo": "bar"
+          }
+        },
+        "note": "value is not number"
+      },
+      {
+        "instance": {
+          "type": "weighted_ref",
+          "data": [
+            "one"
+          ]
+        },
+        "note": "wrong type for data"
+      }
     ]
   }
 }

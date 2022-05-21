@@ -115,7 +115,8 @@ csv_select_transform_tests = [
             "six": {"type": "csv", "config": {"column": 6, "config_ref": "placeholder_config_ref"}},
             "another": {"type": "range", "data": [1, 10]},
             "refs": {
-                "placeholder_config_ref": {"type": "config_ref", "config": {"datafile": "not_real.csv", "headers": "no"}}
+                "placeholder_config_ref": {"type": "config_ref",
+                                           "config": {"datafile": "not_real.csv", "headers": "no"}}
             }
         }
     ),
@@ -132,33 +133,33 @@ csv_select_transform_tests = [
             }
         },
         {
-          "field": {"type": "ref", "data": "CSV_ONE"},
-          "refs": {
-            "ONE": {
-              "type": "values",
-              "data": "Test Conflict"
-            },
-            "CSV_CONFIG_REF": {
-              "type": "config_ref",
-              "config": {
-                "datafile": "{{ injected }}"
-              }
-            },
-            "ONE-1": {
-              "type": "csv",
-              "config": {
-                "column": 1,
-                "config_ref": "CSV_CONFIG_REF"
-              }
-            },
-            "TWO": {
-              "type": "csv",
-              "config": {
-                "column": 2,
-                "config_ref": "CSV_CONFIG_REF"
-              }
+            "field": {"type": "ref", "data": "CSV_ONE"},
+            "refs": {
+                "ONE": {
+                    "type": "values",
+                    "data": "Test Conflict"
+                },
+                "CSV_CONFIG_REF": {
+                    "type": "config_ref",
+                    "config": {
+                        "datafile": "{{ injected }}"
+                    }
+                },
+                "ONE-1": {
+                    "type": "csv",
+                    "config": {
+                        "column": 1,
+                        "config_ref": "CSV_CONFIG_REF"
+                    }
+                },
+                "TWO": {
+                    "type": "csv",
+                    "config": {
+                        "column": 2,
+                        "config_ref": "CSV_CONFIG_REF"
+                    }
+                }
             }
-          }
         }
     ),
     (
@@ -266,7 +267,7 @@ nested_transform_tests = [
         },
         {
             "refs": {"placeholder_config_ref": {"type": "config_ref",
-                                               "config": {"datafile": "not_real.csv", "headers": "no"}}},
+                                                "config": {"datafile": "not_real.csv", "headers": "no"}}},
             "outer": {
                 "type": "nested",
                 "fields": {

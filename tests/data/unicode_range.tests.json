@@ -1,53 +1,179 @@
 {
   "unicode_range.schema.json": {
     "valid": [
-      {"instance": {"type": "unicode_range", "data": [1024, 1279]}, "note": "hex 0400 to 04ff as integer"},
-      {"instance": {"type": "unicode_range", "data": ["0400", "04ff"]}, "note": "hex 0400 to 04ff string no leading 0x"},
-      {"instance": {"type": "unicode_range", "data": ["0x0400", "0x04ff"]}, "note": "hex 0400 to 04ff with leading 0x"},
+      {
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            1024,
+            1279
+          ]
+        },
+        "note": "hex 0400 to 04ff as integer"
+      },
+      {
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            "0400",
+            "04ff"
+          ]
+        },
+        "note": "hex 0400 to 04ff string no leading 0x"
+      },
+      {
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            "0x0400",
+            "0x04ff"
+          ]
+        },
+        "note": "hex 0400 to 04ff with leading 0x"
+      },
       {
         "note": "count by itself is valid",
-        "instance": {"type": "unicode_range", "data": ["0400", "04ff"], "config": {"count": 5}}
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "count": 5
+          }
+        }
       },
       {
         "note": "min and max alone are valid",
-        "instance": {"type": "unicode_range", "data": ["0400", "04ff"], "config": {"min": 3, "max": 5}}
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "min": 3,
+            "max": 5
+          }
+        }
       },
       {
         "note": "mean by itself is valid",
-        "instance": {"type": "unicode_range", "data": ["0400", "04ff"], "config": {"mean": 5}}
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "mean": 5
+          }
+        }
       },
       {
         "note": "mean with stddev is valid",
-        "instance": {"type": "unicode_range", "data": ["0400", "04ff"], "config": {"mean": 5, "stddev":  1}}
+        "instance": {
+          "type": "unicode_range",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "mean": 5,
+            "stddev": 1
+          }
+        }
       }
     ],
     "invalid": [
-      {"instance": {}, "note": "empty"},
-      {"instance": {"type": "unicode_ranges"}, "note": "misspelled"},
-      {"instance": {"type": "unicode_range"}, "note": "no fields or refs or data or stuff?"},
+      {
+        "instance": {},
+        "note": "empty"
+      },
+      {
+        "instance": {
+          "type": "unicode_ranges"
+        },
+        "note": "misspelled"
+      },
+      {
+        "instance": {
+          "type": "unicode_range"
+        },
+        "note": "no fields or refs or data or stuff?"
+      },
       {
         "note": "to few characters",
-        "instance": {"type": "char_class", "data": ["400", "4ff"]}
+        "instance": {
+          "type": "char_class",
+          "data": [
+            "400",
+            "4ff"
+          ]
+        }
       },
       {
         "note": "to many characters",
-        "instance": {"type": "char_class", "data": ["40000", "4fff"]}
+        "instance": {
+          "type": "char_class",
+          "data": [
+            "40000",
+            "4fff"
+          ]
+        }
       },
       {
         "note": "to many characters",
-        "instance": {"type": "char_class", "data": ["0400", "4ffff"]}
+        "instance": {
+          "type": "char_class",
+          "data": [
+            "0400",
+            "4ffff"
+          ]
+        }
       },
       {
         "note": "count and min together is invalid",
-        "instance": {"type": "char_class", "data": ["0400", "04ff"], "config": {"count": 5, "min": 3}}
+        "instance": {
+          "type": "char_class",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "count": 5,
+            "min": 3
+          }
+        }
       },
       {
         "note": "count and max together is invalid",
-        "instance": {"type": "char_class", "data": ["0400", "04ff"], "config": {"count": 5, "max": 5}}
+        "instance": {
+          "type": "char_class",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "count": 5,
+            "max": 5
+          }
+        }
       },
       {
         "note": "count and mean together is invalid",
-        "instance": {"type": "char_class", "data": ["0400", "04ff"], "config": {"count": 5, "mean": 5}}
+        "instance": {
+          "type": "char_class",
+          "data": [
+            "0400",
+            "04ff"
+          ],
+          "config": {
+            "count": 5,
+            "mean": 5
+          }
+        }
       }
     ]
   }

@@ -1,7 +1,8 @@
-import os
 import json
-import pytest
 import logging
+import os
+
+import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
@@ -15,7 +16,7 @@ INSTANCE = "instance"
 MESSAGE = "note"
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
-schema_dir = os.path.realpath(os.sep.join([root_dir, '..', 'datacraft', 'schema']))
+schema_dir = os.path.realpath(os.sep.join([root_dir, '..', 'datacraft', '_registered_types', 'schema']))
 tests_dir = os.sep.join([root_dir, 'data'])
 
 TEST_FILES = [

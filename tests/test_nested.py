@@ -2,8 +2,9 @@ import pytest
 
 import datacraft
 from datacraft import builder, field_loader
+
+
 # to trigger registration
-from datacraft import cli
 
 
 def test_single_nested():

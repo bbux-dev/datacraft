@@ -197,7 +197,7 @@ class _LoaderImpl(Loader):
         return self.refs.get(key)
 
 
-def _validate_schema_for_spec(spec_type, field_spec):
+def _validate_schema_for_spec(spec_type: str, field_spec: dict):
     """ validates the schema for the given spec type and field spec """
     type_schema = lookup_schema(spec_type)
     if type_schema is None:
