@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, Union
 from abc import ABC, abstractmethod
 
-from . import utils, suppliers, entrypoints
+from . import utils, suppliers, preprocessor, spec_formatters
 from .exceptions import SpecException
 from .supplier.model import DataSpec, ValueSupplierInterface
 from .schemas import validate_schema_for_spec
@@ -205,6 +205,26 @@ def _validate_schema_for_spec(spec_type: str, field_spec: dict):
     validate_schema_for_spec(spec_type, field_spec, type_schema)
 
 
+def preprocess_and_format(raw_spec: dict) -> str:
+    """Runs all preprocessors and formats spec as string
+
+    Args:
+        raw_spec: to process
+
+    Returns:
+        formatted spec as a string
+
+    Examples:
+        >>> import datacraft
+        >>> @datacraft.registry.usage('custom')
+        ... def _custom_type_usage():
+        ...     spec = datacraft.preprocess_and_format(_EXAMPLE)
+        ...     return f'Example Spec:\\n{spec}'
+    """
+    preprocessed = preprocess_spec(raw_spec)
+    return spec_formatters.format_json(preprocessed)
+
+
 def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     """
     Uses the registered preprocessors to cumulatively update the spec
@@ -219,8 +239,9 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     updated = dict(raw_spec)
     preprocessors = Registry.preprocessors.get_all()
     for name in preprocessors:
-        preprocessor = Registry.preprocessors.get(name)
-        processed = preprocessor(updated, False)
+        preprocessor_func = Registry.preprocessors.get(name)
+        _log.debug('Running Preprocessor: %s', name)
+        processed = preprocessor_func(updated, False)
         if processed is None:
             _log.error('Invalid preprocessor %s, returned None instead of updated spec, skipping', name)
             continue

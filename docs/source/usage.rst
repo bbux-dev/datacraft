@@ -1024,7 +1024,6 @@ datacraft dependencies. Please install it first with pip or conda. Example using
 REST Server
 -----------
 
-<<<<<<< HEAD
 Datacraft comes with a lightweight Flask server to use to retrieve generated data. Use the ``--server`` with the optional
 ``--server-endpoint /someendpoint`` flags to launch this server.  The default end point will be found at
 http://127.0.0.1:5000/data. If using a template, each call to the endpoint will return the results of applying a
@@ -1040,9 +1039,6 @@ For this example we use the inline yaml spec: ``{id:uuid: {}, ts:date.iso: {}}``
 endpoint. The command below will spin up a flask server that will format the record using the json-pretty formatter.
 The records contain a uuid and a timestamp field.
 
-The code block below is the server side of the transaction. Here the tool is serving up data formatted using the
-json-pretty formatter. The records contain a uuid and a timestamp field.
-
 .. code-block:: shell
 
     $ datacraft --inline "{id:uuid: {}, ts:date.iso: {}}" -i 2 --log-level debug --format json-pretty --server
@@ -1056,7 +1052,6 @@ json-pretty formatter. The records contain a uuid and a timestamp field.
     127.0.0.1 - - [23/Nov/2050 20:48:44] "GET /data HTTP/1.1" 200 -
     No more iterations available
     127.0.0.1 - - [23/Nov/2050 20:48:46] "GET /data HTTP/1.1" 204 -
-
 
 Here is the client side of the transaction, where we perform a GET request on the /data endpoint.
 

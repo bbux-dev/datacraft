@@ -72,6 +72,30 @@ def test_parse_debug_defaults(tmpdir):
     assert os.path.exists(os.path.join(tmpdir, 'dataspec_defaults.json'))
 
 
+def test_type_list(tmpdir):
+    args = ['--type-list', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type_list.json'))
+
+
+def test_type_help_no_filter(tmpdir):
+    args = ['--type-help', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
+
+
+def test_type_help_with_filter(tmpdir):
+    args = ['--type-help', '--type-filter', 'calculate', 'sample', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
+
+
+def test_parse_debug_defaults(tmpdir):
+    args = ['--debug-defaults', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'dataspec_defaults.json'))
+
+
 def test_parse_apply_raw(tmpdir):
     args = ['-o', str(tmpdir),
             '--apply-raw',

@@ -30,6 +30,13 @@ class Registry:
             ... def _special_sauce_schema() -> dict:
             ...    # return JSON schema validating specs with type: special_sauce
 
+        usage:
+            Usage for field spec types, used to provide command line help and examples
+
+            >>> @datacraft.registry.usage('special_sauce')
+            ... def _special_sauce_usage() -> str:
+            ...    # return string describing how to use special_sauce
+
         preprocessors:
             Functions to modify specs before data generations process. If there is a customization you want to do for
             every data spec, or an extenstion you added that requires modifications to the spec before they are run,
@@ -84,6 +91,7 @@ class Registry:
     """
     types = catalogue.create('datacraft', 'type')
     schemas = catalogue.create('datacraft', 'schemas')
+    usage = catalogue.create('datacraft', 'usage')
     preprocessors = catalogue.create('datacraft', 'preprocessor')
     logging = catalogue.create('datacraft', 'logging')
     formats = catalogue.create('datacraft', 'format')
@@ -160,6 +168,11 @@ def registered_formats():
 def registered_types():
     """ list of registered types """
     return list(Registry.types.get_all().keys())
+
+
+def registered_usage():
+    """ list of registered usage """
+    return list(Registry.usage.get_all().keys())
 
 
 def registered_casters():

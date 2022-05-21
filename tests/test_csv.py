@@ -5,8 +5,6 @@ import pytest
 import datacraft
 import datacraft.supplier.csv
 
-# to trigger registration
-
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
 

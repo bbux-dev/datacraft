@@ -3,7 +3,7 @@ import json
 import datacraft
 
 
-def _build_suppliers_map(field_spec, loader):
+def build_suppliers_map(field_spec, loader):
     if 'refs' not in field_spec and 'fields' not in field_spec:
         raise datacraft.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
     if 'refs' in field_spec and 'fields' in field_spec:

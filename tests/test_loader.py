@@ -5,8 +5,6 @@ import pytest
 import datacraft
 from datacraft import builder
 
-# to trigger registration
-
 spec = datacraft.builder.spec_builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \
     .add_ref('ONE', builder.values(['do', 'ca', 'pi'])) \

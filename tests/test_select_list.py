@@ -4,9 +4,6 @@ from datacraft import builder, suppliers, SpecException
 from datacraft.loader import field_loader
 
 
-# to trigger registration
-
-
 def test_invalid_when_no_config():
     _test_invalid_select_list_spec({"field:select_list_subset": {}})
 

@@ -7,9 +7,6 @@ from datacraft import builder
 from datacraft.loader import field_loader
 
 
-# to trigger registration
-
-
 def test_basic_spec():
     spec = _date_spec()
     values = _get_unique_values(spec, 'foo')

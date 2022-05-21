@@ -3,9 +3,6 @@ import pytest
 import datacraft
 
 
-# to trigger registration
-
-
 def test_ref_with_ref_name():
     spec_builder = datacraft.spec_builder()
     spec_builder.add_ref('values', datacraft.builder.values([1, 2, 3]))

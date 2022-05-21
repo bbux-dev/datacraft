@@ -2,11 +2,20 @@ import json
 import logging
 
 import datacraft
+import datacraft.spec_formatters
 from . import schemas
-from .common import _build_suppliers_map
+from .common import build_suppliers_map
 
 _log = logging.getLogger(__name__)
 _CALCULATE_KEY = 'calculate'
+_EXAMPLE_SPEC = {
+    "height_in": [60, 70, 80, 90],
+    "height_cm": {
+        "type": "calculate",
+        "fields": ["height_in"],
+        "formula": "{{ height_in }} * 2.54"
+    }
+}
 
 
 @datacraft.registry.schemas(_CALCULATE_KEY)
@@ -23,6 +32,12 @@ def _configure_calculate_supplier(field_spec: dict, loader: datacraft.Loader):
     if formula is None:
         raise datacraft.SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
 
-    suppliers_map = _build_suppliers_map(field_spec, loader)
+    suppliers_map = build_suppliers_map(field_spec, loader)
 
     return datacraft.suppliers.calculate(suppliers_map=suppliers_map, formula=formula)
+
+
+@datacraft.registry.usage(_CALCULATE_KEY)
+def _example_usage():
+    formatted_spec = datacraft.preprocess_and_format(_EXAMPLE_SPEC)
+    return f'Example Spec:\n{formatted_spec}'

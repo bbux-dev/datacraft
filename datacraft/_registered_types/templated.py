@@ -3,7 +3,7 @@ import logging
 
 import datacraft
 from . import schemas
-from .common import _build_suppliers_map
+from .common import build_suppliers_map
 
 _log = logging.getLogger(__name__)
 _TEMPLATED_KEY = 'templated'
@@ -18,6 +18,6 @@ def _templated_schema():
 def _configure_templated_type(field_spec, loader):
     if 'data' not in field_spec:
         raise datacraft.SpecException(f'data is required field for templated specs: {json.dumps(field_spec)}')
-    suppliers_map = _build_suppliers_map(field_spec, loader)
+    suppliers_map = build_suppliers_map(field_spec, loader)
 
     return datacraft.suppliers.templated(suppliers_map, field_spec.get('data', None))

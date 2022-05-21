@@ -4,8 +4,6 @@ import pytest
 
 from datacraft import builder, field_loader
 
-# to trigger registration
-
 UUID_REGEX = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', re.I)
 
 

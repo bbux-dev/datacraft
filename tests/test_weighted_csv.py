@@ -4,8 +4,6 @@ import pytest
 
 import datacraft
 
-# to trigger registration
-
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
 
