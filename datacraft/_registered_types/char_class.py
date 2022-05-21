@@ -1,6 +1,7 @@
 import json
 import logging
 import string
+from . import common
 
 import datacraft
 from . import schemas
@@ -24,6 +25,20 @@ _CLASS_MAPPING = {
     "hex": string.hexdigits,
     "hex-lower": string.digits + 'abcdef',
     "hex-upper": string.digits + 'ABCDEF',
+}
+
+_EXAMPLE_SPEC = {
+    "password": {
+        "type": "char_class",
+        "data": ["word", "special", "hex-lower", "M4$p3c!@l$@uc3"],
+        "config": {
+            "mean": 14,
+            "stddev": 2,
+            "min": 10,
+            "max": 18,
+            "exclude": ["-", "\""]
+        }
+    }
 }
 
 
@@ -65,3 +80,9 @@ for class_key in _CLASS_MAPPING:
         """ configure the supplier for char_class alias types """
         spec['data'] = class_key
         return _configure_char_class_supplier(spec, loader)
+
+
+@datacraft.registry.usage(_CHAR_CLASS_KEY)
+def _char_class_usage():
+    """basic usage example for char class"""
+    return common.standard_example_usage(_EXAMPLE_SPEC, 3)

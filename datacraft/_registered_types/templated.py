@@ -1,6 +1,7 @@
 import json
 import logging
 
+from . import common
 import datacraft
 from . import schemas
 from .common import build_suppliers_map

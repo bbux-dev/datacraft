@@ -1,6 +1,7 @@
 import json
 import logging
 
+from . import common
 import datacraft
 import datacraft.spec_formatters
 from . import schemas
@@ -39,5 +40,4 @@ def _configure_calculate_supplier(field_spec: dict, loader: datacraft.Loader):
 
 @datacraft.registry.usage(_CALCULATE_KEY)
 def _example_usage():
-    formatted_spec = datacraft.preprocess_and_format(_EXAMPLE_SPEC)
-    return f'Example Spec:\n{formatted_spec}'
+    return common.standard_example_usage(_EXAMPLE_SPEC, 3)

@@ -2,6 +2,7 @@ import datetime
 import logging
 
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -57,6 +58,47 @@ def _configure_supplier_iso(field_spec: dict, loader: datacraft.Loader):
 def _configure_supplier_iso_microseconds(field_spec: dict, loader: datacraft.Loader):
     """ configures the date.iso.us value supplier """
     return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
+
+
+@datacraft.registry.usage(_DATE_KEY)
+def _example_date_usage():
+    example_one = {
+        "dates": {
+            "type": "date",
+            "config": {
+                "duration_days": "90",
+                "start": "15-Dec-2050 12:00",
+                "format": "%d-%b-%Y %H:%M"
+            }
+        }
+    }
+    example_two = {
+        "dates": {
+            "type": "date",
+            "config": {
+                "center_date": "20500601 12:00",
+                "format": "%Y%m%d %H:%M",
+                "stddev_days": "2"
+            }
+        }
+    }
+    example_tre = {
+        "start_time": {
+            "type": "date",
+            "config": {
+                "center_date": "20500601 12:00",
+                "format": "%Y%m%d %H:%M",
+                "hours": {
+                    "type": "values",
+                    "data": {"7": 0.1, "8": 0.2, "9": 0.4, "10": 0.2, "11": 0.1}
+                }
+            }
+        }
+    }
+    one = common.standard_example_usage(example_one, 3)
+    two = common.standard_example_usage(example_two, 3)
+    tre = common.standard_example_usage(example_tre, 3)
+    return '\n'.join([one, two, tre])
 
 
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):

@@ -1,6 +1,7 @@
 import json
 
 import datacraft
+from . import common
 
 
 def build_suppliers_map(field_spec, loader):
@@ -25,3 +26,12 @@ def _get_mappings(field_spec, lookup_key):
     if isinstance(mappings, list):
         mappings = {_key: _key for _key in mappings}
     return mappings
+
+
+def standard_example_usage(example: dict, num: int):
+    """builds a single usage from given example spec"""
+    formatted_spec = datacraft.preprocess_and_format(example)
+    num = 3
+    command = f'datacraft -s spec.json -i {num} --format json -x -l off'
+    output = json.dumps(datacraft.entries(example, num))
+    return f'Example Spec:\n{formatted_spec}\n{command}\n{output}\n'

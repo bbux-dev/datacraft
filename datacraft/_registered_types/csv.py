@@ -10,6 +10,42 @@ from . import schemas
 _log = logging.getLogger(__name__)
 _CSV_TYPE = 'csv'
 _WEIGHTED_CSV = 'weighted_csv'
+_CSV_EXAMPLE = {
+    "status": {
+        "type": "csv",
+        "config": {
+            "column": 1,
+            "config_ref": "tabs_config"
+        }
+    },
+    "description": {
+        "type": "csv",
+        "config": {
+            "column": 2,
+            "config_ref": "tabs_config"
+        }
+    },
+    "status_type:csv?config_ref=tabs_config&column=3": {},
+    "refs": {
+        "tabs_config": {
+            "type": "config_ref",
+            "config": {
+                "datafile": "tabs.csv",
+                "delimiter": "\\t",
+                "headers": True,
+                "sample_rows": True
+            }
+        }
+    }
+}
+_WEIGHTED_CSV_EXAMPLE = {
+    "cities": {
+        "type": "weighted_csv",
+        "config": {
+            "datafile": "weighted_cities.csv"
+        }
+    }
+}
 
 
 @datacraft.registry.types(_CSV_TYPE)
@@ -60,6 +96,18 @@ def _configure_weighted_csv(field_spec, loader):
 def _get_weighted_csv_schema():
     """ get the schema for the weighted_csv type """
     return schemas.load(_WEIGHTED_CSV)
+
+
+@datacraft.registry.usage(_CSV_TYPE)
+def _example_csv_usage():
+    formatted_spec = datacraft.preprocess_and_format(_CSV_EXAMPLE)
+    return f'Example Spec:\n{formatted_spec}'
+
+
+@datacraft.registry.usage(_WEIGHTED_CSV)
+def _example_weighted_csv_usage():
+    formatted_spec = datacraft.preprocess_and_format(_WEIGHTED_CSV_EXAMPLE)
+    return f'Example Spec:\n{formatted_spec}'
 
 
 def _read_named_column(csv_path: str, column_name: str):
