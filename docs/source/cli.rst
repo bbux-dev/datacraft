@@ -90,6 +90,16 @@ args to the ``--type-help`` flag:
 
    -------------------------------------
 
+Specify the ``-o <directory>`` option to create a file type-help.txt, with the full usage info:
+
+.. code-block::
+
+   datacraft --type-help -o .
+   INFO [22-May-2050 01:13:15 PM] Starting Loading Configurations...
+   INFO [22-May-2050 01:13:15 PM] Loading custom type loader: core
+   INFO [22-May-2050 01:13:15 PM] Loading custom type loader: xeger
+   INFO [22-May-2050 01:13:15 PM] Wrote data to .\type-help.txt
+
 Formatting Output
 -----------------
 

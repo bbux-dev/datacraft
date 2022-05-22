@@ -85,7 +85,7 @@ def test_type_help_no_filter(tmpdir):
 
 
 def test_type_help_with_filter(tmpdir):
-    args = ['--type-help', '--type-filter', 'calculate', 'sample', '-o', str(tmpdir)]
+    args = ['--type-help', 'calculate', 'sample', '-o', str(tmpdir)]
     dgmain.main(args)
     assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
 
