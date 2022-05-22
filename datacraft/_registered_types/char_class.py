@@ -1,9 +1,9 @@
 import json
 import logging
 import string
-from . import common
 
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ _CHAR_CLASS_KEY = 'char_class'
 _UNDER_SCORE = '_'
 
 _CLASS_MAPPING = {
-    "ascii": ''.join(chr(x) for x in range(128)),
+    "ascii": string.printable,
     "lower": string.ascii_lowercase,
     "upper": string.ascii_uppercase,
     "letters": string.ascii_letters,
@@ -74,15 +74,37 @@ def _configure_char_class_supplier(spec, loader):
     return datacraft.suppliers.character_class(data, **config)
 
 
-for class_key in _CLASS_MAPPING:
-    @datacraft.registry.types("cc-" + class_key)
-    def _configure_char_class_alias_supplier(spec, loader):
+def register_alias_type_function(key, name):
+    @datacraft.registry.types(key)
+    def function(spec, loader):
         """ configure the supplier for char_class alias types """
-        spec['data'] = class_key
+        spec['data'] = name
         return _configure_char_class_supplier(spec, loader)
+
+    return function
 
 
 @datacraft.registry.usage(_CHAR_CLASS_KEY)
 def _char_class_usage():
     """basic usage example for char class"""
     return common.standard_example_usage(_EXAMPLE_SPEC, 3)
+
+
+def register_alias_usage_function(key):
+    @datacraft.registry.usage(key)
+    def function():
+        """basic usage example for char class"""
+        spec = {
+            "example": {
+                "type": key,
+                "config": {"count": 5}
+            }
+        }
+        return common.standard_example_usage(spec, 3)
+
+    return function
+
+
+for class_key in _CLASS_MAPPING:
+    register_alias_type_function("cc-" + class_key, class_key)
+    register_alias_usage_function("cc-" + class_key)

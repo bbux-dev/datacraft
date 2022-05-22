@@ -2,6 +2,7 @@ import string
 
 import pytest
 
+import datacraft
 from datacraft import builder, field_loader, SpecException
 from datacraft._registered_types.char_class import _CLASS_MAPPING
 
@@ -64,6 +65,14 @@ def test_char_class_multiple_classes():
         assert char in string.ascii_lowercase or char in string.digits
 
 
+def test_verify_class_mappings():
+    for key, values in _CLASS_MAPPING.items():
+        spec = _cc_abbrev_spec(f"cc-{key}", count=5)
+        single_item = datacraft.entries(spec, 1)[0]['name']
+        for c in single_item:
+            assert c in values, f'{c} not expected to be part of {key} type. values: {values}'
+
+
 def _verify_values(supplier, min_size, max_size, exclude='', iterations=100):
     for i in range(iterations):
         value = supplier.next(i)
@@ -82,3 +91,4 @@ def _cc_abbrev_spec(abbrev, **config):
     return builder.spec_builder() \
         .add_field("name", builder.char_class_abbrev(cc_abbrev=abbrev, **config)) \
         .build()
+
