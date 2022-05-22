@@ -30,9 +30,9 @@ def _get_mappings(field_spec, lookup_key):
 def standard_example_usage(example: dict, num: int, pretty: bool = False, no_reformat: bool = False):
     """builds a single usage from given example spec"""
     if no_reformat:
-        formatted_spec = example
+        formatted_spec = example  # type: ignore
     else:
-        formatted_spec = datacraft.preprocess_and_format(example)
+        formatted_spec = datacraft.preprocess_and_format(example)  # type: ignore
     datacraft_format = 'json-pretty' if pretty else 'json'
     command = f'datacraft -s spec.json -i {num} --format {datacraft_format} -x -l off'
     if pretty:

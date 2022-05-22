@@ -48,7 +48,7 @@ def _configure_select_list_subset_supplier(field_spec, loader):
 
 
 @datacraft.registry.usage(_SAMPLE_KEY)
-def _example_select_list_subset_usage():
+def _example_sample_usage():
     return "alias for " + _SELECT_LIST_SUBSET_KEY
 
 

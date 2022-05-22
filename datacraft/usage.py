@@ -22,10 +22,10 @@ def build_cli_help(included_types: list = None):
         included_types = registered_types
     usage_keys = registries.registered_usage()
 
-    width = max(len(key) for key in included_types)
+    width = max(len(key) for key in included_types)  # type: ignore
 
     entries = [_TYPE_BREAK]
-    for type_key in included_types:
+    for type_key in included_types:  # type: ignore
         if type_key in usage_keys:
             func = registries.Registry.usage.get(type_key)
             description = func()
