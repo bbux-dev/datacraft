@@ -1,7 +1,6 @@
 v0.4.0
 ------
-* Added initial built in type help system with command line --type-list and --type-help and --type-filter command
-  line arguments
+* Added initial built in type help system with command line --type-list and --type-help command line arguments
 
 v0.3.2
 --------

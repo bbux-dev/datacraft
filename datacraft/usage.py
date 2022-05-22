@@ -18,7 +18,7 @@ def build_cli_help(included_types: list = None):
         Formatted usage string from types
     """
     registered_types = registries.registered_types()
-    if included_types is None:
+    if included_types is None or len(included_types) == 0:
         included_types = registered_types
     usage_keys = registries.registered_usage()
 

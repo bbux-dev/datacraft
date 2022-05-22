@@ -1,0 +1,30 @@
+{
+  "example_one": {
+    "command": "datacraft --inline \"{demo: {type: uuid}}\" --log-level off -i 5",
+    "match": {
+      "lines": 5,
+      "pattern": "[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}"
+    }
+  },
+  "example_two": {
+    "commands": {
+      "1": {
+        "command":  "datacraft --inline \"{demo: {type: uuid}}\" --log-level off --debug-spec > demo.json",
+        "match": null
+      },
+      "2": {
+        "command": "cat demo.json",
+        "match": {
+          "exact": "{\n  \"demo\": {\n    \"type\": \"uuid\"\n  }\n}"
+        }
+      },
+      "3": {
+        "command": "datacraft -s demo.json --log-level off -i 5",
+        "match": {
+          "lines": 5,
+          "pattern": "[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}"
+        }
+      }
+    }
+  }
+}

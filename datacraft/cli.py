@@ -72,11 +72,9 @@ def parseargs(argv):
                              help='List default values from registry after any external code loading')
     debug_group.add_argument('--type-list', dest='type_list', action='store_true',
                              help='Write out the list of registered types')
-    debug_group.add_argument('--type-help', dest='type_help', action='store_true',
-                             help='Write out the help for registered types, specify one or more types to filter by '
-                                  'with --type-filter <name>')
-    debug_group.add_argument('--type-filter', dest='type_filter', metavar='TYPE_NAME', nargs='+',
-                             help='List of types to include in help, requires --type-help to be specified')
+    debug_group.add_argument('--type-help', dest='type_help', default=argparse.SUPPRESS, nargs='*',
+                             help='Write out the help for registered types, specify one or more types to limit help '
+                                  'to, no arguments means show help for all types')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true',
                         default=registries.get_default('exclude_internal'),
                         help='Do not include non data fields in output records')
@@ -157,10 +155,10 @@ def process_args(args):
         for registered_type in all_types:
             writer.write(registered_type)
         return None
-    if args.type_help:
+    if 'type_help' in args:
         writer = outputs.get_writer(args.outdir, outfile='type-help.txt', overwrite=True)
         entrypoints.load_eps()
-        usage_str = usage.build_cli_help(args.type_filter)
+        usage_str = usage.build_cli_help(args.type_help)
         writer.write(usage_str)
         return None
 

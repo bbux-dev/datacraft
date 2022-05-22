@@ -27,6 +27,69 @@ Log Levels
 You can change the logging levels to one of ``debug, info, warn, error, or off`` by using the ``-l`` or
 ``--log-level`` flag. See example above.
 
+Type Help
+---------
+
+List Types
+^^^^^^^^^^
+
+To see a list of the registered types that can be used in specs use the ``--type-list`` command line flag:
+
+.. code-block:: shell
+
+    datacraft --type-list
+
+.. code-block::
+
+   INFO [22-May-2050 06:20:02 AM] Starting Loading Configurations...
+   INFO [22-May-2050 06:20:02 AM] Loading custom type loader: core
+   INFO [22-May-2050 06:20:02 AM] Loading custom type loader: xeger
+   calculate
+   char_class
+   cc-ascii
+   cc-lower
+   cc-upper
+   ...
+   uuid
+   values
+   xeger
+
+Type Usage
+^^^^^^^^^^
+
+To get detailed usage for all of the types use the ``--type-help`` flag. The flag with no arguments will list all of
+the available usage for all registered types. You can limit the usage printed to specific types by providing them as
+args to the ``--type-help`` flag:
+
+.. code-block:: shell
+
+   # lists all usage
+   datacraft --type-help
+   # only lists help for calculate type
+   datacraft --type-help calculate -l warn
+
+.. code-block::
+
+   -------------------------------------
+   calculate | Example Spec:
+   {
+     "height_in": {
+       "type": "values",
+       "data": [60, 70, 80, 90]
+     },
+     "height_cm": {
+       "type": "calculate",
+       "fields": [
+         "height_in"
+       ],
+       "formula": "{{ height_in }} * 2.54"
+     }
+   }
+   datacraft -s spec.json -i 3 --format json -x -l off
+   [{"height_in": 60, "height_cm": 152.4}, {"height_in": 70, "height_cm": 177.8}, {"height_in": 80, "height_cm": 203.2}]
+
+   -------------------------------------
+
 Formatting Output
 -----------------
 
@@ -68,7 +131,7 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    [{"id": "732376df-9adc-413e-8493-73555fae51f9", "ts": "21-04-2022"}, {"id": "d826774a-1eeb-4e35-8253-0b00a514c0d1", "ts": "02-04-2022"}]
+    [{"id": "732376df-9adc-413e-8493-73555fae51f9", "ts": "21-04-2050"}, {"id": "d826774a-1eeb-4e35-8253-0b00a514c0d1", "ts": "02-04-2050"}]
 
 .. code-block:: shell
 
@@ -79,11 +142,11 @@ separated value line. Examples:
    [
        {
            "id": "4a75d0fc-46b7-4c9b-82f1-c87dcee13674",
-           "ts": "09-04-2022"
+           "ts": "09-04-2050"
        },
        {
            "id": "62db293b-d8f8-4c9a-8653-6dba8713bab9",
-           "ts": "13-04-2022"
+           "ts": "13-04-2050"
        }
    ]
 
@@ -109,14 +172,14 @@ Examples:
 .. code-block:: shell
 
    datacraft --inline "{timestamp:date: {}}" -i 4 -r 2 --log-level off --format json -x
-   [{"timestamp": "25-04-2022"}, {"timestamp": "06-04-2022"}]
-   [{"timestamp": "09-04-2022"}, {"timestamp": "09-04-2022"}]
+   [{"timestamp": "25-04-2050"}, {"timestamp": "06-04-2050"}]
+   [{"timestamp": "09-04-2050"}, {"timestamp": "09-04-2050"}]
 
 
 .. code-block:: shell
 
    datacraft --inline "{timestamp:date: {}}" -i 4  --log-level off --format json -x
-   [{"timestamp": "22-04-2022"}, {"timestamp": "03-04-2022"}, {"timestamp": "10-04-2022"}, {"timestamp": "06-04-2022"}]
+   [{"timestamp": "22-04-2050"}, {"timestamp": "03-04-2050"}, {"timestamp": "10-04-2050"}, {"timestamp": "06-04-2050"}]
 
 
 Apply Raw
