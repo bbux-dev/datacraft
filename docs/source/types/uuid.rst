@@ -25,8 +25,8 @@ Examples:
       "id": {
         "type": "uuid"
       },
-      "id_shorthand:uuid": {}
-      "id_variant3" {
+      "id_shorthand:uuid": {},
+      "id_variant3": {
         "type": "uuid",
         "config": {
           "variant": 3

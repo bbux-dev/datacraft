@@ -24,3 +24,19 @@ def _configure_uuid_supplier(field_spec, loader):
     if variant not in [1, 3, 4, 5]:
         raise datacraft.SpecException('Invalid variant for: ' + json.dumps(field_spec))
     return datacraft.suppliers.uuid(variant)
+
+
+@datacraft.registry.usage(_UUID_KEY)
+def _example_uuid_usage():
+    example = {
+      "id": {
+        "type": _UUID_KEY,
+      },
+      "id_variant3": {
+        "type": _UUID_KEY,
+        "config": {
+          "variant": 3
+        }
+      }
+    }
+    return common.standard_example_usage(example, 3, pretty=True)

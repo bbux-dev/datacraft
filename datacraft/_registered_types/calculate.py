@@ -1,9 +1,9 @@
 import json
 import logging
 
-from . import common
 import datacraft
 import datacraft.spec_formatters
+from . import common
 from . import schemas
 from .common import build_suppliers_map
 

@@ -1,8 +1,8 @@
 import json
 import logging
 
-from . import common
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -45,3 +45,26 @@ def _configure_select_list_subset_supplier(field_spec, loader):
         raise datacraft.SpecException(
             'Unable to identify data for ' + _SELECT_LIST_SUBSET_KEY + ' for spec: ' + json.dumps(field_spec))
     return datacraft.suppliers.select_list_subset(data, **config)
+
+
+@datacraft.registry.usage(_SAMPLE_KEY)
+def _example_select_list_subset_usage():
+    return "alias for " + _SELECT_LIST_SUBSET_KEY
+
+
+@datacraft.registry.usage(_SELECT_LIST_SUBSET_KEY)
+def _example_select_list_subset_usage():
+    example = {
+        "ingredients": {
+            "type": _SELECT_LIST_SUBSET_KEY,
+            "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
+            "config": {
+                "mean": 3,
+                "stddev": 1,
+                "min": 2,
+                "max": 4,
+                "join_with": ", "
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)

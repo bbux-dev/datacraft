@@ -1,9 +1,7 @@
 import json
 import logging
 
-from . import common
 import importlib_resources as pkg_resources
-
 
 from . import schema
 

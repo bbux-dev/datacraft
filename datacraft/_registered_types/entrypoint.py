@@ -1,9 +1,5 @@
 """datacraft.custom_type_loader entrypoint for built in types"""
-
-
-from . import common
-def load_custom():
-    from . import (
+from . import (
         calculate,
         char_class,
         combine,
@@ -22,3 +18,7 @@ def load_custom():
         uuid_handler,
         values
     )
+
+
+def load_custom():
+    pass

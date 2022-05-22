@@ -1,11 +1,10 @@
 import json
 import logging
 from typing import Dict
-from . import common
-
-from datacraft import ValueSupplierInterface
 
 import datacraft
+from datacraft import ValueSupplierInterface
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -52,6 +51,37 @@ def _configure_weighted_ref_supplier(parent_field_spec, loader):
     if 'count' in config:
         return datacraft.suppliers.array_supplier(supplier, **config)
     return supplier
+
+
+@datacraft.registry.usage(_REF_KEY)
+def _example_ref_usage():
+    example = {"pointer": {"type": _REF_KEY, "data": "ref_name"}, "refs": {"ref_name": 42}}
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_WEIGHTED_REF_KEY)
+def _example_weighted_ref_usage():
+    example = {
+        "http_code": {
+            "type": _WEIGHTED_REF_KEY,
+            "data": {"GOOD_CODES": 0.7, "BAD_CODES": 0.3}
+        },
+        "refs": {
+            "GOOD_CODES": {
+                "200": 0.5,
+                "202": 0.3,
+                "203": 0.1,
+                "300": 0.1
+            },
+            "BAD_CODES": {
+                "400": 0.5,
+                "403": 0.3,
+                "404": 0.1,
+                "500": 0.1
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)
 
 
 def weighted_ref_supplier(key_supplier: ValueSupplierInterface,

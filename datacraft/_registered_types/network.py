@@ -1,8 +1,8 @@
 import json
 import logging
 
-from . import common
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -71,3 +71,48 @@ def _configure_mac_address_supplier(field_spec, loader):
         delim = datacraft.registries.get_default('mac_addr_separator')
 
     return datacraft.suppliers.mac_address(delim)
+
+
+@datacraft.registry.usage(_IP_KEY)
+def _example_ip_usage():
+    return "Alias for ipv4"
+
+
+@datacraft.registry.usage(_IPV4_KEY)
+def _example_ipv4_usage():
+    example = {
+        "network": {
+            "type": _IPV4_KEY,
+            "config": {
+                "cidr": "2.22.222.0/16"
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_IP_PRECISE_KEY)
+def _example_ip_precise_usage():
+    example = {
+        "network": {
+            "type": _IP_PRECISE_KEY,
+            "config": {
+                "cidr": "192.168.0.0/14",
+                "sample": "true"
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_NET_MAC_KEY)
+def _example_net_mac_usage():
+    example = {
+        "network": {
+            "type": _NET_MAC_KEY,
+            "config": {
+                "dashes": "true"
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)

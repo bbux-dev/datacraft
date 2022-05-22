@@ -101,6 +101,26 @@ def _example_date_usage():
     return '\n'.join([one, two, tre])
 
 
+@datacraft.registry.usage(_DATE_ISO_KEY)
+def _example_date_iso_usage():
+    example = {
+        "timestamp": {
+            "type": _DATE_ISO_KEY
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_DATE_ISO_US_KEY)
+def _example_date_iso_micros_usage():
+    example = {
+        "timestamp.us": {
+            "type": _DATE_ISO_US_KEY
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
 def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
     """ configures an iso based date supplier using the provided date format """
     config = datacraft.utils.load_config(field_spec, loader)

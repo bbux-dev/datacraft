@@ -1,62 +1,62 @@
 import json
 import logging
 
-from . import common
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
 _COMBINE_KEY = 'combine'
 _COMBINE_LIST_KEY = 'combine-list'
 _COMBINE_EXAMPLE = {
-  "combine": {
-    "type": "combine",
-    "refs": ["first", "last"],
-    "config": {
-      "join_with": " "
-    }
-  },
-  "refs": {
-    "first": {
-      "type": "values",
-      "data": ["zebra", "hedgehog", "llama", "flamingo"]
+    "combine": {
+        "type": "combine",
+        "refs": ["first", "last"],
+        "config": {
+            "join_with": " "
+        }
     },
-    "last": {
-      "type": "values",
-      "data": ["jones", "smith", "williams"]
+    "refs": {
+        "first": {
+            "type": "values",
+            "data": ["zebra", "hedgehog", "llama", "flamingo"]
+        },
+        "last": {
+            "type": "values",
+            "data": ["jones", "smith", "williams"]
+        }
     }
-  }
 }
 _COMBINE_LIST_EXAMPLE = {
-  "full_name": {
-    "type": "combine-list",
-    "refs": [
-      ["first", "last"],
-      ["first", "middle", "last"],
-      ["first", "middle_initial", "last"]
-    ],
-    "config": {
-      "join_with": " "
+    "full_name": {
+        "type": "combine-list",
+        "refs": [
+            ["first", "last"],
+            ["first", "middle", "last"],
+            ["first", "middle_initial", "last"]
+        ],
+        "config": {
+            "join_with": " "
+        }
+    },
+    "refs": {
+        "first": {
+            "type": "values",
+            "data": ["zebra", "hedgehog", "llama", "flamingo"]
+        },
+        "last": {
+            "type": "values",
+            "data": ["jones", "smith", "williams"]
+        },
+        "middle": {
+            "type": "values",
+            "data": ["cloud", "sage", "river"]
+        },
+        "middle_initial": {
+            "type": "values",
+            "data": {"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1}
+        }
     }
-  },
-  "refs": {
-    "first": {
-      "type": "values",
-      "data": ["zebra", "hedgehog", "llama", "flamingo"]
-    },
-    "last": {
-      "type": "values",
-      "data": ["jones", "smith", "williams"]
-    },
-    "middle": {
-      "type": "values",
-      "data": ["cloud", "sage", "river"]
-    },
-    "middle_initial": {
-      "type": "values",
-      "data": {"a": 0.3, "m": 0.3, "j": 0.1, "l": 0.1, "e": 0.1, "w": 0.1}
-    }
-  }
 }
 
 

@@ -47,3 +47,53 @@ def _configure_geo_pair(field_spec, loader):
     """ configures value supplier for geo.pair type """
     config = datacraft.utils.load_config(field_spec, loader)
     return datacraft.suppliers.geo_pair(**config)
+
+
+@datacraft.registry.usage(_GEO_LAT_KEY)
+def _get_geo_lat_usage():
+    """ usage for geo.lat type """
+    example = {
+        "lat": {
+            "type": "geo.lat",
+            "config": {
+                "start_lat": -45.0,
+                "end_lat": 45.0
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_GEO_LONG_KEY)
+def _get_geo_long_usage():
+    """ usage for geo.long type """
+    example = {
+        "long": {
+            "type": "geo.long",
+            "config": {
+                "start_long": -45.0,
+                "end_long": 45.0
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_GEO_PAIR_KEY)
+def _get_geo_pair_usage():
+    """ usage for geo.pair type """
+    example = {
+        "egypt": {
+            "type": "geo.pair",
+            "config": {
+                "bbox": [
+                    31.33134,
+                    22.03795,
+                    34.19295,
+                    25.00562
+                ],
+                "precision": 3
+            }
+        }
+    }
+    return common.standard_example_usage(example, 3)

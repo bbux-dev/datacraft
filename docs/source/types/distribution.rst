@@ -46,12 +46,13 @@ Examples:
 
 .. code-block:: json
 
-    {
-      "ages": {
-        "type": "distribution",
-        "data": "normal(mean=28, stddev=10, min=18, max=40)"
-      }
-    }
+   {
+     "age": {
+       "type": "distribution",
+       "data": "normal(mean=28, stddev=10, min=18, max=40)",
+       "config": {"cast": "int"}
+     }
+   }
 
 .. code-block:: json
 

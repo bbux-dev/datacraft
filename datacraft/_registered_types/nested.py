@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, Any
 
-from . import common
 import datacraft
 from datacraft import ValueSupplierInterface, KeyProviderInterface, SupplierException
 from datacraft.supplier import key_suppliers
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -41,6 +41,31 @@ def _configure_nested_supplier(spec, loader):
             supplier = loader.get_from_spec(nested_spec)
         field_supplier_map[key] = supplier
     return nested_supplier(field_supplier_map, count_supplier, key_supplier, as_list)
+
+
+@datacraft.registry.usage(_NESTED_KEY)
+def _example_nested_usage():
+    example = {
+        "id": {
+            "type": "uuid"
+        },
+        "user": {
+            "type": "nested",
+            "fields": {
+                "user_id": {
+                    "type": "uuid"
+                },
+                "geo": {
+                    "type": "nested",
+                    "fields": {
+                        "place_id:cc-digits?mean=5": {},
+                        "coordinates:geo.pair?as_list=true": {}
+                    }
+                }
+            }
+        }
+    }
+    return common.standard_example_usage(example, 1, pretty=True)
 
 
 def nested_supplier(field_supplier_map: Dict[str, ValueSupplierInterface],

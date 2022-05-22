@@ -1,8 +1,8 @@
 import json
 import logging
 
-from . import common
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -23,3 +23,34 @@ def _configure_distribution_supplier(field_spec, _):
             'required data element not defined for ' + _DISTRIBUTION_KEY + ' type : ' + json.dumps(field_spec))
     distribution = datacraft.distributions.from_string(field_spec['data'])
     return datacraft.suppliers.distribution_supplier(distribution)
+
+
+@datacraft.registry.usage(_DISTRIBUTION_KEY)
+def _example_distribution_usage():
+    example_one = {
+        "values": {
+            "type": "distribution",
+            "data": "uniform(start=10, end=30)"
+        }
+    }
+    example_two = {
+        "age": {
+            "type": "distribution",
+            "data": "normal(mean=28, stddev=10, min=18, max=40)",
+            "config": {"cast": "int"}
+        }
+    }
+    example_tre = {
+        "pressure": {
+            "type": "distribution",
+            "data": "gauss(mean=33, stddev=3.4756535)",
+            "config": {
+                "count_dist": "normal(mean=2, stddev=1, min=1, max=4)",
+                "as_list": True
+            }
+        }
+    }
+    one = common.standard_example_usage(example_one, 3)
+    two = common.standard_example_usage(example_two, 3)
+    tre = common.standard_example_usage(example_tre, 3)
+    return '\n'.join([one, two, tre])

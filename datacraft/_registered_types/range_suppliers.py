@@ -1,8 +1,8 @@
 import json
 import logging
 
-from . import common
 import datacraft
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -46,6 +46,39 @@ def _configure_range_supplier(field_spec, _):
         suppliers_list = [_configure_range_supplier_for_data(field_spec, subdata) for subdata in data]
         return datacraft.suppliers.from_list_of_suppliers(suppliers_list, True)
     return _configure_range_supplier_for_data(field_spec, data)
+
+
+@datacraft.registry.usage(_RANGE_KEY)
+def _example_range_usage():
+    example = {
+        "zero_to_ten_step_half": {
+            "type": _RANGE_KEY,
+            "data": [0, 10, 0.5]
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_RAND_RANGE_KEY)
+def _example_rand_range_usage():
+    example = {
+        "four_digits_precision": {
+            "type": _RAND_RANGE_KEY,
+            "data": [0, 10, 4]
+        }
+    }
+    return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_RAND_INT_RANGE_KEY)
+def _example_range_int_range_usage():
+    example = {
+        "rand_0_to_99": {
+            "type": _RAND_INT_RANGE_KEY,
+            "data": [0, 100]
+        }
+    }
+    return common.standard_example_usage(example, 3)
 
 
 def _configure_range_supplier_for_data(field_spec, data):
