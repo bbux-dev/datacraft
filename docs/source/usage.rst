@@ -65,13 +65,13 @@ our example above to the following:
     {
         "id": {"type": "uuid"},
         "timestamp": {"type": "date.iso"},
-        "count": {"type": "rand_range", "data": [1,100], "config": {"cast": "int"}}
+        "count": {"type": "rand_int_range", "data": [1,100]}
     }
 
 Here we define the three fields of our record: ``id``, ``timestamp``, and ``count``. The portion after the name is
 called a Field Spec. This defines the type of data the field consists of and how it should be generated. The ``id``
 field is a ``uuid`` just like the previous example.  The ``timestamp`` is a ISO 8601 date and the ``count`` is a random
-number between 1 and 100 that is cast to an integer. If we run this spec and specify the ``--format json`` flag:
+integer between 1 and 100. If we run this spec and specify the ``--format json`` flag:
 
 .. code-block:: shell
 
@@ -415,54 +415,58 @@ Now with ``prize_count`` set to 3
 NOTE: It is a good practice to use a default in case that a variable is not defined, or that the variable
 substitution flags are not specified. With no default, the value would become blank and render the JSON invalid.
 
-NOTE: If using a ``calculate`` spec with a ``formula`` specified, or a ``templated`` spec, you will need to adjust the
-formula and data elements so they are correctly interpreted by the Jinja2 templating engine. The template will need
-to be wrapped in a quoted literal with the existing value in it. i.e ``"{{ field }}other stuff"`` becomes
-``"{{ '{{ field }}other stuff' }}"``
+NOTE: If using a ``calculate`` spec with a ``formula`` specified, or a ``templated`` spec, these will need to be
+adjusted if you are also using templated values in your spec. You will need to adjust the formula and data elements
+so they are correctly interpreted by the Jinja2 templating engine. The template will need to be wrapped in a quoted
+literal with the existing value in it. i.e ``"{{ field }}other stuff"`` becomes ``"{{ '{{ field }}other stuff' }}"``
 
-.. code-block:: json
+.. tabs::
 
-   {
-     "sum": {
-       "type": "calculate",
-       "formula": "{{one}} + {{two}}",
-       "refs": ["one", "two"]
-     },
-     "system": {
-       "type": "templated",
-       "data": "p{{var1}}.53.{{var2}}.01",
-       "refs": ["var1", "var2"]
-     },
-     "refs": {
-       "one": [1, 1.0, 1.0000001],
-       "two": [2, 2.0, 2.0000001],
-       "var1:rand_int_range": [0, 100],
-       "var2:rand_int_range": [0, 100]
-     }
-   }
+   .. tab:: Before
 
-Should become:
+      .. code-block:: json
 
-.. code-block:: json
+         {
+           "sum": {
+             "type": "calculate",
+             "formula": "{{one}} + {{two}}",
+             "refs": ["one", "two"]
+           },
+           "system": {
+             "type": "templated",
+             "data": "p{{var1}}.53.{{var2}}.01",
+             "refs": ["var1", "var2"]
+           },
+           "refs": {
+             "one": [1, 1.0, 1.0000001],
+             "two": [2, 2.0, 2.0000001],
+             "var1:rand_int_range": [0, 100],
+             "var2:rand_int_range": [0, 100]
+           }
+         }
 
-   {
-     "sum": {
-       "type": "calculate",
-       "formula": "{{ '{{one}} + {{two}}' }}",
-       "refs": ["one", "two"]
-     },
-     "system": {
-       "type": "templated",
-       "data": "{{ 'p{{var1}}.53.{{var2}}.01' }}",
-       "refs": ["var1", "var2"]
-     },
-     "refs": {
-       "one": [1, 1.0, 1.0000001],
-       "two": [2, 2.0, 2.0000001],
-       "var1:rand_int_range": [0, 100],
-       "var2:rand_int_range": [0, 100]
-     }
-   }
+   .. tab:: After
+
+      .. code-block:: json
+
+         {
+           "sum": {
+             "type": "calculate",
+             "formula": "{{ '{{one}} + {{two}}' }}",
+             "refs": ["one", "two"]
+           },
+           "system": {
+             "type": "templated",
+             "data": "{{ 'p{{var1}}.53.{{var2}}.01' }}",
+             "refs": ["var1", "var2"]
+           },
+           "refs": {
+             "one": [1, 1.0, 1.0000001],
+             "two": [2, 2.0, 2.0000001],
+             "var1:rand_int_range": [0, 100],
+             "var2:rand_int_range": [0, 100]
+           }
+         }
 
 .. _field_groups:
 
@@ -557,7 +561,7 @@ acts like the first form and the sets of fields are rotated through in turn.
 CSV Inputs
 ----------
 
-Instead of hard coding large numbers of values into a Data Spec, these can be externalized using the one of the
+Instead of hard coding large numbers of values into a Data Spec, these can be externalized using one of the
 :ref:`csv<csv_core_types>` types. This requires a ``-d`` or ``--datadir`` argument when running from the command line
 to specify where the referenced csv files live. For example:
 
@@ -777,8 +781,9 @@ Custom Types Entry Point
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Datacraft provides a way to discover registered types using the `datacraft.custom_type_loader` entry point. At load
-time all the entry points for this key are loaded. This allows you users to create their own libraries and packages
-that use the `@datacraft.registry.*` decorators. To add an entry point to your setup.cfg or setup.py for the
+time all the entry points for this key are loaded. This allows users to create their own libraries and packages
+that use the :ref:`@datacraft.registry.*<registry_decorators>` decorators. To add an entry
+point to your setup.cfg or setup.py for the
 `datacraft.custom_type_loader`:
 
 .. tabs::

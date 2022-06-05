@@ -26,5 +26,52 @@ new or existing systems.
 Docs
 ----
 
-Find latest documentation and usage information here:
+Find the latest documentation and detailed usage information here:
 [datacraft.readthedocs.io](https://datacraft.readthedocs.io/en/latest/index.html)
+
+Installation
+------------
+
+```shell
+$ pip install datacraft
+
+$ datacraft -h # for full command line usage
+```
+
+Basic Usage
+-----------
+
+```shell
+$ datacraft type-list # list all available field spec types ...
+```
+
+```shell
+$ datacraft --type-help combine
+INFO [05-Jun-2050 05:52:59 PM] Starting Loading Configurations...
+INFO [05-Jun-2050 05:52:59 PM] Loading custom type loader: core
+INFO [05-Jun-2050 05:52:59 PM] Loading custom type loader: xeger
+-------------------------------------
+combine | Example Spec:
+{
+  "combine": {
+    "type": "combine",
+    "refs": ["first", "last"],
+    "config": {
+      "join_with": " "
+    }
+  },
+  "refs": {
+    "first": {
+      "type": "values",
+      "data": ["zebra", "hedgehog", "llama", "flamingo"]
+    },
+    "last": {
+      "type": "values",
+      "data": ["jones", "smith", "williams"]
+    }
+  }
+}
+datacraft -s spec.json -i 3 --format json -x -l off
+[{"combine": "zebra jones"}, {"combine": "hedgehog smith"}, {"combine": "llama williams"}]
+```
+

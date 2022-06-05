@@ -72,7 +72,7 @@ def parseargs(argv):
                              help='List default values from registry after any external code loading')
     debug_group.add_argument('--type-list', dest='type_list', action='store_true',
                              help='Write out the list of registered types')
-    debug_group.add_argument('--type-help', dest='type_help', default=argparse.SUPPRESS, nargs='*',
+    debug_group.add_argument('--type-help', dest='type_help', metavar='TYPE_NAME', default=argparse.SUPPRESS, nargs='*',
                              help='Write out the help for registered types, specify one or more types to limit help '
                                   'to, no arguments means show help for all types')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true',

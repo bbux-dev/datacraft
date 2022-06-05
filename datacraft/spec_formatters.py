@@ -15,8 +15,7 @@ Module with functions that handle formatting specs in an orderly and consistent 
 References:
 
     JSON Custom formatting
-    https://stackoverflow.com/questions/13249415/
-    how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
+    https://stackoverflow.com/questions/13249415/how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
 
     YAML custom formatting
     from https://til.simonwillison.net/python/style-yaml-dump
