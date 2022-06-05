@@ -1,3 +1,4 @@
+flask
 myst-parser
 sphinx-copybutton
 sphinx-autodoc-typehints
