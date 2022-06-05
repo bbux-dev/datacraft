@@ -94,3 +94,8 @@ ENV/
 
 # mypy
 .mypy_cache
+
+# docs
+docs/modules.rst
+docs/datacraft.rst
+docs/datacraft.supplier.rst
