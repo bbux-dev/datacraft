@@ -1,7 +1,6 @@
 import pytest
+
 import datacraft
-# to trigger registration
-from datacraft import cli
 
 
 def test_ref_with_ref_name():

@@ -1,0 +1,16 @@
+{%- macro show_example(example) %}
+.. tabs::
+
+   .. tab:: Data Spec
+
+      .. code-block:: json
+{% filter indent(width=9) %}
+{{ example.spec }}
+{% endfilter %}
+   .. tab:: Command and Output
+
+      .. code-block:: shell
+{% filter indent(width=9) %}
+{{ example.command }}
+{% endfilter %}
+{%- endmacro %}

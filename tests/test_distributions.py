@@ -1,6 +1,6 @@
 import pytest
+
 import datacraft
-from datacraft import distributions
 
 
 @pytest.fixture()
@@ -52,14 +52,14 @@ def test_from_string_normal(string_func, min_values_generated):
 
 
 invalid_funcs = [
-    "normal(5, 2)",               # no names
+    "normal(5, 2)",  # no names
     "noormal(mean=5, stddev=2)",  # invalid spelling of distribution
     "normal(means=5, stddev=2)",  # invalid spelling of param
-    "",                           # empty string not valid
-    " ",                          # white space not valid
-    "()",                         # open close parens not valid
-    "normal()",                   # no args
-    "uniform(start=20, end=30",   # missing closing paren
+    "",  # empty string not valid
+    " ",  # white space not valid
+    "()",  # open close parens not valid
+    "normal()",  # no args
+    "uniform(start=20, end=30",  # missing closing paren
     "uniform)start=20, end=30(",  # inverted parens
     "gauss(mean=33, stddev=5, maximum=50)"  # maximum is not a valid extra arg
     "gauss(mean=33, stddev=5, )"  # extra comma

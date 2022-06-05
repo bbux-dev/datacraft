@@ -1,9 +1,10 @@
 import string
+
 import pytest
-from datacraft import builder, field_loader, SpecException, SupplierException
-# to trigger registration
-from datacraft import cli
-from datacraft import _registered_types
+
+import datacraft
+from datacraft import builder, field_loader, SpecException
+from datacraft._registered_types.char_class import _CLASS_MAPPING
 
 
 def test_char_class_no_data_element():
@@ -44,7 +45,7 @@ def test_char_class_printable():
 
 
 def test_char_class_abbreviations():
-    abbreviations = ['cc-' + key for key in _registered_types._CLASS_MAPPING.keys()]
+    abbreviations = ['cc-' + key for key in _CLASS_MAPPING.keys()]
 
     for abbreviation in abbreviations:
         spec = _cc_abbrev_spec(abbrev=abbreviation, count=7)
@@ -62,6 +63,14 @@ def test_char_class_multiple_classes():
     assert isinstance(value, str)
     for char in value:
         assert char in string.ascii_lowercase or char in string.digits
+
+
+def test_verify_class_mappings():
+    for key, values in _CLASS_MAPPING.items():
+        spec = _cc_abbrev_spec(f"cc-{key}", count=5)
+        single_item = datacraft.entries(spec, 1)[0]['name']
+        for c in single_item:
+            assert c in values, f'{c} not expected to be part of {key} type. values: {values}'
 
 
 def _verify_values(supplier, min_size, max_size, exclude='', iterations=100):
@@ -82,3 +91,4 @@ def _cc_abbrev_spec(abbrev, **config):
     return builder.spec_builder() \
         .add_field("name", builder.char_class_abbrev(cc_abbrev=abbrev, **config)) \
         .build()
+

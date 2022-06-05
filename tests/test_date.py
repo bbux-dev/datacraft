@@ -3,10 +3,8 @@ import datetime
 import pytest
 
 import datacraft
-from datacraft.loader import field_loader
 from datacraft import builder
-# to trigger registration
-from datacraft import cli
+from datacraft.loader import field_loader
 
 
 def test_basic_spec():

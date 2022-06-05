@@ -1,8 +1,7 @@
 import pytest
+
 import datacraft
 import datacraft.supplier.calculate
-# to trigger registration
-from datacraft import cli
 
 simple_calc_data = [
     (
@@ -59,12 +58,12 @@ def test_keywords_are_now_valid(keyword):
 
 
 missing_required_invalid_inputs = [
-    (None,               None,             '{{ a }} + 2'),
+    (None, None, '{{ a }} + 2'),
     ({'not_used': 'a'}, {'not_used': 'a'}, '{{ a }} + 2'),
-    (None,              {'not_used': 'a'}, None),
-    ({'not_used': 'a'}, None,              None),
-    ({},                None,              '{{ a }} + 2'),
-    (None,              ['not_used', 'a'], '{{ a }} + 2')
+    (None, {'not_used': 'a'}, None),
+    ({'not_used': 'a'}, None, None),
+    ({}, None, '{{ a }} + 2'),
+    (None, ['not_used', 'a'], '{{ a }} + 2')
 ]
 
 

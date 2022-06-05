@@ -1,10 +1,12 @@
-from datacraft import field_loader
-import datacraft.suppliers as suppliers
-from datacraft.loader import preprocess_spec
-from datacraft.exceptions import SpecException
-import datacraft.builder as builder
 from collections import Counter
+
 import pytest
+
+import datacraft.builder as builder
+import datacraft.suppliers as suppliers
+from datacraft import field_loader
+from datacraft.exceptions import SpecException
+from datacraft.loader import preprocess_spec
 
 
 def test_single_value():

@@ -8,14 +8,13 @@ import json
 import logging
 import yaml
 
-from . import outputs, utils
-from . import template_engines, builder, spec_formatters, loader, registries
+from . import outputs, utils, usage
+from . import template_engines, builder, spec_formatters, loader, registries, entrypoints
 # this activates the decorators, so they will be discoverable
 from .exceptions import SpecException
 
 # need to import this to trigger registration process
 from . import preprocessor, defaults, distributions
-from . import _registered_types
 
 _log = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ def parseargs(argv):
                         help='Path to template to populate, or template inline as a string')
     parser.add_argument('-r', '--records-per-file', dest='records_per_file', default=None, type=int,
                         help='Number of records to place in each file, default is all, requires -o to be specified')
-    parser.add_argument('-k', '--printkey', action='store_true', default=False,
+    parser.add_argument('-k', '--printkey', action='store_true',
                         help='When printing to stdout field name should be printed along with value')
     parser.add_argument('-c', '--code', nargs='+',
                         help='Path to custom defined functions in one or more modules to load')
@@ -62,14 +61,20 @@ def parseargs(argv):
     parser.add_argument('--strict', action='store_true',
                         default=registries.get_default('strict_mode'),
                         help='Enforce schema validation for all registered field specs')
-    parser.add_argument('--apply-raw', action='store_true', dest='apply_raw', default=False,
+    parser.add_argument('--apply-raw', action='store_true', dest='apply_raw',
                         help='Data from -s argument should be applied to the template with out treating as a Data Spec')
-    parser.add_argument('--debug-spec', dest='debug_spec', action='store_true', default=False,
-                        help='Debug spec after internal reformatting')
-    parser.add_argument('--debug-spec-yaml', dest='debug_spec_yaml', action='store_true', default=False,
-                        help='Debug spec after internal reformatting, write out as yaml')
-    parser.add_argument('--debug-defaults', dest='debug_defaults', action='store_true', default=False,
-                        help='List default values from registry after any external code loading')
+    debug_group = parser.add_argument_group('info')
+    debug_group.add_argument('--debug-spec', dest='debug_spec', action='store_true',
+                             help='Debug spec after internal reformatting')
+    debug_group.add_argument('--debug-spec-yaml', dest='debug_spec_yaml', action='store_true',
+                             help='Debug spec after internal reformatting, write out as yaml')
+    debug_group.add_argument('--debug-defaults', dest='debug_defaults', action='store_true',
+                             help='List default values from registry after any external code loading')
+    debug_group.add_argument('--type-list', dest='type_list', action='store_true',
+                             help='Write out the list of registered types')
+    debug_group.add_argument('--type-help', dest='type_help', default=argparse.SUPPRESS, nargs='*',
+                             help='Write out the help for registered types, specify one or more types to limit help '
+                                  'to, no arguments means show help for all types')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true',
                         default=registries.get_default('exclude_internal'),
                         help='Do not include non data fields in output records')
@@ -140,6 +145,22 @@ def process_args(args):
     ###################
     # Load Data Spec
     ###################
+
+    # this would bypass spec loading
+    if args.type_list:
+        writer = outputs.get_writer(args.outdir, outfile='type_list.json', overwrite=True)
+        # writer = _get_writer(args)
+        entrypoints.load_eps()
+        all_types = registries.registered_types()
+        for registered_type in all_types:
+            writer.write(registered_type)
+        return None
+    if 'type_help' in args:
+        writer = outputs.get_writer(args.outdir, outfile='type-help.txt', overwrite=True)
+        entrypoints.load_eps()
+        usage_str = usage.build_cli_help(args.type_help)
+        writer.write(usage_str)
+        return None
 
     _log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
     spec = _load_spec(args)

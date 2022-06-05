@@ -71,4 +71,3 @@ def test_buffered_supplier_from_spec():
     for i in range(10):
         value = supplier.next(i)
         assert value == supplier.next(i)
-

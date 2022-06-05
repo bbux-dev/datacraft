@@ -1,27 +1,94 @@
 {
   "geo.lat.schema.json": {
     "valid": [
-      {"instance": {"type": "geo.lat"}},
-      {"instance": {"type": "geo.lat", "config": {"start_lat": -89.0}}},
-      {"instance": {"type": "geo.lat", "config": {"end_lat": 89.9}}},
-      {"instance": {"type": "geo.lat", "config": {"start_lat": -90.0, "end_lat": 90.0}}},
-      {"instance": {"type": "geo.lat", "config": {"bbox": [31.33134, 22.03795, 34.19295, 25.00562]}}}
+      {
+        "instance": {
+          "type": "geo.lat"
+        }
+      },
+      {
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "start_lat": -89.0
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "end_lat": 89.9
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "start_lat": -90.0,
+            "end_lat": 90.0
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "bbox": [
+              31.33134,
+              22.03795,
+              34.19295,
+              25.00562
+            ]
+          }
+        }
+      }
     ],
     "invalid": [
-      {"instance": {}, "note": "empty"},
-      {"instance": {"type": "geo.lats"}, "note": "misspelled"},
-      {"instance": {"type": "geo-lat"}, "note": "misspelled"},
       {
-        "note": "out of range of valid latitude",
-        "instance": {"type": "geo.lat", "config": {"start_lat": -99.0}}
+        "instance": {},
+        "note": "empty"
+      },
+      {
+        "instance": {
+          "type": "geo.lats"
+        },
+        "note": "misspelled"
+      },
+      {
+        "instance": {
+          "type": "geo-lat"
+        },
+        "note": "misspelled"
       },
       {
         "note": "out of range of valid latitude",
-        "instance": {"type": "geo.lat", "config": {"end_lat": 99.9}}
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "start_lat": -99.0
+          }
+        }
       },
       {
         "note": "out of range of valid latitude",
-        "instance": {"type": "geo.lat", "config": {"start_lat": -90.1, "end_lat": 90.1  }}
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "end_lat": 99.9
+          }
+        }
+      },
+      {
+        "note": "out of range of valid latitude",
+        "instance": {
+          "type": "geo.lat",
+          "config": {
+            "start_lat": -90.1,
+            "end_lat": 90.1
+          }
+        }
       }
     ]
   }

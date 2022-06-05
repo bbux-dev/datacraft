@@ -4,8 +4,6 @@ import pytest
 
 import datacraft
 from datacraft import builder, field_loader
-# to trigger registration
-from datacraft import cli
 
 
 def test_geo_lat_default_precision():
@@ -104,7 +102,7 @@ def test_geo_pair_as_list():
     end_long = 60.0
 
     spec = _geo_pair_spec(bbox=[start_long, start_lat, end_long, end_lat], as_list=True)
-    
+
     supplier = field_loader(spec).get('pair')
     value = supplier.next(0)
     assert isinstance(value, list)

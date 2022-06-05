@@ -1,10 +1,6 @@
 import yaml
-import json
 
 from datacraft.loader import field_loader
-# to trigger registration
-from datacraft import cli
-
 
 yaml_spec = '''
 ---

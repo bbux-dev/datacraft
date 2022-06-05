@@ -23,12 +23,12 @@ Examples:
 
 .. code-block:: json
 
-    { "pointer": { "type": "ref", "data": "ref_name" } }, "refs": { "ref_name": 42 } }
+    { "pointer": { "type": "ref", "data": "ref_name" }, "refs": { "ref_name": 42 } }
 
-    { "pointer": { "type": "ref", "ref": "ref_name" } }, "refs": { "ref_name": 42 } }
+    { "pointer": { "type": "ref", "ref": "ref_name" }, "refs": { "ref_name": 42 } }
 
-    { "pointer:ref": { "ref": "ref_name" } }, "refs": { "ref_name": 42 } }
+    { "pointer:ref": { "ref": "ref_name" }, "refs": { "ref_name": 42 } }
 
-    { "pointer:ref": { "data": "ref_name" } }, "refs": { "ref_name": 42 } }
+    { "pointer:ref": { "data": "ref_name" }, "refs": { "ref_name": 42 } }
 
     { "pointer:ref": "ref_name", "refs": { "ref_name": 42 } }

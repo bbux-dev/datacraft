@@ -1,8 +1,7 @@
 import pytest
-from datacraft.loader import field_loader
+
 from datacraft import builder, suppliers, SpecException
-# to trigger registration
-from datacraft import cli
+from datacraft.loader import field_loader
 
 
 def test_invalid_when_no_config():

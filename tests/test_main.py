@@ -1,8 +1,8 @@
 import os
 
+import catalogue
 import pytest
 
-import catalogue
 import datacraft
 from datacraft import __main__ as dgmain
 
@@ -64,6 +64,30 @@ def test_parse_debug_spec_yaml(tmpdir):
     args = ['--debug-spec-yaml', '-o', str(tmpdir), '--inline', '{foo: [1,2,3]}']
     dgmain.main(args)
     assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
+def test_parse_debug_defaults(tmpdir):
+    args = ['--debug-defaults', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'dataspec_defaults.json'))
+
+
+def test_type_list(tmpdir):
+    args = ['--type-list', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type_list.json'))
+
+
+def test_type_help_no_filter(tmpdir):
+    args = ['--type-help', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
+
+
+def test_type_help_with_filter(tmpdir):
+    args = ['--type-help', 'calculate', 'sample', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
 
 
 def test_parse_debug_defaults(tmpdir):

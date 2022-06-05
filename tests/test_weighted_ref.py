@@ -1,10 +1,7 @@
-# to trigger registration
 import pytest
 
 from datacraft import builder, suppliers, field_loader, SupplierException
-from datacraft.supplier.refs import weighted_ref_supplier
-# to trigger registration
-from datacraft import cli
+from datacraft._registered_types.refs import weighted_ref_supplier
 
 
 def test_weighted_ref_missing_key():

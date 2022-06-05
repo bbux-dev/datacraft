@@ -1,4 +1,5 @@
 import pytest
+
 from datacraft import SpecException
 from datacraft.casters import from_config
 
@@ -82,9 +83,9 @@ cast_tests = [
 
     (space_aBcD_space, 'lower', ' abcd '),
     (space_aBcD_space, 'upper', ' ABCD '),
-    (space_aBcD_space, 'trim',  'aBcD'),
-    (space_aBcD_space, 'l;t',   'abcd'),
-    (space_aBcD_space, 'u;t',   'ABCD'),
+    (space_aBcD_space, 'trim', 'aBcD'),
+    (space_aBcD_space, 'l;t', 'abcd'),
+    (space_aBcD_space, 'u;t', 'ABCD'),
     (space_aBcD_space, 'trim;lower', 'abcd'),
     (space_aBcD_space, 'trim;str;upper;lower', 'abcd'),
 
