@@ -101,8 +101,8 @@ def record_level(record_processor: RecordProcessor,
     Creates a OutputHandler for record level events
 
     Args:
-        record_processor (RecordProcessor): to process the records into strings
-        writer (WriterInterface): to write the processed records
+        record_processor: to process the records into strings
+        writer: to write the processed records
         records_per_file: number of records to accumulate before writing
 
     Returns:
