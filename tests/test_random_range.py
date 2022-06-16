@@ -3,6 +3,7 @@ import decimal
 import pytest
 
 import datacraft
+from . import builder
 
 
 def test_random_range_exponent():
@@ -23,8 +24,8 @@ valid_tests = [
 
 @pytest.mark.parametrize("field_type,data,lower,upper", valid_tests)
 def test_random_range_parameterized(field_type, data, lower, upper):
-    builder = datacraft.spec_builder()
-    spec = builder.add_field('test', {'type': field_type, 'data': data}).build()
+    spec_builder = builder.spec_builder()
+    spec = spec_builder.add_field('test', {'type': field_type, 'data': data}).build()
     val = next(spec.generator(1, enforce_schema=True))['test']
     assert lower <= float(val) <= upper
 
@@ -38,8 +39,8 @@ field_type_keys = [
 @pytest.mark.parametrize("field_type", field_type_keys)
 def test_random_range_invalid_missing_data(field_type):
     with pytest.raises(datacraft.SpecException):
-        builder = datacraft.spec_builder()
-        spec = builder.add_field('test', {'type': field_type}).build()
+        spec_builder = builder.spec_builder()
+        spec = spec_builder.add_field('test', {'type': field_type}).build()
         next(spec.generator(1))['test']
 
 
@@ -53,6 +54,6 @@ invalid_data_type = [
 @pytest.mark.parametrize("field_type, data", invalid_data_type)
 def test_random_range_invalid_data_type(field_type, data):
     with pytest.raises(datacraft.SpecException):
-        builder = datacraft.spec_builder()
-        spec = builder.add_field('test', {'type': field_type, 'data': data}).build()
+        spec_builder = builder.spec_builder()
+        spec = spec_builder.add_field('test', {'type': field_type, 'data': data}).build()
         next(spec.generator(1))['test']

@@ -1,7 +1,8 @@
 import pytest
 
 import datacraft
-from datacraft import builder, field_loader
+from datacraft import field_loader
+from . import builder
 
 
 def test_single_nested():

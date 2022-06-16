@@ -3,7 +3,8 @@ import decimal
 import pytest
 
 import datacraft
-from datacraft import builder, field_loader
+from datacraft import field_loader
+from . import builder
 
 
 def test_geo_lat_default_precision():

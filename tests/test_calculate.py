@@ -2,6 +2,7 @@ import pytest
 
 import datacraft
 import datacraft.supplier.calculate
+from . import builder
 
 simple_calc_data = [
     (
@@ -37,7 +38,7 @@ def test_simple_calculation(alias_to_values, formula, expected_first_value):
 
 
 def test_calculate_valid_from_builder():
-    spec_builder = datacraft.spec_builder()
+    spec_builder = builder.spec_builder()
     spec_builder.values('field', 21)
     mapping = {'field': 'a'}
     formula = '{{a}} * 2'
@@ -48,7 +49,7 @@ def test_calculate_valid_from_builder():
 
 @pytest.mark.parametrize('keyword', ['for', 'if', 'else', 'in', 'elif'])
 def test_keywords_are_now_valid(keyword):
-    spec_builder = datacraft.spec_builder()
+    spec_builder = builder.spec_builder()
     spec_builder.values('field', 84)
     mapping = {'field': keyword}
     formula = '{{%s}}/2' % keyword
@@ -69,7 +70,7 @@ missing_required_invalid_inputs = [
 
 @pytest.mark.parametrize('fields, refs, formula', missing_required_invalid_inputs)
 def test_calculate_missing_required(fields, refs, formula):
-    spec_builder = datacraft.spec_builder()
+    spec_builder = builder.spec_builder()
     spec_builder.calculate('something_interesting', fields=fields, refs=refs, formula=formula)
 
     with pytest.raises(datacraft.SpecException):

@@ -858,49 +858,7 @@ automatically discovered and loaded by the datacraft tooling at run time.
 Programmatic Usage
 ------------------
 
-Building Specs
-^^^^^^^^^^^^^^
-
-The :ref:`datacraft.builder<builder_module>` module contains tools that can be used to programmatically generate Data
-Specs. This may be easier for some who are not as familiar with JSON or prefer to manage their structures in code.
-The core object is the ``Builder``. You can add fields, refs, and field groups to this. Each of the core field types
-has a builder function that will generate a Field Spec for it. See example below.
-
-These examples can be used to generate email addresses.  The first example uses the raw API to build up the spec. The
-second uses a dictionary that mirrors the JSON format.
-
-.. code-block:: python
-
-   import datacraft
-
-   animal_names = ['zebra', 'hedgehog', 'llama', 'flamingo']
-   action_list = ['fling', 'jump', 'launch', 'dispatch']
-   domain_weights = {
-       "gmail.com": 0.6,
-       "yahoo.com": 0.3,
-       "hotmail.com": 0.1
-   }
-   # for building the final spec
-   spec_builder = datacraft.spec_builder()
-   # for building the references, is it self also a Builder, but with no refs
-   refs = spec_builder.refs()
-   # info for each reference added
-   domains = refs.values('DOMAINS', data=domain_weights)
-   animals = refs.values('ANIMALS', data=animal_names)
-   actions = refs.values('ACTIONS', data=action_list, sample=True)
-   # combines ANIMALS and ACTIONS with an _
-   handles = refs.combine('HANDLE', refs=[animals, actions], join_with='_')
-
-   spec_builder.combine('email', refs=[handles, domains], join_with='@')
-
-   spec = spec_builder.build()
-
-   # print single generated record
-   print(next(spec.generator(1)))
-   #{'email': 'zebra_dispatch@gmail.com'}
-
-
-An alternative is to have a spec as a dictionary that mirrors the JSON format:
+The simplest way to use datacraft programmatically is to have a spec as a dictionary that mirrors the JSON format:
 
 .. code-block:: python
 
@@ -952,9 +910,8 @@ Example:
 
     import datacraft
 
-    name_list = ['bob', 'bobby', 'robert', 'bobo']
-    builder = datacraft.spec_builder()
-    spec = builder.values('name', name_list).to_spec()
+    raw_spec {'name': ['bob', 'bobby', 'robert', 'bobo']}
+    spec = datacraft.parse_spec(raw_spec)
 
     template = 'Name: {{ name }}'
     # need this to apply the data to the template

@@ -1,7 +1,8 @@
 import pytest
 
 import datacraft.supplier.common
-from datacraft import builder, suppliers, field_loader
+from datacraft import suppliers, field_loader
+from . import builder
 
 
 def test_buffered_supplier_one_behind():

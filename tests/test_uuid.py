@@ -2,7 +2,9 @@ import re
 
 import pytest
 
-from datacraft import builder, field_loader
+from datacraft import field_loader
+
+from . import builder
 
 UUID_REGEX = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', re.I)
 

@@ -36,9 +36,9 @@ def standard_example_usage(example: dict, num: int, pretty: bool = False, no_ref
     datacraft_format = 'json-pretty' if pretty else 'json'
     command = f'datacraft -s spec.json -i {num} --format {datacraft_format} -x -l off'
     if pretty:
-        output = json.dumps(datacraft.entries(example, num), indent=4)
+        output = json.dumps(datacraft.entries(example, num, enforce_schema=True), indent=4)
     else:
         output = json.dumps(
-            datacraft.entries(example, num),
+            datacraft.entries(example, num, enforce_schema=True),
             ensure_ascii=datacraft.registries.get_default('format_json_ascii'))
     return f'Example Spec:\n{formatted_spec}\n{command}\n{output}\n'

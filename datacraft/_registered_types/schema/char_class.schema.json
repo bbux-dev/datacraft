@@ -13,27 +13,31 @@
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
         "min": {
-          "type": "integer",
+          "type": ["integer", "string"],
+          "pattern": "^\\d+$",
           "description": "minimum number of characters in string",
           "default": null,
           "examples": [1, 7, 2255],
           "minimum": 1
         },
         "max": {
-          "type": "integer",
+          "type": ["integer", "string"],
+          "pattern": "^\\d+$",
           "description": "maximum number of characters in string",
           "default": null,
           "examples": [1, 7, 2255],
           "minimum": 1
         },
         "mean": {
-          "type": "number",
+          "type": ["number", "string"],
+          "pattern": "^\\d+$",
           "description": "mean number of characters in string",
           "default": null,
           "examples": [3, 5, 7.5]
         },
         "stddev": {
-          "type": "number",
+          "type": ["number", "string"],
+          "pattern": "^\\d+$",
           "description": "standard deviation from mean for number of characters in string",
           "default": null,
           "examples": [0.5, 3, 7]

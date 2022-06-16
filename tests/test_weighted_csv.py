@@ -4,6 +4,8 @@ import pytest
 
 import datacraft
 
+from . import builder
+
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
 
@@ -48,7 +50,7 @@ def test_weighted_csv_valid_no_header_indexed_column():
 
 
 def test_weighted_csv_from_builder():
-    spec = datacraft.spec_builder() \
+    spec = builder.spec_builder() \
         .weighted_csv('status', datafile='weighted.csv', column='status', weight_column='weight', headers=True) \
         .to_spec()
 
@@ -72,6 +74,6 @@ def _build_csv_spec(field_name, **config):
         "datafile": "weighted.csv"
     }
     base.update(config)
-    return datacraft.spec_builder() \
-        .add_field(field_name, datacraft.builder.weighted_csv(**base)) \
+    return builder.spec_builder() \
+        .add_field(field_name, builder.weighted_csv(**base)) \
         .build()

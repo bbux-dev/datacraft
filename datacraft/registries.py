@@ -71,9 +71,9 @@ class Registry:
             ...     # return a datacraft.Distribution, args can be custom for the defined distribution
 
         defaults:
-            Default values. Different types have different default values for some configs.  This provides a mechanism
-            to override or to register other custom defaults. Read a default from the registry
-            with: ``datacraft.types.get_default('var_key')``. While ``datacraft.types.all_defaults()`` will give a
+            Default values. Different types have different default values for some configs.  This provides a
+            mechanism to override or to register other custom defaults. Read a default from the registry with:
+            ``datacraft.registries.get_default('var_key')``. While ``datacraft.registries.all_defaults()`` will give a
             mapping of all registered default keys and values.
 
             >>> @datacraft.registry.defaults('special_sauce_ingredient')
@@ -81,9 +81,9 @@ class Registry:
             ...     # return the default value (i.e. onions)
 
         casters:
-            Cast or alter values in simple ways. These are all the valid forms of altering generated values after they
-            are created outside of the ValueSupplier types. Use ``datacraft.types.registered_casters()`` to get a list
-            of all the currently registered ones.
+            Cast or alter values in simple ways. These are all the valid forms of altering generated values
+            after they are created outside of the ValueSupplier types. Use ``datacraft.registries.registered_casters()``
+            to get a list of all the currently registered ones.
 
             >>> @datacraft.registry.casters('reverse')
             ... def _cast_reverse_strings():
