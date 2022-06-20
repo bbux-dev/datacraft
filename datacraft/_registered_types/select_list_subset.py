@@ -12,6 +12,13 @@ _SAMPLE_KEY = 'sample'
 
 
 @datacraft.registry.schemas(_SAMPLE_KEY)
+def _sample_schema():
+    """ schema for sample alias type """
+    schema = schemas.load(_SELECT_LIST_SUBSET_KEY)
+    schema['properties']['type']['pattern'] = f'^{_SAMPLE_KEY}$'
+    return schema
+
+
 @datacraft.registry.schemas(_SELECT_LIST_SUBSET_KEY)
 def _select_list_subset_schema():
     """ schema for select_list_subset type """
