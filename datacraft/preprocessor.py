@@ -169,6 +169,8 @@ def _preprocess_nested(raw_spec: dict, is_refs: bool = False) -> dict:
 def _preprocess_verify_types(raw_spec: dict, is_refs: bool = False) -> dict:
     """ log only checks """
     for key, field_spec in raw_spec.items():
+        if key == 'field_groups':
+            continue
         if key == 'refs':
             _preprocess_verify_types(field_spec)
             continue
