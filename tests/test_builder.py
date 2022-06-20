@@ -3,8 +3,8 @@ import json
 import pytest
 
 import datacraft
-import datacraft.builder as builder
 from datacraft import distributions, DataSpec, SpecException
+from . import builder
 
 
 def test_api_builder():
@@ -160,7 +160,9 @@ full_spec_build_tests = [
     (builder.spec_builder().csv('name', datafile="demo.csv", sample="on"),
      {"name": {"type": "csv", "config": {"datafile": "demo.csv", "sample": "on"}}}),
     (builder.spec_builder().csv_select('name', data={"one": 1, "two": 2}, headers=False),
-     {"name": {"type": "csv_select", "config": {"headers": False}, "data": {"one": 1, "two": 2}}}),
+     {"refs": {"name_config_ref": {"type": "config_ref", "config": {"headers": False}}},
+      "one": {"type": "csv", "config": {"column": 1, "config_ref": "name_config_ref"}},
+      "two": {"type": "csv", "config": {"column": 2, "config_ref": "name_config_ref"}}}),
     (builder.spec_builder().nested('name', fields={"one": {"type": "values", "data": 1}}),
      {"name": {"type": "nested", "fields": {"one": {"type": "values", "data": 1}}}}),
     (builder.spec_builder().calculate('name', refs=['ONE', 'TWO'], formula='{{ ONE }} + {{ TWO }}'),
@@ -203,8 +205,6 @@ invalid_spec_build_tests = [
     builder.spec_builder().date('name', duration_days={1: 0.5, 2: 0.5}, offset=4),  # invalid duration_days
     builder.spec_builder().date_iso('name', duration_days=4, offset="1"),  # invalid offset
     builder.spec_builder().date_iso_us('name', duration_days=5, offset=6, start=42),  # invalid start
-    builder.spec_builder().char_class('name', "visible", min="5", max=7),  # min should be number
-    builder.spec_builder().char_class_abbrev('name', "visible", min=3, max="10"),  # max should be number
     builder.spec_builder().unicode_range('name', ["3040", "309f"], count=4, mean=3),  # can't have count and mean
     builder.spec_builder().unicode_range('name', [["3040", "309f"]], count=5, max=6),  # can't have count and max
     builder.spec_builder().geo_lat('name', start_lat=175.5),  # lat out of range

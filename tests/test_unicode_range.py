@@ -1,6 +1,8 @@
 import pytest
 
-from datacraft import builder, field_loader, SpecException
+from datacraft import field_loader, SpecException
+
+from . import builder
 
 
 def test_unicode_no_data_element():

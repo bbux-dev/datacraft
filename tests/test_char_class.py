@@ -3,8 +3,9 @@ import string
 import pytest
 
 import datacraft
-from datacraft import builder, field_loader, SpecException
+from datacraft import field_loader, SpecException
 from datacraft._registered_types.char_class import _CLASS_MAPPING
+from . import builder
 
 
 def test_char_class_no_data_element():
@@ -91,4 +92,3 @@ def _cc_abbrev_spec(abbrev, **config):
     return builder.spec_builder() \
         .add_field("name", builder.char_class_abbrev(cc_abbrev=abbrev, **config)) \
         .build()
-

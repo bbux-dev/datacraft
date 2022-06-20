@@ -1,8 +1,9 @@
 import pytest
 
-from datacraft import builder, SpecException
+from datacraft import SpecException
 from datacraft.loader import field_loader
 
+from . import builder
 
 def test_ip_v4_spec():
     spec = _ipv4_spec(cidr="192.168.0.0/16")

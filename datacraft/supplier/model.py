@@ -69,9 +69,8 @@ class DataSpec(dict):
 
         Examples:
             >>> import datacraft
-            >>> builder = datacraft.spec_builder()
-            >>> builder.values(['bob', 'bobby', 'robert', 'bobo']))
-            >>> spec = builder.build()
+            >>> raw_spec {'name': ['bob', 'bobby', 'robert', 'bobo']}
+            >>> spec = datacraft.parse_spec(raw_spec)
             >>> template = 'Name: {{ name }}'
             >>> processor = datacraft.outputs.processor(template=template)
             >>> generator = spec.generator(

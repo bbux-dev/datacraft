@@ -1,7 +1,9 @@
 import pytest
 
-from datacraft import builder, suppliers, field_loader, SupplierException
+from datacraft import suppliers, field_loader, SupplierException
 from datacraft._registered_types.refs import weighted_ref_supplier
+
+from . import builder
 
 
 def test_weighted_ref_missing_key():

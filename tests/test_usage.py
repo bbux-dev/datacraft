@@ -23,8 +23,8 @@ def _test_supplier_no_usage(_, __):
 
 
 def test_usage_misspelled_type():
-    usage_string = datacraft.usage.build_cli_help([DEMO_FOR_TEST+'zzz'])
-    assert DEMO_FOR_TEST+'zzz' in usage_string
+    usage_string = datacraft.usage.build_cli_help([DEMO_FOR_TEST + 'zzz'])
+    assert DEMO_FOR_TEST + 'zzz' in usage_string
     assert 'unknown type' in usage_string
 
 

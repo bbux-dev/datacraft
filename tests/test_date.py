@@ -3,8 +3,8 @@ import datetime
 import pytest
 
 import datacraft
-from datacraft import builder
 from datacraft.loader import field_loader
+from . import builder
 
 
 def test_basic_spec():

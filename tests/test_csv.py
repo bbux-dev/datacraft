@@ -4,6 +4,7 @@ import pytest
 
 import datacraft
 import datacraft.supplier.csv
+from . import builder
 
 test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
@@ -95,16 +96,16 @@ def test_csv_single_column():
 
 
 def test_row_level_sampling():
-    builder = datacraft.spec_builder()
+    spec_builder = builder.spec_builder()
     config = {
         "datafile": "test.csv",
         "headers": True,
         "sample_rows": "on"
     }
-    builder.config_ref('csvconfig', **config)
-    builder.csv('status', config_ref='csvconfig', column=1)
-    builder.csv('status_description', config_ref='csvconfig', column=2)
-    spec = builder.build()
+    spec_builder.config_ref('csvconfig', **config)
+    spec_builder.csv('status', config_ref='csvconfig', column=1)
+    spec_builder.csv('status_description', config_ref='csvconfig', column=2)
+    spec = spec_builder.build()
 
     with open(os.sep.join([test_dir, 'test.csv'])) as handle:
         parts = [line.strip().split(',') for line in handle.readlines()]
@@ -126,8 +127,8 @@ def _build_csv_spec(field_name, **config):
         "column": 1
     }
     base.update(config)
-    return datacraft.spec_builder() \
-        .add_field(field_name, datacraft.builder.csv(**base)) \
+    return builder.spec_builder() \
+        .add_field(field_name, builder.csv(**base)) \
         .build()
 
 

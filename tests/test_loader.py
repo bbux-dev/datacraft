@@ -3,9 +3,9 @@ from collections import Counter
 import pytest
 
 import datacraft
-from datacraft import builder
+from . import builder
 
-spec = datacraft.builder.spec_builder() \
+spec = builder.spec_builder() \
     .add_field('foo', builder.combine(['ONE', 'TWO'], join_with='')) \
     .add_ref('ONE', builder.values(['do', 'ca', 'pi'])) \
     .add_ref('TWO', builder.values(['g', 't', 'g'])) \

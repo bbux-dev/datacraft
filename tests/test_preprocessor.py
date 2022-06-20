@@ -1,8 +1,9 @@
 import pytest
 
-from datacraft import builder, loader, SpecException
+from datacraft import loader, SpecException
 from datacraft.preprocessor import _parse_key, _is_spec_data, _update_no_params
 from datacraft.preprocessor import _preprocess_spec, _preprocess_nested
+from . import builder
 
 parse_key_tests = [
     (

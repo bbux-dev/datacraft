@@ -1,5 +1,7 @@
 import datacraft
 
+from . import builder
+
 
 def test_basic_template():
     supplier_map = {
@@ -30,14 +32,14 @@ def test_spec_based_templated():
 
 
 def test_builder_based_templated():
-    builder = datacraft.spec_builder()
-    builder.refs().values(key='health', data=[20, 25, 30])
-    builder.refs().values(key='dex', data=[15, 16, 17])
-    builder.templated(
+    spec_builder = builder.spec_builder()
+    spec_builder.refs().values(key='health', data=[20, 25, 30])
+    spec_builder.refs().values(key='dex', data=[15, 16, 17])
+    spec_builder.templated(
         key='field',
         data='Health: {{ health }}, Dexterity: {{ dex }}',
         refs=['health', 'dex']
     )
-    spec = builder.build()
+    spec = spec_builder.build()
     single = list(spec.generator(1))
     assert single == [{'field': 'Health: 20, Dexterity: 15'}]

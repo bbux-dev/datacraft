@@ -1,8 +1,9 @@
 import pytest
 
 import datacraft.suppliers
-from datacraft import builder, SupplierException
+from datacraft import SupplierException
 from datacraft.supplier import key_suppliers
+from . import builder
 
 
 def test_no_field_groups():
