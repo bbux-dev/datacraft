@@ -1,3 +1,6 @@
+import pytest
+
+import datacraft
 from datacraft import field_loader
 
 from . import builder
@@ -63,3 +66,18 @@ def test_range_wrap_around():
 
     vals = [supplier.next(i) for i in range(4)]
     assert vals == [1, 2, 3, 1]
+
+
+invalid_range_specs = [
+    {'field0': {'type': 'range'}},  # no data
+    {'field1': {'type': 'range', 'data': [1]}},  # single element in data
+    {'field2': {'type': 'range', 'data': "1-10"}},  # data not list
+    {'field3': {'type': 'range', 'data': [1, 10], 'config': {'precision': 'A'}}},  # nested invalid precision
+    {'field4': {'type': 'range', 'data': [11, 10]}},  # end before start
+]
+
+
+@pytest.mark.parametrize('spec', invalid_range_specs)
+def test_invalid_range_specs(spec):
+    with pytest.raises(datacraft.SpecException):
+        datacraft.entries(spec, 1)
