@@ -48,13 +48,6 @@ def _get_char_class_schema():
     return schemas.load(_CHAR_CLASS_KEY)
 
 
-for class_key in _CLASS_MAPPING:
-    @datacraft.registry.schemas("cc-" + class_key)
-    def _get_char_class_alias_schema():
-        """ get the schema for the char_class type """
-        return schemas.load(_CHAR_CLASS_KEY)
-
-
 @datacraft.registry.types(_CHAR_CLASS_KEY)
 def _configure_char_class_supplier(spec, loader):
     """ configure the supplier for char_class types """
@@ -84,6 +77,22 @@ def register_alias_type_function(key, name):
     return function
 
 
+def register_alias_type_schema(key):
+    @datacraft.registry.schemas(key)
+    def function():
+        """ configure the schema for char_class alias types """
+        # start with character class schema
+        schema = schemas.load(_CHAR_CLASS_KEY)
+        # "properties": {
+        #     "type": {"type": "string", "pattern": "^char_class$"}, <- replace this
+        schema['properties']['type']['pattern'] = f'^{key}$'
+        # drop requirement for data, since this is injected by the cc-<name>
+        schema['required'] = ['type']
+        return schema
+
+    return function
+
+
 @datacraft.registry.usage(_CHAR_CLASS_KEY)
 def _char_class_usage():
     """basic usage example for char class"""
@@ -105,6 +114,8 @@ def register_alias_usage_function(key):
     return function
 
 
-for class_key in _CLASS_MAPPING:
-    register_alias_type_function("cc-" + class_key, class_key)
-    register_alias_usage_function("cc-" + class_key)
+for class_name in _CLASS_MAPPING:
+    class_key = "cc-" + class_name
+    register_alias_type_function(class_key, class_name)
+    register_alias_type_schema(class_key)
+    register_alias_usage_function(class_key)
