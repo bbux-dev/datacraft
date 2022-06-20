@@ -1,3 +1,7 @@
+v0.5.0
+------
+* Bug fixes and removal of `datacraft.spec_builder` function and tooling from API.
+
 v0.4.0
 ------
 * Added initial built in type help system with command line --type-list and --type-help command line arguments
