@@ -11,7 +11,7 @@ _log = logging.getLogger(__name__)
 @lru_cache()
 def load_eps():
     """initiate any custom entry points"""
-    eps = metadata.entry_points().get('datacraft.custom_type_loader', [])
+    eps = metadata.entry_points().select(group='datacraft.custom_type_loader')
 
     for ep in eps:
         plugin = ep.load()
