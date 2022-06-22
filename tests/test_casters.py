@@ -98,6 +98,17 @@ cast_tests = [
     (five_point_one_to_nine, 'round2', 5.12),
     (five_point_one_to_nine, 'round1', 5.1),
     (five_point_one_to_nine, 'round0', 5.0),
+
+    (forty_two_point_two, 'zfill10', '000000' + forty_two_point_two),
+    (forty_two_point_two, 'zfill9',  '00000' + forty_two_point_two),
+    (forty_two_point_two, 'zfill8',  '0000' + forty_two_point_two),
+    (forty_two_point_two, 'zfill7',  '000' + forty_two_point_two),
+    (forty_two_point_two, 'zfill6',  '00' + forty_two_point_two),
+    (forty_two_point_two, 'zfill5',  '0' + forty_two_point_two),
+    (forty_two_point_two, 'zfill4',  forty_two_point_two),
+    (forty_two_point_two, 'zfill3',  forty_two_point_two),
+    (forty_two_point_two, 'zfill2',  forty_two_point_two),
+    (forty_two_point_two, 'zfill1',  forty_two_point_two),
 ]
 
 

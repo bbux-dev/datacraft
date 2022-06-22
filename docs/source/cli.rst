@@ -100,6 +100,42 @@ Specify the ``-o <directory>`` option to create a file type-help.txt, with the f
    INFO [22-May-2050 01:13:15 PM] Loading custom type loader: xeger
    INFO [22-May-2050 01:13:15 PM] Wrote data to .\type-help.txt
 
+Caster List
+^^^^^^^^^^^
+
+The different casting operators available can be listed with the ``--cast-list`` command line flag. The ones that
+look like ``string -> str -> s`` indicate the aliases that can be used in place of the full caster name. For example:
+
+
+.. code-block:: json
+
+   {
+       "age1": {
+           "type": "rand_range",
+           "data": [1, 100],
+           "config": {
+               "cast": "int"
+           }
+       },
+       "age2:rand_range?cast=i": [1, 100],
+       "age3:rand_range?cast=round3;str;f": [1, 100]
+   }
+
+.. code-block:: shell
+
+   datacraft -s cast.json -i 1 -x -l off --format json-pretty
+   [
+       {
+           "age1": 44,
+           "age2": 74,
+           "age3": 78.535
+       }
+   ]
+
+The age1 and age2 fields both cast the value to an integer.  The age3 field illustrates the use of multiple casters.
+This one first rounds the value to three digits then casts to a string followed by a floating point number.
+
+
 Formatting Output
 -----------------
 

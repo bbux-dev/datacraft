@@ -14,7 +14,7 @@ from . import template_engines, builder, spec_formatters, loader, registries, en
 from .exceptions import SpecException
 
 # need to import this to trigger registration process
-from . import preprocessor, defaults, distributions
+from . import preprocessor, defaults, distributions, casters
 
 _log = logging.getLogger(__name__)
 
@@ -75,6 +75,8 @@ def parseargs(argv):
     debug_group.add_argument('--type-help', dest='type_help', metavar='TYPE_NAME', default=argparse.SUPPRESS, nargs='*',
                              help='Write out the help for registered types, specify one or more types to limit help '
                                   'to, no arguments means show help for all types')
+    debug_group.add_argument('--cast-list', dest='cast_list', action='store_true',
+                             help='Write out the list of registered casters')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true',
                         default=registries.get_default('exclude_internal'),
                         help='Do not include non data fields in output records')
@@ -160,6 +162,12 @@ def process_args(args):
         entrypoints.load_eps()
         usage_str = usage.build_cli_help(args.type_help)
         writer.write(usage_str)
+        return None
+    if args.cast_list:
+        writer = outputs.get_writer(args.outdir, outfile='cast_list.json', overwrite=True)
+        caster_names = casters.all_names()
+        for caster in caster_names:
+            writer.write(caster)
         return None
 
     _log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)

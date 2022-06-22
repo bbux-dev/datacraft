@@ -111,6 +111,16 @@ class _MultiCaster(CasterInterface):
         return value
 
 
+class _ZFillCaster(CasterInterface):
+    """ Zero Fill By Specified amount """
+
+    def __init__(self, width: int):
+        self.width = width
+
+    def cast(self, value: Any) -> Any:
+        return str(value).zfill(self.width)
+
+
 _CASTER_MAP = {
     "i": _IntCaster(),
     "int": _IntCaster(),
@@ -129,8 +139,15 @@ _CASTER_MAP = {
     "trim": _TrimCaster(),
     "round": _RoundCaster(None)
 }
-for i in range(8):
+
+_ROUND_COUNT = 10
+for i in range(_ROUND_COUNT):
     _CASTER_MAP[f'round{i}'] = _RoundCaster(i)
+
+_ZFILL_START = 1
+_ZFILL_END = 11
+for i in range(_ZFILL_START, _ZFILL_END):
+    _CASTER_MAP[f'zfill{i}'] = _ZFillCaster(i)
 
 
 def get(name):
@@ -152,6 +169,26 @@ def get(name):
     if len(casters) == 1:
         return casters[0]
     return _MultiCaster(casters)
+
+
+def all_names():
+    """gets the unique set of all casters registered and builtin"""
+    names = [
+        'int -> i',
+        'float -> f',
+        'string -> str -> s',
+        'hex -> h',
+        'lower -> l',
+        'upper -> u',
+        'trim -> t',
+        'round'
+    ]
+    for n in range(_ROUND_COUNT):
+        names.append(f'round{n}')
+    for m in range(_ZFILL_START, _ZFILL_END):
+        names.append(f'zfill{m}')
+    names.extend(registries.registered_casters())
+    return names
 
 
 def from_config(config: dict):
