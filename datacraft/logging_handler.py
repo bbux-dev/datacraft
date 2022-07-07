@@ -5,13 +5,6 @@ import logging
 
 from . import registries
 
-_MAPPING = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARN,
-    "error": logging.ERROR
-}
-
 
 @registries.Registry.logging('default')
 def _configure_logging(loglevel: str):
@@ -24,9 +17,11 @@ def _configure_logging(loglevel: str):
     if str(loglevel).lower() in ['off', 'stop', 'disable']:
         logging.disable(logging.CRITICAL)
     else:
-        level = _MAPPING.get(loglevel, registries.get_default('log_level'))
+        numeric_level = getattr(logging, loglevel.upper(), None)
+        if not isinstance(numeric_level, int):
+            raise ValueError('Invalid log level: %s' % loglevel)
         logging.basicConfig(
             format='%(levelname)s [%(asctime)s] %(message)s',
-            level=level,
+            level=numeric_level,
             datefmt='%d-%b-%Y %I:%M:%S %p'
         )

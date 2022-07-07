@@ -24,7 +24,8 @@ since these work on both linux and windows based command prompts. Inline JSON is
 Log Levels
 ----------
 
-You can change the logging levels to one of ``debug, info, warn, error, or off`` by using the ``-l`` or
+You can change the logging levels to one of
+``'critical', 'fatal', 'error', 'warning', 'warn', 'info', 'debug', 'off', 'stop', 'disable'`` by using the ``-l`` or
 ``--log-level`` flag. See example above.
 
 Type Help

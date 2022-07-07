@@ -6,6 +6,8 @@ import os
 import sys
 import json
 import logging
+from typing import Any
+
 import yaml
 
 from . import outputs, utils, usage
@@ -17,6 +19,19 @@ from .exceptions import SpecException
 from . import preprocessor, defaults, distributions, casters
 
 _log = logging.getLogger(__name__)
+
+_LOG_LEVELS = [
+    "critical",
+    "fatal",
+    "error",
+    "warning",
+    "warn",
+    "info",
+    "debug",
+    "off",
+    "stop",
+    "disable"
+]
 
 
 def parseargs(argv):
@@ -53,8 +68,8 @@ def parseargs(argv):
                         help='Path to custom defined functions in one or more modules to load')
     parser.add_argument('-d', '--datadir',
                         help='Path to external directory to load external data files such as csvs')
-    parser.add_argument('-l', '--log-level', dest='log_level', default="info",
-                        help='Logging level verbosity, default is info, valid are "debug","info","warn","error","off"')
+    parser.add_argument('-l', '--log-level', dest='log_level', default="info", choices=_LOG_LEVELS,
+                        help=f'Logging level verbosity, default is info')
     formats = str(registries.registered_formats())
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + formats)
@@ -77,6 +92,8 @@ def parseargs(argv):
                                   'to, no arguments means show help for all types')
     debug_group.add_argument('--cast-list', dest='cast_list', action='store_true',
                              help='Write out the list of registered casters')
+    debug_group.add_argument('--format-list', dest='format_list', action='store_true',
+                             help='Write out the list of registered formatters')
     parser.add_argument('-x', '--exclude-internal', dest='exclude_internal', action='store_true',
                         default=registries.get_default('exclude_internal'),
                         help='Do not include non data fields in output records')
@@ -148,27 +165,21 @@ def process_args(args):
     # Load Data Spec
     ###################
 
+    # trigger any custom code loading
+    entrypoints.load_eps()
     # this would bypass spec loading
     if args.type_list:
-        writer = outputs.get_writer(args.outdir, outfile='type_list.json', overwrite=True)
-        # writer = _get_writer(args)
-        entrypoints.load_eps()
         all_types = registries.registered_types()
-        for registered_type in all_types:
-            writer.write(registered_type)
-        return None
+        return _write_info(info=all_types, dest_name='type_list.txt', outdir=args.outdir)
     if 'type_help' in args:
-        writer = outputs.get_writer(args.outdir, outfile='type-help.txt', overwrite=True)
-        entrypoints.load_eps()
         usage_str = usage.build_cli_help(args.type_help)
-        writer.write(usage_str)
-        return None
+        return _write_info(info=usage_str, dest_name='type_help.txt', outdir=args.outdir)
     if args.cast_list:
-        writer = outputs.get_writer(args.outdir, outfile='cast_list.json', overwrite=True)
         caster_names = casters.all_names()
-        for caster in caster_names:
-            writer.write(caster)
-        return None
+        return _write_info(info=caster_names, dest_name='cast_list.txt', outdir=args.outdir)
+    if args.format_list:
+        all_formats = registries.registered_formats()
+        return _write_info(info=all_formats, dest_name='format_list.txt', outdir=args.outdir)
 
     _log.debug('Attempting to load Data Spec from %s', args.spec if args.spec else args.inline)
     spec = _load_spec(args)
@@ -215,6 +226,17 @@ def process_args(args):
         processor=processor)
 
     return generator
+
+
+def _write_info(info: Any, dest_name: str, outdir: Any) -> None:
+    """Writes debug info to stdout or disk"""
+    writer = outputs.get_writer(outdir, outfile=dest_name, overwrite=True)
+    if isinstance(info, str):
+        info_str = info
+    else:
+        info_str = '\n'.join(info)
+    writer.write(info_str)
+    return None
 
 
 def _handle_defaults(args):

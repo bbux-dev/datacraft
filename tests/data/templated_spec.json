@@ -1,0 +1,9 @@
+{
+  "pet": {
+    "type": "values",
+    "data": ["cat", "dog", "pig"],
+    "config": {
+      "count": {{ pet_count | default(1, true) | int }}
+    }
+  }
+}

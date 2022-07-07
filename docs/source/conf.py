@@ -8,8 +8,8 @@ project = 'Datacraft'
 copyright = '2022, Brian Buxton'
 author = 'Brian Buxton'
 
-release = '0.5'
-version = '0.5.1'
+release = '0.6'
+version = '0.6.0'
 
 # -- General configuration
 

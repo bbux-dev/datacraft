@@ -29,6 +29,8 @@ def _format_json_pretty(record: Union[list, dict]) -> str:
     return json.dumps(record, indent=int(registries.get_default('json_indent')), ensure_ascii=format_json_ascii)
 
 
+@registries.Registry.formats('csv-with-header')
+@registries.Registry.formats('csvh')
 @registries.Registry.formats('csv')
 def _format_csv(record: Union[list, dict]) -> str:
     """formats the values of the record as comma separated values  """
@@ -45,7 +47,7 @@ def _csv_line(record):
 @registries.Registry.formats('yaml')
 def _format_yaml(record: Union[list, dict]) -> str:
     """formats the values of the record as YAML """
-    return yaml.dump(record, sort_keys=False, width=4096).strip()
+    return str(yaml.dump(record, sort_keys=False, width=4096)).strip()
 
 
 class WriterInterface(ABC):
@@ -85,7 +87,7 @@ class _SingleFieldOutput(OutputHandlerInterface):
         if self.output_key:
             self.writer.write('%s -> %s' % (key, value))
         else:
-            self.writer.write(value)
+            self.writer.write(str(value))
 
     def finished_record(self, iteration=None, group_name=None, exclude_internal=False):
         pass
@@ -248,7 +250,7 @@ class _IncrementingFileWriter(WriterInterface):
 class _FormatProcessor(RecordProcessor):
     """A simple class that wraps a record formatting function"""
 
-    def __init__(self, key):
+    def __init__(self, key: str):
         self.format_func = registries.Registry.formats.get(key)
 
     def process(self, record: Union[list, dict]) -> str:
@@ -264,7 +266,34 @@ class _FormatProcessor(RecordProcessor):
         return self.format_func(record)
 
 
-def _for_format(key: str) -> _FormatProcessor:
+class _CsvFormatProcessor(RecordProcessor):
+    """for extra csv formatting """
+
+    def __init__(self, key: str, add_header: bool = False):
+        self.format_func = registries.Registry.formats.get(key)
+        self.add_header = add_header
+        self.header_added = False
+
+    def process(self, record: Union[list, dict]) -> str:
+        """
+        Processes the given record into the appropriate output string
+
+        Args:
+            record: dictionary of record to format
+
+        Returns:
+            The formatted record
+        """
+        if self.add_header and not self.header_added:
+            if isinstance(record, list):
+                header = {k: k for k, _ in record[0].items()}
+            else:
+                header = {k: k for k, _ in record.items()}
+            return '\n'.join([self.format_func(header), self.format_func(record)])
+        return self.format_func(record)
+
+
+def _for_format(key: str) -> RecordProcessor:
     """
     Creates FormatProcessor for provided key if one is registered
 
@@ -278,6 +307,8 @@ def _for_format(key: str) -> _FormatProcessor:
         SpecException when key is not registered
     """
     try:
+        if key.startswith('csv'):
+            return _CsvFormatProcessor(key, key in ['csv-with-header', 'csvh'])
         return _FormatProcessor(key)
     except catalogue.RegistryError as err:
         raise SpecException(str(err)) from err

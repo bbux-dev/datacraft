@@ -1,3 +1,4 @@
+import json
 import os
 
 import pytest
@@ -34,6 +35,31 @@ def configure_supplier(field_spec, loader):
     key = field_spec.get('ref')
     wrapped = loader.get(key)
     return ReverseStringSupplier(wrapped)
+
+
+@datacraft.registry.usage('reverse_string')
+def get_reverse_string_usage():
+    example = {
+        "backwards": {
+            "type": "reverse_string",
+            "ref": "ANIMALS"
+        },
+        "refs": {
+            "ANIMALS": {
+                "type": "values",
+                "data": ["zebra", "hedgehog", "llama", "flamingo"]
+            }
+        }
+    }
+    example_str = json.dumps(example, indent=4)
+    command = 'datacraft -s spec.json -i 5 --format json-pretty -x -l off'
+    output = json.dumps(datacraft.entries(example, 5, enforce_schema=True), indent=4)
+    return '\n'.join([
+        "Reverses output of other suppliers",
+        "Example:", example_str,
+        "Command:", command,
+        "Output:", output
+    ])
 
 
 def test_registry_from_local():

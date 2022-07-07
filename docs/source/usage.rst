@@ -97,8 +97,8 @@ for your needs:
 Spec Formats
 ------------
 
-A Data Spec can be created in multiple formats.  The most common is the JSON syntax described above. Another format that
-is supported is YAML:
+A Data Spec can be created in multiple formats.  The most common is the JSON syntax described above. Another format
+that is supported is YAML:
 
 .. code-block:: yaml
 
@@ -184,9 +184,9 @@ generation process.  The simplest example of this is the ``combine`` type:
       }
     }
 
-Here the combine type takes a refs argument that specifies the name of two references to combine the values of. There
-is also a ``ref`` type. This is useful for making Data Specs easier to read by segmenting the structures into smaller
-pieces.  This is particularly useful with ``nested`` types:
+Here the combine type takes a refs argument that specifies the name of two or more references to combine the values of.
+There is also a ``ref`` type. This is useful for making Data Specs easier to read by segmenting the structures into
+smaller pieces.  This is particularly useful with ``nested`` types:
 
 .. code-block:: json
 
@@ -228,24 +228,24 @@ with the ``--debug-spec`` command line argument. If we run this spec from the co
 Templating
 ----------
 
-The datacraft tool supports templating using the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine
-format. To populate a template file or string with the generated values for each iteration, pass the
-``-t /path/to/template`` (or template string) arg to the datacraft command. The basic format for a template is to put
-the field names in ``{{ field name }}`` notation wherever they should be substituted. For example the following
-is a template for bulk indexing data into Elasticsearch.
+Datacraft supports templating using the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine format. To
+populate a template file or string with the generated values for each iteration, pass the ``-t /path/to/template``
+(or template string) arg to the datacraft command. The basic format for a template is to put the field names in
+``{{field name }}`` notation wherever they should be substituted. For example, the following is a template for bulk
+indexing data into Elasticsearch.
 
 .. code-block:: json
 
    {"index": {"_index": "test", "_id": "{{ id }}"}}
-   {"doc": {"name": "{{ name }}", "age": "{{ age }}", "gender": "{{ gender }}"}}
+   {"doc": {"name": "{{ name }}", "age": "{{ age }}", "color": "{{ color }}"}}
 
-We could then create a spec to populate the id, name, age, and gender fields. Such as:
+We could then create a spec to populate the id, name, age, and color fields. Such as:
 
 .. code-block:: json
 
    {
      "id": {"type": "range", "data": [1, 10]},
-     "gender": {"M": 0.48, "F": 0.52},
+     "color": {"red": 0.33, "blue": 0.44, "yellow": 0.33},
      "name": [
          "bob", "rob", "bobby", "bobo", "robert", "roberto", "bobby joe", "roby", "robi", "steve"
      ],
@@ -257,25 +257,27 @@ When we run the tool we get the data populated for the template:
 .. code-block:: shell
 
    datacraft -s es-spec.json -t template.json -i 10 --log-level off -x
-   { "index" : { "_index" : "test", "_id" : "1" } }
-   { "doc" : {"name" : "bob", "age": "22", "gender": "F" } }
-   { "index" : { "_index" : "test", "_id" : "2" } }
-   { "doc" : {"name" : "rob", "age": "24", "gender": "F" } }
-   { "index" : { "_index" : "test", "_id" : "3" } }
-   { "doc" : {"name" : "bobby", "age": "26", "gender": "F" } }
-   { "index" : { "_index" : "test", "_id" : "4" } }
+   {"index": {"_index": "test", "_id": "3"}}
+   {"doc": {"name": "bobby", "age": "26", "color": "yellow"}}
+   {"index": {"_index": "test", "_id": "4"}}
+   {"doc": {"name": "bobo", "age": "28", "color": "blue"}}
+   {"index": {"_index": "test", "_id": "5"}}
+   {"doc": {"name": "robert", "age": "30", "color": "blue"}}
+   {"index": {"_index": "test", "_id": "6"}}
+   {"doc": {"name": "roberto", "age": "32", "color": "red"}}
+   {"index": {"_index": "test", "_id": "7"}}
    ...
 
 It is also possible to do templating inline from the command line:
 
 .. code-block:: shell
 
-   datacraft -s es-spec.json -i 5 --log-level off -x --template '{{name}}: ({{age}}, {{gender}})'
-   bob: (22, F)
-   rob: (24, M)
-   bobby: (26, M)
-   bobo: (28, M)
-   robert: (30, F)
+   datacraft -s es-spec.json -i 5 --log-level off -x --template '{{name}}: ({{age}}, {{color}})'
+   bob: (22, red)
+   rob: (24, blue)
+   bobby: (26, blue)
+   bobo: (28, yellow)
+   robert: (30, red)
 
 Loops in Templates
 ^^^^^^^^^^^^^^^^^^
@@ -491,7 +493,7 @@ part of ``nested`` Field Specs. Below is an example spec with no ``field_groups`
    }
 
 If the tag field was only present in 50% of the data, we would want to be able to adjust the output to match this.
-Here is an updated version of the spec with the ``field_groups`` specified to give the 50/50 output. This uses the
+Below is an updated version of the spec with the ``field_groups`` specified to give the 50/50 output. This uses the
 first form of the ``field_groups`` a List of Lists of field names to output together.
 
 .. code-block:: json
@@ -643,7 +645,7 @@ large, not all features will be supported. You will not be able to set sampling 
 maximum number of iterations will be equal to the size of the smallest number of lines for all the large input CSV
 files. The current size threshold is set to 250 MB. So, if you are using two different csv files as inputs and one is
 300 MB with 5 million entries and another is 500 MB with 2 million entries, you will be limited to 2 million
-iterations before an exception will be raised and processing will cease., You can override the default size limit on
+iterations before an exception will be raised and processing will cease. You can override the default size limit on
 the command line by using the ``--set-default`` flag. Example:
 
 .. code-block:: shell
@@ -777,14 +779,91 @@ validation in your code.
 See the :ref:`Registry Decorators<registry_decorators>` for the complete list of components that can be expanded or
 registered.
 
+Custom Type Usage
+^^^^^^^^^^^^^^^^^
+
+There is an additional decorator that can be used to register usage help for a custom type:
+``@datacraft.registry.usage(<my_custom_type>)``. Example:
+
+.. code-block:: python
+
+   import datacraft
+
+   @datacraft.registry.usage('reverse_string')
+   def get_reverse_string_usage():
+       example = {
+           "backwards": {
+               "type": "reverse_string",
+               "ref": "ANIMALS"
+           },
+           "refs": {
+               "ANIMALS": {
+                   "type": "values",
+                   "data": ["zebra", "hedgehog", "llama", "flamingo"]
+               }
+           }
+       }
+       example_str = json.dumps(example, indent=4)
+       command = 'datacraft -s spec.json -i 5 --format json-pretty -x -l off'
+       output = json.dumps(datacraft.entries(example, 5, enforce_schema=True), indent=4)
+       return '\n'.join([
+           "Reverses output of other suppliers",
+           "Example:", example_str,
+           "Command:", command,
+           "Output:", output
+       ])
+
+.. code-block:: shell
+   datacraft -c custom.py --type-help reverse_string -l off
+   -------------------------------------
+   reverse_string | Reverses output of other suppliers
+   Example:
+   {
+       "backwards": {
+           "type": "reverse_string",
+           "ref": "ANIMALS"
+       },
+       "refs": {
+           "ANIMALS": {
+               "type": "values",
+               "data": [
+                   "zebra",
+                   "hedgehog",
+                   "llama",
+                   "flamingo"
+               ]
+           }
+       }
+   }
+   Command:
+   datacraft -s spec.json -i 5 --format json-pretty -x -l off
+   Output:
+   [
+       {
+           "backwards": "arbez"
+       },
+       {
+           "backwards": "gohegdeh"
+       },
+       {
+           "backwards": "amall"
+       },
+       {
+           "backwards": "ognimalf"
+       },
+       {
+           "backwards": "arbez"
+       }
+   ]
+   -------------------------------------
+
 Custom Types Entry Point
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Datacraft provides a way to discover registered types using the `datacraft.custom_type_loader` entry point. At load
 time all the entry points for this key are loaded. This allows users to create their own libraries and packages
-that use the :ref:`@datacraft.registry.*<registry_decorators>` decorators. To add an entry
-point to your setup.cfg or setup.py for the
-`datacraft.custom_type_loader`:
+that use the :ref:`@datacraft.registry.*<registry_decorators>` decorators. To add an entry point to your setup.cfg or
+setup.py for the `datacraft.custom_type_loader`:
 
 .. tabs::
 
@@ -986,8 +1065,8 @@ datacraft dependencies. Please install it first with pip or conda. Example using
 REST Server
 -----------
 
-Datacraft comes with a lightweight Flask server to use to retrieve generated data. Use the ``--server`` with the optional
-``--server-endpoint /someendpoint`` flags to launch this server.  The default end point will be found at
+Datacraft comes with a lightweight Flask server to use to retrieve generated data. Use the ``--server`` with the
+optional ``--server-endpoint /someendpoint`` flags to launch this server.  The default end point will be found at
 http://127.0.0.1:5000/data. If using a template, each call to the endpoint will return the results of applying a
 single record to the template data. If you specify one of the ``--format`` flags, the formatted record will be returned
 as a string. If neither a formatter or a template are applied, the record for each iteration will be returned as JSON.

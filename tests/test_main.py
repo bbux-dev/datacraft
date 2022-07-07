@@ -72,24 +72,6 @@ def test_parse_debug_defaults(tmpdir):
     assert os.path.exists(os.path.join(tmpdir, 'dataspec_defaults.json'))
 
 
-def test_type_list(tmpdir):
-    args = ['--type-list', '-o', str(tmpdir)]
-    dgmain.main(args)
-    assert os.path.exists(os.path.join(tmpdir, 'type_list.json'))
-
-
-def test_type_help_no_filter(tmpdir):
-    args = ['--type-help', '-o', str(tmpdir)]
-    dgmain.main(args)
-    assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
-
-
-def test_type_help_with_filter(tmpdir):
-    args = ['--type-help', 'calculate', 'sample', '-o', str(tmpdir)]
-    dgmain.main(args)
-    assert os.path.exists(os.path.join(tmpdir, 'type-help.txt'))
-
-
 def test_parse_debug_defaults(tmpdir):
     args = ['--debug-defaults', '-o', str(tmpdir)]
     dgmain.main(args)
@@ -221,6 +203,23 @@ def test_var_args(tmpdir):
     assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
 
 
+def test_parse_template_spec_with_vars(tmpdir):
+    args = ['--spec', os.path.join(test_dir, 'templated_spec.json'),
+            '--vars', 'pet_count=2',
+            '-i', '5',
+            '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'generated-0'))
+
+
+def test_parse_not_json_or_yaml(tmpdir):
+    args = ['--spec', os.path.join(test_dir, 'not_json_or_yaml.blah'),
+            '-i', '5',
+            '-o', str(tmpdir)]
+    with pytest.raises(datacraft.SpecException):
+        dgmain.main(args)
+
+
 def test_var_args_not_all_defined(tmpdir):
     args = ['--format', 'json',
             '--inline', '{ {{ first }}: 1, {{ second }}: [2, 4, 6], {{ third }}: 3}',
@@ -239,3 +238,24 @@ def test_var_args_not_all_defined_no_assignment(tmpdir):
             '--vars', 'first=a', 'second', 'third=c']  # missing second
     with pytest.raises(datacraft.SpecException):
         dgmain.main(args)
+
+
+format_key_tests = [
+    ('--type-list', 'type_list.txt'),
+    ('--type-help', 'type_help.txt'),
+    ('--cast-list', 'cast_list.txt'),
+    ('--format-list', 'format_list.txt'),
+]
+
+
+@pytest.mark.parametrize("info_flag,filename", format_key_tests)
+def test_write_info_file_created(info_flag, filename, tmpdir):
+    args = [info_flag, '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, filename))
+
+
+def test_type_help_with_filter(tmpdir):
+    args = ['--type-help', 'calculate', 'sample', '-o', str(tmpdir)]
+    dgmain.main(args)
+    assert os.path.exists(os.path.join(tmpdir, 'type_help.txt'))

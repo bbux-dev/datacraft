@@ -1,3 +1,11 @@
+v0.6.0
+------
+
+* Addition of zfillN casters
+* Added --cast-list and --format-list command line args to dump registered casters and formatters
+* Added `csv-with-header` (`csvh` for short) formatters, i.e. `--format csvh`
+* Various bug fixes
+
 v0.5.0
 ------
 * Bug fixes and removal of `datacraft.spec_builder` function and tooling from API.

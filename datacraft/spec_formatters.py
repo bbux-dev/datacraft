@@ -57,7 +57,7 @@ def format_yaml(raw_spec: dict) -> str:
         the ordered and formatted YAML string
     """
     ordered = _order_spec(raw_spec)
-    dirty_yaml = yaml.dump(ordered, sort_keys=False, width=4096).strip()
+    dirty_yaml = str(yaml.dump(ordered, sort_keys=False, width=4096)).strip()
     cleaned_yaml = _clean_semi_formatted_yaml(dirty_yaml)
     try:
         loaded_yaml = yaml.load(cleaned_yaml, Loader=yaml.FullLoader)
