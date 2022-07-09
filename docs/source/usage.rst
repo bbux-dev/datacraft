@@ -814,6 +814,7 @@ There is an additional decorator that can be used to register usage help for a c
        ])
 
 .. code-block:: shell
+
    datacraft -c custom.py --type-help reverse_string -l off
    -------------------------------------
    reverse_string | Reverses output of other suppliers

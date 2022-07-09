@@ -55,7 +55,7 @@ class Registry:
 
         formats:
             Registered formats for output.  When using the --format <format name>. Unlike other registered functions,
-            this one is called directly for to perform the required formatting function. The return value from the
+            this one is called directly to perform the required formatting function. The return value from the
             formatter is the new value that will be written to the configured output (default is console).
 
             >>> @datacraft.registry.formats('custom_format')

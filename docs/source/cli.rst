@@ -28,8 +28,12 @@ You can change the logging levels to one of
 ``'critical', 'fatal', 'error', 'warning', 'warn', 'info', 'debug', 'off', 'stop', 'disable'`` by using the ``-l`` or
 ``--log-level`` flag. See example above.
 
-Type Help
----------
+Registry Help
+-------------
+
+Many of the Field Spec types, formatters, and casters are stored in the datacraft
+:ref:`Registry<registry_decorators>`. Use the commands below to list and print out help for the various registered
+entities.
 
 List Types
 ^^^^^^^^^^
@@ -137,6 +141,24 @@ The age1 and age2 fields both cast the value to an integer.  The age3 field illu
 This one first rounds the value to three digits then casts to a string followed by a floating point number.
 
 
+Formatter List
+^^^^^^^^^^^^^^
+
+Use the command line ``--format-list`` flag to print out the list of registered formatters.
+
+.. code-block:: shell
+
+    datacraft --format-list -l warn
+
+.. code-block::
+
+   json
+   json-pretty
+   csv
+   csvh
+   csv-with-header
+   yaml
+
 Formatting Output
 -----------------
 
@@ -145,7 +167,7 @@ the value:
 
 .. code-block:: shell
 
-    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off
+    datacraft --inline "{ id:uuid, ts:date }" -i 2 --log-level off
 
 .. code-block:: shell
 
@@ -156,7 +178,7 @@ the value:
 
 .. code-block:: shell
 
-    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --printkey
+    datacraft --inline "{ id:uuid, ts:date }" -i 2 --log-level off --printkey
 
 .. code-block:: shell
 
@@ -170,11 +192,11 @@ Sometimes it may be useful to dump the generated data into a format that is easi
 or ``--format`` flag to specify one of ``json`` or ``json-pretty`` or ``csv``. The ``json`` format will print a flat
 version of each record that takes up a single line for each iteration. The ``json-pretty`` format will print an
 indented version of each record that will span multiple lines. The ``csv`` format will output each record as a comma
-separated value line. Examples:
+separated value line. If you want headers with the csv use the ``csv-with-header`` or ``csvh`` format. Examples:
 
 .. code-block:: shell
 
-    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format json -x
+    datacraft --inline "{ id:uuid, ts:date }" -i 2 --log-level off --format json -x
 
 .. code-block:: shell
 
@@ -182,7 +204,7 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format json-pretty -x
+    datacraft --inline "{ id:uuid, ts:date }" -i 2 --log-level off --format json-pretty -x
 
 .. code-block:: shell
 
@@ -199,12 +221,22 @@ separated value line. Examples:
 
 .. code-block:: shell
 
-    datacraft --inline "{ id:uuid: {}, ts:date: {}}" -i 2 --log-level off --format csv -x
+    datacraft --inline "{ id:uuid, ts:date }" -i 2 --log-level off --format csv -x
 
 .. code-block:: shell
 
     f8b87f46-ebda-4364-a042-21e6ac117762,09-12-2050
     3b0c236c-3882-4242-9f3b-053ab3da4be8,12-12-2050
+
+.. code-block:: shell
+
+   datacraft --inline "{ id:uuid, ts:date.iso.us }" -i 2 --log-level off --format csvh -x
+
+.. code-block:: shell
+
+   id,ts
+   1d79ebca-9cc4-4de2-8af3-0cfc1bbd7c55,2022-07-23T19:12:41.683306
+   a41e1f3a-3954-406b-b022-fc54f43f6aab,2022-07-25T10:23:19.766581
 
 Records Per File
 ----------------
