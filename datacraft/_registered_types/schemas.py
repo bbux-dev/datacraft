@@ -32,4 +32,11 @@ def load(key: str) -> dict:
         ResourceError if schema for key not found
     """
     naming_convention = f'{key}.schema.json'
-    return load_resource_as_json(naming_convention)
+
+    type_schema = load_resource_as_json(naming_convention)
+    definitions = load_resource_as_json('definitions.json')
+    if 'definitions' in type_schema:
+        type_schema['definitions'].update(definitions['definitions'])
+    else:
+        type_schema['definitions'] = definitions['definitions']
+    return type_schema
