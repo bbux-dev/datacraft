@@ -3,8 +3,6 @@ from functools import lru_cache
 import logging
 import importlib_metadata as metadata
 
-import datacraft._registered_types.schemas
-
 _log = logging.getLogger(__name__)
 
 
@@ -13,9 +11,9 @@ def load_eps():
     """initiate any custom entry points"""
     eps = metadata.entry_points().select(group='datacraft.custom_type_loader')
 
-    for ep in eps:
-        plugin = ep.load()
-        _log.info('Loading custom type loader: %s', ep.name)
+    for entry_point in eps:
+        plugin = entry_point.load()
+        _log.info('Loading custom type loader: %s', entry_point.name)
         try:
             plugin()
         except Exception as err:

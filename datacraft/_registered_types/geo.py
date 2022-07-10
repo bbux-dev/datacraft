@@ -1,3 +1,4 @@
+"""module for geo type datacraft registry functions"""
 import logging
 
 import datacraft

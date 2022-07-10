@@ -1,3 +1,4 @@
+"""module for network type datacraft registry functions"""
 import json
 import logging
 

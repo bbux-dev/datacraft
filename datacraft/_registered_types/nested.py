@@ -1,3 +1,4 @@
+"""module for nested type datacraft registry functions"""
 import logging
 from typing import Dict, Any
 
@@ -21,7 +22,7 @@ def _get_nested_schema():
 def _configure_nested_supplier(spec, loader):
     """ configure the supplier for nested types """
     fields = spec['fields']
-    keys = [key for key in fields.keys()]
+    keys = list(fields.keys())
     config = datacraft.utils.load_config(spec, loader)
     count_supplier = datacraft.suppliers.count_supplier(**config)
     if 'field_groups' in spec:

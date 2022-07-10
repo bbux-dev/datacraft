@@ -1,3 +1,4 @@
+"""module for range_suppliers type datacraft registry functions"""
 import json
 import logging
 
@@ -35,12 +36,12 @@ def _get_rand_int_range_schema():
 def _configure_range_supplier(field_spec, _):
     """ configures the range value supplier """
     if 'data' not in field_spec:
-        raise datacraft.SpecException('No data element defined for: %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'No data element defined for: {json.dumps(field_spec)}')
 
     data = field_spec.get('data')
     if not isinstance(data, list) or len(data) < 2:
         raise datacraft.SpecException(
-            'data element for ranges type must be list with at least two elements: %s' % json.dumps(field_spec))
+            f'data element for ranges type must be list with at least two elements:{json.dumps(field_spec)}')
     # we have the nested case
     if isinstance(data[0], list):
         suppliers_list = [_configure_range_supplier_for_data(field_spec, subdata) for subdata in data]
@@ -93,7 +94,7 @@ def _configure_range_supplier_for_data(field_spec, data):
     # more intuitive behavior
     end = data[1] + 1
     if not end > start:
-        raise datacraft.SpecException('end element must be larger than start: %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'end element must be larger than start:{json.dumps(field_spec)}')
     if len(data) == 2:
         step = 1
     else:
@@ -117,12 +118,12 @@ def _configure_rand_int_range_supplier(field_spec, loader):
 def _configure_rand_range_supplier(field_spec, loader):
     """ configures the random range value supplier """
     if 'data' not in field_spec:
-        raise datacraft.SpecException('No data element defined for: %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'No data element defined for: {json.dumps(field_spec)}')
     data = field_spec.get('data')
     config = datacraft.utils.load_config(field_spec, loader)
     if not isinstance(data, list) or len(data) == 0:
         raise datacraft.SpecException(
-            'rand_range specs require data as array with at least one element: %s' % json.dumps(field_spec))
+            f'rand_range specs require data as array with at least one element: {json.dumps(field_spec)}')
     start = 0
     end = 0
     if len(data) == 1:

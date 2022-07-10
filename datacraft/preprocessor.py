@@ -13,21 +13,20 @@ _log = logging.getLogger(__name__)
 
 
 @registries.Registry.preprocessors('load-entry-points')
-def _load_entry_points(raw_spec: dict, is_refs: bool = False) -> dict:
+def _load_entry_points(raw_spec: dict) -> dict:
     """load the entry points then return original spec"""
     entrypoints.load_eps()
     return raw_spec
 
 
 @registries.Registry.preprocessors('default')
-def _preprocess_spec(raw_spec: dict, is_refs: bool = False) -> dict:
+def _preprocess_spec(raw_spec: dict) -> dict:
     """
     Preprocesses the spec into a format that is easier to use.
     Pushes all url params in keys into config object. Converts shorthand specs into full specs
 
     Args:
         raw_spec: to preprocess
-        is_refs: is this the refs section of the spec
 
     Returns:
         the reformatted spec
@@ -35,7 +34,7 @@ def _preprocess_spec(raw_spec: dict, is_refs: bool = False) -> dict:
     updated_specs = {}
     for key, spec in raw_spec.items():
         if key == 'refs':
-            updated_specs[key] = _preprocess_spec(raw_spec[key], True)
+            updated_specs[key] = _preprocess_spec(raw_spec[key])
             continue
         if key == 'field_groups':
             updated_specs[key] = spec
@@ -49,22 +48,26 @@ def _preprocess_spec(raw_spec: dict, is_refs: bool = False) -> dict:
 
 
 @registries.Registry.preprocessors('csv-select')
-def _preprocess_csv_select(raw_spec: dict, is_refs: bool = False) -> dict:
+def _preprocess_csv_select(raw_spec: dict) -> dict:
     """
     Converts and csv-select elements into standard csv ones
 
     Args:
         raw_spec: to process
-        is_refs: is this the refs section of the spec
 
     Returns:
         converted spec
     """
+    return _preprocess_csv_select_recursive(raw_spec)
+
+
+def _preprocess_csv_select_recursive(raw_spec: dict, is_refs: bool = False) -> dict:
+    """process spec slightly different depending if this is the refs section or not"""
     updated_specs = {}
     for key, spec in raw_spec.items():
         if key == 'refs':
             # run preprocessors on refs too
-            updated_specs['refs'] = _preprocess_csv_select(spec, True)
+            updated_specs['refs'] = _preprocess_csv_select_recursive(spec, True)
         if 'type' in spec and spec['type'] == 'csv_select':
             # convention is that refs have upper case names
             config_ref_name = _add_config_ref_if_needed(key, is_refs, raw_spec, spec, updated_specs)
@@ -121,7 +124,7 @@ def _add_config_ref_if_needed(key, is_refs, raw_spec, spec, updated_specs):
 
 
 @registries.Registry.preprocessors('nested')
-def _preprocess_nested(raw_spec: dict, is_refs: bool = False) -> dict:
+def _preprocess_nested(raw_spec: dict) -> dict:
     """
     Converts all nested elements
 
@@ -135,16 +138,16 @@ def _preprocess_nested(raw_spec: dict, is_refs: bool = False) -> dict:
     updated_specs = {}  # type: ignore
     if 'refs' in raw_spec:
         if 'refs' in updated_specs:
-            updated_specs['refs'].update(_preprocess_spec(raw_spec['refs'], True))
+            updated_specs['refs'].update(_preprocess_spec(raw_spec['refs']))
         else:
-            updated_specs['refs'] = _preprocess_spec(raw_spec['refs'], True)
+            updated_specs['refs'] = _preprocess_spec(raw_spec['refs'])
     for key, spec in raw_spec.items():
         if key == 'refs':
             # run preprocessors on refs too
-            updated_refs = _preprocess_spec(spec, True)
-            updated_refs = _preprocess_csv_select(updated_refs, True)
+            updated_refs = _preprocess_spec(spec)
+            updated_refs = _preprocess_csv_select_recursive(updated_refs, True)
             # in case we have nested nested elements
-            updated_refs = _preprocess_nested(updated_refs, True)
+            updated_refs = _preprocess_nested(updated_refs)
             updated_specs['refs'] = updated_refs
             continue
 
@@ -166,7 +169,7 @@ def _preprocess_nested(raw_spec: dict, is_refs: bool = False) -> dict:
 
 
 @registries.Registry.preprocessors('type_check')
-def _preprocess_verify_types(raw_spec: dict, is_refs: bool = False) -> dict:
+def _preprocess_verify_types(raw_spec: dict) -> dict:
     """ log only checks """
     for key, field_spec in raw_spec.items():
         if key == 'field_groups':

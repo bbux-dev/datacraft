@@ -1,3 +1,4 @@
+"""module for refs type datacraft registry functions"""
 import json
 import logging
 from typing import Dict
@@ -114,5 +115,5 @@ class _WeightedRefsSupplier(ValueSupplierInterface):
         key = self.key_supplier.next(iteration)
         supplier = self.values_map.get(key)
         if supplier is None:
-            raise datacraft.SupplierException("Unknown Key '%s' for Weighted Reference" % key)
+            raise datacraft.SupplierException(f"Unknown Key '{key}' for Weighted Reference")
         return supplier.next(iteration)

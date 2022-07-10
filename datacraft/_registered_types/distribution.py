@@ -1,3 +1,4 @@
+"""module for distribution type datacraft registry functions"""
 import json
 import logging
 

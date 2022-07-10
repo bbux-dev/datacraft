@@ -241,7 +241,7 @@ def preprocess_spec(data_spec: Union[Dict[str, Dict], DataSpec]):
     for name in preprocessors:
         preprocessor_func = Registry.preprocessors.get(name)
         _log.debug('Running Preprocessor: %s', name)
-        processed = preprocessor_func(updated, False)
+        processed = preprocessor_func(updated)
         if processed is None:
             _log.error('Invalid preprocessor %s, returned None instead of updated spec, skipping', name)
             continue

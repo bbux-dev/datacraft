@@ -1,3 +1,4 @@
+"""module for combine type datacraft registry functions"""
 import json
 import logging
 
@@ -76,7 +77,7 @@ def _get_combine_list_schema():
 def _configure_combine_supplier(field_spec, loader):
     """ configures supplier for combine type """
     if 'refs' not in field_spec and 'fields' not in field_spec:
-        raise datacraft.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Must define one of fields or refs. {json.dumps(field_spec)}')
 
     if 'refs' in field_spec:
         supplier = _load_combine_from_refs(field_spec, loader)
@@ -89,12 +90,12 @@ def _configure_combine_supplier(field_spec, loader):
 def _configure_combine_list_supplier(field_spec, loader):
     """ configures supplier for combine-list type """
     if 'refs' not in field_spec:
-        raise datacraft.SpecException('Must define refs for combine-list type. %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Must define refs for combine-list type. {json.dumps(field_spec)}')
 
     refs_list = field_spec['refs']
     if len(refs_list) < 1 or not isinstance(refs_list[0], list):
         raise datacraft.SpecException(
-            'refs pointer must be list of lists: i.e [["ONE", "TWO"]]. %s' % json.dumps(field_spec))
+            f'refs pointer must be list of lists: i.e [["ONE", "TWO"]]. {json.dumps(field_spec)}')
 
     suppliers_list = []
     for ref in refs_list:

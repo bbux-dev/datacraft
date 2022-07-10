@@ -1,8 +1,10 @@
+"""module for uuid_handler type datacraft registry functions"""
 import json
 import logging
 
-from . import common
 import datacraft
+
+from . import common
 from . import schemas
 
 _log = logging.getLogger(__name__)
@@ -29,14 +31,14 @@ def _configure_uuid_supplier(field_spec, loader):
 @datacraft.registry.usage(_UUID_KEY)
 def _example_uuid_usage():
     example = {
-      "id": {
-        "type": _UUID_KEY,
-      },
-      "id_variant3": {
-        "type": _UUID_KEY,
-        "config": {
-          "variant": 3
+        "id": {
+            "type": _UUID_KEY,
+        },
+        "id_variant3": {
+            "type": _UUID_KEY,
+            "config": {
+                "variant": 3
+            }
         }
-      }
     }
     return common.standard_example_usage(example, 3, pretty=True)

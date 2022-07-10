@@ -1,7 +1,7 @@
+"""module for config_ref type datacraft registry functions"""
 import logging
 
 import datacraft
-from . import common
 
 _log = logging.getLogger(__name__)
 _CONFIG_REF_KEY = 'config_ref'

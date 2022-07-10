@@ -101,5 +101,5 @@ def decode_num(num):
 
 def load_file_as_string(data_path: str) -> str:
     """ Loads the file at the given path as a string"""
-    with open(data_path, 'r') as handle:
+    with open(data_path, 'r', encoding='utf-8') as handle:
         return handle.read()

@@ -183,10 +183,10 @@ def all_names():
         'trim -> t',
         'round'
     ]
-    for n in range(_ROUND_COUNT):
-        names.append(f'round{n}')
-    for m in range(_ZFILL_START, _ZFILL_END):
-        names.append(f'zfill{m}')
+    for num in range(_ROUND_COUNT):
+        names.append(f'round{num}')
+    for num in range(_ZFILL_START, _ZFILL_END):
+        names.append(f'zfill{num}')
     names.extend(registries.registered_casters())
     return names
 

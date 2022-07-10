@@ -88,7 +88,7 @@ def uniform_date_timestamp(
         # buffer end date by one to keep inclusive
         try:
             end_date = datetime.datetime.strptime(end, date_format_string) \
-                       + datetime.timedelta(days=1) - offset_date
+                + datetime.timedelta(days=1) - offset_date
         except TypeError as err:
             raise ValueError(f"TypeError. Format: {date_format_string}, may not match param: {end}") from err
     else:
@@ -101,5 +101,3 @@ def uniform_date_timestamp(
         _log.warning("End date (%s) is before start date (%s)", start_date, end_date)
         return None, None
     return start_ts, end_ts
-
-

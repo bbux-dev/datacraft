@@ -3,8 +3,10 @@ Module for parsing and helper functions for specs
 
 Examples:
     >>> import datacraft
-    >>> raw_spec = {'name': {'type': 'values', 'data': ['ann', 'bob', 'carl']}}
-    >>> raw_spec['age'] = {'type': 'rand_int_range', 'data': [22, 47]}
+    >>> raw_spec = {
+    ...     'name': {'type': 'values', 'data': ['ann', 'bob', 'carl']},
+    ...     'age': {'type': 'rand_int_range', 'data': [22, 47]}
+    ... }
     >>> spec = datacraft.parse_spec(raw_spec)
     >>> type(spec)
     DataSpec
@@ -81,7 +83,8 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator
 
 class _DataSpecMeta(type):
     """ to hide implementation when doing type(spec) """
-    def __repr__(self):
+
+    def __repr__(cls):
         return 'DataSpec'
 
 

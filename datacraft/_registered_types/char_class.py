@@ -1,3 +1,4 @@
+"""module for char_class type datacraft registry functions"""
 import json
 import logging
 import string
@@ -68,6 +69,7 @@ def _configure_char_class_supplier(spec, loader):
 
 
 def register_alias_type_function(key, name):
+    """registers and alias function for the given char_class key"""
     @datacraft.registry.types(key)
     def function(spec, loader):
         """ configure the supplier for char_class alias types """
@@ -78,6 +80,7 @@ def register_alias_type_function(key, name):
 
 
 def register_alias_type_schema(key):
+    """registers a schema function for the given char_class key"""
     @datacraft.registry.schemas(key)
     def function():
         """ configure the schema for char_class alias types """
@@ -100,6 +103,7 @@ def _char_class_usage():
 
 
 def register_alias_usage_function(key):
+    """registers usage information for the given char_class alias key"""
     @datacraft.registry.usage(key)
     def function():
         """basic usage example for char class"""

@@ -1,3 +1,4 @@
+"""module for csv type datacraft registry functions"""
 import csv
 import json
 import logging
@@ -112,21 +113,21 @@ def _example_weighted_csv_usage():
 
 def _read_named_column(csv_path: str, column_name: str):
     """ reads values from a named column into a list """
-    with open(csv_path, newline='') as csvfile:
+    with open(csv_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         return [val[column_name] for val in reader]
 
 
 def _read_named_column_weights(csv_path: str, column_name: str):
     """ reads values for weights for named column into a list """
-    with open(csv_path, newline='') as csvfile:
+    with open(csv_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         return [float(val[column_name]) for val in reader]
 
 
 def _read_indexed_column(csv_path: str, column_index: int, skip_first: bool):
     """ reads values from a indexed column into a list """
-    with open(csv_path, newline='') as csvfile:
+    with open(csv_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         if skip_first:
             next(reader)
@@ -135,7 +136,7 @@ def _read_indexed_column(csv_path: str, column_index: int, skip_first: bool):
 
 def _read_indexed_column_weights(csv_path: str, column_index: int, skip_first: bool):
     """ reads values for weights for indexed column into a list """
-    with open(csv_path, newline='') as csvfile:
+    with open(csv_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(csvfile)
         if skip_first:
             next(reader)

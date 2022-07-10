@@ -69,7 +69,7 @@ def parseargs(argv):
     parser.add_argument('-d', '--datadir',
                         help='Path to external directory to load external data files such as csvs')
     parser.add_argument('-l', '--log-level', dest='log_level', default="info", choices=_LOG_LEVELS,
-                        help=f'Logging level verbosity, default is info')
+                        help='Logging level verbosity, default is info')
     formats = str(registries.registered_formats())
     parser.add_argument('-f', '--format', default=None,
                         help='Formatter for output records, default is none, valid are: ' + formats)
@@ -161,10 +161,6 @@ def process_args(args):
         writer.write(json.dumps(defaults_info, indent=4))
         return None
 
-    ###################
-    # Load Data Spec
-    ###################
-
     # trigger any custom code loading
     entrypoints.load_eps()
     # this would bypass spec loading
@@ -236,7 +232,6 @@ def _write_info(info: Any, dest_name: str, outdir: Any) -> None:
     else:
         info_str = '\n'.join(info)
     writer.write(info_str)
-    return None
 
 
 def _handle_defaults(args):

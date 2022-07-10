@@ -1,17 +1,19 @@
+"""module for shared code for datacraft registry functions"""
 import json
 
 import datacraft
 
 
-def build_suppliers_map(field_spec, loader):
+def build_suppliers_map(field_spec: dict, loader: datacraft.Loader) -> dict:
+    """uses refs or fields to build a map for those suppliers"""
     if 'refs' not in field_spec and 'fields' not in field_spec:
-        raise datacraft.SpecException('Must define one of fields or refs. %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Must define one of fields or refs. {json.dumps(field_spec)}')
     if 'refs' in field_spec and 'fields' in field_spec:
-        raise datacraft.SpecException('Must define only one of fields or refs. %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Must define only one of fields or refs. {json.dumps(field_spec)}')
     mappings = _get_mappings(field_spec, 'refs')
     mappings.update(_get_mappings(field_spec, 'fields'))
     if len(mappings) < 1:
-        raise datacraft.SpecException('fields or refs empty: %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'fields or refs empty: {json.dumps(field_spec)}')
     suppliers_map = {}
     for field_or_ref, alias in mappings.items():
         supplier = loader.get(field_or_ref)

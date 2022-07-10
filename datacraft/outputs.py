@@ -85,7 +85,7 @@ class _SingleFieldOutput(OutputHandlerInterface):
 
     def handle(self, key, value):
         if self.output_key:
-            self.writer.write('%s -> %s' % (key, value))
+            self.writer.write(f'{key} -> {value}')
         else:
             self.writer.write(str(value))
 
@@ -209,7 +209,7 @@ class _SingleFileWriter(WriterInterface):
             mode = 'w'
         else:
             mode = 'a'
-        with open(outfile, mode) as handle:
+        with open(outfile, mode, encoding='utf-8') as handle:
             handle.write(value)
             handle.write('\n')
         _log.info('Wrote data to %s', outfile)
@@ -242,7 +242,7 @@ class _IncrementingFileWriter(WriterInterface):
     def write(self, value):
         outfile = os.path.join(self.outdir, self.engine.process({'count': self.count}))
         self.count += 1
-        with open(outfile, 'w') as handle:
+        with open(outfile, 'w', encoding='utf-8') as handle:
             handle.write(value)
             handle.write('\n')
 
@@ -378,7 +378,7 @@ def get_writer(outdir: str = None,
 
     Examples:
         >>> import datacraft
-        >>> writer = datacraft.outputs.get_writer('./output', outfileprefix='test-data-', extension='.csv')
+        >>> csv_writer = datacraft.outputs.get_writer('./output', outfileprefix='test-data-', extension='.csv')
     """
     if outdir:
         _log.debug('Creating output file writer for dir: %s, prefix: %s', outdir, kwargs.get('outfile_prefix'))

@@ -98,7 +98,7 @@ def test_load_ref_by_name():
 
 def test_registered_invalid_preprocessor():
     @datacraft.registry.preprocessors('test_invalid')
-    def _do_stuff(_, __):
+    def _do_stuff(_):
         return None
 
     raw_spec = {

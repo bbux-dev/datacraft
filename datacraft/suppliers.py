@@ -65,11 +65,15 @@ def values(spec: Any, **kwargs) -> ValueSupplierInterface:
 
     Examples:
         >>> import datacraft
-        >>> spec = {"type": "values", "data": [1,2,3,5,8,13]}
-        >>> fib_supplier = datacraft.suppliers.values(spec)
+        >>> raw_spec = {"type": "values", "data": [1,2,3,5,8,13]}
+        >>> fib_supplier = datacraft.suppliers.values(raw_spec)
         >>> fib_supplier = datacraft.suppliers.values([1,2,3,5,8,13])
+        >>> fib_supplier.next(0)
+        1
         >>> weights =  {"1": 0.1, "2": 0.2, "3": 0.1, "4": 0.2, "5": 0.1, "6": 0.2, "7": 0.1}
         >>> mostly_even_supplier = datacraft.suppliers.values(weights)
+        >>> mostly_even_supplier.next(0)
+        '4'
     """
     # shortcut notations no type, or data, the spec is the data
     if _data_not_in_spec(spec):
@@ -89,8 +93,8 @@ def values(spec: Any, **kwargs) -> ValueSupplierInterface:
         supplier = constant(data)
 
     # Check for count param
-        # if 'count' in kwargs or 'count_dist' in kwargs:
-        #     return MultipleValueSupplier(supplier, count_supplier(**kwargs))
+    # if 'count' in kwargs or 'count_dist' in kwargs:
+    #     return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
 
 
@@ -288,8 +292,8 @@ def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
 
     Examples:
         >>> import datacraft
-        >>> weights = {"dog": 0.5, "cat": 0.2, "bunny": 0.1, "hamster": 0.1, "pig": 0.05, "snake": 0.04, "_NULL_": 0.01}
-        >>> weighted_pet_supplier = datacraft.suppliers.weighted_values(weights)
+        >>> pets = {"dog": 0.5, "cat": 0.2, "bunny": 0.1, "hamster": 0.1, "pig": 0.05, "snake": 0.04, "_NULL_": 0.01}
+        >>> weighted_pet_supplier = datacraft.suppliers.weighted_values(pets)
         >>> most_likely_a_dog = weighted_pet_supplier.next(0)
     """
     if len(data) == 0:
@@ -321,9 +325,10 @@ def random_range(start: Union[str, int, float],
         the value supplier for the range
 
     Examples:
-        >>> range_supplier = datacraft.suppliers.random_range(5, 25, precision=3)
+        >>> num_supplier = datacraft.suppliers.random_range(5, 25, precision=3)
         >>> # should be between 5 and 25 with 3 decimal places
-        >>> next_value = range_supplier.next(0))
+        >>> num_supplier.next(0)
+        8.377
     """
     return RandomRangeSupplier(start, end, precision, count_supplier(data=count))
 
@@ -386,9 +391,11 @@ def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
         >>> import datacraft
         >>> pet_list = ["dog", "cat", "hamster", "pig", "rabbit", "horse"]
         >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, min=2, max=5)
-        >>> new_pets = pet_supplier.next(0)
-        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,min=1,max=3)")
-        >>> new_pets = pet_supplier.next(0)
+        >>> pet_supplier.next(0)
+        ['rabbit', 'cat', 'pig', 'cat']
+        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,stddev=1,min=1,max=3)")
+        >>> pet_supplier.next(0)
+        ['pig', 'horse']
     """
     if 'count' in kwargs or 'count_dist' in kwargs:
         counts = count_supplier(**kwargs)
@@ -434,14 +441,14 @@ def decorated(supplier: ValueSupplierInterface, **kwargs) -> ValueSupplierInterf
     Examples:
         >>> import datacraft
         >>> nums = datacraft.suppliers.values([1, 2, 3, 4, 5])
-        >>> supplier = datacraft.suppliers.decorated(nums, prefix='you are number ')
-        >>> supplier.next(0)
+        >>> prefix_supplier = datacraft.suppliers.decorated(nums, prefix='you are number ')
+        >>> prefix_supplier.next(0)
         you are number 1
-        >>> supplier = datacraft.suppliers.decorated(nums, suffix=' more minutes')
-        >>> supplier.next(0)
+        >>> suffix_supplier = datacraft.suppliers.decorated(nums, suffix=' more minutes')
+        >>> suffix_supplier.next(0)
         1 more minutes
-        >>> supplier = datacraft.suppliers.decorated(nums, quote='"')
-        >>> supplier.next(0)
+        >>> quoted_supplier = datacraft.suppliers.decorated(nums, quote='"')
+        >>> quoted_supplier.next(0)
         "1"
     """
     return DecoratedSupplier(supplier, **kwargs)
@@ -1047,9 +1054,9 @@ def templated(supplier_map: Dict[str, ValueSupplierInterface],
 
     Examples:
         >>> from datacraft import suppliers
-        >>> supplier_map = { 'char': suppliers.values(['a', 'b', 'c']), 'num': suppliers.values([1, 2, 3]) }
-        >>> template_str = 'letter {{ char }}, number {{ num }}'
-        >>> supplier = suppliers.templated(supplier_map, template_str)
+        >>> char_to_num_supplier = { 'char': suppliers.values(['a', 'b', 'c']), 'num': suppliers.values([1, 2, 3]) }
+        >>> letter_number_template = 'letter {{ char }}, number {{ num }}'
+        >>> supplier = suppliers.templated(char_to_num_supplier, letter_number_template)
         >>> supplier.next(0)
         'letter a, nummber 1'
     """

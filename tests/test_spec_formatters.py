@@ -1,3 +1,5 @@
+from yaml.constructor import ConstructorError
+
 import datacraft
 
 
@@ -77,7 +79,7 @@ def test_miss_match_logs_error(mocker):
 
 
 def test_error_logged(mocker):
-    mocker.patch('yaml.load', side_effect=Exception('uh oh'))
+    mocker.patch('yaml.load', side_effect=ConstructorError('uh oh'))
     raw_spec = {"test": {"type": "values", "data": "for spec"}}
     # for test coverage
     datacraft.spec_formatters.format_yaml(raw_spec)

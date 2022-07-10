@@ -1,3 +1,4 @@
+"""module for templated type datacraft registry functions"""
 import json
 import logging
 

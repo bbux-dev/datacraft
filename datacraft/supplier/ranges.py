@@ -65,6 +65,8 @@ class _ResettingFloatRange(ResettableIterator):
         self.dstop = decimal.Decimal(str(stop))
         self.dstep = decimal.Decimal(str(step))
         self.precision = precision
+        self.current = None
+        self.quantize = None
         self.reset()
 
     def reset(self):

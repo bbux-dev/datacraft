@@ -43,7 +43,7 @@ class Registry:
             this is where you would register that pre-processor.
 
             >>> @datacraft.registry.preprocessors('custom-preprocessing')
-            ... def _preprocess_spec_to_some_end(raw_spec: dict, is_refs: bool) -> dict:
+            ... def _preprocess_spec_to_some_end(raw_spec: dict) -> dict:
             ...    # return spec with any modification
 
         logging:

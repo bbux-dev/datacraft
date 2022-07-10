@@ -1,3 +1,4 @@
+"""module for calculate type datacraft registry functions"""
 import json
 import logging
 
@@ -31,7 +32,7 @@ def _configure_calculate_supplier(field_spec: dict, loader: datacraft.Loader):
 
     formula = field_spec.get('formula')
     if formula is None:
-        raise datacraft.SpecException('Must define formula for calculate type. %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Must define formula for calculate type. {json.dumps(field_spec)}')
 
     suppliers_map = build_suppliers_map(field_spec, loader)
 

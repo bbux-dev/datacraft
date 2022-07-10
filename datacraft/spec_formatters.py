@@ -28,6 +28,7 @@ from collections import OrderedDict
 
 import yaml
 from _ctypes import PyObj_FromPtr  # type: ignore
+from yaml import MarkedYAMLError
 
 _log = logging.getLogger('spec.formatter')
 
@@ -65,7 +66,7 @@ def format_yaml(raw_spec: dict) -> str:
             _log.warning('yaml does not match raw')
             _log.warning(json.dumps(loaded_yaml, indent=4))
             _log.warning(json.dumps(raw_spec, indent=4))
-    except Exception:
+    except MarkedYAMLError:
         _log.warning('yaml does not load')
         _log.warning(cleaned_yaml)
         _log.warning(dirty_yaml)
@@ -137,7 +138,7 @@ class _NoIndent:
         """
         Added to support formatting for YAML
         """
-        return representer.represent_scalar(' ', u'{.value}'.format(node))
+        return representer.represent_scalar(' ', f'{node.value}')
 
 
 class _MyEncoder(json.JSONEncoder):

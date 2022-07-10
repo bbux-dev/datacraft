@@ -86,7 +86,7 @@ class _SampleEnabledCsv(CsvData):
         super().__init__(has_headers)
 
     def _load_data(self):
-        with open(self.csv_path, newline='') as csvfile:
+        with open(self.csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile, delimiter=self.delimiter, quotechar=self.quotechar)
             return list(reader)
 
@@ -119,7 +119,7 @@ class _RowLevelSampleEnabledCsv(CsvData):
         super().__init__(has_headers)
 
     def _load_data(self):
-        with open(self.csv_path, newline='') as csvfile:
+        with open(self.csv_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile, delimiter=self.delimiter, quotechar=self.quotechar)
             return list(reader)
 
@@ -171,7 +171,7 @@ class _BufferedCsvData(CsvData):
         start = self.size * self.increment + 1
         end = start + self.size + 1
         buff = []
-        with open(self.csv_path) as handle:
+        with open(self.csv_path, encoding='utf-8') as handle:
             rows = csv.reader(handle, delimiter=self.delimiter, quotechar=self.quotechar)
             for line in rows:
                 if rows.line_num == end:

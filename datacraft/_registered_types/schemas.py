@@ -1,7 +1,10 @@
+"""module for schema loading for internal registered types"""
 import json
 import logging
 
 import importlib_resources as pkg_resources
+
+from datacraft import ResourceError
 
 from . import schema
 
@@ -14,7 +17,6 @@ def load_resource_as_json(resource_name: str) -> dict:
         with pkg_resources.open_text(schema, resource_name) as schema_resource:
             return json.load(schema_resource)
     except FileNotFoundError as err:
-        from datacraft import ResourceError
         raise ResourceError(f'No resource with name {resource_name} was found') from err
 
 

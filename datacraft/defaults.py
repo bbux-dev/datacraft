@@ -4,7 +4,6 @@ Module for storing default settings across package
 import logging
 from . import registries
 
-
 _LARGE_CSV_SIZE_MB = 250
 
 

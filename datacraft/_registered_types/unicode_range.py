@@ -1,3 +1,4 @@
+"""module for unicode_range type datacraft registry functions"""
 import json
 import logging
 

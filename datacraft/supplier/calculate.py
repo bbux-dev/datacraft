@@ -36,8 +36,8 @@ def calculate_supplier(suppliers: Dict[str, ValueSupplierInterface], engine: Rec
     Examples:
         >>> import datacraft
         >>> formula = "{{ft}} * 30.48"
-        >>> suppliers = { "ft": suppliers.values([4, 5, 6]) }
-        >>> calculate = _CalculateSupplier(suppliers=suppliers, formula=formula)
+        >>> ft_supplier = { "ft": ft_supplier.values([4, 5, 6]) }
+        >>> calculate = _CalculateSupplier(suppliers=ft_supplier, formula=formula)
         >>> assert calculate.next(0) == 121.92
     """
     return _CalculateSupplier(suppliers, engine)

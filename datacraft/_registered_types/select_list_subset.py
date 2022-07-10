@@ -1,3 +1,4 @@
+"""module for select_list_subset type datacraft registry functions"""
 import json
 import logging
 
@@ -32,15 +33,15 @@ def _configure_select_list_subset_supplier(field_spec, loader):
     config = datacraft.utils.load_config(field_spec, loader)
     data = None
     if config is None or ('mean' not in config and 'count' not in config):
-        raise datacraft.SpecException('Config with mean or count defined must be provided: %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Config with mean or count defined must be provided: {json.dumps(field_spec)}')
     if 'ref' in field_spec and 'data' in field_spec:
-        raise datacraft.SpecException('Only one of "data" or "ref" can be provided for: %s' % json.dumps(field_spec))
+        raise datacraft.SpecException(f'Only one of "data" or "ref" can be provided for:{json.dumps(field_spec)}')
 
     if 'ref' in field_spec:
         ref_name = field_spec.get('ref')
         field_spec = loader.get_ref(ref_name)
         if field_spec is None:
-            raise datacraft.SpecException('No ref with name %s found: %s' % (ref_name, json.dumps(field_spec)))
+            raise datacraft.SpecException(f'No ref with name %s found: {ref_name}, {json.dumps(field_spec)}')
 
         if 'data' in field_spec:
             data = field_spec.get('data')

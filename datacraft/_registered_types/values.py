@@ -1,3 +1,4 @@
+"""module for values type datacraft registry functions"""
 import logging
 
 import datacraft

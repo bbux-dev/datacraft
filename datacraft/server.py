@@ -14,6 +14,7 @@ class _Server:
     """
     Light weight Flask server
     """
+
     def __init__(self,
                  generator: Generator,
                  endpoint: str,
