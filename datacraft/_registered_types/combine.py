@@ -10,7 +10,7 @@ _log = logging.getLogger(__name__)
 _COMBINE_KEY = 'combine'
 _COMBINE_LIST_KEY = 'combine-list'
 _COMBINE_EXAMPLE = {
-    "combine": {
+    "name": {
         "type": "combine",
         "refs": ["first", "last"],
         "config": {
