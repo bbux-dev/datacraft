@@ -76,3 +76,22 @@ def test_data_is_wrong_type(spec):
     # this does not use the schema for validation
     with pytest.raises(datacraft.SpecException):
         datacraft.entries(spec, 1)
+
+
+invalid_but_still_used_replacements = [
+    1000,
+    True,
+    22.2
+]
+
+
+@pytest.mark.parametrize("replacement", invalid_but_still_used_replacements)
+def test_invalid_but_still_used_replacements(replacement):
+    spec = {
+        "field": ["ba", "baba", "bababa"],
+        "replacement": builder.replace("field", {"ba": replacement})
+    }
+
+    entries = datacraft.entries(spec, 3)
+    values = [e['replacement'] for e in entries]
+    assert all(isinstance(e, str) for e in values)

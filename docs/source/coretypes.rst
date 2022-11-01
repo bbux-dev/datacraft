@@ -43,4 +43,4 @@ These are the built in field spec types.
 
 .. include:: types/templated.rst
 
-
+.. include:: types/replace.rst

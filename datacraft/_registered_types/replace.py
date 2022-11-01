@@ -100,7 +100,7 @@ class _ReplaceSupplier(ValueSupplierInterface):
     def next(self, iteration):
         modified = str(self.wrapped.next(iteration))
         for value, replacement in self.replacements.items():
-            modified = modified.replace(value, replacement)
+            modified = modified.replace(value, str(replacement))
         return modified
 
 
@@ -125,5 +125,5 @@ class _RegexReplaceSupplier(ValueSupplierInterface):
         modified = str(self.wrapped.next(iteration))
         for pattern, replacement in self.replacements.items():
             regex = re.compile(pattern)
-            modified = re.sub(regex, replacement, modified)
+            modified = re.sub(regex, str(replacement), modified)
         return modified
