@@ -1373,6 +1373,51 @@ def templated(data: str,
     return spec
 
 
+def replace(ref: str,
+            data: dict,
+            **config) -> dict:
+    """
+    Constructs a replace Field Spec
+
+    Args:
+        ref: ref/field to replace values from
+        data: mapping of value to replacement
+        config: in kwargs format
+
+    Returns:
+        the replace spec
+    """
+
+    spec = {
+        "type": "replace",
+        "ref": ref,
+        "data": data
+    }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def regex_replace(ref: str,
+                  data: dict,
+                  **config) -> dict:
+    """
+    Constructs a regex_replace Field Spec
+
+    Args:
+        ref: ref/field to replace values from
+        data: mapping of regex to replacement
+        config: in kwargs format
+
+    Returns:
+        the regex_replace spec
+    """
+    spec = replace(ref, data, **config)
+    spec['type'] = 'regex_replace'
+    return spec
+
+
 def _create_key_list(entries):
     """
     Checks if entries are from FieldInfo objects and extracts keys

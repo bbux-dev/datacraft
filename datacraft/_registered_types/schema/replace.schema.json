@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/range.schema.json",
+  "type": "object",
+  "required": ["type", "data", "ref"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^(regex_)?replace"},
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"},
+        "cast": {"$ref": "#/definitions/cast"}
+      }
+    },
+    "ref": {
+      "type": "string",
+      "description": "any valid defined field or reference from root spec"
+    },
+    "data": {
+      "type": "object",
+      "description": "Mapping of value in output of referenced supplier to replacement value",
+      "examples": [
+        {"00000": "NNNNN"},
+        {"SECRET": "REPLACE_THIS"}
+      ]
+    }
+  }
+}
