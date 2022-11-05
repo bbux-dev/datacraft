@@ -23,6 +23,7 @@ from .supplier.uuid import uuid_supplier
 from .supplier.unicode import unicode_range_supplier
 from .supplier.templated import templated_supplier
 from .supplier import network, ranges
+from .supplier.strings import cut_supplier
 
 _log = logging.getLogger(__name__)
 
@@ -1062,3 +1063,19 @@ def templated(supplier_map: Dict[str, ValueSupplierInterface],
     """
     engine = template_engines.string(template_str)
     return templated_supplier(supplier_map, engine)
+
+
+def cut(supplier: datacraft.ValueSupplierInterface,
+        start: int = 0,
+        end: int = None):
+    """Trim output of given supplier from start to end, if length permits
+
+    Args:
+        supplier: to get output from
+        start: where in output string to cut from (inclusive)
+        end: where to end cut (exclusive)
+
+    Returns:
+        The shortened version of the output string
+    """
+    return cut_supplier(supplier, start, end)

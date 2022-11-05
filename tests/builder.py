@@ -878,6 +878,26 @@ def date_iso_us(**config) -> dict:
     return spec
 
 
+def date_iso_millis(**config) -> dict:
+    """
+    Constructs a date.iso.ms Field Spec
+
+    Args:
+        config: in kwargs format
+
+    Returns:
+        the date.iso.us spec
+    """
+
+    spec = {
+        "type": "date.iso.ms"
+    }  # type: Dict[str, Any]
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
 def uuid(**config) -> dict:
     """
     Constructs a uuid Field Spec

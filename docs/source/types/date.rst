@@ -6,6 +6,24 @@ be: 25-12-2050. There is also a `date.iso` type that generates ISO8601 formatted
 and a `date.iso.us` for one that generates them with microseconds. We use the `format specification <https://docs
 .python.org/3/library/datetime.html#strftime-and-strptime-format-codes>`_ from the datetime module.
 
+.. list-table::
+   :header-rows: 1
+
+   * - type
+     - example output
+   * - date
+     - 11-18-2050
+   * - date.iso
+     - 2050-12-01T01:44:35
+   * - date.iso.ms
+     - 2050-12-01T05:11:20.543
+   * - date.iso.millis
+     - 2050-12-01T05:11:20.543
+   * - date.iso.us
+     - 2050-12-01T06:19:02.752373
+   * - date.iso.micros
+     - 2050-12-01T06:17:05.487878
+
 Uniformly Sampled Dates
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -63,7 +81,13 @@ Prototype:
         OR,
         "type": "date.iso",
         OR,
+        "type": "date.iso.ms",
+        OR,
+        "type": "date.iso.millis",
+        OR,
         "type": "date.iso.us",
+        OR,
+        "type": "date.iso.micros",
         "config": {
           "format": "Valid datetime format string",
           "duration_days": "The number of days from the start date to create date strings for",

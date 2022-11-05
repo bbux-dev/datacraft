@@ -132,6 +132,14 @@ def test_date_end_doesnt_match_format():
         loader.get('foo')
 
 
+def test_date_iso_millis():
+    spec = {
+        "ts": builder.date_iso_millis()
+    }
+    first = datacraft.entries(spec, 1)[0]["ts"]
+    assert len(first) == 23, first + ' does not match expected length!'
+
+
 def _get_unique_values(spec, key, iterations=100):
     loader = field_loader(spec)
     supplier = loader.get(key)
