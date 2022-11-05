@@ -16,5 +16,6 @@ from . import (
     templated,
     unicode_range,
     uuid_handler,
-    values
+    values,
+    replace
 )
