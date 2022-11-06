@@ -1,73 +1,17 @@
 {
   "uuid.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "uuid"
-        }
-      },
-      {
-        "instance": {
-          "type": "uuid",
-          "config": {
-            "variant": 1
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "uuid",
-          "config": {
-            "variant": 3
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "uuid",
-          "config": {
-            "variant": 4
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "uuid",
-          "config": {
-            "variant": 5
-          }
-        }
-      }
+      {"instance": {"type": "uuid"}},
+      {"instance": {"type": "uuid", "config": {"variant": 1}}},
+      {"instance": {"type": "uuid", "config": {"variant": 3}}},
+      {"instance": {"type": "uuid", "config": {"variant": 4}}},
+      {"instance": {"type": "uuid", "config": {"variant": 5}}}
     ],
     "invalid": [
-      {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "uuids"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "uuid",
-          "config": {
-            "variant": 2
-          }
-        },
-        "note": "invalid variant"
-      },
-      {
-        "instance": {
-          "type": "uuid",
-          "config": {
-            "variant": 6
-          }
-        },
-        "note": "invalid variant"
-      }
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "uuids"}, "note": "misspelled"},
+      {"instance": {"type": "uuid", "config": {"variant": 2}}, "note":  "invalid variant"},
+      {"instance": {"type": "uuid", "config": {"variant": 6}}, "note":  "invalid variant"}
     ]
   }
 }

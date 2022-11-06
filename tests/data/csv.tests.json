@@ -1,138 +1,23 @@
 {
   "csv.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv"
-          }
-        },
-        "note": "minimum config 1"
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "config_ref": "has_the_info",
-            "column": 1
-          }
-        },
-        "note": "minimum config 2"
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "tabs.csv",
-            "delimiter": "\t",
-            "headers": "true"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "column": "status"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "quotechar": "'"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "sample": true
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "sample_rows": true
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "count": 2
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "count": [
-              1,
-              1,
-              2
-            ],
-            "join_with": " "
-          }
-        }
-      }
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv"}}, "note": "minimum config 1"},
+      {"instance": {"type": "csv", "config": {"config_ref": "has_the_info", "column": 1}}, "note": "minimum config 2"},
+      {"instance": {"type": "csv", "config": {"datafile": "tabs.csv", "delimiter": "\t", "headers": "true"}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "column": "status"}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "quotechar": "'"}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "sample": true}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "sample_rows": true}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "count": 2}}},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "count": [1, 1, 2], "join_with": " "}}}
     ],
     "invalid": [
-      {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "seesv"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "csv"
-        },
-        "note": "no config"
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {}
-        },
-        "note": "empty config"
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "datafile": "test.csv",
-            "headers": "missing"
-          }
-        },
-        "note": "invalid headers"
-      },
-      {
-        "instance": {
-          "type": "csv",
-          "config": {
-            "config_ref": "pointer"
-          }
-        },
-        "note": "config ref, no column, gives misleading error"
-      }
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "seesv"}, "note": "misspelled"},
+      {"instance": {"type": "csv"}, "note": "no config"},
+      {"instance": {"type": "csv", "config": {}}, "note": "empty config"},
+      {"instance": {"type": "csv", "config": {"datafile": "test.csv", "headers": "missing"}}, "note": "invalid headers"},
+      {"instance": {"type": "csv", "config": {"config_ref": "pointer"}}, "note": "config ref, no column, gives misleading error"}
     ]
   }
 }

@@ -1,124 +1,25 @@
 {
   "ip.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "ip"
-        },
-        "note": "empty spec is valid"
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "base": "10"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "base": "10.20"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "base": "10.20.30"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "base": "10.20.30.40"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "ipv4",
-          "config": {
-            "base": "10."
-          }
-        },
-        "note": "trailing dot is fine"
-      },
-      {
-        "instance": {
-          "type": "ipv4",
-          "config": {
-            "base": "10.20."
-          }
-        },
-        "note": "trailing dot is fine"
-      },
-      {
-        "instance": {
-          "type": "ipv4",
-          "config": {
-            "base": "10.20.30."
-          }
-        },
-        "note": "trailing dot is fine"
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "cidr": "10.20.30.0/8"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "cidr": "10.20.30.0/16"
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "cidr": "10.20.30.0/24"
-          }
-        }
-      }
+      {"instance": {"type": "ip"}, "note": "empty spec is valid"},
+      {"instance": {"type": "ip", "config": {"base": "10"}}},
+      {"instance": {"type": "ip", "config": {"base": "10.20"}}},
+      {"instance": {"type": "ip", "config": {"base": "10.20.30"}}},
+      {"instance": {"type": "ip", "config": {"base": "10.20.30.40"}}},
+      {"instance": {"type": "ipv4", "config": {"base": "10."}}, "note": "trailing dot is fine"},
+      {"instance": {"type": "ipv4", "config": {"base": "10.20."}}, "note": "trailing dot is fine"},
+      {"instance": {"type": "ipv4", "config": {"base": "10.20.30."}}, "note": "trailing dot is fine"},
+      {"instance": {"type": "ip", "config": {"cidr": "10.20.30.0/8"}}},
+      {"instance": {"type": "ip", "config": {"cidr": "10.20.30.0/16"}}},
+      {"instance": {"type": "ip", "config": {"cidr": "10.20.30.0/24"}}}
     ],
     "invalid": [
-      {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "ips"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "ip",
-          "config": {
-            "base": "10.20.30.40.50"
-          }
-        },
-        "note": "invalid base"
-      },
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "ips"}, "note": "misspelled"},
+      {"instance": {"type": "ip", "config": {"base": "10.20.30.40.50"}}, "note": "invalid base"},
       {
         "note": "cidr range not supported, only /8 /16 /24",
-        "instance": {
-          "type": "ip",
-          "config": {
-            "cidr": "10.20.30.0/12"
-          }
-        }
+        "instance": {"type": "ip", "config": {"cidr": "10.20.30.0/12"}}
       }
     ]
   }

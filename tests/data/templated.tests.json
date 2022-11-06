@@ -1,80 +1,18 @@
 {
   "templated.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "templated",
-          "data": "{{ one }} and {{ two }}",
-          "refs": [
-            "one",
-            "two"
-          ]
-        }
-      },
-      {
-        "instance": {
-          "type": "templated",
-          "data": "{{ one }} and {{ two }}",
-          "fields": [
-            "one",
-            "two"
-          ]
-        }
-      }
+      {"instance": {"type": "templated", "data": "{{ one }} and {{ two }}", "refs": ["one", "two"]}},
+      {"instance": {"type": "templated", "data": "{{ one }} and {{ two }}", "fields": ["one", "two"]}}
     ],
     "invalid": [
-      {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "templateds"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "templated"
-        },
-        "note": "no fields or refs"
-      },
-      {
-        "instance": {
-          "type": "templated",
-          "data": "{{ one }} and {{ two }}",
-          "refs": []
-        },
-        "note": "empty refs"
-      },
-      {
-        "instance": {
-          "type": "templated",
-          "data": "{{ one }} and {{ two }}",
-          "refs": [
-            ""
-          ]
-        },
-        "note": "empty string ref"
-      },
-      {
-        "instance": {
-          "type": "templated",
-          "data": "{{ one }} and {{ two }}",
-          "fields": []
-        },
-        "note": "empty fields"
-      },
-      {
-        "instance": {
-          "type": "templated",
-          "data": "{{ one }} and {{ two }}",
-          "fields": [
-            ""
-          ]
-        },
-        "note": "empty string field"
-      }
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "templateds"}, "note": "misspelled"},
+      {"instance": {"type": "templated"}, "note": "no fields or refs"},
+      {"instance": {"type": "templated", "data": "{{ one }} and {{ two }}", "refs": []}, "note":  "empty refs"},
+      {"instance": {"type": "templated", "data": "{{ one }} and {{ two }}", "refs": [""]}, "note":  "empty string ref"},
+      {"instance": {"type": "templated", "data": "{{ one }} and {{ two }}", "fields": []}, "note":  "empty fields"},
+      {"instance": {
+        "type": "templated", "data": "{{ one }} and {{ two }}", "fields": [""]}, "note":  "empty string field"}
     ]
   }
 }
