@@ -13,6 +13,9 @@ _DATE_ISO_MS_KEY = 'date.iso.ms'
 _DATE_ISO_MILLIS_KEY = 'date.iso.millis'
 _DATE_ISO_US_KEY = 'date.iso.us'
 _DATE_ISO_MICROS_KEY = 'date.iso.micros'
+_DATE_EPOCH_KEY = 'date.epoch'
+_DATE_EPOCH_MS_KEY = 'date.epoch.ms'
+_DATE_EPOCH_MILLIS_KEY = 'date.epoch.millis'
 _ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
 _ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 
@@ -27,6 +30,15 @@ def _get_date_schema():
     """ returns the schema for date types """
     # NOTE: These all share a schema
     return schemas.load(_DATE_KEY)
+
+
+@datacraft.registry.schemas(_DATE_EPOCH_KEY)
+@datacraft.registry.schemas(_DATE_EPOCH_MS_KEY)
+@datacraft.registry.schemas(_DATE_EPOCH_MILLIS_KEY)
+def _get_date_epoch_schema():
+    """ returns the schema for date types """
+    # NOTE: These all share a schema
+    return schemas.load(_DATE_EPOCH_KEY)
 
 
 @datacraft.registry.types(_DATE_KEY)
@@ -47,22 +59,37 @@ def _hour_supplier(config: dict, loader: datacraft.Loader):
 @datacraft.registry.types(_DATE_ISO_KEY)
 def _configure_supplier_iso(field_spec: dict, loader: datacraft.Loader):
     """ configures the date.iso value supplier """
-    return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_NO_MICRO)
+    return _configure_supplier_custom_date_format(field_spec, loader, _ISO_FORMAT_NO_MICRO)
 
 
 @datacraft.registry.types(_DATE_ISO_US_KEY)
 @datacraft.registry.types(_DATE_ISO_MICROS_KEY)
 def _configure_supplier_iso_microseconds(field_spec: dict, loader: datacraft.Loader):
     """ configures the date.iso.us value supplier """
-    return _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
+    return _configure_supplier_custom_date_format(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
 
 
 @datacraft.registry.types(_DATE_ISO_MS_KEY)
 @datacraft.registry.types(_DATE_ISO_MILLIS_KEY)
 def _configure_supplier_iso_milliseconds(field_spec: dict, loader: datacraft.Loader):
     """ configures the date.iso.ms value supplier """
-    micros_supplier = _configure_supplier_iso_date(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
+    micros_supplier = _configure_supplier_custom_date_format(field_spec, loader, _ISO_FORMAT_WITH_MICRO)
     return datacraft.suppliers.cut(micros_supplier, start=0, end=23)
+
+
+@datacraft.registry.types(_DATE_EPOCH_KEY)
+def _configure_date_epoch_supplier(field_spec: dict, _: datacraft.Loader):
+    """ configures the date.epoch value supplier """
+    config = field_spec.get('config', {})
+    return datacraft.suppliers.epoch_date(as_millis=False, **config)
+
+
+@datacraft.registry.types(_DATE_EPOCH_MS_KEY)
+@datacraft.registry.types(_DATE_EPOCH_MILLIS_KEY)
+def _configure_date_epoch_millis_supplier(field_spec: dict, _: datacraft.Loader):
+    """ configures the date.epoch.ms value supplier """
+    config = field_spec.get('config', {})
+    return datacraft.suppliers.epoch_date(as_millis=True, **config)
 
 
 @datacraft.registry.usage(_DATE_KEY)
@@ -106,52 +133,48 @@ def _example_date_usage():
     return '\n'.join([one, two, tre])
 
 
-@datacraft.registry.usage(_DATE_ISO_KEY)
-def _example_date_iso_usage():
-    example = {
-        "timestamp": {
-            "type": _DATE_ISO_KEY
+def register_example_date_usage(key):
+    """registers a unique function for the basic usage"""
+    @datacraft.registry.usage(key)
+    def function():
+        suffix = key.replace('date', '')
+        example = {
+            "timestamp" + suffix: {
+                "type": key
+            }
         }
-    }
-    return common.standard_example_usage(example, 3)
+        return common.standard_example_usage(example, 3)
+
+    return function
 
 
-@datacraft.registry.usage(_DATE_ISO_US_KEY)
-@datacraft.registry.usage(_DATE_ISO_MICROS_KEY)
-def _example_date_iso_micros_usage():
-    example = {
-        "timestamp.micros": {
-            "type": _DATE_ISO_US_KEY
-        }
-    }
-    return common.standard_example_usage(example, 3)
+for key in [
+    _DATE_ISO_KEY,
+    _DATE_ISO_US_KEY,
+    _DATE_ISO_MICROS_KEY,
+    _DATE_ISO_MS_KEY,
+    _DATE_ISO_MILLIS_KEY,
+    _DATE_EPOCH_KEY,
+    _DATE_EPOCH_MS_KEY,
+    _DATE_EPOCH_MILLIS_KEY
+]:
+    register_example_date_usage(key)
 
 
-@datacraft.registry.usage(_DATE_ISO_MS_KEY)
-@datacraft.registry.usage(_DATE_ISO_MILLIS_KEY)
-def _example_date_iso_millis_usage():
-    example = {
-        "timestamp.millis": {
-            "type": _DATE_ISO_US_KEY
-        }
-    }
-    return common.standard_example_usage(example, 3)
-
-
-def _configure_supplier_iso_date(field_spec, loader, iso_date_format):
-    """ configures an iso based date supplier using the provided date format """
+def _configure_supplier_custom_date_format(field_spec, loader, output_date_format):
+    """ configures a custom date supplier using the provided date format as the output format """
     config = datacraft.utils.load_config(field_spec, loader)
     # make sure the start and end dates match the ISO format we are using
     start = config.get('start')
     end = config.get('end')
-    date_format = config.get('format', )
+    date_format = config.get('format')
     if start:
         start_date = datetime.datetime.strptime(start, date_format)
-        config['start'] = start_date.strftime(iso_date_format)
+        config['start'] = start_date.strftime(output_date_format)
     if end:
         end_date = datetime.datetime.strptime(end, date_format)
-        config['end'] = end_date.strftime(iso_date_format)
-    config['format'] = iso_date_format
+        config['end'] = end_date.strftime(output_date_format)
+    config['format'] = output_date_format
     # End fixes to support iso
     config['hour_supplier'] = _hour_supplier(config, loader)
     return datacraft.suppliers.date(**config)

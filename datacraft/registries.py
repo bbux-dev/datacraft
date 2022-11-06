@@ -188,7 +188,7 @@ def get_default(key):
         key: to lookup
 
     Returns:
-        The default for thekey
+        The default for the key
     """
 
     func = Registry.defaults.get(key)

@@ -17,7 +17,7 @@ from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSuppli
 from .supplier.model import Distribution, ValueSupplierInterface, ResettableIterator
 from .supplier.combine import combine_supplier
 from .supplier.calculate import calculate_supplier
-from .supplier.date import date_supplier, uniform_date_timestamp
+from .supplier.date import date_supplier, uniform_date_timestamp, epoch_date_supplier
 from .supplier.csv import load_csv_data, csv_supplier
 from .supplier.uuid import uuid_supplier
 from .supplier.unicode import unicode_range_supplier
@@ -608,8 +608,7 @@ def date(**kwargs) -> ValueSupplierInterface:
         start (str): start date string
         end (str): end date string
         offset (int): number of days to shift the duration, positive is back negative is forward
-        duration_days (str): number of days after start, default is 30
-        date_format_string (str): format for parsing dates
+        duration_days (int): number of days after start, default is 30
 
     Returns:
         supplier for dates
@@ -620,17 +619,47 @@ def date(**kwargs) -> ValueSupplierInterface:
     return _create_uniform_date_supplier(hour_supplier, **kwargs)
 
 
+def epoch_date(as_millis: bool = False, **kwargs) -> ValueSupplierInterface:
+    """
+    Creates supplier the provides epoch dates
+
+    Can use one of center_date or (start, end, offset, duration_days) etc.
+
+    Args:
+        as_millis: if the timestamp should be millis since epoch, default is seconds
+
+    Keyword Args:
+        format (str): Format string for date args used, required if any provided
+        center_date (str): Date matching format to center dates around
+        stddev_days (float): Standard deviation in days from center date
+        start (str): start date string
+        end (str): end date string
+        offset (int): number of days to shift the duration, positive is back negative is forward
+        duration_days (str): number of days after start, default is 30
+
+    Returns:
+        supplier for dates
+    """
+    if 'center_date' in kwargs or 'stddev_days' in kwargs:
+        timestamp_distribution, _ = _gauss_date_timestamp(**kwargs)
+    else:
+        timestamp_distribution, _ = _uniform_date_timestamp(**kwargs)
+    return epoch_date_supplier(timestamp_distribution, is_millis=as_millis)
+
+
 def _create_stats_based_date_supplier(hour_supplier: ValueSupplierInterface, **kwargs):
     """ creates stats based date supplier from config """
-    center_date = kwargs.get('center_date')
-    stddev_days = kwargs.get('stddev_days', registries.get_default('date_stddev_days'))
-    date_format = kwargs.get('format', registries.get_default('date_format'))
-    timestamp_distribution = _gauss_date_timestamp(center_date, float(stddev_days), date_format)
+    timestamp_distribution, date_format = _gauss_date_timestamp(**kwargs)
     return date_supplier(date_format, timestamp_distribution, hour_supplier)
 
 
 def _create_uniform_date_supplier(hour_supplier: ValueSupplierInterface, **kwargs):
     """ creates uniform based date supplier from config """
+    timestamp_distribution, date_format = _uniform_date_timestamp(**kwargs)
+    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+
+
+def _uniform_date_timestamp(**kwargs):
     duration_days = kwargs.get('duration_days', registries.get_default('date_duration_days'))
     offset = int(kwargs.get('offset', 0))
     start = kwargs.get('start')
@@ -640,34 +669,34 @@ def _create_uniform_date_supplier(hour_supplier: ValueSupplierInterface, **kwarg
     if start_ts is None or end_ts is None:
         raise SpecException(f'Unable to generate timestamp supplier from config: {json.dumps(kwargs)}')
     timestamp_distribution = distributions.uniform(start=start_ts, end=end_ts)
-    return date_supplier(date_format, timestamp_distribution, hour_supplier)
+    return timestamp_distribution, date_format
 
 
 _SECONDS_IN_DAY = 24.0 * 60.0 * 60.0
 
 
-def _gauss_date_timestamp(
-        center_date_str: Union[str, None],
-        stddev_days: float,
-        date_format_string: str):
+def _gauss_date_timestamp(**kwargs):
     """
     Creates a normally distributed date distribution around the center date
 
-    Args:
+    Keyword Args:
         center_date_str: center date for distribution
         stddev_days: standard deviation from center date in days
-        date_format_string: format for returned dates
+        format: format for returned dates
 
     Returns:
-        Distribution that gives normally distributed seconds since epoch for the given params
+        Distribution that gives normally distributed seconds since epoch for the given params, and date_format_string
     """
+    center_date_str = kwargs.get('center_date')
+    stddev_days = float(kwargs.get('stddev_days', registries.get_default('date_stddev_days')))
+    date_format_string = kwargs.get('format', registries.get_default('date_format'))
     if center_date_str:
         center_date = datetime.datetime.strptime(center_date_str, date_format_string)
     else:
         center_date = datetime.datetime.now()
     mean = center_date.timestamp()
     stddev = stddev_days * _SECONDS_IN_DAY
-    return distributions.normal(mean=mean, stddev=stddev)
+    return distributions.normal(mean=mean, stddev=stddev), date_format_string
 
 
 def geo_lat(**kwargs) -> ValueSupplierInterface:

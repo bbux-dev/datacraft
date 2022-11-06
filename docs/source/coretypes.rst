@@ -25,7 +25,7 @@ These are the built in field spec types.
 
 .. include:: types/uuid.rst
 
-.. include:: types/select_list.rst
+.. include:: types/sample.rst
 
 .. include:: types/char_class.rst
 

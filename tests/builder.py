@@ -785,7 +785,6 @@ def range_spec(data: list, **config) -> dict:
     Returns:
         the range spec
     """
-
     spec = {
         "type": "range",
         "data": data
@@ -828,14 +827,7 @@ def date(**config) -> dict:
     Returns:
         the date spec
     """
-
-    spec = {
-        "type": "date"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("date", config)
 
 
 def date_iso(**config) -> dict:
@@ -848,14 +840,7 @@ def date_iso(**config) -> dict:
     Returns:
         the date.iso spec
     """
-
-    spec = {
-        "type": "date.iso"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("date.iso", config)
 
 
 def date_iso_us(**config) -> dict:
@@ -868,14 +853,7 @@ def date_iso_us(**config) -> dict:
     Returns:
         the date.iso.us spec
     """
-
-    spec = {
-        "type": "date.iso.us"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("date.iso.us", config)
 
 
 def date_iso_millis(**config) -> dict:
@@ -886,21 +864,40 @@ def date_iso_millis(**config) -> dict:
         config: in kwargs format
 
     Returns:
-        the date.iso.us spec
+        the date.iso.ms spec
     """
+    return _simple_spec("date.iso.ms", config)
 
-    spec = {
-        "type": "date.iso.ms"
-    }  # type: Dict[str, Any]
 
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+def date_epoch(**config) -> dict:
+    """
+    Constructs a date.epoch Field Spec
+
+    Args:
+        config: in kwargs format
+
+    Returns:
+        the date.epoch spec
+    """
+    return _simple_spec("date.epoch", config)
+
+
+def date_epoch_ms(**config) -> dict:
+    """
+    Constructs a date.epoch.ms Field Spec
+
+    Args:
+        config: in kwargs format
+
+    Returns:
+        the date.epoch.ms spec
+    """
+    return _simple_spec("date.epoch.ms", config)
 
 
 def uuid(**config) -> dict:
     """
-    Constructs a uuid Field Spec
+    Constructs an uuid Field Spec
 
     Args:
         config: in kwargs format
@@ -908,14 +905,7 @@ def uuid(**config) -> dict:
     Returns:
         the uuid spec
     """
-
-    spec = {
-        "type": "uuid"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("uuid", config)
 
 
 def char_class(data: Union[str, List[str]], **config) -> dict:
@@ -929,7 +919,6 @@ def char_class(data: Union[str, List[str]], **config) -> dict:
     Returns:
         the char_class spec
     """
-
     spec = {
         "type": "char_class",
         "data": data
@@ -951,7 +940,6 @@ def char_class_abbrev(cc_abbrev: str, **config) -> dict:
     Returns:
         the char_class_abbrev spec
     """
-
     spec = {
         "type": "char_class_abbrev"
     }  # type: Dict[str, Any]
@@ -976,7 +964,6 @@ def unicode_range(data: Union[List[str], List[List[str]]], **config) -> dict:
     Returns:
         the unicode_range spec
     """
-
     spec = {
         "type": "unicode_range",
         "data": data,
@@ -1000,14 +987,7 @@ def geo_lat(**config) -> dict:
     Returns:
         the geo.lat spec
     """
-
-    spec = {
-        "type": "geo.lat"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("geo.lat", config)
 
 
 def geo_long(**config) -> dict:
@@ -1020,14 +1000,7 @@ def geo_long(**config) -> dict:
     Returns:
         the geo.long spec
     """
-
-    spec = {
-        "type": "geo.long"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("geo.long", config)
 
 
 def geo_pair(**config) -> dict:
@@ -1040,14 +1013,7 @@ def geo_pair(**config) -> dict:
     Returns:
         the geo.pair spec
     """
-
-    spec = {
-        "type": "geo.pair"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("geo.pair", config)
 
 
 def ip(**config) -> dict:
@@ -1060,14 +1026,7 @@ def ip(**config) -> dict:
     Returns:
         the ip spec
     """
-
-    spec = {
-        "type": "ip"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("ip", config)
 
 
 def ipv4(**config) -> dict:
@@ -1080,19 +1039,12 @@ def ipv4(**config) -> dict:
     Returns:
         the ipv4 spec
     """
-
-    spec = {
-        "type": "ipv4"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("ipv4", config)
 
 
 def ip_precise(**config) -> dict:
     """
-    Constructs a ip.precise Field Spec
+    Constructs an ip.precise Field Spec
 
     Args:
         config: in kwargs format
@@ -1100,14 +1052,7 @@ def ip_precise(**config) -> dict:
     Returns:
         the ip.precise spec
     """
-
-    spec = {
-        "type": "ip.precise"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("ip.precise", config)
 
 
 def mac(**config) -> dict:
@@ -1120,14 +1065,7 @@ def mac(**config) -> dict:
     Returns:
         the mac spec
     """
-
-    spec = {
-        "type": "net.mac"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("net.mac", config)
 
 
 def weighted_ref(data: Dict[str, float], **config) -> dict:
@@ -1188,14 +1126,7 @@ def csv(**config) -> dict:
     Returns:
         the csv spec
     """
-
-    spec = {
-        "type": "csv"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("csv", config)
 
 
 def csv_select(data: Dict[str, int] = None, **config) -> dict:
@@ -1253,14 +1184,7 @@ def config_ref(**config) -> dict:
     Returns:
         the config_ref spec
     """
-
-    spec = {
-        "type": "config_ref"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("config_ref", config)
 
 
 def calculate(refs: dict = None,
@@ -1330,14 +1254,7 @@ def weighted_csv(**config) -> dict:
     Returns:
         the weighted_csv spec
     """
-
-    spec = {
-        "type": "weighted_csv"
-    }  # type: Dict[str, Any]
-
-    if len(config) > 0:
-        spec['config'] = config
-    return spec
+    return _simple_spec("weighted_csv", config)
 
 
 def distribution(data: str = None, **config) -> dict:
@@ -1435,6 +1352,15 @@ def regex_replace(ref: str,
     """
     spec = replace(ref, data, **config)
     spec['type'] = 'regex_replace'
+    return spec
+
+
+def _simple_spec(key, config):
+    spec = {
+        "type": key
+    }  # type: Dict[str, Any]
+    if len(config) > 0:
+        spec['config'] = config
     return spec
 
 

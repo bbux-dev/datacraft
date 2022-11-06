@@ -1,0 +1,95 @@
+{
+  "date.epoch.schema.json": {
+    "valid": [
+      {"instance": {"type": "date.epoch"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.epoch.ms"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.epoch.millis"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.epoch", "config": {"offset": 1}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": "22"}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "offset": 1}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "offset": -1}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "offset": 1, "start": "15-12-2050"}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "start": "15-Dec-2050", "format": "%d-%b-%Y"}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "end": "15-Dec-2050"}}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "offset": 1, "start": "15-12-2050", "end": "15-12-2051" }}},
+      {"instance": {"type": "date.epoch", "config": {"duration_days": 1, "start": "15-Dec-2050", "end": "15-Dec-2051", "format": "%d-%b-%Y"}}},
+      {"instance": {"type": "date.epoch", "config": {"center_date": "15-Dec-2050", "format": "%d-%b-%Y"}}},
+      {"instance": {"type": "date.epoch", "config": {"center_date": "15-Dec-2050", "format": "%d-%b-%Y", "stddev_days": 30}}},
+      {"instance": {"type": "date.epoch", "config": {"stddev_days": 30}}},
+      {
+        "instance": {
+          "type": "date.epoch",
+          "config": {
+            "hours": { "type": "values", "data": { "7": 0.3, "8": 0.2, "9": 0.1, "10": 0.2, "11": 0.2 } }
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "date.epoch",
+          "config": {
+            "hours": {"type": "rand_range", "data": [9, 17]}
+          }
+        }
+      },
+      {
+        "instance": {
+          "type": "date.epoch",
+          "config": {
+            "hours": {"type": "distribution", "data": "normal(mean=12, stddev=5, min=6, max=21)"}
+          }
+        }
+      }
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "date.epock"}, "note": "misspelled"},
+      {"instance": {"type": "date.epoch", "config": {"offset": 1.5}}, "note": "only integer offsets supported"},
+      {
+        "note": "only string formatted start dates supported",
+        "instance": {"type": "date.epoch", "config": {"start": 1615477175}}
+      },
+      {
+        "note": "only string formatted end dates supported",
+        "instance": {"type": "date.epoch", "config": {"end": 1615477175}}
+      },
+      {
+        "note": "cannot supply start and center_date",
+        "instance": {"type": "date.epoch", "config": {"start": "15-12-2050", "center_date": "25-12-2050"}}
+      },
+      {
+        "note": "cannot supply end and center_date",
+        "instance": {"type": "date.epoch", "config": {"center_date": "25-12-2050", "end": "31-12-2050"}}
+      },
+      {
+        "note": "cannot supply duration_days and center_date",
+        "instance": {"type": "date.epoch", "config": {"center_date": "25-12-2050", "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply start and stddev_days",
+        "instance": {"type": "date.epoch", "config": {"start": "15-12-2050", "stddev_days": 30}}
+      },
+      {
+        "note": "cannot supply end and stddev_days",
+        "instance": {"type": "date.epoch", "config": {"stddev_days": 30, "end": "31-12-2050"}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.epoch", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.iso", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.iso.ms", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.iso.us", "config": {"stddev_days": 30, "duration_days": 22}}
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["type"],
   "properties": {
-    "type": {  "type": "string", "pattern": "^date(\\.iso(\\.ms|\\.millis|\\.us|\\.micros)?)?$"},
+    "type": {  "type": "string", "pattern": "^date.epoch(\\.ms|\\.millis)?$"},
     "config": {
       "type": "object",
       "properties": {
@@ -13,7 +13,7 @@
         "quote": {"$ref": "#/definitions/quote"},
         "count": {"$ref": "#/definitions/count"},
         "format": {
-          "description": "Valid datetime format string",
+          "description": "Valid datetime format string for parsing arguments (start, end, etc.)",
           "default": "%d-%m-%Y",
           "examples": [
             "%Y%m%d",

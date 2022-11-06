@@ -6,6 +6,8 @@ import pytest
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
+import datacraft.registries
+
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(levelname)s %(message)s',
                     level=logging.INFO)
@@ -27,12 +29,14 @@ TEST_FILES = [
     "uuid.tests.json",
     "char_class.tests.json",
     "date.tests.json",
+    "date-epoch.tests.json",
     "geo.lat.tests.json",
     "geo.long.tests.json",
     "geo.pair.tests.json",
     "unicode_range.tests.json",
     "ip.tests.json",
     "select_list_subset.tests.json",
+    "sample.tests.json",
     "calculate.tests.json",
     "csv.tests.json",
     "weighted_csv.tests.json",
@@ -50,11 +54,11 @@ def test_run_validation(test_file_name):
     tests = load_test_file(test_file_name)
     should_have_failed = {}
     for file, type_tests in tests.items():
+        # old way we used the actual file name and loaded that, now just need type name
+        field_type = file.replace('.schema.json', '')
         if 'EXAMPLE' in file:
             continue
-        schema = load_schema_file(file)
-        # hack for now
-        schema['definitions'] = definitions['definitions']
+        schema = datacraft.registries.lookup_schema(field_type)
         for should_be_valid in type_tests[ASSUMED_VALID]:
             validate(should_be_valid[INSTANCE], schema=schema)
         for should_not_be_valid in type_tests[ASSUMED_INVALID]:
