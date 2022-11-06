@@ -2,6 +2,11 @@
   "date.schema.json": {
     "valid": [
       {"instance": {"type": "date"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.iso"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.iso.ms"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.iso.millis"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.iso.us"}, "note": "empty date spec is valid"},
+      {"instance": {"type": "date.iso.micros"}, "note": "empty date spec is valid"},
       {"instance": {"type": "date", "config": {"offset": 1}}},
       {"instance": {"type": "date", "config": {"duration_days": 1}}},
       {"instance": {"type": "date", "config": {"duration_days": "22"}}},
@@ -44,6 +49,8 @@
       {"instance": {}, "note": "empty"},
       {"instance": {"type": "dates"}, "note": "misspelled"},
       {"instance": {"type": "date,iso"}, "note": "misspelled"},
+      {"instance": {"type": "date.isoms"}, "note": "misspelled"},
+      {"instance": {"type": "date.iso.microseconds"}, "note": "misspelled"},
       {"instance": {"type": "date", "config": {"offset": 1.5}}, "note": "only integer offsets supported"},
       {
         "note": "only string formatted start dates supported",
@@ -76,6 +83,18 @@
       {
         "note": "cannot supply duration_days and stddev_days",
         "instance": {"type": "date", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.iso", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.iso.ms", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "cannot supply duration_days and stddev_days",
+        "instance": {"type": "date.iso.us", "config": {"stddev_days": 30, "duration_days": 22}}
       }
     ]
   }

@@ -45,7 +45,7 @@ TEST_FILES = [
 
 
 @pytest.mark.parametrize("test_file_name", TEST_FILES)
-def _test_run_validation(test_file_name):
+def test_run_validation(test_file_name):
     definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)
     should_have_failed = {}
