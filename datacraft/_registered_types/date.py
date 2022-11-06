@@ -18,30 +18,13 @@ _ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
 
 
 @datacraft.registry.schemas(_DATE_KEY)
-def _get_date_schema():
-    """ returns the schema for date types """
-    return schemas.load(_DATE_KEY)
-
-
 @datacraft.registry.schemas(_DATE_ISO_KEY)
-def _get_date_iso_schema():
-    """ returns the schema for date.iso types """
-    # NOTE: These all share a schema
-    return schemas.load(_DATE_KEY)
-
-
-@datacraft.registry.schemas(_DATE_ISO_US_KEY)
-@datacraft.registry.schemas(_DATE_ISO_MICROS_KEY)
-def _get_date_iso_us_schema():
-    """ returns the schema for date.iso.us types """
-    # NOTE: These all share a schema
-    return schemas.load(_DATE_KEY)
-
-
 @datacraft.registry.schemas(_DATE_ISO_MS_KEY)
 @datacraft.registry.schemas(_DATE_ISO_MILLIS_KEY)
-def _get_date_iso_ms_schema():
-    """ returns the schema for date.iso.ms types """
+@datacraft.registry.schemas(_DATE_ISO_US_KEY)
+@datacraft.registry.schemas(_DATE_ISO_MICROS_KEY)
+def _get_date_schema():
+    """ returns the schema for date types """
     # NOTE: These all share a schema
     return schemas.load(_DATE_KEY)
 
@@ -137,7 +120,7 @@ def _example_date_iso_usage():
 @datacraft.registry.usage(_DATE_ISO_MICROS_KEY)
 def _example_date_iso_micros_usage():
     example = {
-        "timestamp.us": {
+        "timestamp.micros": {
             "type": _DATE_ISO_US_KEY
         }
     }
@@ -148,7 +131,7 @@ def _example_date_iso_micros_usage():
 @datacraft.registry.usage(_DATE_ISO_MILLIS_KEY)
 def _example_date_iso_millis_usage():
     example = {
-        "timestamp.us": {
+        "timestamp.millis": {
             "type": _DATE_ISO_US_KEY
         }
     }
