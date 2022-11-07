@@ -336,7 +336,7 @@ class Builder:
 
     def select_list_subset(self, key: str, data: List[Any] = None, ref_name: str = None, **config) -> FieldInfo:
         """
-        creates select_list_subset Field Spec and adds to Data Spec
+        creates sample Field Spec and adds to Data Spec
 
         Args:
             key: name of ref/field
@@ -345,7 +345,7 @@ class Builder:
             config: in kwargs format
 
         Returns:
-            FieldInfo for the added select_list_subset field
+            FieldInfo for the added sample field
         """
         return self._add_field_spec(key, select_list_subset(data, ref_name, **config))
 
@@ -1092,7 +1092,7 @@ def weighted_ref(data: Dict[str, float], **config) -> dict:
 
 def select_list_subset(data: List[Any] = None, ref: str = None, **config) -> dict:
     """
-    Constructs a select_list_subset Field Spec
+    Constructs a sample Field Spec
 
     Args:
         data: to select from
@@ -1100,11 +1100,11 @@ def select_list_subset(data: List[Any] = None, ref: str = None, **config) -> dic
         config: in kwargs format
 
     Returns:
-        the select_list_subset spec
+        the sample spec
     """
 
     spec = {
-        "type": "select_list_subset"
+        "type": "sample"
     }  # type: Dict[str, Any]
     if data is not None:
         spec['data'] = data

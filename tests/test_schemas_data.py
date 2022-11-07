@@ -35,7 +35,7 @@ TEST_FILES = [
     "geo.pair.tests.json",
     "unicode_range.tests.json",
     "ip.tests.json",
-    "select_list_subset.tests.json",
+    "sample.tests.json",
     "sample.tests.json",
     "calculate.tests.json",
     "csv.tests.json",

@@ -11,7 +11,7 @@ Prototype:
       "<field name>": {
         "type": "sample",
         OR
-        "type": "select_list_subset", $ <- legacy name
+        "type": "sample", $ <- legacy name
         "config": {
           "mean": N,
           "stddev": N,

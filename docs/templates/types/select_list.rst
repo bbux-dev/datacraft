@@ -1,7 +1,7 @@
-select_list_subset
+sample
 ------------------
 
-A select_list_subset spec is used to select multiple values from a list to use as the value for a field.
+A sample spec is used to select multiple values from a list to use as the value for a field.
 
 Prototype:
 
@@ -9,7 +9,7 @@ Prototype:
 
     {
       "<field name>": {
-        "type": "select_list_subset",
+        "type": "sample",
         "config": {
           "mean": N,
           "stddev": N,
@@ -31,7 +31,7 @@ Examples:
 
     {
       "ingredients": {
-        "type": "select_list_subset",
+        "type": "sample",
         "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
         "config": {
           "mean": 3,
@@ -47,7 +47,7 @@ Examples:
 
     {
       "ingredients": {
-        "type": "select_list_subset",
+        "type": "sample",
         "data": ["onions", "mushrooms", "garlic", "bell peppers", "spinach", "potatoes", "carrots"],
         "config": {
           "mean": 3,

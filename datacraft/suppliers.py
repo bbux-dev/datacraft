@@ -1014,7 +1014,7 @@ def resettable(iterator: ResettableIterator):
     return iter_supplier(iterator)
 
 
-def select_list_subset(data: list, **kwargs):
+def sample(data: list, **kwargs):
     """Creates a supplier that selects elements from the data list based on the supplier kwargs
 
     Args:
@@ -1023,9 +1023,20 @@ def select_list_subset(data: list, **kwargs):
     Keyword Args:
         mean (float): mean number of values to include in list
         stddev (float): standard deviation from the mean
+        count: number of elements in list to use
+        count_dist: count distribution to use
+        min: minimum number of values to return
+        max: maximum number of values to return
+        join_with: value to join values with, default is None
 
     Returns:
         supplier to supply subsets of data list
+
+    Examples:
+        >>> import datacraft
+        >>> supplier = datacraft.suppliers.sample(['dog', 'cat', 'rat'], mean=2)
+        >>> supplier.next(1)
+        ['cat', 'rat']
     """
     if utils.any_key_exists(kwargs, ['mean', 'stddev']):
         return list_stats_sampler(data, **kwargs)

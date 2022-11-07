@@ -7,15 +7,15 @@ from . import builder
 
 
 def test_invalid_when_no_config():
-    _test_invalid_select_list_spec({"field:select_list_subset": {}})
+    _test_invalid_select_list_spec({"field:sample": {}})
 
 
 def test_invalid_when_no_mean_specified():
-    _test_invalid_select_list_spec({"field:select_list_subset?stddev=1": {}})
+    _test_invalid_select_list_spec({"field:sample?stddev=1": {}})
 
 
 def test_invalid_when_ref_not_defined():
-    spec = builder.single_field("field:select_list_subset?mean=2", {"ref": "REF"}).build()
+    spec = builder.single_field("field:sample?mean=2", {"ref": "REF"}).build()
     _test_invalid_select_list_spec(spec)
 
 
@@ -64,7 +64,7 @@ def test_select_list_mean_and_variance():
 
 
 def test_select_list_using_loader():
-    spec = {"pets:select_list_subset?mean=2&stddev=0&join_with= ": ['dog', 'cat', 'pig', 'hog', 'bun']}
+    spec = {"pets:sample?mean=2&stddev=0&join_with= ": ['dog', 'cat', 'pig', 'hog', 'bun']}
     loader = field_loader(spec)
     supplier = loader.get('pets')
     value = supplier.next(0)
