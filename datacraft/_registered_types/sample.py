@@ -9,7 +9,7 @@ from . import schemas
 _log = logging.getLogger(__name__)
 _SAMPLE_KEY = 'sample'
 # legacy alias
-_SELECT_LIST_SUBSET_KEY = 'sample'
+_SELECT_LIST_SUBSET_KEY = 'select_list_subset'
 
 
 @datacraft.registry.schemas(_SAMPLE_KEY)

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/datacraft/schemas/select_list_subset.schema.json",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/sample.schema.json",
   "type": "object",
   "required": ["type"],
   "oneOf": [
@@ -8,7 +8,7 @@
     {"required": ["data"]}
   ],
   "properties": {
-    "type": {"type": "string", "pattern": "^select_list_subset$"},
+    "type": {"type": "string", "pattern": "^sample$"},
     "config": {
       "type": "object",
       "oneOf": [

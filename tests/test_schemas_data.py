@@ -3,7 +3,7 @@ import logging
 import os
 
 import pytest
-from jsonschema import validate
+import jsonschema
 from jsonschema.exceptions import ValidationError
 
 import datacraft.registries
@@ -36,7 +36,7 @@ TEST_FILES = [
     "unicode_range.tests.json",
     "ip.tests.json",
     "sample.tests.json",
-    "sample.tests.json",
+    "select_list_subset.tests.json",
     "calculate.tests.json",
     "csv.tests.json",
     "weighted_csv.tests.json",
@@ -50,7 +50,6 @@ TEST_FILES = [
 
 @pytest.mark.parametrize("test_file_name", TEST_FILES)
 def test_run_validation(test_file_name):
-    definitions = load_schema_file('definitions.json')
     tests = load_test_file(test_file_name)
     should_have_failed = {}
     for file, type_tests in tests.items():
@@ -60,11 +59,11 @@ def test_run_validation(test_file_name):
             continue
         schema = datacraft.registries.lookup_schema(field_type)
         for should_be_valid in type_tests[ASSUMED_VALID]:
-            validate(should_be_valid[INSTANCE], schema=schema)
+            jsonschema.validate(should_be_valid[INSTANCE], schema=schema)
         for should_not_be_valid in type_tests[ASSUMED_INVALID]:
             log.debug(json.dumps(should_not_be_valid))
             try:
-                validate(should_not_be_valid[INSTANCE], schema=schema)
+                jsonschema.validate(should_not_be_valid[INSTANCE], schema=schema)
             except ValidationError:
                 continue
             failed_for_file = should_have_failed.get(file)
@@ -101,7 +100,43 @@ def test_validate_count_formats():
     for bad_count in bad_counts:
         # print(json.dumps(bad_count))
         with pytest.raises(ValidationError):
-            validate(bad_count, schema=schema)
+            jsonschema.validate(bad_count, schema=schema)
+
+
+@pytest.mark.parametrize("test_file_name", TEST_FILES)
+def test_spec_entries(test_file_name):
+    # just testing which ones pass the schema but not creation and vise versa
+    tests = load_test_file(test_file_name)
+    fail_spec_exception = []
+    fail_other_reason = []
+    should_have_failed = []
+    for file, type_tests in tests.items():
+        if 'EXAMPLE' in file:
+            continue
+        for example in type_tests[ASSUMED_VALID]:
+            spec = {'field': example[INSTANCE]}
+            try:
+                datacraft.entries(spec, 1)
+            except datacraft.SpecException:
+                fail_spec_exception.append(spec)
+            except Exception:
+                fail_other_reason.append(spec)
+        for example in type_tests[ASSUMED_INVALID]:
+            spec = {'field': example[INSTANCE]}
+            try:
+                datacraft.entries(spec, 1)
+            except Exception:
+                # that what we expected
+                continue
+            should_have_failed.append(spec)
+    for failed in fail_spec_exception:
+        log.warning(failed)
+    for failed in fail_other_reason:
+        log.warning(failed)
+    if len(should_have_failed) > 0:
+        log.warning('Specs that passed but normally fail schema validation')
+        for passed in should_have_failed:
+            log.warning(passed)
 
 
 def load_test_file(file_name):
