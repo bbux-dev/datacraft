@@ -1,45 +1,23 @@
 {
   "distribution.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "distribution",
-          "data": "uniform(start=10, end=25)"
-        }
-      },
-      {
-        "instance": {
-          "type": "distribution",
-          "data": "normal(mean=10, stddev=2.532)"
-        }
-      }
+      {"instance": {"type": "distribution", "data": "uniform(start=10, end=25)"}},
+      {"instance": {"type": "distribution", "data": "normal(mean=10, stddev=2.532)"}}
     ],
     "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "distributions"}, "note": "misspelled"},
       {
-        "instance": {},
-        "note": "empty"
+        "instance": {
+          "type": "distribution", "data": {"formula": "uniform(start=10, end=25)"}
+        },
+        "note":  "wrong type"
       },
       {
         "instance": {
-          "type": "distributions"
+          "type": "distribution", "formula": "uniform(start=10, end=25)"
         },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "distribution",
-          "data": {
-            "formula": "uniform(start=10, end=25)"
-          }
-        },
-        "note": "wrong type"
-      },
-      {
-        "instance": {
-          "type": "distribution",
-          "formula": "uniform(start=10, end=25)"
-        },
-        "note": "data not specified"
+        "note":  "data not specified"
       }
     ]
   }

@@ -132,6 +132,26 @@ def test_date_end_doesnt_match_format():
         loader.get('foo')
 
 
+def test_date_iso_millis():
+    spec = {
+        "ts": builder.date_iso_millis()
+    }
+    first = datacraft.entries(spec, 1)[0]["ts"]
+    assert len(first) == 23, first + ' does not match expected length!'
+
+
+def test_date_epoch():
+    spec = _date_epoch_spec()
+    first = datacraft.entries(spec, 1)[0]["foo"]
+    assert first > 0
+
+
+def test_date_epoch_millis():
+    spec = _date_epoch_ms_spec()
+    first = datacraft.entries(spec, 1)[0]["foo"]
+    assert first > 0
+
+
 def _get_unique_values(spec, key, iterations=100):
     loader = field_loader(spec)
     supplier = loader.get(key)
@@ -148,6 +168,14 @@ def _date_iso_spec(**config):
 
 def _date_iso_us_spec(**config):
     return builder.spec_builder().add_field('foo', builder.date_iso_us(**config)).build()
+
+
+def _date_epoch_spec(**config):
+    return builder.spec_builder().add_field('foo', builder.date_epoch(**config)).build()
+
+
+def _date_epoch_ms_spec(**config):
+    return builder.spec_builder().add_field('foo', builder.date_epoch_ms(**config)).build()
 
 
 def test_date_restrict_hours():

@@ -1,377 +1,60 @@
 {
   "range.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "range",
-          "data": [
-            10
-          ]
-        },
-        "note": "upper bound only"
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": [
-            0,
-            10
-          ]
-        }
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": [
-            0,
-            10,
-            2
-          ]
-        },
-        "note": "start stop step"
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": [
-            [
-              0,
-              10
-            ]
-          ]
-        },
-        "note": "single nested"
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": [
-            [
-              0,
-              10,
-              2
-            ]
-          ]
-        },
-        "note": "single nested start stop step"
-      },
+      {"instance": {"type": "range", "data": [10]}, "note": "upper bound only"},
+      {"instance": {"type": "range", "data": [0, 10]}},
+      {"instance": {"type": "range", "data": [0, 10, 2]}, "note": "start stop step"},
+      {"instance": {"type": "range", "data": [[0, 10]]}, "note": "single nested"},
+      {"instance": {"type": "range", "data": [[0, 10, 2]]}, "note":  "single nested start stop step"},
       {
         "note": "multi sized nested",
-        "instance": {
-          "type": "range",
-          "data": [
-            [
-              10
-            ],
-            [
-              10,
-              100,
-              2
-            ],
-            [
-              100,
-              1000,
-              100
-            ]
-          ]
-        }
+        "instance": {"type": "range", "data": [[10], [10, 100, 2], [100, 1000, 100]]}
       },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            10
-          ]
-        },
-        "note": "upper bound only"
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            0,
-            10
-          ]
-        }
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            0,
-            10,
-            2
-          ]
-        },
-        "note": "start stop step"
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            [
-              0,
-              10
-            ]
-          ]
-        },
-        "note": "single nested"
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            [
-              0,
-              10,
-              2
-            ]
-          ]
-        },
-        "note": "single nested start stop step"
-      },
+      {"instance": {"type": "rand_range", "data": [10]}, "note": "upper bound only"},
+      {"instance": {"type": "rand_range", "data": [0, 10]}},
+      {"instance": {"type": "rand_range", "data": [0, 10, 2]}, "note": "start stop step"},
+      {"instance": {"type": "rand_range", "data": [[0, 10]]}, "note": "single nested"},
+      {"instance": {"type": "rand_range", "data": [[0, 10, 2]]}, "note":  "single nested start stop step"},
       {
         "note": "multi sized nested",
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            [
-              10
-            ],
-            [
-              10,
-              100,
-              2
-            ],
-            [
-              100,
-              1000,
-              100
-            ]
-          ]
-        }
+        "instance": {"type": "rand_range", "data": [[10], [10, 100, 2], [100, 1000, 100]]}
       },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            10
-          ]
-        },
-        "note": "upper bound only"
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            0,
-            10
-          ]
-        }
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            0,
-            10,
-            2
-          ]
-        },
-        "note": "start stop step"
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            [
-              0,
-              10
-            ]
-          ]
-        },
-        "note": "single nested"
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            [
-              0,
-              10,
-              2
-            ]
-          ]
-        },
-        "note": "single nested start stop step"
-      },
+      {"instance": {"type": "rand_int_range", "data": [10]}, "note": "upper bound only"},
+      {"instance": {"type": "rand_int_range", "data": [0, 10]}},
+      {"instance": {"type": "rand_int_range", "data": [0, 10, 2]}, "note": "start stop step"},
+      {"instance": {"type": "rand_int_range", "data": [[0, 10]]}, "note": "single nested"},
+      {"instance": {"type": "rand_int_range", "data": [[0, 10, 2]]}, "note":  "single nested start stop step"},
       {
         "note": "multi sized nested",
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            [
-              10
-            ],
-            [
-              10,
-              100,
-              2
-            ],
-            [
-              100,
-              1000,
-              100
-            ]
-          ]
-        }
+        "instance": {"type": "rand_int_range", "data": [[10], [10, 100, 2], [100, 1000, 100]]}
       }
     ],
     "invalid": [
-      {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "ranges"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "range"
-        },
-        "note": "no data"
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": []
-        },
-        "note": "empty data"
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": [
-            1,
-            10,
-            2,
-            4
-          ]
-        },
-        "note": "too many entries"
-      },
-      {
-        "instance": {
-          "type": "range",
-          "data": {}
-        },
-        "note": "wrong data type"
-      },
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "ranges"}, "note": "misspelled"},
+      {"instance": {"type": "range"}, "note": "no data"},
+      {"instance": {"type": "range", "data": []}, "note": "empty data"},
+      {"instance": {"type": "range", "data": [1, 10, 2, 4]}, "note": "too many entries"},
+      {"instance": {"type": "range", "data": {}}, "note": "wrong data type"},
       {
         "note": "invalid count type,",
-        "instance": {
-          "type": "range",
-          "data": [
-            0,
-            10
-          ],
-          "config": {
-            "count": true
-          }
-        }
+        "instance": {"type": "range", "data": [0, 10], "config": {"count": true}}
       },
-      {
-        "instance": {
-          "type": "rand_range"
-        },
-        "note": "no data"
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": []
-        },
-        "note": "empty data"
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            1,
-            10,
-            2,
-            4
-          ]
-        },
-        "note": "too many entries"
-      },
-      {
-        "instance": {
-          "type": "rand_range",
-          "data": {}
-        },
-        "note": "wrong data type"
-      },
+      {"instance": {"type": "rand_range"}, "note": "no data"},
+      {"instance": {"type": "rand_range", "data": []}, "note": "empty data"},
+      {"instance": {"type": "rand_range", "data": [1, 10, 2, 4]}, "note": "too many entries"},
+      {"instance": {"type": "rand_range", "data": {}}, "note": "wrong data type"},
       {
         "note": "invalid count type,",
-        "instance": {
-          "type": "rand_range",
-          "data": [
-            0,
-            10
-          ],
-          "config": {
-            "count": "blue"
-          }
-        }
+        "instance": {"type": "rand_range", "data": [0, 10], "config": {"count": "blue"}}
       },
-      {
-        "instance": {
-          "type": "rand_int_range"
-        },
-        "note": "no data"
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": []
-        },
-        "note": "empty data"
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            1,
-            10,
-            2,
-            4
-          ]
-        },
-        "note": "too many entries"
-      },
-      {
-        "instance": {
-          "type": "rand_int_range",
-          "data": {}
-        },
-        "note": "wrong data type"
-      },
+      {"instance": {"type": "rand_int_range"}, "note": "no data"},
+      {"instance": {"type": "rand_int_range", "data": []}, "note": "empty data"},
+      {"instance": {"type": "rand_int_range", "data": [1, 10, 2, 4]}, "note": "too many entries"},
+      {"instance": {"type": "rand_int_range", "data": {}}, "note": "wrong data type"},
       {
         "note": "invalid count type,",
-        "instance": {
-          "type": "rand_int_range",
-          "data": [
-            0,
-            10
-          ],
-          "config": {
-            "count": "blue"
-          }
-        }
+        "instance": {"type": "rand_int_range", "data": [0, 10], "config": {"count": "blue"}}
       }
     ]
   }

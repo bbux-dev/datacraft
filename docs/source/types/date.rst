@@ -3,8 +3,34 @@ date
 
 A Date Field Spec is used to generate date strings. The default format is day-month-year i.e. Christmas 2050 would
 be: 25-12-2050. There is also a `date.iso` type that generates ISO8601 formatted date strings without microseconds
-and a `date.iso.us` for one that generates them with microseconds. We use the `format specification <https://docs
-.python.org/3/library/datetime.html#strftime-and-strptime-format-codes>`_ from the datetime module.
+and a `date.iso.us` for one that generates them with microseconds. There are also a `date.epoch` and `date.epcoh.ms`
+and `date.epoch.millis`. These are for generating unix epoch timestamps. We use the
+`format specification <https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes>`_
+from the datetime module.
+
+.. list-table::
+   :header-rows: 1
+
+   * - type
+     - example output
+   * - date
+     - 11-18-2050
+   * - date.iso
+     - 2050-12-01T01:44:35
+   * - date.iso.ms
+     - 2050-12-01T05:11:20.543
+   * - date.iso.millis
+     - 2050-12-01T05:11:20.543
+   * - date.iso.us
+     - 2050-12-01T06:19:02.752373
+   * - date.iso.micros
+     - 2050-12-01T06:17:05.487878
+   * - date.epoch
+     - 1669825519
+   * - date.epoch.ms
+     - 1668624934547
+   * - date.epoch.millis
+     - 1669166880466
 
 Uniformly Sampled Dates
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -63,7 +89,13 @@ Prototype:
         OR,
         "type": "date.iso",
         OR,
+        "type": "date.iso.ms",
+        OR,
+        "type": "date.iso.millis",
+        OR,
         "type": "date.iso.us",
+        OR,
+        "type": "date.iso.micros",
         "config": {
           "format": "Valid datetime format string",
           "duration_days": "The number of days from the start date to create date strings for",
@@ -79,6 +111,8 @@ Prototype:
 
 Examples:
 
+Dates that start on 15 Dec 2050 and span a 90 day period
+
 .. code-block:: json
 
     {
@@ -91,6 +125,8 @@ Examples:
         }
       }
     }
+
+Dates centered on 01 Jun 2050 with a standard deviation of +-2 days
 
 .. code-block:: json
 
@@ -105,15 +141,30 @@ Examples:
       }
     }
 
+ISO Date Centered at 1 Jun 2050, with weighted hours of the day
+
 .. code-block:: json
 
     {
       "start_time": {
-        "type": "date",
+        "type": "date.iso",
         "config": {
-          "center_date": "20500601 12:00",
-          "format": "%Y%m%d %H:%M",
+          "center_date": "2050-06-01T12:00:00",
           "hours": { "type": "values", "data": { "7": 0.1, "8": 0.2, "9": 0.4, "10": 0.2, "11": 0.1 } }
+        }
+      }
+    }
+
+Epoch Date with milliseconds 14 days in the future with a 7 day window for timestamps
+
+.. code-block:: json
+
+    {
+      "start_time": {
+        "type": "date.epoch.ms",
+        "config": {
+          "offset": -14,
+          "duration_days": 7
         }
       }
     }

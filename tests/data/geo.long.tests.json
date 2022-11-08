@@ -1,108 +1,31 @@
 {
   "geo.long.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "geo.long"
-        }
-      },
-      {
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "start_long": -179.0
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "end_long": 179.9
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "start_long": -180.0,
-            "end_long": 180.0
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "bbox": [
-              31.33134,
-              22.03795,
-              34.19295,
-              25.00562
-            ]
-          }
-        }
-      }
+      {"instance": {"type": "geo.long"}},
+      {"instance": {"type": "geo.long", "config": {"start_long": -179.0}}},
+      {"instance": {"type": "geo.long", "config": {"end_long": 179.9}}},
+      {"instance": {"type": "geo.long", "config": {"start_long": -180.0, "end_long": 180.0}}},
+      {"instance": {"type": "geo.long", "config": {"bbox": [31.33134, 22.03795, 34.19295, 25.00562]}}}
     ],
     "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "geo.longs"}, "note": "misspelled"},
+      {"instance": {"type": "geo-long"}, "note": "misspelled"},
       {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "geo.longs"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "geo-long"
-        },
-        "note": "misspelled"
+        "note": "out of range of valid longitude",
+        "instance": {"type": "geo.long", "config": {"start_long": -189.0}}
       },
       {
         "note": "out of range of valid longitude",
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "start_long": -189.0
-          }
-        }
+        "instance": {"type": "geo.long", "config": {"end_long": 189.9}}
       },
       {
         "note": "out of range of valid longitude",
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "end_long": 189.9
-          }
-        }
-      },
-      {
-        "note": "out of range of valid longitude",
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "start_long": -180.1,
-            "end_long": 180.1
-          }
-        }
+        "instance": {"type": "geo.long", "config": {"start_long": -180.1, "end_long": 180.1}}
       },
       {
         "note": "bounding box has out of range coordinates",
-        "instance": {
-          "type": "geo.long",
-          "config": {
-            "bbox": [
-              31.33134,
-              99.03795,
-              34.19295,
-              25.00562
-            ]
-          }
-        }
+        "instance": {"type": "geo.long", "config": {"bbox": [31.33134, 99.03795, 34.19295, 25.00562]}}
       }
     ]
   }

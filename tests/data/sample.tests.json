@@ -1,0 +1,44 @@
+{
+  "sample.schema.json": {
+    "valid": [
+      {"instance": {"type": "sample", "data": ["one"]}},
+      {"instance": {"type": "sample", "data": ["one", "two"]}},
+      {"instance": {"type": "sample", "data": ["one", "two", "tre"]}},
+      {"instance": {"type": "sample", "ref": "has_the_list"}},
+      {
+        "note": "count by itself is valid",
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"count": 5}}
+      },
+      {
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"mean": 2, "min": 1, "max": 3}}
+      },
+      {
+        "note": "mean by itself is valid",
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"mean": 2}}
+      },
+      {
+        "note": "mean with stddev is valid",
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"mean": 2, "stddev":  1}}
+      }
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "samples"}, "note": "misspelled"},
+      {"instance": {"type": "sample"}, "note": "no data element defined"},
+      {"instance": {"type": "sample", "data": 42}, "note": "data not a list"},
+      {"instance": {"type": "sample", "data": "foobar"}, "note": "data not a list"},
+      {
+        "note": "count and min together is invalid",
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"count": 5, "min": 3}}
+      },
+      {
+        "note": "count and max together is invalid",
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"count": 5, "max": 5}}
+      },
+      {
+        "note": "count and mean together is invalid",
+        "instance": {"type": "sample", "data": ["a", "b", "c"], "config": {"count": 5, "mean": 5}}
+      }
+    ]
+  }
+}

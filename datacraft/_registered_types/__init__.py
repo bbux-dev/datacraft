@@ -12,7 +12,7 @@ from . import (
     network,
     range_suppliers,
     refs,
-    select_list_subset,
+    sample,
     templated,
     unicode_range,
     uuid_handler,

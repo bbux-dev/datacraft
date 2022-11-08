@@ -1,199 +1,45 @@
 {
   "values.schema.json": {
     "valid": [
-      {
-        "instance": {
-          "type": "values",
-          "data": "constant"
-        }
-      },
+      {"instance": {"type": "values", "data": "constant"}},
       {
         "note": "blank string still a constant",
-        "instance": {
-          "type": "values",
-          "data": ""
-        }
+        "instance": {"type": "values", "data": ""}
       },
-      {
-        "instance": {
-          "type": "values",
-          "data": 1
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": 1.5
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": true
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ]
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": {
-            "one": 0.4,
-            "two": 0.5
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": 2
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": [
-              1,
-              2
-            ]
-          }
-        }
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": {
-              "1": 0.7,
-              "2": 0.3
-            }
-          }
-        }
-      }
+      {"instance": {"type": "values", "data": 1}},
+      {"instance": {"type": "values", "data": 1.5}},
+      {"instance": {"type": "values", "data": true}},
+      {"instance": {"type": "values", "data": ["one", "two"]}},
+      {"instance": {"type": "values", "data": {"one": 0.4, "two": 0.5}}},
+      {"instance": {"type": "values", "data": ["one", "two"], "config": {"count": 2}}},
+      {"instance": {"type": "values", "data": ["one", "two"], "config": {"count": [1, 2]}}},
+      {"instance": {"type": "values", "data": ["one", "two"], "config": {"count": {"1": 0.7, "2": 0.3}}}}
     ],
     "invalid": [
-      {
-        "instance": {},
-        "note": "empty"
-      },
-      {
-        "instance": {
-          "type": "value"
-        },
-        "note": "misspelled"
-      },
-      {
-        "instance": {
-          "type": "values"
-        },
-        "note": "no fields or refs"
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": []
-        },
-        "note": "empty data"
-      },
-      {
-        "instance": {
-          "type": "values",
-          "data": {}
-        },
-        "note": "empty data,"
-      },
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "value"}, "note": "misspelled"},
+      {"instance": {"type": "values"}, "note": "no fields or refs"},
+      {"instance": {"type": "values", "data": []}, "note": "empty data"},
+      {"instance": {"type": "values", "data": {}}, "note": "empty data,"},
       {
         "note": "invalid count type,",
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": true
-          }
-        }
+        "instance": {"type": "values", "data": ["one", "two"], "config": {"count": true}}
       },
       {
         "note": "empty count type,",
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": []
-          }
-        }
+        "instance": {"type": "values", "data": ["one", "two"], "config": {"count": []}}
       },
       {
         "note": "counts not integers",
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": [
-              1.1,
-              1.7
-            ]
-          }
-        }
+        "instance": {"type": "values", "data": ["one", "two"], "config": {"count": [1.1, 1.7]}}
       },
       {
         "note": "empty count type",
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": {}
-          }
-        }
+        "instance": {"type": "values", "data": ["one", "two"], "config": {"count": {}}}
       },
       {
         "note": "bad count keys",
-        "instance": {
-          "type": "values",
-          "data": [
-            "one",
-            "two"
-          ],
-          "config": {
-            "count": {
-              "one": 0.7,
-              "two": 0.3
-            }
-          }
-        }
+        "instance": {"type": "values", "data": ["one", "two"], "config": {"count": {"one": 0.7, "two": 0.3}}}
       }
     ]
   }

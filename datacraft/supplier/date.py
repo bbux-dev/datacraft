@@ -27,6 +27,21 @@ def date_supplier(date_format: str,
     return _DateSupplier(timestamp_distribution, date_format, hour_supplier)
 
 
+def epoch_date_supplier(timestamp_distribution: Distribution,
+                        is_millis: bool = False) -> ValueSupplierInterface:
+    """
+    Creates a value supplier that provides dates with the given format
+
+    Args:
+        timestamp_distribution: distribution object that will provide the timestamps that will be formatted
+        is_millis: should this be a millisecond based timestamp
+
+    Returns:
+        ValueSupplierInterface that supplies dates with the given format
+    """
+    return _EpochDateSupplier(timestamp_distribution, is_millis)
+
+
 class _DateSupplier(ValueSupplierInterface):
     """
     Value Supplier implementation for dates
@@ -55,6 +70,29 @@ class _DateSupplier(ValueSupplierInterface):
         if self.date_format:
             return next_date.strftime(self.date_format)
         return next_date.replace(microsecond=0).isoformat()
+
+
+class _EpochDateSupplier(ValueSupplierInterface):
+    """
+    Value Supplier implementation for epoch dates
+    """
+
+    def __init__(self,
+                 timestamp_distribution: Distribution,
+                 is_millis: bool = False):
+        """
+        Args:
+            timestamp_distribution: distribution for timestamps
+            is_millis: should this be a millisecond based timestamp
+        """
+        self.timestamp_distribution = timestamp_distribution
+        self.is_millis = is_millis
+
+    def next(self, iteration):
+        random_seconds = self.timestamp_distribution.next_value()
+        if self.is_millis:
+            return int(random_seconds*1000)
+        return int(random_seconds)
 
 
 def uniform_date_timestamp(
