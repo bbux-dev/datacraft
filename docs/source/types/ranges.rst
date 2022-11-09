@@ -55,6 +55,9 @@ Examples:
 rand_range
 ^^^^^^^^^^
 
+Generates a random floating point number in the given range. Use the `rand_int_range` type as a shortcut for casting
+the numbers as integers.
+
 Prototype:
 
 .. code-block:: python
@@ -73,3 +76,23 @@ Prototype:
     upper: (Union[int, float]) - upper limit of random range
     lower: (Union[int, float]) - lower limit of random range
     precision: (int) - Number of digits after decimal point
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "zero_to_ten_three_decimals": {
+        "type": "rand_range",
+        "data": [0, 10, 3]
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "int_in_range": {
+        "type": "rand_int_range",
+        "data": [1, 100]
+      }
+    }

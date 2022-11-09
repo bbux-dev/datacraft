@@ -31,7 +31,7 @@ Examples:
       "remove_dashes": {
         "type": "replace",
         "ref": "id",
-        "data": { "-", "" }
+        "data": { "-": "" }
       }
     }
 
@@ -59,7 +59,7 @@ Prototype:
 Examples:
 
 This first example with take a 10 digit string of numbers and format it as a phone number. The double forward slash
-allows the strings to be compiled into regular expressions.  Notice the \N format for specifying the group capture
+allows the strings to be compiled into regular expressions.  Notice the \\N format for specifying the group capture
 replacement.
 
 .. code-block:: json
