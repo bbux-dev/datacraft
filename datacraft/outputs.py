@@ -314,7 +314,8 @@ def _for_format(key: str) -> RecordProcessor:
         raise SpecException(str(err)) from err
 
 
-def processor(template: Union[str, Path] = None, format_name: str = None) -> Union[None, RecordProcessor]:
+def processor(template: Union[str, Path, None] = None,
+              format_name: Union[str, None] = None) -> Union[None, RecordProcessor]:
     """
     Configures the record level processor for either the template or for the format_name
 
@@ -354,8 +355,8 @@ def processor(template: Union[str, Path] = None, format_name: str = None) -> Uni
     return _processor
 
 
-def get_writer(outdir: str = None,
-               outfile: str = None,
+def get_writer(outdir: Union[str, None] = None,
+               outfile: Union[str, None] = None,
                overwrite: bool = False,
                **kwargs) -> WriterInterface:
     """

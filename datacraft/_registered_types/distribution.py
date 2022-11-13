@@ -51,7 +51,10 @@ def _example_distribution_usage():
             }
         }
     }
-    one = common.standard_example_usage(example_one, 3)
-    two = common.standard_example_usage(example_two, 3)
-    tre = common.standard_example_usage(example_tre, 3)
-    return '\n'.join([one, two, tre])
+    examples = [example_one, example_two, example_tre]
+    clis = [common.standard_cli_example_usage(example, 3) for example in examples]
+    apis = [common.standard_api_example_usage(example, 3) for example in examples]
+    return {
+        'cli': '\n'.join(clis),
+        'api': '\n'.join(apis)
+    }

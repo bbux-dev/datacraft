@@ -50,7 +50,7 @@ class BoundedDistribution(Distribution):
     def __init__(self,
                  distribution: Distribution,
                  min_val: float = 0.0,
-                 max_val: float = None):
+                 max_val: Union[float, None] = None):
         """
         Args:
             distribution: to bound

@@ -1,6 +1,7 @@
 """ Implementations for range types """
 import math
 import decimal
+from typing import Union
 
 from .model import ValueSupplierInterface, ResettableIterator
 
@@ -36,7 +37,7 @@ class WrappedRangeSupplier(ValueSupplierInterface):
 def float_range(start: float,
                 stop: float,
                 step: float = 1,
-                precision: int = None) -> ResettableIterator:
+                precision: Union[int, None] = None) -> ResettableIterator:
     """
     Fancy foot work to support floating point ranges due to rounding errors with the way floating point numbers are
     stored

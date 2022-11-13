@@ -277,7 +277,7 @@ def list_values(data: list, **kwargs) -> ValueSupplierInterface:
     return list_value_supplier(data, count_supplier(**kwargs), sample, as_list)
 
 
-def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
+def weighted_values(data: dict, config: Union[dict, None] = None) -> ValueSupplierInterface:
     """
     Creates a weighted value supplier from the data, which is a mapping of value to the weight is should represent.
 
@@ -310,7 +310,7 @@ def weighted_values(data: dict, config: dict = None) -> ValueSupplierInterface:
 
 def random_range(start: Union[str, int, float],
                  end: Union[str, int, float],
-                 precision: Union[str, int, float] = None,
+                 precision: Union[str, int, float, None] = None,
                  count: Union[int, List[int], Dict[str, float], Distribution] = 1) -> ValueSupplierInterface:
     """
     Creates a random range supplier for the start and end parameters with the given precision
@@ -906,7 +906,7 @@ def ip_precise(cidr: str, sample: bool = False) -> ValueSupplierInterface:
     return network.ip_precise(cidr, sample)
 
 
-def mac_address(delimiter: str = None) -> ValueSupplierInterface:
+def mac_address(delimiter: Union[str, None] = None) -> ValueSupplierInterface:
     """Creates a value supplier that produces mac addresses
 
     Args:
@@ -929,7 +929,7 @@ def mac_address(delimiter: str = None) -> ValueSupplierInterface:
     return network.mac_address(delimiter)
 
 
-def combine(to_combine, join_with: str = None, as_list: bool = None):
+def combine(to_combine, join_with: Union[str, None] = None, as_list: Union[bool, None] = None):
     """Creates a value supplier that will combine the outputs of the provided suppliers in order. The default is to
     join the values with an empty string. Provide the join_with config param to specify a different string to
     join the values with. Set as_list to true, if the values should be returned as a list and not joined
@@ -960,7 +960,7 @@ def combine(to_combine, join_with: str = None, as_list: bool = None):
     return combine_supplier(to_combine, join_with, as_list)
 
 
-def uuid(variant: int = None) -> ValueSupplierInterface:
+def uuid(variant: Union[int, None] = None) -> ValueSupplierInterface:
     """
     Creates a UUid Value Supplier
 
@@ -1107,7 +1107,7 @@ def templated(supplier_map: Dict[str, ValueSupplierInterface],
 
 def cut(supplier: datacraft.ValueSupplierInterface,
         start: int = 0,
-        end: int = None):
+        end: Union[int, None] = None):
     """Trim output of given supplier from start to end, if length permits
 
     Args:

@@ -1,3 +1,12 @@
+v0.7.0
+------
+* Added `replace` and `regex_replace` types
+* Added `data.iso.ms` and `date.iso.miliis` for iso dates that include milliseconds
+* Added `date.epoch` and `date.epoch.ms` for create dates that are seconds or milliseconds since epoch (Jan 1 1970)
+* Added `datacraft.registered_types()`, `datacraft.registered_formats()`, and `datacraft.registered_casters()` to root.
+* Added `datacraft.type_usage('type-name')` for getting API examples for a given registered type, if that type has API
+usage information provided
+
 v0.6.0
 ------
 

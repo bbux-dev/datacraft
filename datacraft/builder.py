@@ -11,6 +11,7 @@ Examples:
     >>> type(spec)
     DataSpec
 """
+import copy
 import logging
 from typing import Dict, List
 from typing import Generator
@@ -54,6 +55,18 @@ def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
 
     Returns:
         the list of N entries
+
+    Examples:
+        >>> import datacraft
+        >>> spec = {
+        ...     "id": {"type": "uuid"},
+        ...     "timestamp": {"type": "date.iso.millis"},
+        ...     "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+        ... }
+        >>> print(*datacraft.entries(spec, 3), sep='\\n')
+        {'id': '40bf8be1-23d2-4e93-9b8b-b37103c4b18c', 'timestamp': '2050-12-03T20:40:03.709', 'handle': '@WPNn'}
+        {'id': '3bb5789e-10d1-4ae3-ae61-e0682dad8ecf', 'timestamp': '2050-11-20T02:57:48.131', 'handle': '@kl1KUdtT'}
+        {'id': '474a439a-8582-46a2-84d6-58bfbfa10bca', 'timestamp': '2050-11-29T18:08:44.971', 'handle': '@XDvquPI'}
     """
     return list(generator(raw_spec, iterations, **kwargs))
 
@@ -78,17 +91,10 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator
     Returns:
         the generator for the provided spec
     """
-    return _DataSpecImpl(raw_spec).generator(iterations, **kwargs)
+    return _DataSpecImpl(copy.deepcopy(raw_spec)).generator(iterations, **kwargs)
 
 
-class _DataSpecMeta(type):
-    """ to hide implementation when doing type(spec) """
-
-    def __repr__(cls):
-        return 'DataSpec'
-
-
-class _DataSpecImpl(DataSpec, metaclass=_DataSpecMeta):
+class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
