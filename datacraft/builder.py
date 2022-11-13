@@ -94,14 +94,7 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator
     return _DataSpecImpl(copy.deepcopy(raw_spec)).generator(iterations, **kwargs)
 
 
-class _DataSpecMeta(type):
-    """ to hide implementation when doing type(spec) """
-
-    def __repr__(cls):
-        return 'DataSpec'
-
-
-class _DataSpecImpl(DataSpec, metaclass=_DataSpecMeta):
+class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):

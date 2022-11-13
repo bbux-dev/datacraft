@@ -1,4 +1,6 @@
 """Module for string manipulation suppliers"""
+from typing import Union
+
 import datacraft
 
 
@@ -7,7 +9,7 @@ class _CutSupplier(datacraft.ValueSupplierInterface):
     def __init__(self,
                  wrapped: datacraft.ValueSupplierInterface,
                  start: int = 0,
-                 end: int = None):
+                 end: Union[int, None] = None):
         self.wrapped = wrapped
         self.start = start
         self.end = end
@@ -19,5 +21,5 @@ class _CutSupplier(datacraft.ValueSupplierInterface):
 
 def cut_supplier(supplier: datacraft.ValueSupplierInterface,
                  start: int = 0,
-                 end: int = None):
+                 end: Union[int, None] = None):
     return _CutSupplier(supplier, start, end)

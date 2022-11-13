@@ -12,7 +12,7 @@ _log = logging.getLogger(__name__)
 
 def date_supplier(date_format: str,
                   timestamp_distribution: Distribution,
-                  hour_supplier: ValueSupplierInterface = None) -> ValueSupplierInterface:
+                  hour_supplier: Union[ValueSupplierInterface, None] = None) -> ValueSupplierInterface:
     """
     Creates a value supplier that provides dates with the given format
 
@@ -50,7 +50,7 @@ class _DateSupplier(ValueSupplierInterface):
     def __init__(self,
                  timestamp_distribution: Distribution,
                  date_format_string: str,
-                 hour_supplier: ValueSupplierInterface = None):
+                 hour_supplier: Union[ValueSupplierInterface, None] = None):
         """
         Args:
             timestamp_distribution: distribution for timestamps
