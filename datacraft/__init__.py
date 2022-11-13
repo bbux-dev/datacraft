@@ -36,7 +36,7 @@ spec = {
   }
 }
 
-print(*datacraft.entries(spec, 3), sep='\n')
+print(*datacraft.entries(spec, 3), sep='\\n')
 
 {'field': 'foo', 'replacement': 'foo'}
 {'field': 'bar', 'replacement': 'fir'}

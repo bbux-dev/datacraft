@@ -11,7 +11,64 @@ and assign it to a variable and it will generate the same data as the command li
 
 Example:
 
-Useful functions.
+.. code-block:: python
+
+    import datacraft
+
+    spec = {
+        "id": {"type": "uuid"},
+        "timestamp": {"type": "date.iso.millis"},
+        "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+    }
+
+    print(*datacraft.entries(spec, 3), sep='\n')
+    # {'id': '40bf8be1-23d2-4e93-9b8b-b37103c4b18c', 'timestamp': '2050-12-03T20:40:03.709', 'handle': '@WPNn'}
+    # {'id': '3bb5789e-10d1-4ae3-ae61-e0682dad8ecf', 'timestamp': '2050-11-20T02:57:48.131', 'handle': '@kl1KUdtT'}
+    # {'id': '474a439a-8582-46a2-84d6-58bfbfa10bca', 'timestamp': '2050-11-29T18:08:44.971', 'handle': '@XDvquPI'}
+
+    # or if you prefer a generator
+    for record in datacraft.generator(spec, 3_000_000):
+        pass
+
+
+There are some functions that can be helpful for getting the list of registered types as well as examples for
+using them with the API.
+
+.. code-block:: python
+
+    import datacraft
+
+    # List all registered types:
+    datacraft.registered_types()
+    # ['calculate', 'char_class', 'cc-ascii', 'cc-lower', '...', 'uuid', 'values', 'replace', 'regex_replace']
+
+    # Print API usage for a specific type or types
+    print(datacraft.type_usage('char_class', 'replace', '...'))
+    # Example Output
+    """
+    -------------------------------------
+    replace | API Example:
+
+    import datacraft
+
+    spec = {
+     "field": {
+       "type": "values",
+       "data": ["foo", "bar", "baz"]
+     },
+     "replacement": {
+       "type": "replace",
+       "data": {"ba": "fi"},
+       "ref": "field"
+     }
+    }
+
+    print(*datacraft.entries(spec, 3), sep='\n')
+
+    {'field': 'foo', 'replacement': 'foo'}
+    {'field': 'bar', 'replacement': 'fir'}
+    {'field': 'baz', 'replacement': 'fiz'}
+    """
 
 .. contents::
    :depth: 2
