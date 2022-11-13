@@ -78,7 +78,7 @@ def _example_regex_replace_usage():
             }
         }
     }
-    return common.standard_example_usage(example, 4)
+    return common.standard_example_usage(example, 4, pretty=True)
 
 
 class _ReplaceSupplier(ValueSupplierInterface):

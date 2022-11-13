@@ -3,7 +3,7 @@ Module to hold models for core data structures and classes
 """
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
-from typing import Union, Tuple, List, Any, Generator
+from typing import Union, Tuple, List, Any, Generator, Dict
 
 
 class DataSpec(dict):
@@ -50,6 +50,7 @@ class DataSpec(dict):
     def pop(self, k, d=None):
         return self.raw_spec.pop(k, d)
 
+    @abstractmethod
     def generator(self, iterations: int, **kwargs) -> Generator:
         """
         Creates a generator that will produce records or render the template for each record

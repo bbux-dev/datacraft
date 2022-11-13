@@ -168,7 +168,7 @@ def process_args(args):
         all_types = registries.registered_types()
         return _write_info(info=all_types, dest_name='type_list.txt', outdir=args.outdir)
     if 'type_help' in args:
-        usage_str = usage.build_cli_help(args.type_help)
+        usage_str = usage.build_cli_help(*args.type_help)
         return _write_info(info=usage_str, dest_name='type_help.txt', outdir=args.outdir)
     if args.cast_list:
         caster_names = casters.all_names()

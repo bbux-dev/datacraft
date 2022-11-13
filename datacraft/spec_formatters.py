@@ -1,4 +1,5 @@
-"""
+""" data spec formatting
+
 Module with functions that handle formatting specs in an orderly and consistent structure i.e:
 
 .. code-block:: json

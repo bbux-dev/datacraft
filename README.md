@@ -1,7 +1,11 @@
 Datacraft
 =========
+
+
 [![Build Status](https://circleci.com/gh/bbux-dev/datacraft/tree/develop.svg?style=shield)](https://circleci.com/gh/bbux-dev/datacraft/tree/main)
 [![codecov](https://codecov.io/gh/bbux-dev/datacraft/branch/develop/graph/badge.svg?token=QFA9QZTQ05)](https://codecov.io/gh/bbux-dev/datacraft)
+
+A tool for generating synthetic data.
 
 Overview
 --------
@@ -24,7 +28,8 @@ modify, update, and manage. It also lends itself to sharing and reuse. Instead o
 synthetic test data, you can build Data Specs that encapsulate the information needed to generate the data. If 
 well-designed, these can be easier to inspect and reason through compared with scanning thousands of lines of a csv 
 file. `datacraft` makes it easy to generate millions or billions of records to use for development and testing of 
-new or existing systems.
+new or existing systems. Datacraft also has a python API so that you can generate your synthetic data as part of your
+test suite or application without have to use online tools or external services.
 
 Docs
 ----
@@ -43,6 +48,8 @@ $ datacraft -h # for full command line usage
 
 Basic Usage
 -----------
+
+### Command Line
 
 ```shell
 $ datacraft type-list # list all available field spec types ...
@@ -76,6 +83,66 @@ combine | Example Spec:
 }
 datacraft -s spec.json -i 3 --format json -x -l off
 [{"name": "zebra jones"}, {"name": "hedgehog smith"}, {"name": "llama williams"}]
+```
+
+### Python API
+
+Basic Usage:
+
+```python
+import datacraft
+
+spec = {
+    "id": {"type": "uuid"},
+    "timestamp": {"type": "date.iso.millis"},
+    "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+}
+
+print(*datacraft.entries(spec, 3), sep='\\n')
+```
+
+```python
+{'id': '40bf8be1-23d2-4e93-9b8b-b37103c4b18c', 'timestamp': '2050-12-03T20:40:03.709', 'handle': '@WPNn'}
+{'id': '3bb5789e-10d1-4ae3-ae61-e0682dad8ecf', 'timestamp': '2050-11-20T02:57:48.131', 'handle': '@kl1KUdtT'}
+{'id': '474a439a-8582-46a2-84d6-58bfbfa10bca', 'timestamp': '2050-11-29T18:08:44.971', 'handle': '@XDvquPI'}
+```
+
+Type Help
+
+```python
+import datacraft
+
+# List all registered types:
+datacraft.registered_types()
+['calculate', 'char_class', 'cc-ascii', 'cc-lower', '...', 'uuid', 'values', 'replace', 'regex_replace']
+
+# Print API usage for a specific type or types
+print(datacraft.type_usage('char_class', 'replace', '...'))
+# Example Output
+"""
+-------------------------------------
+replace | API Example:
+
+import datacraft
+
+spec = {
+ "field": {
+   "type": "values",
+   "data": ["foo", "bar", "baz"]
+ },
+ "replacement": {
+   "type": "replace",
+   "data": {"ba": "fi"},
+   "ref": "field"
+ }
+}
+
+print(*datacraft.entries(spec, 3), sep='\n')
+
+{'field': 'foo', 'replacement': 'foo'}
+{'field': 'bar', 'replacement': 'fir'}
+{'field': 'baz', 'replacement': 'fiz'}
+"""
 ```
 
 For more detailed documentation please see: 

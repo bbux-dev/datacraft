@@ -5,6 +5,14 @@
 Datacraft API
 =============
 
+The Datacraft API is can be used to generate data in a similar way to the command line tooling. Data Specs are defined
+as dictionaries and follow the JSON based format and schemas. Most of the time you can copy a JSON spec from a file
+and assign it to a variable and it will generate the same data as the command line ``datacraft`` tool.
+
+Example:
+
+Useful functions.
+
 .. contents::
    :depth: 2
 
