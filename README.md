@@ -87,8 +87,6 @@ datacraft -s spec.json -i 3 --format json -x -l off
 
 ### Python API
 
-Basic Usage:
-
 ```python
 import datacraft
 
@@ -98,7 +96,7 @@ spec = {
     "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
 }
 
-print(*datacraft.entries(spec, 3), sep='\\n')
+print(*datacraft.entries(spec, 3), sep='\n')
 ```
 
 ```python

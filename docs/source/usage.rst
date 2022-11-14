@@ -858,10 +858,24 @@ There is an additional decorator that can be used to register usage help for a c
    ]
    -------------------------------------
 
+If you want different usage for the command line help from python, you can return a dictionary with ``api`` and ``cli``
+as the keys:
+
+.. code-block:: python
+
+   import datacraft
+
+   @datacraft.registry.usage('reverse_string')
+   def get_reverse_string_usage():
+       return {
+         "api": "import datacraft\n...",
+         "cli": "datacraft -c custom.py -s spec.json ..."
+       }
+
 Custom Types Entry Point
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Datacraft provides a way to discover registered types using the `datacraft.custom_type_loader` entry point. At load
+Datacraft provides a way to discover registered types using the ``datacraft.custom_type_loader`` entry point. At load
 time all the entry points for this key are loaded. This allows users to create their own libraries and packages
 that use the :ref:`@datacraft.registry.*<registry_decorators>` decorators. To add an entry point to your setup.cfg or
 setup.py for the `datacraft.custom_type_loader`:
@@ -971,11 +985,13 @@ The simplest way to use datacraft programmatically is to have a spec as a dictio
      }
    }
 
-   spec = datacraft.parse_spec(raw_spec)
+   print(*datacraft.entries(raw_spec, 3), sep='\n')
 
-   # print single generated record
-   print(next(spec.generator(1)))
-   #{'email': 'zebra_fling@gmail.com'}
+.. code-block:: python
+
+   {'email': 'zebra_fling@gmail.com'}
+   {'email': 'hedgehog_fling@yahoo.com'}
+   {'email': 'llama_dispatch@hotmail.com'}
 
 
 Record Generator
