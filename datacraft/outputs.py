@@ -245,6 +245,7 @@ class _IncrementingFileWriter(WriterInterface):
         with open(outfile, 'w', encoding='utf-8') as handle:
             handle.write(value)
             handle.write('\n')
+        _log.info('Wrote data to %s', outfile.replace('/', os.path.sep))
 
 
 class _FormatProcessor(RecordProcessor):
