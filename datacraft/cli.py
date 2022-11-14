@@ -32,6 +32,43 @@ _LOG_LEVELS = [
     "stop",
     "disable"
 ]
+_LONG_DESCRIPTION = '''
+Example Usage:
+
+# create 10 records from the spec and print them out as a CSV with headers included
+$ datacraft --spec spec.json --iterations 10 --format csv-with-headers --exclude-internal
+
+# List field spec types registered
+$ datacraft --type-list
+
+# Get example spec and usage info for one or more listed types
+$ datacraft --type-help values templated
+
+# Inline YAML syntax, Generate 10 records as CSV and exclude internal fields
+$ datacraft --inline '{id:uuid: {}, ts:date.iso: {}}' -i 10 --format csv -x
+
+# Create 10 records with two records per file, and output these with a name of the form data-N.csv in the /tmp dir
+$ datacraft --inline '{"id:cc-word?cnt=6": {}, "ts:date.iso.millis": {}}' \\
+  -i 10 -r 2 \\
+  --format csvh -x \\
+  --prefix data \\
+  --outfile-extension .csv \\
+  -outdir /tmp
+
+# Convert inline YAML spec to JSON format
+$ datacraft --inline '{"id:cc-word?cnt=6": {}, "ts:date.iso?suffix='Z'": {}}' --debug-spec > /tmp/spec.json
+
+# Convert existing JSON Spec to YAML
+$ datacraft --spec /tmp/spec.json --debug-spec-yaml
+
+# Turn on debug level logging
+$ datacraft ... --log-level debug
+
+# Turn off logging
+$ datacraft ... --log-level off
+
+See: https://datacraft.readthedocs.io/en/latest/ for detailed usage and documentation
+'''
 
 
 def parseargs(argv):
@@ -44,7 +81,9 @@ def parseargs(argv):
     Returns:
         args object
     """
-    parser = argparse.ArgumentParser(description='Run datacraft.')
+    parser = argparse.ArgumentParser(description='Run datacraft.',
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     epilog=_LONG_DESCRIPTION)
     group = parser.add_argument_group('input')
     group.add_argument('-s', '--spec', help='Spec to Use')
     group.add_argument('--inline', help='Spec as string')
