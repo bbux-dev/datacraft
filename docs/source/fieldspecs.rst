@@ -163,12 +163,13 @@ Example:
 Count Config Parameter
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Several types support a ``count`` config parameter. The value of the count parameter can be any of the supported
-values specs formats. For example a constant ``3``\ , list ``[2, 3, 7]``\ , or weighted map ``{"1": 0.5, "2": 0.3,
-"3": 0.2 }``. This will produce the number of values by creating a value supplier for the count based on the supplied
-parameter. Most of the time if the count is greater than 1, the values will be returned as an array. Some types
-support joining the values by specifying the ``join_with`` parameter. Some types will let you explicitly set the
-``as_list`` parameter to force the results to be returned as an array and not the default for the given type.
+Several types support a ``count`` config parameter (``cnt`` works too). The value of the count parameter can be any of
+the supported values specs formats. For example a constant ``3``\ , list ``[2, 3, 7]``\ , or weighted map
+``{"1": 0.5, "2": 0.3, "3": 0.2 }``. This will produce the number of values by creating a value supplier for the count
+based on the supplied parameter. Most of the time if the count is greater than 1, the values will be returned as an
+array. Some types support joining the values by specifying the ``join_with`` parameter. Some types will let you
+explicitly set the ``as_list`` parameter to force the results to be returned as an array and not the default for the
+given type.
 
 Count Distributions
 ^^^^^^^^^^^^^^^^^^^

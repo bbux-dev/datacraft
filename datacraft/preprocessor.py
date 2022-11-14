@@ -215,6 +215,9 @@ def _update_with_params(key, spec, updated_specs):
 
     config = updated.get('config', {})
     config.update(params)
+    # special case
+    if 'cnt' in config:
+        config['count'] = config.pop('cnt')
     updated['config'] = config
     if spectype:
         updated['type'] = spectype

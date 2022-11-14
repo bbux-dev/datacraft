@@ -373,3 +373,11 @@ def test_update_no_params():
     assert 'field' in updated_specs
     assert 'id' in updated_specs['field']
     assert 'nested' == updated_specs['field']['type']
+
+
+def test_cnt_substitute_for_count():
+    input_spec = {"id:cc-word?cnt=6": {}}
+    updated = _preprocess_spec(input_spec)
+    config = updated['id']['config']
+    assert config.get('count') == '6'
+    assert 'cnt' not in config
