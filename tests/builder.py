@@ -817,7 +817,7 @@ def rand_range(data: list, **config) -> dict:
     return spec
 
 
-def date(**config) -> dict:
+def date(data: str = None, **config) -> dict:
     """
     Constructs a date Field Spec
 
@@ -827,7 +827,14 @@ def date(**config) -> dict:
     Returns:
         the date spec
     """
-    return _simple_spec("date", config)
+    spec = {
+        "type": "date"
+    }  # type: Dict[str, Any]
+    if data:
+        spec['data'] = data
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
 
 
 def date_iso(**config) -> dict:

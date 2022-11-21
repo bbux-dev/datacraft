@@ -1,15 +1,5 @@
 """
 Module for parsing and helper functions for specs
-
-Examples:
-    >>> import datacraft
-    >>> raw_spec = {
-    ...     'name': {'type': 'values', 'data': ['ann', 'bob', 'carl']},
-    ...     'age': {'type': 'rand_int_range', 'data': [22, 47]}
-    ... }
-    >>> spec = datacraft.parse_spec(raw_spec)
-    >>> type(spec)
-    DataSpec
 """
 import copy
 import logging
@@ -41,10 +31,10 @@ def parse_spec(raw_spec: dict) -> DataSpec:
 
 def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
     """
-    Creates n entries from the provided spec
+    Creates n entries/records from the provided spec
 
     Args:
-        raw_spec: to create generator for
+        raw_spec: to create entries for
         iterations: number of iterations before max
 
     Keyword Args:
@@ -54,7 +44,7 @@ def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
         enforce_schema (bool): If schema validation should be applied where possible
 
     Returns:
-        the list of N entries
+        the list of N entries/records
 
     Examples:
         >>> import datacraft

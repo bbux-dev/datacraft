@@ -46,14 +46,14 @@ def standard_cli_example_usage(example: dict, num: int, pretty: bool = False, no
     else:
         formatted_spec = datacraft.preprocess_and_format(example)  # type: ignore
     datacraft_format = 'json-pretty' if pretty else 'json'
-    command = f'datacraft -s spec.json -i {num} --format {datacraft_format} -x -l off'
+    command = f'$ datacraft -s spec.json -i {num} --format {datacraft_format} -x -l off'
     if pretty:
         output = json.dumps(datacraft.entries(example, num, enforce_schema=True), indent=4)
     else:
         output = json.dumps(
             datacraft.entries(example, num, enforce_schema=True),
             ensure_ascii=datacraft.registries.get_default('format_json_ascii'))
-    return f'Example Spec:\n{formatted_spec}\n{command}\n{output}\n'
+    return f'Example Spec:\n{formatted_spec}\n\n{command}\n{output}\n'
 
 
 def standard_api_example_usage(example: dict, num: int, no_reformat: bool = False):

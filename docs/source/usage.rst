@@ -1006,22 +1006,43 @@ Example:
 
     import datacraft
 
-    raw_spec {'name': ['bob', 'bobby', 'robert', 'bobo']}
-    spec = datacraft.parse_spec(raw_spec)
+    raw_spec = {'name': ['bob', 'bobby', 'robert', 'bobo']}
 
     template = 'Name: {{ name }}'
     # need this to apply the data to the template
     processor = datacraft.outputs.processor(template=template)
 
-    generator = spec.generator(
-       iterations=5,
-       processor=processor)
+    generator = datacraft.generator(
+        raw_spec=raw_spec,
+        iterations=5,
+        processor=processor)
 
     single_record = next(generator)
     # 'Name: bob'
     remaining_records = list(generator)  # five iterations wraps around to first
     # ['Name: bobby', 'Name: robert', 'Name: bobo', 'Name: bob']
 
+
+Records List
+^^^^^^^^^^^^
+
+The ``datacraft.entries`` function is a convenience function for generating a list of records from a raw dictionary
+spec.
+
+.. code-block:: python
+
+    import datacraft
+
+    spec = {
+        "id": {"type": "uuid"},
+        "timestamp": {"type": "date.iso.millis"},
+        "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+    }
+
+    print(*datacraft.entries(spec, 3), sep='\n')
+    #{'id': '40bf8be1-23d2-4e93-9b8b-b37103c4b18c', 'timestamp': '2050-12-03T20:40:03.709', 'handle': '@WPNn'}
+    #{'id': '3bb5789e-10d1-4ae3-ae61-e0682dad8ecf', 'timestamp': '2050-11-20T02:57:48.131', 'handle': '@kl1KUdtT'}
+    #{'id': '474a439a-8582-46a2-84d6-58bfbfa10bca', 'timestamp': '2050-11-29T18:08:44.971', 'handle': '@XDvquPI'}
 
 Pandas DataFrame
 ^^^^^^^^^^^^^^^^

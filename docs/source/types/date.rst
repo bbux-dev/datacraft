@@ -96,6 +96,7 @@ Prototype:
         "type": "date.iso.us",
         OR,
         "type": "date.iso.micros",
+        "data" "replacement for config.format, valid for type: date only",
         "config": {
           "format": "Valid datetime format string",
           "duration_days": "The number of days from the start date to create date strings for",
@@ -166,5 +167,25 @@ Epoch Date with milliseconds 14 days in the future with a 7 day window for times
           "offset": -14,
           "duration_days": 7
         }
+      }
+    }
+
+
+Date format in data element using shorthand notation
+
+.. code-block:: json
+
+    {
+      "start_time:date": "%d-%b-%Y %H:%M"
+    }
+
+Equivalent to
+
+.. code-block:: json
+
+    {
+      "start_time": {
+        "type": "date",
+        "data": "%d-%b-%Y %H:%M"
       }
     }

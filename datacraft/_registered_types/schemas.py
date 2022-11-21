@@ -14,7 +14,7 @@ _log = logging.getLogger(__name__)
 def load_resource_as_json(resource_name: str) -> dict:
     """ loads the internal json resource with the given resource_name """
     try:
-        with pkg_resources.open_text(schema, resource_name) as schema_resource:
+        with (pkg_resources.files(schema) / resource_name).open('rb') as schema_resource:
             return json.load(schema_resource)
     except FileNotFoundError as err:
         raise ResourceError(f'No resource with name {resource_name} was found') from err

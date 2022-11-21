@@ -1,5 +1,6 @@
 """module for date type datacraft registry functions"""
 import datetime
+import json
 import logging
 
 import datacraft
@@ -46,6 +47,12 @@ def _configure_date_supplier(field_spec: dict, loader: datacraft.Loader):
     """ configures the date value supplier """
     config = datacraft.utils.load_config(field_spec, loader)
     config['hour_supplier'] = _hour_supplier(config, loader)
+    data = field_spec.get('data')
+    if data and 'format' in config:
+        raise datacraft.SpecException(
+            f'Cannot specify both data and format for {_DATE_KEY} type: {json.dumps(field_spec)}')
+    if data:
+        config['format'] = data
     return datacraft.suppliers.date(**config)
 
 
@@ -127,9 +134,13 @@ def _example_date_usage():
             }
         }
     }
+    example_four = {"format_as_data:date": "%d-%b-%Y %H:%M"}
     examples = [example_one, example_two, example_tre]
-    clis = [common.standard_cli_example_usage(example, 3) for example in examples]
+    clis = [common.standard_cli_example_usage(example, 3, pretty=True) for example in examples]
     apis = [common.standard_api_example_usage(example, 3) for example in examples]
+    clis.append(common.standard_cli_example_usage(example_four, 3, pretty=True, no_reformat=True))
+    apis.append(common.standard_api_example_usage(example_four, 3, no_reformat=True))
+
     return {
         'cli': '\n'.join(clis),
         'api': '\n'.join(apis)
@@ -138,6 +149,7 @@ def _example_date_usage():
 
 def register_example_date_usage(key):
     """registers a unique function for the basic usage"""
+
     @datacraft.registry.usage(key)
     def function():
         suffix = key.replace('date', '')

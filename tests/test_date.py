@@ -152,6 +152,32 @@ def test_date_epoch_millis():
     assert first > 0
 
 
+def test_date_format_as_data():
+    spec = {
+        'date': builder.date(data="%d-%m-%Y %H")
+    }
+    first = datacraft.entries(spec, 1)[0]["date"]
+    assert len(first) == 13
+
+
+def test_date_restrict_hours():
+    date_format = "%d-%m-%Y %H"
+    config = {
+        "duration_days": 14, "format": date_format,
+        "hours": {
+            "type": "distribution",
+            "data": "normal(mean=12, stddev=5, min=6, max=21)"
+        }
+    }
+    spec = _date_spec(**config)
+    iterations = 100
+    gen = datacraft.parse_spec(spec).generator(iterations)
+    for _ in range(iterations):
+        date = next(gen)['foo']
+        dt = datetime.datetime.strptime(date, date_format)
+        assert 6 <= dt.hour <= 21
+
+
 def _get_unique_values(spec, key, iterations=100):
     loader = field_loader(spec)
     supplier = loader.get(key)
@@ -176,21 +202,3 @@ def _date_epoch_spec(**config):
 
 def _date_epoch_ms_spec(**config):
     return builder.spec_builder().add_field('foo', builder.date_epoch_ms(**config)).build()
-
-
-def test_date_restrict_hours():
-    date_format = "%d-%m-%Y %H"
-    config = {
-        "duration_days": 14, "format": date_format,
-        "hours": {
-            "type": "distribution",
-            "data": "normal(mean=12, stddev=5, min=6, max=21)"
-        }
-    }
-    spec = _date_spec(**config)
-    iterations = 100
-    gen = datacraft.parse_spec(spec).generator(iterations)
-    for _ in range(iterations):
-        date = next(gen)['foo']
-        dt = datetime.datetime.strptime(date, date_format)
-        assert 6 <= dt.hour <= 21

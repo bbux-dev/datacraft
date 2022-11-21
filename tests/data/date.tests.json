@@ -43,7 +43,8 @@
             "hours": {"type": "distribution", "data": "normal(mean=12, stddev=5, min=6, max=21)"}
           }
         }
-      }
+      },
+      {"instance": {"type": "date", "data": "%d-%b-%Y"}}
     ],
     "invalid": [
       {"instance": {}, "note": "empty"},
@@ -95,6 +96,10 @@
       {
         "note": "cannot supply duration_days and stddev_days",
         "instance": {"type": "date.iso.us", "config": {"stddev_days": 30, "duration_days": 22}}
+      },
+      {
+        "note": "data must be string with format if supplied",
+        "instance": {"type": "date", "data":  1700000000 }
       }
     ]
   }

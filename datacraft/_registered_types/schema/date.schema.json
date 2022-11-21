@@ -5,6 +5,15 @@
   "required": ["type"],
   "properties": {
     "type": {  "type": "string", "pattern": "^date(\\.iso(\\.ms|\\.millis|\\.us|\\.micros)?)?$"},
+    "data": {
+      "type":  "string",
+      "description": "For date type, this is a short cut for config.format, invalid for any other type",
+      "examples": [
+        "%Y%m%d",
+        "%m/%d/%Y",
+        "%H:%M:%S"
+      ]
+    },
     "config": {
       "type": "object",
       "properties": {
