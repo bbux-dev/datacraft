@@ -6,6 +6,7 @@ v0.7.0
 * Added `datacraft.registered_types()`, `datacraft.registered_formats()`, and `datacraft.registered_casters()` to root.
 * Added `datacraft.type_usage('type-name')` for getting API examples for a given registered type, if that type has API
 usage information provided
+* Added `_TRUE_` and `_FALSE_` special tokens for values specs to produce JSON `true` and `false` values
 
 v0.6.0
 ------
