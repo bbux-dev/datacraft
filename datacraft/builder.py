@@ -17,13 +17,19 @@ _log = logging.getLogger(__name__)
 
 def parse_spec(raw_spec: dict) -> DataSpec:
     """
-    Parses the raw spec into a DataSpec object. Takes in specs that may contain shorthand specifications.
+    Parses the raw spec into a DataSpec object. Takes in specs that may contain shorthand specifications. This is
+    helpful if the spec is going to be reused in different scenarios.  Otherwise, prefer the generator or entries
+    functions.
 
     Args:
         raw_spec: raw dictionary that conforms to JSON spec format
 
     Returns:
         the fully parsed and loaded spec
+
+    Examples:
+        >>> import datacraft
+        >>> raw_spec = { "field": {"type": "values", "data": [10, 100, 1000]}}
     """
     specs = preprocess_spec(raw_spec)
     return _DataSpecImpl(specs)
