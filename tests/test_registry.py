@@ -5,7 +5,6 @@ import pytest
 
 import datacraft
 import datacraft.registries as registries
-from datacraft.loader import field_loader
 from datacraft.utils import load_custom_code
 
 spec = {
@@ -63,7 +62,7 @@ def get_reverse_string_usage():
 
 
 def test_registry_from_local():
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
 
     reg = registries.Registry
     all_types = reg.types.get_all()
@@ -78,7 +77,7 @@ def test_registry_from_file():
     # string_reverser, same as above just different key
     load_custom_code(os.path.join(test_dir, 'custom.py'))
 
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
 
     reg = registries.Registry
     all_types = reg.types.get_all()

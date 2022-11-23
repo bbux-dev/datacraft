@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from datacraft import field_loader
+import datacraft
 
 from . import builder
 
@@ -11,7 +11,7 @@ UUID_REGEX = re.compile('[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 
 def test_uuid_spec():
     spec = builder.single_field("foo:uuid", {}).build()
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('foo')
 
     value1 = supplier.next(0)
@@ -35,7 +35,7 @@ valid_data_specs = [
 def test_uuid_valid_schema(key, spec):
     # for coverage
     spec = builder.single_field(key, spec).build()
-    loader = field_loader(spec, enforce_schema=True)
+    loader = datacraft.loader.field_loader(spec, enforce_schema=True)
     supplier = loader.get('foo')
 
     value1 = supplier.next(0)

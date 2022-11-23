@@ -1,6 +1,6 @@
 import yaml
 
-from datacraft.loader import field_loader
+import datacraft
 
 yaml_spec = '''
 ---
@@ -31,7 +31,7 @@ refs:
 
 def test_load_yaml():
     spec = yaml.load(yaml_spec, Loader=yaml.FullLoader)
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == 'dog'
@@ -41,7 +41,7 @@ def test_load_yaml():
 
 def test_load_yaml_shorthand():
     spec = yaml.load(yaml_shorthand_spec, Loader=yaml.FullLoader)
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('foo')
 
     assert supplier.next(0) == '"dog"'

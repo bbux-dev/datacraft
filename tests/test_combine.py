@@ -1,8 +1,7 @@
 import pytest
 
 import datacraft.suppliers as suppliers
-from datacraft import SpecException
-from datacraft.loader import field_loader
+import datacraft
 from . import builder
 
 
@@ -59,8 +58,8 @@ def test_combine_list_refs_not_list_of_lists():
 
 
 def _test_invalid_combine_spec(spec):
-    with pytest.raises(SpecException) as err:
-        field_loader(spec).get('field')
+    with pytest.raises(datacraft.SpecException) as err:
+        datacraft.loader.field_loader(spec).get('field')
     # for debugging
     # print(str(err.value))
 
@@ -84,20 +83,20 @@ def test_combine_fields():
         .add_field("full_name", builder.combine(fields=["first", "last"], join_with=' ')) \
         .build()
 
-    supplier = field_loader(spec).get('full_name')
+    supplier = datacraft.loader.field_loader(spec).get('full_name')
     assert supplier.next(0) == 'bob smith'
 
 
 def test_combine_list_spec_valid_but_weird1():
     spec = _combine_list_spec([["uno"]])
-    supplier = field_loader(spec).get('field')
+    supplier = datacraft.loader.field_loader(spec).get('field')
     assert supplier.next(0) == 'uno'
     assert supplier.next(1) == 'uno'
 
 
 def test_combine_list_spec_valid_but_weird2():
     spec = _combine_list_spec([["uno", "dos"]])
-    supplier = field_loader(spec).get('field')
+    supplier = datacraft.loader.field_loader(spec).get('field')
     assert supplier.next(0) == 'unodos'
     assert supplier.next(1) == 'unodos'
 
@@ -115,7 +114,7 @@ def test_combine_list_spec_valid_normal():
         .add_ref("TRE", builder.values('tres')) \
         .build()
 
-    supplier = field_loader(spec).get('field')
+    supplier = datacraft.loader.field_loader(spec).get('field')
     assert supplier.next(0) == 'unodos'
     assert supplier.next(1) == 'dostres'
     assert supplier.next(2) == 'tresuno'

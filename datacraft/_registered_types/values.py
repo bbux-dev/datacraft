@@ -23,11 +23,12 @@ def _handle_values_type(spec, loader):
 
 
 @datacraft.registry.usage(_VALUES_KEY)
-def _example_uuid_usage():
+def _example_values_usage():
     example = {
         "field_constant": {"type": "values", "data": 42},
         "field_list": {"type": "values", "data": [1, 2, 3, 5, 8, 13, None]},
         "field_weighted": {"type": "values", "data": {"200": 0.6, "404": 0.1, "303": 0.3}},
-        "field_weighted_with_null": {"type": "values", "data": {"200": 0.5, "404": 0.1, "303": 0.3, "_NULL_": 0.1}}
+        "field_weighted_with_null": {"type": "values", "data": {"200": 0.5, "404": 0.1, "303": 0.3, "_NULL_": 0.1}},
+        "field_weighted_booleans": {"_TRUE_": 0.3, "_FALSE_": 0.6, "_NIL_": 0.1}
     }
     return common.standard_example_usage(example, 1, pretty=True)

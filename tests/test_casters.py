@@ -1,6 +1,6 @@
 import pytest
 
-from datacraft import SpecException
+import datacraft
 from datacraft.casters import from_config
 
 
@@ -20,7 +20,7 @@ def test_none_is_none():
 
 def test_hex_cast_value_error():
     caster = from_config({'cast': 'hex'})
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         caster.cast('abc123')
 
 
@@ -120,10 +120,10 @@ def test_valid_type_cast_forms(input_value, cast_type, expected_value):
 
 
 def test_invalid_casting_int():
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         from_config({'cast': 'int'}).cast('abc123')
 
 
 def test_invalid_casting_float():
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         from_config({'cast': 'float'}).cast('456def')

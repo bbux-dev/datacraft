@@ -1,7 +1,6 @@
 import pytest
 
 import datacraft
-from datacraft import field_loader
 from . import builder
 
 
@@ -16,7 +15,7 @@ def test_single_nested():
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build())) \
         .build()
-    supplier = field_loader(spec).get('geo')
+    supplier = datacraft.loader.field_loader(spec).get('geo')
 
     first = supplier.next(0)
     assert isinstance(first, dict)
@@ -38,7 +37,7 @@ def test_multi_nested():
         .add_field("id:uuid", {}) \
         .add_field("user", builder.nested(fields=user_spec.build())) \
         .build()
-    supplier = field_loader(spec).get('user')
+    supplier = datacraft.loader.field_loader(spec).get('user')
 
     first = supplier.next(0)
     assert isinstance(first, dict)
@@ -60,7 +59,7 @@ def test_single_nested_as_list():
         .add_field("id:uuid", {}) \
         .add_field("geo", builder.nested(fields=geo_spec.build(), as_list=True)) \
         .build()
-    supplier = field_loader(spec).get('geo')
+    supplier = datacraft.loader.field_loader(spec).get('geo')
 
     first = supplier.next(0)
     assert isinstance(first, list)

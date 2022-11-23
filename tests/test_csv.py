@@ -13,7 +13,7 @@ test_dir = os.sep.join([os.path.dirname(os.path.realpath(__file__)), 'data'])
 
 def test_csv_valid_with_header_indexed_column():
     spec = _build_csv_spec('status')
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status')
 
     assert supplier.next(0) == '100'
@@ -25,7 +25,7 @@ def test_csv_valid_with_header_indexed_column():
 
 def test_csv_valid_no_header_indexed_column():
     spec = _build_csv_spec('status', datafile="test_no_headers.csv", headers=False)
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status')
 
     assert supplier.next(0) == '100'
@@ -33,7 +33,7 @@ def test_csv_valid_no_header_indexed_column():
 
 def test_csv_valid_with_header_field_name_column():
     spec = _build_csv_spec('status', column="status")
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status')
 
     assert supplier.next(0) == '100'
@@ -41,7 +41,7 @@ def test_csv_valid_with_header_field_name_column():
 
 def test_csv_valid_with_header_field_name_column_shorthand():
     spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2": {}}
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status_desc')
 
     assert supplier.next(0) == 'Continue'
@@ -49,7 +49,7 @@ def test_csv_valid_with_header_field_name_column_shorthand():
 
 def test_csv_valid_sample_mode():
     spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true": {}}
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status_desc')
 
     assert supplier.next(0) is not None
@@ -57,7 +57,7 @@ def test_csv_valid_sample_mode():
 
 def test_csv_valid_sample_mode_with_count():
     spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true&count=2": {}}
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status_desc')
 
     assert len(supplier.next(0)) == 2
@@ -65,7 +65,7 @@ def test_csv_valid_sample_mode_with_count():
 
 def test_csv_valid_sample_mode_with_count_as_list():
     spec = {"status_desc:csv?datafile=test.csv&headers=true&column=2&sample=true": {"config": {"count": [4, 3, 2]}}}
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('status_desc')
 
     assert len(supplier.next(0)) == 4
@@ -87,7 +87,7 @@ def _test_invalid_csv_config(key, spec):
 def test_csv_single_column():
     # we don't specify the column number or name, so default is to expect single column of values
     spec = {"user_agent:csv?datafile=single_column.csv&headers=false": {}}
-    loader = datacraft.field_loader(spec, data_dir=test_dir)
+    loader = datacraft.loader.field_loader(spec, data_dir=test_dir)
     supplier = loader.get('user_agent')
 
     expected = 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.1.2) Gecko/20090803 Firefox/3.5.2 Slackware'

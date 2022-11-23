@@ -1,13 +1,13 @@
 import pytest
 
 import datacraft.registries as types
-from datacraft import ResourceError, SpecException
+import datacraft
 from datacraft._registered_types.schemas import load
 from datacraft.schemas import validate_schema_for_spec
 
 
 def test_load_unknown_key():
-    with pytest.raises(ResourceError):
+    with pytest.raises(datacraft.ResourceError):
         load('fluffy')
 
 
@@ -40,12 +40,12 @@ def test_load_and_validate_schema():
 
 def test_load_and_validate_invalid_schema():
     range_schema = types.lookup_schema('range')
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         validate_schema_for_spec('range', {'type': 'range'}, range_schema)
 
 
 def test_invalid_count_param_values_spec():
     values_schema = types.lookup_schema('values')
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         spec = {'type': 'values', 'data': [1, 2, 3], 'config': {'count': {}}}
         validate_schema_for_spec('values', spec, values_schema)

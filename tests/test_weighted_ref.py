@@ -1,6 +1,6 @@
 import pytest
 
-from datacraft import suppliers, field_loader, SupplierException
+import datacraft
 from datacraft._registered_types.refs import weighted_ref_supplier
 
 from . import builder
@@ -18,11 +18,11 @@ def test_weighted_ref_missing_key():
         .add_ref('baz', {'baz': 0.999}) \
         .build()
 
-    key_supplier = suppliers.values(['foo', 'bar', 'baz', 'notvalid'])
-    values_map = {key: suppliers.values(value) for key, value in spec['refs'].items()}
+    key_supplier = datacraft.suppliers.values(['foo', 'bar', 'baz', 'notvalid'])
+    values_map = {key: datacraft.suppliers.values(value) for key, value in spec['refs'].items()}
     supplier = weighted_ref_supplier(key_supplier, values_map)
 
-    with pytest.raises(SupplierException) as exception:
+    with pytest.raises(datacraft.SupplierException) as exception:
         [supplier.next(i) for i in range(0, 10)]
     assert "Unknown Key 'notvalid' for Weighted Reference" in str(exception.value)
 
@@ -39,7 +39,7 @@ def test_weighed_ref_count_as_list():
         .add_ref('tre', 'tres') \
         .build()
 
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('field')
     first = supplier.next(0)
 

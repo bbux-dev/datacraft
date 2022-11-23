@@ -228,7 +228,7 @@ invalid_spec_build_tests = [
 @pytest.mark.parametrize("field_info", invalid_spec_build_tests)
 def test_invalid_spec_builder(field_info):
     spec = field_info.builder.build()
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         next(spec.generator(1, enforce_schema=True))
 
 

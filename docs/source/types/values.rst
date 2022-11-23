@@ -12,7 +12,7 @@ Prototype:
         "type": "values",
         "data": Union[str, bool, int, float, list, dict],
         "config": {
-          "key": Any
+          "key": "value"
         }
       }
     }
@@ -25,7 +25,7 @@ Examples:
 
 .. code-block:: python
 
-    {"field_list": {"type": "values", "data": [1, 2, 3, 5, 8, 13, None]}}
+    {"field_list": {"type": "values", "data": [1, 2, 3, 5, 8, 13, '_NONE_']}}
 
 .. code-block:: json
 
@@ -58,7 +58,45 @@ Examples:
 
 .. code-block:: text
 
-    $ datacraft -s spec.json -i 3 --format json -x --log-level off
+    $ datacraft -s spec.json -i 3 -r 1 --format json -x --log-level off
     {"short_hand_field_weighted_with_null": "200"}
     {"short_hand_field_weighted_with_null": null}
     {"short_hand_field_weighted_with_null": "200"}
+
+Special Output Values
+=====================
+
+There are certain valid JSON output values that are trickier to produce with a values spec. There are also times when
+your values are interpreted as strings but you need them to be output as one of these special null values. The way
+we do this is by using a ``_TYPE_`` form.  Below is the current mappings:
+
+.. code-block:: json
+
+   {
+       "_NONE_": null,
+       "_NULL_": null,
+       "_NIL_": null,
+       "_TRUE_": true,
+       "_FALSE_": false
+   }
+
+This is particularly useful when using a weighted values form of the values spec:
+
+.. code-block:: json
+
+        {
+            "converted": {
+                "type": "values",
+                "data": {
+                    "_TRUE_": 0.05,
+                    "_FALSE_": 0.95
+                }
+            }
+        }
+
+.. code-block:: text
+
+    $ datacraft -s /tmp/spec.json -i 3 -r 1 --format json -x --log-level off
+    {"converted": false}
+    {"converted": false}
+    {"converted": false}

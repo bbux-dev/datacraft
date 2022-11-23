@@ -1,6 +1,6 @@
 import pytest
 
-from datacraft import loader, SpecException
+import datacraft
 from datacraft.preprocessor import _parse_key, _is_spec_data, _update_no_params
 from datacraft.preprocessor import _preprocess_spec, _preprocess_nested
 from . import builder
@@ -51,7 +51,7 @@ specs_should_raise_exception = [
 
 @pytest.mark.parametrize("spec", specs_should_raise_exception)
 def test_preprocess_should_raise_spec_exception(spec):
-    with pytest.raises(SpecException):
+    with pytest.raises(datacraft.SpecException):
         _preprocess_spec(spec)
 
 
@@ -205,7 +205,7 @@ csv_select_transform_tests = [
 @pytest.mark.parametrize("input_spec,expected_output_spec", csv_select_transform_tests)
 def test_preprocess_csv_select(input_spec, expected_output_spec):
     # need first layer of pre-processing done
-    updated = loader.preprocess_spec(input_spec)
+    updated =datacraft.loader.preprocess_spec(input_spec)
     assert updated == expected_output_spec
 
 
@@ -217,8 +217,8 @@ specs_missing_config = [
 
 @pytest.mark.parametrize("input_spec", specs_missing_config)
 def test_preprocess_csv_select_missing_config(input_spec):
-    with pytest.raises(SpecException):
-        loader.preprocess_spec(input_spec)
+    with pytest.raises(datacraft.SpecException):
+       datacraft.loader.preprocess_spec(input_spec)
 
 
 def _builder_nested(outer_key, inner_key, inner_spec):
@@ -348,8 +348,8 @@ def test_preprocess_nested_no_fields():
             "refs": {"lat": 55.5, "long": 99.9}  # <- invalid should be fields
         }
     }
-    with pytest.raises(SpecException):
-        loader.preprocess_spec(spec)
+    with pytest.raises(datacraft.SpecException):
+       datacraft.loader.preprocess_spec(spec)
 
 
 def test_is_spec_data_positive_examples():

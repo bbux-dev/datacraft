@@ -2,10 +2,7 @@ from collections import Counter
 
 import pytest
 
-import datacraft.suppliers as suppliers
-from datacraft import field_loader
-from datacraft.exceptions import SpecException
-from datacraft.loader import preprocess_spec
+import datacraft
 from . import builder
 
 
@@ -33,7 +30,7 @@ def test_weighted_values():
     assert 'bar' in most_common_keys
 
 
-@pytest.mark.parametrize("null_marker_key", ['_NONE_', '_NULL_'])
+@pytest.mark.parametrize("null_marker_key", ['_NONE_', '_NULL_', '_NIL_'])
 def test_weighted_values_special_none_marker(null_marker_key):
     spec = {'data': {'foo': 0.5, null_marker_key: 0.4, 'baz': 0.1}}
     most_common_keys = _get_most_common_keys(spec, 100, 2)
@@ -42,16 +39,28 @@ def test_weighted_values_special_none_marker(null_marker_key):
     assert None in most_common_keys
 
 
+def test_weighted_boolean():
+    weights = {
+        "_TRUE_": 0.3,
+        "_FALSE_": 0.7
+    }
+    spec = {
+        "boolean_field": builder.values(data=weights)
+    }
+    values = [e['boolean_field'] for e in datacraft.entries(spec, 10)]
+    assert all(v in [True, False] for v in values), "Not all values are boolean as expected"
+
+
 def test_weighted_values_invalid_type():
     spec = {'foo': '0.5', 'bar': '0.4', 'baz': '0.1'}
-    with pytest.raises(SpecException):
-        suppliers.weighted_values(spec)
+    with pytest.raises(datacraft.SpecException):
+        datacraft.suppliers.weighted_values(spec)
 
 
 def test_weighted_values_empty():
     spec = {}
-    with pytest.raises(SpecException):
-        suppliers.weighted_values(spec)
+    with pytest.raises(datacraft.SpecException):
+        datacraft.suppliers.weighted_values(spec)
 
 
 def test_shortcut_notation():
@@ -64,7 +73,7 @@ def test_shortcut_notation():
 
 
 def _get_most_common_keys(spec, iterations, num_keys_to_collect):
-    supplier = suppliers.values(spec)
+    supplier = datacraft.suppliers.values(spec)
     data = [supplier.next(i) for i in range(iterations)]
     counter = Counter(data)
     most_common_keys = [item[0] for item in counter.most_common(num_keys_to_collect)]
@@ -74,23 +83,23 @@ def _get_most_common_keys(spec, iterations, num_keys_to_collect):
 def test_count_param_invalid():
     # the word two is not a valid count
     spec = {'foo?count=two': ['A', 'B', 'C', 'D']}
-    updated = preprocess_spec(spec)
+    updated = datacraft.preprocess_spec(spec)
     with pytest.raises(ValueError):
-        suppliers.values(updated['foo'])
+        datacraft.suppliers.values(updated['foo'])
 
 
 def _test_invalid_spec(spec, key):
-    updated = preprocess_spec(spec)
-    with pytest.raises(SpecException):
-        suppliers.values(updated[key])
+    updated = datacraft.preprocess_spec(spec)
+    with pytest.raises(datacraft.SpecException):
+        datacraft.suppliers.values(updated[key])
 
 
 def test_count_param_valid():
     spec = {
         'foo?count=2': ['A', 'B', 'C', 'D']
     }
-    updated = preprocess_spec(spec)
-    supplier = suppliers.values(updated['foo'])
+    updated = datacraft.preprocess_spec(spec)
+    supplier = datacraft.suppliers.values(updated['foo'])
     first = supplier.next(0)
     assert type(first) == list
     assert ['A', 'B'] == first
@@ -101,14 +110,14 @@ def test_config_ref_for_values():
     spec = builder.single_field("name?config_ref=quoteit", ["bob", "joe", "ann", "sue"]) \
         .add_ref("quoteit", builder.config_ref(quote="\"")) \
         .build()
-    supplier = field_loader(spec).get('name')
+    supplier = datacraft.loader.field_loader(spec).get('name')
     assert supplier.next(0) == '"bob"'
 
 
 def test_values_list_order():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spec = builder.single_field('field', data).build()
-    supplier = field_loader(spec).get('field')
+    supplier = datacraft.loader.field_loader(spec).get('field')
 
     values = [supplier.next(i) for i in range(10)]
     assert values == data
@@ -117,7 +126,7 @@ def test_values_list_order():
 def test_values_count_as_list():
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spec = builder.single_field('field', builder.values(data, count=[2, 3])).build()
-    supplier = field_loader(spec).get('field')
+    supplier = datacraft.loader.field_loader(spec).get('field')
 
     first = supplier.next(0)
     assert isinstance(first, list) and len(first) == 2

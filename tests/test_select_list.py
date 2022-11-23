@@ -1,7 +1,6 @@
 import pytest
 
-from datacraft import suppliers, SpecException
-from datacraft.loader import field_loader
+import datacraft
 
 from . import builder
 
@@ -26,8 +25,8 @@ def test_invalid_when_ref_and_data_specified():
 
 
 def _test_invalid_select_list_spec(spec):
-    with pytest.raises(SpecException):
-        field_loader(spec).get('field')
+    with pytest.raises(datacraft.SpecException):
+        datacraft.loader.field_loader(spec).get('field')
 
 
 def test_select_list_basic():
@@ -36,7 +35,7 @@ def test_select_list_basic():
         'stddev': 0,
         'join_with': '-'
     }
-    supplier = suppliers.list_stats_sampler(['a', 'b', 'c'], **config)
+    supplier = datacraft.suppliers.list_stats_sampler(['a', 'b', 'c'], **config)
 
     possible = ['a-b', 'a-c', 'b-a', 'b-c', 'c-a', 'c-b']
 
@@ -51,7 +50,7 @@ def test_select_list_mean_and_variance():
         'stddev': 1,
         'join_with': '-'
     }
-    supplier = suppliers.list_stats_sampler(['a', 'b', 'c'], **config)
+    supplier = datacraft.suppliers.list_stats_sampler(['a', 'b', 'c'], **config)
 
     # possible values are single element, all combos of two, and all combos of three
     possible = ['a', 'b', 'c',
@@ -65,7 +64,7 @@ def test_select_list_mean_and_variance():
 
 def test_select_list_using_loader():
     spec = {"pets:sample?mean=2&stddev=0&join_with= ": ['dog', 'cat', 'pig', 'hog', 'bun']}
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('pets')
     value = supplier.next(0)
     assert len(value) == 7
@@ -75,7 +74,7 @@ def test_select_list_ref_contains_data():
     spec_builder = builder.spec_builder()
     spec_builder.select_list_subset('pets', data=None, ref_name='pets_list', count=2)
     spec_builder.refs().values(key='pets_list', data=['goat', 'sheep', 'bear', 'cow', 'dragon'])
-    loader = field_loader(spec_builder.build())
+    loader = datacraft.loader.field_loader(spec_builder.build())
     supplier = loader.get('pets')
     value = supplier.next(0)
     assert isinstance(value, list)

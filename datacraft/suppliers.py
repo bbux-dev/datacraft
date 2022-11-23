@@ -293,7 +293,9 @@ def weighted_values(data: dict, config: Union[dict, None] = None) -> ValueSuppli
 
     Examples:
         >>> import datacraft
-        >>> pets = {"dog": 0.5, "cat": 0.2, "bunny": 0.1, "hamster": 0.1, "pig": 0.05, "snake": 0.04, "_NULL_": 0.01}
+        >>> pets = {
+        ... "dog": 0.5, "cat": 0.2, "bunny": 0.1, "hamster": 0.1, "pig": 0.05, "snake": 0.04, "_NULL_": 0.01
+        ... }
         >>> weighted_pet_supplier = datacraft.suppliers.weighted_values(pets)
         >>> most_likely_a_dog = weighted_pet_supplier.next(0)
     """
@@ -301,7 +303,19 @@ def weighted_values(data: dict, config: Union[dict, None] = None) -> ValueSuppli
         raise SpecException('Invalid Weights, no values defined')
     if config is None:
         config = {}
-    choices = [key if key not in ['_NONE_', '_NULL_'] else None for key in data.keys()]
+    replacements = {
+        '_NONE_': None,
+        '_NULL_': None,
+        '_NIL_': None,
+        '_TRUE_': True,
+        '_FALSE_': False
+    }
+    choices = []
+    for key in data.keys():
+        if key in replacements:
+            choices.append(replacements.get(key))
+        else:
+            choices.append(key)
     weights = list(data.values())
     if not isinstance(weights[0], float):
         raise SpecException('Invalid type for weights: ' + str(type(weights[0])))

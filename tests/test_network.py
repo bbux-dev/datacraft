@@ -1,14 +1,13 @@
 import pytest
 
-from datacraft import SpecException
-from datacraft.loader import field_loader
+import datacraft
 
 from . import builder
 
 def test_ip_v4_spec():
     spec = _ipv4_spec(cidr="192.168.0.0/16")
 
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('network')
 
     value = supplier.next(0)
@@ -23,7 +22,7 @@ def test_ip_precise_spec():
         "network:ip.precise?cidr=10.0.0.0/24": {}
     }
 
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('network')
 
     value = supplier.next(0)
@@ -48,8 +47,8 @@ def test_ip_spec_precise_missing_cidr_param():
 
 
 def _test_invalid_precise_spec(spec):
-    loader = field_loader(spec)
-    with pytest.raises(SpecException):
+    loader = datacraft.loader.field_loader(spec)
+    with pytest.raises(datacraft.SpecException):
         loader.get('network')
 
 
@@ -57,8 +56,8 @@ def test_ip_spec_invalid_base_and_cidr_specified():
     spec = {
         "network:ip?cidr=10.0.0.0/24&base=10.0.0": {}
     }
-    loader = field_loader(spec)
-    with pytest.raises(SpecException):
+    loader = datacraft.loader.field_loader(spec)
+    with pytest.raises(datacraft.SpecException):
         loader.get('network')
 
 
@@ -86,8 +85,8 @@ def _test_invalid_cidr(cidr_value):
     spec = {
         f"network:ip?cidr={cidr_value}": {}
     }
-    loader = field_loader(spec)
-    with pytest.raises(SpecException):
+    loader = datacraft.loader.field_loader(spec)
+    with pytest.raises(datacraft.SpecException):
         loader.get('network')
 
 
@@ -98,7 +97,7 @@ def test_ip_spec_sample():
             "config": {"cidr": "8.1.2.0/24", "sample": "true"}
         }
     }
-    loader = field_loader(spec)
+    loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('network')
 
     value = supplier.next(0)
@@ -106,21 +105,21 @@ def test_ip_spec_sample():
 
 
 def test_ip_spec_no_octets():
-    loader = field_loader(_create_ip_spec_with_base('192.168.1.1'))
+    loader = datacraft.loader.field_loader(_create_ip_spec_with_base('192.168.1.1'))
     supplier = loader.get('network')
     value = supplier.next(0)
     assert value == '192.168.1.1'
 
 
 def test_ip_spec_three_octets():
-    loader = field_loader(_create_ip_spec_with_base('10'))
+    loader = datacraft.loader.field_loader(_create_ip_spec_with_base('10'))
     supplier = loader.get('network')
     value = supplier.next(0)
     assert value.startswith('10.')
 
 
 def test_ip_spec_three_octets_dot_in_base():
-    loader = field_loader(_create_ip_spec_with_base('11.'))
+    loader = datacraft.loader.field_loader(_create_ip_spec_with_base('11.'))
     supplier = loader.get('network')
     value = supplier.next(0)
     assert value.startswith('11.')
@@ -153,8 +152,8 @@ def test_mac_address_dashes():
 
 
 def _test_ip_spec_invalid_base(base):
-    loader = field_loader(_create_ip_spec_with_base(base))
-    with pytest.raises(SpecException):
+    loader = datacraft.loader.field_loader(_create_ip_spec_with_base(base))
+    with pytest.raises(datacraft.SpecException):
         loader.get('network')
 
 
