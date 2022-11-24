@@ -23,9 +23,9 @@ Examples:
 
     {"field_constant": {"type": "values", "data": 42}}
 
-.. code-block:: python
+.. code-block:: json
 
-    {"field_list": {"type": "values", "data": [1, 2, 3, 5, 8, 13, '_NONE_']}}
+    {"field_list": {"type": "values", "data": [1, 2, 3, 5, 8, 13]}}
 
 .. code-block:: json
 
@@ -64,11 +64,12 @@ Examples:
     {"short_hand_field_weighted_with_null": "200"}
 
 Special Output Values
-=====================
+^^^^^^^^^^^^^^^^^^^^^
 
 There are certain valid JSON output values that are trickier to produce with a values spec. There are also times when
-your values are interpreted as strings but you need them to be output as one of these special null values. The way
-we do this is by using a ``_TYPE_`` form.  Below is the current mappings:
+your values are interpreted as strings but you need them to be output as one of these special values. The way
+we do this is by using a special token of the form ``_TYPE_``.  Below is the current mappings of special token to
+output value:
 
 .. code-block:: json
 
@@ -84,15 +85,15 @@ This is particularly useful when using a weighted values form of the values spec
 
 .. code-block:: json
 
-        {
-            "converted": {
-                "type": "values",
-                "data": {
-                    "_TRUE_": 0.05,
-                    "_FALSE_": 0.95
-                }
+    {
+        "converted": {
+            "type": "values",
+            "data": {
+                "_TRUE_": 0.05,
+                "_FALSE_": 0.95
             }
         }
+    }
 
 .. code-block:: text
 
@@ -100,3 +101,27 @@ This is particularly useful when using a weighted values form of the values spec
     {"converted": false}
     {"converted": false}
     {"converted": false}
+
+The special token values can be mixed and matched as well:
+
+.. code-block:: json
+
+    {
+        "mixed": {
+            "type": "values",
+            "data": {
+                "_NONE_": 0.11,
+                "_NULL_": 0.11,
+                "_NIL_": 0.11,
+                "_TRUE_": 0.33,
+                "_FALSE_": 0.33
+            }
+        }
+    }
+
+.. code-block:: text
+
+    $ datacraft -s /tmp/spec.json -i 3 -r 1 --format json -x --log-level off
+    {"mixed": false}
+    {"mixed": true}
+    {"mixed": null}

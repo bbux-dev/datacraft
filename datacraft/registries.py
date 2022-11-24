@@ -34,8 +34,9 @@ class Registry:
             Usage for field spec types, used to provide command line help and examples
 
             >>> @datacraft.registry.usage('special_sauce')
-            ... def _special_sauce_usage() -> str:
+            ... def _special_sauce_usage() -> Union[str, dict]:
             ...    # return string describing how to use special_sauce
+            ...    # or a dictionary with {"cli": "cli usage example", "api": "api usage example"}
 
         preprocessors:
             Functions to modify specs before data generations process. If there is a customization you want to do for

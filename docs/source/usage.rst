@@ -75,7 +75,7 @@ integer between 1 and 100. If we run this spec and specify the ``--format json``
 
 .. code-block:: shell
 
-    $ datacraft -s demo.json --log-level off -i 5 --format json -x
+    $ datacraft -s demo.json --log-level off -i 5 -r 1 --format json -x
     {"id": "706bf38c-02a8-4087-bf41-62cdf4963f0b", "timestamp": "2050-11-30T05:21:14", "count": 59}
     {"id": "d96bad3e-45c3-424e-9d4e-1233f9ed6ab5", "timestamp": "2050-11-09T20:21:03", "count": 61}
     {"id": "ff3b8d87-ab3d-4ebe-af35-a081ee5098b5", "timestamp": "2050-11-05T08:24:05", "count": 36}
