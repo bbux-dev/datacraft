@@ -90,8 +90,10 @@ args to the ``--type-help`` flag:
        "formula": "{{ height_in }} * 2.54"
      }
    }
-   datacraft -s spec.json -i 3 --format json -x -l off
-   [{"height_in": 60, "height_cm": 152.4}, {"height_in": 70, "height_cm": 177.8}, {"height_in": 80, "height_cm": 203.2}]
+   datacraft -s spec.json -i 3 -r 1--format json -x -l off
+   {"height_in": 60, "height_cm": 152.4}
+   {"height_in": 70, "height_cm": 177.8}
+   {"height_in": 80, "height_cm": 203.2}
 
    -------------------------------------
 
@@ -196,11 +198,12 @@ separated value line. If you want headers with the csv use the ``csv-with-header
 
 .. code-block:: shell
 
-    datacraft --inline "{ id:uuid, ts:date }" -i 2 --log-level off --format json -x
+    datacraft --inline "{ id:uuid, ts:date }" -i 2 -r 1 --log-level off --format json -x
 
 .. code-block:: shell
 
-    [{"id": "732376df-9adc-413e-8493-73555fae51f9", "ts": "21-04-2050"}, {"id": "d826774a-1eeb-4e35-8253-0b00a514c0d1", "ts": "02-04-2050"}]
+    {"id": "732376df-9adc-413e-8493-73555fae51f9", "ts": "21-04-2050"}
+    {"id": "d826774a-1eeb-4e35-8253-0b00a514c0d1", "ts": "02-04-2050"}
 
 .. code-block:: shell
 
@@ -257,7 +260,7 @@ Examples:
 
 .. code-block:: shell
 
-   datacraft --inline "{timestamp:date: {}}" -i 4  --log-level off --format json -x
+   datacraft --inline "{timestamp:date: {}}" -i 4 -r 1 --log-level off --format json -x
    [{"timestamp": "22-04-2050"}, {"timestamp": "03-04-2050"}, {"timestamp": "10-04-2050"}, {"timestamp": "06-04-2050"}]
 
 
@@ -321,6 +324,8 @@ that have schemas defined. Examples:
     WARNING [13-Nov-2050 02:59:25 PM] '-99.0' is not of type 'number'
     ERROR [13-Nov-2050 02:59:25 PM] Failed to validate spec type: geo.pair with spec: {'config': {'start_lat': '-99.0'}, 'type': 'geo.pair'}
 
+In the instance above the start latitude is interpreted as a string. If we reformat the inline spec:
+
 .. code-block:: shell
 
     datacraft --inline "{geo:geo.pair: {config: {start_lat: -99.0}}}" --log-level info -i 2 --format json --strict
@@ -332,6 +337,8 @@ that have schemas defined. Examples:
     WARNING [13-Nov-2050 03:00:57 PM] -99.0 is less than the minimum of -90
     ERROR [13-Nov-2050 03:00:57 PM] Failed to validate spec type: geo.pair with spec: {'config': {'start_lat': -99.0}, 'type': 'geo.pair'}
 
+This time validation fails for the expected reason that the start_lat is out of the valid range.
+
 .. code-block:: shell
 
     datacraft --inline "demo:unicode_range: {}" -i 3 --strict
@@ -341,6 +348,27 @@ that have schemas defined. Examples:
     INFO [13-Nov-2050 03:07:36 PM] Starting Loading Configurations...
     INFO [13-Nov-2050 03:07:36 PM] Starting Processing...
     WARNING [13-Nov-2050 03:07:36 PM] 'data' is a required property
+
+Here we are told that we are missing a required property for the unicode_range spec.  You can always use the
+``--type-help`` flag to get an usable example for any type:
+
+.. code-block:: shell
+
+    $ datacraft --type-help unicode_range
+    -------------------------------------
+    unicode_range | Example Spec:
+    {
+      "text": {
+        "type": "unicode_range",
+        "data": ["3040", "309f"],
+        "config": {
+          "mean": 5
+        }
+      }
+    }
+
+    $ datacraft -s spec.json -i 3 --format json -x -l off
+    [{"text": "ぢたゝわすづそぜるく"}, {"text": "も"}, {"text": "゚ぷつ゛ざくしが゘び"}]
 
 Default Values
 --------------

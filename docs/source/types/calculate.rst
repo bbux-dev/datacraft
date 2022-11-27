@@ -64,13 +64,11 @@ Examples:
       }
     }
 
-We use the `asteval <http://newville.github.io/asteval/basics.html>`_
-package to do formula evaluation. This provides a fairly safe way to do
-evaluation. The package provides a bunch of
+We use the `asteval <http://newville.github.io/asteval/basics.html>`_ package to do formula evaluation.
+This provides a fairly safe way to do evaluation. The package provides a bunch of
 `built-in-functions <http://newville.github.io/asteval/basics.html#built-in-functions>`_
-as well. We also use the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating
-engine format for specifying variable names to substitute. In theory, you
-could use any valid jinja2 syntax i.e.:
+as well. We also use the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine format for specifying
+variable names to substitute. In theory, you could use any valid jinja2 syntax i.e.:
 
 .. code-block:: json
 

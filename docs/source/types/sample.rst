@@ -61,3 +61,10 @@ Examples:
         }
       }
     }
+
+.. code-block:: text
+
+    $ datacraft -s sample.json  -i 3 -t 'Ingredients: {{ ingredients | safe }}' -l off
+    Ingredients: "garlic", "onions"
+    Ingredients: "mushrooms", "potatoes", "garlic", "bell peppers"
+    Ingredients: "potatoes", "mushrooms"

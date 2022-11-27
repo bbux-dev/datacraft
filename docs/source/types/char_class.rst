@@ -88,8 +88,25 @@ Examples:
       }
     }
 
+.. code-block:: text
+
+    $ datacraft -s spec.json -i 4 -r 1 -x -l off --format json
+    {"password": "c1hbR&V!sYi4+Em"}
+    {"password": "Z7Qd0AM>$f7'"}
+    {"password": "9Bh8Z%6?ed4g"}
+    {"password": "sqQ&I!Ucdp"}
+
+
 .. code-block:: json
 
     {
       "one_to_five_digits:cc-digits?min=1&max=5": {}
     }
+
+.. code-block:: text
+
+    $ datacraft -s spec.json -i 4 -r 1 -x -l off --format json
+    {"one_to_five_digits": "43040"}
+    {"one_to_five_digits": "5"}
+    {"one_to_five_digits": "6914"}
+    {"one_to_five_digits": "752"}

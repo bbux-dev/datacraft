@@ -26,7 +26,8 @@ modify, update, and manage. It also lends itself to sharing and reuse. Instead o
 synthetic  test data, you can build Data Specs that encapsulate the information needed to generate the data. If
 well-designed, these can be easier to inspect and reason through compared with scanning thousands of lines of a csv
 file. It is also easy to generate millions or billions of records to use for development and testing of new or
-existing systems.
+existing systems. Datacraft also has a python API so that you can generate your synthetic data as part of your
+test suite or application without have to use online tools or external services.
 
 .. toctree::
     :maxdepth: 2
