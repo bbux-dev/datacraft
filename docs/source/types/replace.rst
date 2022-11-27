@@ -35,6 +35,14 @@ Examples:
       }
     }
 
+.. code-block:: text
+
+    $ datacraft --spec uuid-spec.json -i 3 -r 1 -x -l off --format json
+    {"id": "e809af25-bd85-4118-a5e9-cfdc953e172b", "remove_dashes": "1622e5cf2f334b81a90a6c031e0f78bf"}
+    {"id": "2a98b892-bb73-49de-8186-fa7cb4510001", "remove_dashes": "9c1d22d6f6e544bb8c0d582c441a1c78"}
+    {"id": "7986c789-1e5c-46f1-b5f1-a095f6a75209", "remove_dashes": "b50e914ea7994b6bb3194ce8c3402c8e"}
+
+
 regex_replace
 -------------
 
@@ -82,3 +90,11 @@ replacement.
         }
       }
     }
+
+.. code-block:: text
+
+    $ datacraft --spec phone-spec.json -i 4 -r 1 -x -l off --format json
+    {"phone": "(773) 542-6190"}
+    {"phone": "(632) 956-3481"}
+    {"phone": "(575) 307-4587"}
+    {"phone": "(279) 788-3403"}
