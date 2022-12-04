@@ -1,3 +1,7 @@
+v0.7.1
+------
+* Added py.typed to get type hint support to dependent projects
+
 v0.7.0
 ------
 * Added `replace` and `regex_replace` types
