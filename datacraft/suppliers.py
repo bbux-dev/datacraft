@@ -7,7 +7,6 @@ import json
 import logging
 from typing import Union, List, Dict, Any
 
-import datacraft.supplier.ranges
 from . import registries, casters, distributions, utils, template_engines
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
@@ -229,12 +228,12 @@ def alter(supplier, **kwargs) -> ValueSupplierInterface:
         supplier = decorated(supplier, **kwargs)
     if _is_buffered(**kwargs):
         supplier = buffered(supplier, **kwargs)
-    if _wrap_with_multiple_value(supplier, **kwargs):
+    if _wrap_with_multiple_value(**kwargs):
         return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
 
 
-def _wrap_with_multiple_value(supplier, **kwargs):
+def _wrap_with_multiple_value(**kwargs):
     """ checks if this supplier should be wrapped with multiple values supplier """
     has_count = 'count' in kwargs or 'count_dist' in kwargs
     as_list = utils.is_affirmative('as_list', kwargs)
@@ -408,7 +407,7 @@ def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
         >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, min=2, max=5)
         >>> pet_supplier.next(0)
         ['rabbit', 'cat', 'pig', 'cat']
-        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,stddev=1,min=1,max=3)")
+        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,stddev=1,min=1)")
         >>> pet_supplier.next(0)
         ['pig', 'horse']
     """
@@ -1119,7 +1118,7 @@ def templated(supplier_map: Dict[str, ValueSupplierInterface],
     return templated_supplier(supplier_map, engine)
 
 
-def cut(supplier: datacraft.ValueSupplierInterface,
+def cut(supplier: ValueSupplierInterface,
         start: int = 0,
         end: Union[int, None] = None):
     """Trim output of given supplier from start to end, if length permits
