@@ -100,7 +100,7 @@ def parseargs(argv):
     parser.add_argument('-t', '--template',
                         help='Path to template to populate, or template inline as a string')
     parser.add_argument('-r', '--records-per-file', dest='records_per_file', default=None, type=int,
-                        help='Number of records to place in each file, default is all, requires -o to be specified')
+                        help='Number of records to place in each iteration, default is all')
     parser.add_argument('-k', '--printkey', action='store_true',
                         help='When printing to stdout field name should be printed along with value')
     parser.add_argument('-c', '--code', nargs='+',
@@ -146,6 +146,10 @@ def parseargs(argv):
                         help="Run a flask http server with the generated content")
     parser.add_argument("--server-endpoint", dest='endpoint', default='/data',
                         help="End point to host data service on")
+    parser.add_argument("--server-port", dest='port', default=5000, type=int,
+                        help="Server port")
+    parser.add_argument('--server-delay', type=float, dest='server_delay',
+                        help="Number of seconds before response is returned")
     parser.add_argument("--suppress-output", dest='suppress_output', action='store_true',
                         help="Silent mode, no output other than logging produced, set --log-level off to turn off "
                              "logging")

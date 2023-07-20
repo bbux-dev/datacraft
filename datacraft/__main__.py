@@ -38,8 +38,10 @@ def main(argv):
                 records_per_file = 1
             server.run(generator,
                        args.endpoint,
+                       args.port,
                        data_is_json=(not using_template_or_formatter),
-                       count_supplier=suppliers.count_supplier(count=records_per_file))
+                       count_supplier=suppliers.count_supplier(count=records_per_file),
+                       delay=args.server_delay)
         except ModuleNotFoundError:
             _log.warning('--server mode requires flask, pip/conda install flask and rerun command')
     else:
