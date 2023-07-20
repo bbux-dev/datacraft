@@ -1,3 +1,7 @@
+v0.7.3
+------
+* added --server-port option
+
 v0.7.2
 ------
 * Fix to allow POST and GET for server end points

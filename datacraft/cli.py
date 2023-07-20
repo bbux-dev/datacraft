@@ -146,6 +146,8 @@ def parseargs(argv):
                         help="Run a flask http server with the generated content")
     parser.add_argument("--server-endpoint", dest='endpoint', default='/data',
                         help="End point to host data service on")
+    parser.add_argument("--server-port", dest='port', default=5000, type=int,
+                        help="Server port")
     parser.add_argument('--server-delay', type=float, dest='server_delay',
                         help="Number of seconds before response is returned")
     parser.add_argument("--suppress-output", dest='suppress_output', action='store_true',
