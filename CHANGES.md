@@ -1,3 +1,8 @@
+v0.7.2
+------
+* Fix to allow POST and GET for server end points
+* Fix for count as list for values objects
+
 v0.7.1
 ------
 * Added py.typed to get type hint support to dependent projects

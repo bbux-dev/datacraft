@@ -94,8 +94,8 @@ def values(spec: Any, **kwargs) -> ValueSupplierInterface:
         supplier = constant(data)
 
     # Check for count param
-    # if 'count' in kwargs or 'count_dist' in kwargs:
-    #     return MultipleValueSupplier(supplier, count_supplier(**kwargs))
+    if 'count' in kwargs or 'count_dist' in kwargs:
+        return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
 
 

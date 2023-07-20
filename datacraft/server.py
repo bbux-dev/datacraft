@@ -52,7 +52,7 @@ class _Server:
         """ run the Flask app """
         app = flask.Flask(__name__)
         _log.info('Adding endpoint to server: %s', self.endpoint)
-        app.add_url_rule(self.endpoint, view_func=self.callback)
+        app.add_url_rule(self.endpoint, view_func=self.callback, methods=['POST', 'GET'])
         app.run()
 
 
