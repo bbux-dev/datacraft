@@ -17,7 +17,7 @@ def test_server(mocker, one):
 
     gen = datacraft.parse_spec(spec).generator(1)
 
-    datacraft.server.run(gen, endpoint='/test', data_is_json=True, count_supplier=one)
+    datacraft.server.run(gen, endpoint='/test', data_is_json=True, count_supplier=one, )
 
 
 def test_server_callback_stop_iteration(mocker, one):

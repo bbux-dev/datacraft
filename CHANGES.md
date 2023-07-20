@@ -2,6 +2,7 @@ v0.7.2
 ------
 * Fix to allow POST and GET for server end points
 * Fix for count as list for values objects
+* Added --server-delay arg to add option delay between requests and response in seconds
 
 v0.7.1
 ------
