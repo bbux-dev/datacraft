@@ -2,7 +2,7 @@
 Light weight module for running a Flask Server that returns data from a generator.
 """
 import time
-from typing import Generator
+from typing import Generator, Union
 import logging
 import flask
 
@@ -22,7 +22,7 @@ class _Server:
                  port: int,
                  data_is_json: bool,
                  count_supplier: datacraft.ValueSupplierInterface,
-                 delay: float = None):
+                 delay: Union[float, None] = None):
         self.generator = generator
         self.endpoint = endpoint
         self.port = port
@@ -70,7 +70,7 @@ def run(generator: Generator,
         port: int,
         data_is_json: bool,
         count_supplier: datacraft.ValueSupplierInterface,
-        delay: float = None):
+        delay: Union[float, None] = None):
     """
     Runs a light weight Flask server with data returned by the provided generator served at each subsequent call to
     the provided endpoint. End point should start with /. When StopIteration encountered, returns a 204 status code.
