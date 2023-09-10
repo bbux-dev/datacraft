@@ -1,3 +1,7 @@
+v0.8.0
+------
+* added New `ref_list` type. For inject field values into positions in list/array objects.
+
 v0.7.3
 ------
 * added --server-port option

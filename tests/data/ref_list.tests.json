@@ -1,0 +1,13 @@
+{
+  "ref_list.schema.json": {
+    "valid": [
+      {"instance": {"type": "ref_list", "data": ["one", "two"]}},
+      {"instance": {"type": "ref_list", "refs": ["one", "two"]}}
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "refs_lists"}, "note": "misspelled"},
+      {"instance": {"type": "ref_list"}, "note":  "no data or refs   supplied"}
+    ]
+  }
+}

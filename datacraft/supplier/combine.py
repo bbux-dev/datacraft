@@ -1,14 +1,14 @@
 """
 Module for combine type implementations
 """
-from typing import List
+from typing import List, Union
 
 from .model import ValueSupplierInterface
 
 
 def combine_supplier(suppliers_list: List[ValueSupplierInterface],
-                     join_with: str,
-                     as_list: bool) -> ValueSupplierInterface:
+                     join_with: Union[str, None] = None,
+                     as_list: bool = False) -> ValueSupplierInterface:
     """
     Args:
         suppliers_list: list of suppliers to combine in order of combination
@@ -25,8 +25,8 @@ class _CombineValuesSupplier(ValueSupplierInterface):
 
     def __init__(self,
                  suppliers_list: List[ValueSupplierInterface],
-                 as_list: bool,
-                 join_with: str):
+                 as_list: bool = False,
+                 join_with: Union[str, None] = None):
         """
         Args:
             suppliers_list: list of suppliers to combine in order of combination

@@ -441,6 +441,21 @@ class Builder:
         """
         return self._add_field_spec(key, ref_spec(ref_name, data, **config))
 
+    def ref_list(self, key: str, ref_names: list = None, data: list = None, **config) -> FieldInfo:
+        """
+        creates ref Field Spec and adds to Data Spec
+
+        Args:
+            key: name of ref/field
+            ref_names: names of references to get values from
+            data: name of reference to get values from
+            config: in kwargs format
+
+        Returns:
+            FieldInfo for the added ref_list field
+        """
+        return self._add_field_spec(key, ref_list_spec(ref_names, data, **config))
+
     def weighted_csv(self, key: str, **config) -> FieldInfo:
         """
         creates weighted_csv Field Spec and adds to Data Spec
@@ -1245,6 +1260,32 @@ def ref_spec(ref_name: str = None, data: str = None, **config) -> dict:
         spec['data'] = data
     if ref_name is not None:
         spec['ref'] = ref_name
+
+    if len(config) > 0:
+        spec['config'] = config
+    return spec
+
+
+def ref_list_spec(ref_names: list = None, data: str = None, **config) -> dict:
+    """
+    Constructs a ref_list Field Spec
+
+    Args:
+        ref_names: name of references to get values from
+        data: name of references to get values from
+        config: in kwargs format
+
+    Returns:
+        the ref spec
+    """
+
+    spec = {
+        "type": "ref_list"
+    }  # type: Dict[str, Any]
+    if data is not None:
+        spec['data'] = data
+    if ref_names is not None:
+        spec['refs'] = ref_names
 
     if len(config) > 0:
         spec['config'] = config
