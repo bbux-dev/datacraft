@@ -42,6 +42,7 @@ TEST_FILES = [
     "weighted_csv.tests.json",
     "nested.tests.json",
     "ref.tests.json",
+    "ref_list.tests.json",
     "weighted_ref.tests.json",
     "distribution.tests.json",
     "templated.tests.json"
