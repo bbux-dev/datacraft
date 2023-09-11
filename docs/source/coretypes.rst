@@ -7,6 +7,8 @@ These are the built in field spec types.
 
 .. include:: types/refs.rst
 
+.. include:: types/ref_list.rst
+
 .. include:: types/weighted_refs.rst
 
 .. include:: types/ranges.rst
