@@ -20,16 +20,40 @@ Prototype:
       }
     }
 
-Examples:
+Example:
+
+In this example we want a location field as a list of [latitude, longitude, altitude]
 
 .. code-block:: json
 
-    { "pointer": { "type": "ref_list", "data": "refs": ["one", "two"] }, "refs": { "refs": ["one", "two"] } }
+    {
+      "location": {
+        "type": "ref_list",
+        "refs": ["lat", "long", "altitude"]
+      },
+      "refs": {
+        "lat": {
+          "type": "geo.lat"
+        },
+        "long": {
+          "type": "geo.long"
+        },
+        "altitude": {
+          "type": "rand_int_range",
+          "data": [5000, 10000]
+        }
+      }
+    }
 
-    { "pointer": { "type": "ref_list", "refs": ["one", "two"] }, "refs": { "one": 1, "two": 2 } }
+.. code-block:: bash
 
-    { "pointer:ref_list": { "refs": ["one", "two"] }, "refs": { "one": 1, "two": 2 } }
-
-    { "pointer:ref_list": { "data": ["one", "two"] }, "refs": { "one": 1, "two": 2 } }
-
-    { "pointer:ref_list": ["one", "two"], "refs": { "one": 1, "two": 2 } }
+    $ datacraft -s spec.json -i 1 --format json-pretty -x -l off
+    [
+        {
+            "location": [
+                -36.7587,
+                -40.5453,
+                6233
+            ]
+        }
+    ]

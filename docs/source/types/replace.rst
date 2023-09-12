@@ -11,6 +11,7 @@ Prototype:
     {
       "<field name>": {
         "type": "replace",
+        "ref": "<field or ref to source value from>",
         "data": {
           "<value to replace 1>": "<value to replace with 1>",
           ...
@@ -55,6 +56,7 @@ Prototype:
     {
       "<field name>": {
         "type": "regex_replace",
+        "ref": "<field or ref to source value from>",
         "data": {
           "<value to replace 1>": "<value to replace with 1>",
           ...
