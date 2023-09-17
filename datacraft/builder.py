@@ -30,6 +30,8 @@ def parse_spec(raw_spec: dict) -> DataSpec:
     Examples:
         >>> import datacraft
         >>> raw_spec = { "field": {"type": "values", "data": [10, 100, 1000]}}
+        >>> spec = datacraft.parse_spec(raw_spec)
+        >>> record = list(spec.generator(1))
     """
     specs = preprocess_spec(raw_spec)
     return _DataSpecImpl(specs)
