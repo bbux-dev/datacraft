@@ -48,12 +48,14 @@ Prototype:
     {
       "<field name>": {
         "type": "char_class":
-        or
-        "type": "cc-<char_class_name>",
         "data": <char_class_name>,
         or
+        "type": "cc-<char_class_name>",
+        or
+        "type": "char_class":
         "data": <string with custom set of characters to sample from>
         or
+        "type": "char_class":
         "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>]
         "config":{
           "exclude": <string of characters to exclude from output>,

@@ -56,7 +56,7 @@ Prototype:
 
     {
       "<field name>": {
-        "type": "ipv4",
+        "type": "ip.precise",
         "config": {
           "cidr": "<valid cidr value>",
         }

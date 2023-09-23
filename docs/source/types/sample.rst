@@ -11,7 +11,7 @@ Prototype:
       "<field name>": {
         "type": "sample",
         OR
-        "type": "sample", $ <- legacy name
+        "type": "sample",
         "config": {
           "mean": N,
           "stddev": N,
@@ -23,7 +23,7 @@ Prototype:
         },
         "data": ["data", "to", "select", "from"],
         OR
-        "ref": "REF_WITH_DATA_AS_LIST"
+        "ref": "<ref or field with data  as list>"
       }
     }
 
