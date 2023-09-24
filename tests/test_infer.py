@@ -1,11 +1,13 @@
+import math
 import json
 
 import pytest
 
+import datacraft
 from datacraft.infer import from_examples, csv_to_spec
 
 from datacraft._infer import (_is_numeric, _calculate_weights,
-                             _are_values_unique, _compute_range)
+                              _are_values_unique, _compute_range)
 
 EXAMPLES = [
     # 0. Empty List
@@ -192,3 +194,23 @@ def test_from_examples(input_data, expected_output):
     actual = from_examples(input_data)
     assert actual == expected_output, f"Actual not equal to expected: {json.dumps(actual, indent=2)}, " \
                                       f"{json.dumps(expected_output, indent=2)}"
+
+
+def test_round_trip():
+    weights = {
+        "a": 0.25,
+        1: 0.25,
+        "_TRUE_": 0.25,
+        2.34567: 0.25
+    }
+    spec = {
+        "basket": {
+            "type": "values",
+            "data": weights
+        }
+    }
+    records = datacraft.entries(spec, 10000)
+    inferred_spec = datacraft.infer.from_examples(records)
+
+    for key, val in inferred_spec["basket"]["data"].items():
+        assert math.isclose(weights[key], val, rel_tol=0.1)

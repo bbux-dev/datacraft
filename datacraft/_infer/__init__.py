@@ -4,10 +4,11 @@ from collections import Counter
 import datacraft
 from datacraft import ValueListAnalyzer
 
+# using string keys, since 1, and 0 evaluate to True and False respectively
 _LOOKUP = {
-    True: "_TRUE_",
-    False: "_FALSE_",
-    None: "_NONE_"
+    "True": "_TRUE_",
+    "False": "_FALSE_",
+    "None": "_NONE_"
 }
 
 
@@ -169,11 +170,11 @@ def _default_analyzer() -> datacraft.ValueListAnalyzer:
 
 
 def _requires_substitution(values):
-    return _is_boolean(values) or _any_is_none(values)
+    return _any_is_boolean(values) or _any_is_none(values)
 
 
 def _substitute(values):
-    return [_LOOKUP.get(v, v) for v in values]
+    return [_LOOKUP.get(str(v), v) for v in values]
 
 
 def _is_numeric(values):
@@ -188,8 +189,8 @@ def _all_lists_of_type(lists, type_check):
     return all(isinstance(val, type_check) for sublist in lists for val in sublist)
 
 
-def _is_boolean(values):
-    return all(isinstance(value, bool) for value in values)
+def _any_is_boolean(values):
+    return any(isinstance(value, bool) for value in values)
 
 
 def _any_is_none(values):
