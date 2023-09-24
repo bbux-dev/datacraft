@@ -1,12 +1,9 @@
+from abc import ABC, abstractmethod
+
 import pandas as pd  # type: ignore
-from collections import Counter
 from typing import Any, Dict, Generator, List, Union, Callable
 
-_LOOKUP = {
-    True: "_TRUE_",
-    False: "_FALSE_",
-    None: "_NONE_"
-}
+from . import registries
 
 
 class _TreeNode:
@@ -158,205 +155,48 @@ def _process_jsons(jsons: List[Dict[str, Any]],
     return tree.to_spec(func=func)
 
 
-def _requires_substitution(values):
-    return _is_boolean(values) or _any_is_none(values)
+class ValueListAnalyzer(ABC):
+    """Interface class for implementations that infer a Field Spec from a list of values"""
+    @abstractmethod
+    def is_compatible(self, values: Generator[Any, None, None]) -> bool:
+        """
+        Check if the analyzer is compatible with the provided values.
+
+        Args:
+            values (Generator[Any, None, None]): Generator producing values to check.
+
+        Returns:
+            bool: True if the analyzer can handle the values, otherwise False.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+        """
+        Generate a specification for the provided list of values.
+
+        Args:
+            values (List[Any]): List of values to generate the spec for.
+
+        Returns:
+            Dict[str, Any]: A dictionary with the inferred spec for the values.
+        """
+        raise NotImplementedError
 
 
-def _substitute(values):
-    return [_LOOKUP.get(v, v) for v in values]
-
-
-def _is_numeric(values):
-    return all((isinstance(value, (int, float)) and not isinstance(value, bool)) for value in values)
-
-
-def _all_lists_numeric(values):
-    return all(_is_numeric(sublist) for sublist in values)
-
-
-def _all_lists_of_type(lists, type_check):
-    return all(isinstance(val, type_check) for sublist in lists for val in sublist)
-
-
-def _is_boolean(values):
-    return all(isinstance(value, bool) for value in values)
-
-
-def _any_is_none(values):
-    return any(v is None for v in values)
-
-
-def _compute_range(values: List[Union[int, float]]) -> Dict[str, Any]:
-    """
-    Compute the range from a list of numeric values.
-
-    Args:
-        values (List[Union[int, float]]): A list of numeric values.
-
-    Returns:
-        Dict[str, Any]: A dictionary with the structure:
-            {
-                "type": "rand_range",
-                "data": [min, max]
-            }
-    """
-    if not _is_numeric(values):
-        raise ValueError("All values in the list must be numeric.")
-
-    type_key = "rand_range"
-    if all(isinstance(value, int) for value in values):
-        type_key = "rand_int_range"
-
-    return {
-        "type": type_key,
-        "data": [min(values), max(values)]
-    }
-
-
-def _compute_list_range(values: list) -> dict:
-    """
-    Creates rand_range spec for lists of values
-    Args:
-        values: list of lists of values
-
-    Returns:
-        (dict): rand_range or rand_int_range spec
-    """
-    max_value = max(num for sublist in values for num in sublist)
-    min_value = min(num for sublist in values for num in sublist)
-
-    weights = _caclulate_list_size_weights(values)
-
-    if _all_lists_of_type(values, int):
-        field_type = "rand_int_range"
-    else:
-        field_type = "rand_range"
-
-    return {
-        "type": field_type,
-        "data": [min_value, max_value],
-        "config": {"count": weights, "as_list": True}
-    }
-
-
-def _caclulate_list_size_weights(values):
-    # Calculate the frequency of each sublist length
-    length_freq = Counter(len(sublist) for sublist in values)
-    # Calculate the total number of lists
-    total_lists = len(values)
-    # Calculate the weights for each sublist length
-    weights = {str(length): freq / total_lists for length, freq in length_freq.items()}
-    return weights
-
-
-def _compute_str_list_spec(values: list) -> dict:
-    """
-    Creates string spec from lists of list of strings
-    Args:
-        values: list of lists of strings
-
-    Returns:
-        (dict): with appropriate string spec
-    """
-
-    weights = _caclulate_list_size_weights(values)
-    # Flatten the list of lists
-    flat_list = [s for sublist in values for s in sublist]
-
-    # Determine the number of unique strings
-    unique_strings = set(flat_list)
-    num_unique = len(unique_strings)
-
-    # Determine the range of sizes of the strings
-    sizes = [len(s) for s in unique_strings]
-    min_size = min(sizes)
-    max_size = max(sizes)
-    avg_size = sum(sizes) / num_unique
-
-    # Count occurrences of each string
-    counts = Counter(flat_list)
-
-    # Filter and count the strings that appear more than once
-    repeated_count = sum(1 for count in counts.values() if count > 1)
-
-    return {
-        "type": "values",
-        "data": flat_list,
-        "config": {"count": weights, "as_list": True}
-    }
-
-
-def _calculate_weights(values: List[str]) -> Dict[str, float]:
-    """
-    Calculate the weights of occurrences of values from a list.
-
-    Args:
-        values (List[str]): A list of string values.
-
-    Returns:
-        Dict[str, float]: A dictionary containing each unique value from the list as the key
-                          and its corresponding weight (or relative frequency) as the value.
-    """
-    total_count = len(values)
-    counts = Counter(values)
-
-    return {key: count / total_count for key, count in counts.items()}
-
-
-def _are_values_unique(values: List) -> bool:
-    """
-    Check if all values in the list are unique.
-
-    Args:
-        values (List): A list of values.
-
-    Returns:
-        bool: True if all values are unique, otherwise False.
-    """
-    return len(values) == len(set(values))
-
-
-def _all_list_is_str(lists):
-    return all(isinstance(val, str) for sublist in lists for val in sublist)
-
-
-def compute_spec(values: List[Any]):
-    """
-    Compute spec from list of values
-    Args:
-        values: List of values accumulated for leaf node
-
-    Returns:
-        Dict[str, Any]: A dictionary with the inferred spec for the values
-    """
-    # insert mechanism here to elegantly handle all the types of lists of values
-    # there shouldn't be
-    # handle leaf nodes that are lists
-    if isinstance(values, list) and isinstance(values[0], list):
-        if _is_numeric(values[0]):
-            return _compute_list_range(values)
-        if _all_list_is_str(values):
-            return _compute_str_list_spec(values)
-        return {
-            "type": "values",
-            "data": values
-        }
-    if len(set(values)) > 1 and _is_numeric(values):
-        return _compute_range(values)
-    if _requires_substitution(values):
-        values = _substitute(values)
-
-    # unique values, just rotate through them
-    if _are_values_unique(values):
-        return {
-            "type": "values",
-            "data": values
-        }
-    # use weighted values
-    return {
-        "type": "values",
-        "data": _calculate_weights(values)
-    }
+def _lookup_handler(values: List[Any]):
+    analyzer = registries.lookup_analyzer("default")
+    if analyzer is None:
+        raise LookupError("Unable to find default analyzer")
+    for key in registries.registered_analyzers():
+        if key == "default":
+            continue
+        analyzer = registries.lookup_analyzer(key)
+        if analyzer is None or not isinstance(analyzer, ValueListAnalyzer):
+            raise LookupError(f"Analyzer with name {key} registered but not valid: {analyzer}")
+        if analyzer.is_compatible(v for v in values):
+            return analyzer
+    return analyzer.generate_spec(values)
 
 
 def from_examples(examples: List[dict]) -> dict:
@@ -380,7 +220,7 @@ def from_examples(examples: List[dict]) -> dict:
     """
     if examples is None or len(examples) == 0:
         return {}
-    return _process_jsons(examples, func=compute_spec)
+    return _process_jsons(examples, _lookup_handler)
 
 
 def csv_to_spec(file_path: str) -> Dict[str, Union[str, Dict]]:

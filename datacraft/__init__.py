@@ -61,8 +61,9 @@ from .usage import build_api_help as type_usage
 from .usage import build_cli_help as cli_usage
 # registry decorators
 from .registries import Registry as registry
-from .registries import registered_types, registered_formats, registered_casters
+from .registries import registered_types, registered_formats, registered_casters, registered_analyzers
 # to trigger registered functions
 from . import cli
 from . import entrypoints
+from .infer import ValueListAnalyzer
 entrypoints.load_eps()

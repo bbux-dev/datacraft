@@ -2,7 +2,9 @@ import json
 
 import pytest
 
-from datacraft.infer import (from_examples, csv_to_spec, _is_numeric, _calculate_weights,
+from datacraft.infer import from_examples, csv_to_spec
+
+from datacraft._infer import (_is_numeric, _calculate_weights,
                              _are_values_unique, _compute_range)
 
 EXAMPLES = [
