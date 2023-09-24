@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd  # type: ignore
 from collections import Counter
 from typing import Any, Dict, Generator, List, Union, Callable
 

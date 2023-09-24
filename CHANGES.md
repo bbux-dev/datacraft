@@ -1,6 +1,7 @@
 v0.8.0
 ------
 * added New `ref_list` type. For inject field values into positions in list/array objects.
+* added `escape` and `escape_str` params for `char_class` types.
 
 v0.7.3
 ------

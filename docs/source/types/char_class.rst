@@ -59,6 +59,8 @@ Prototype:
         "data": [<char_class_name1>, <char_class_name2>, ..., <custom characters>]
         "config":{
           "exclude": <string of characters to exclude from output>,
+          "escape": <string of characters to escape in output e.g. " -> \\", useful if non JSON output
+          "escape_str": <string to use for escaping, default is \>
           "min": <min number of characters in string>,
           "max": <max number of characters in string>,
           or

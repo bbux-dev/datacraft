@@ -73,6 +73,18 @@ def test_verify_class_mappings():
             assert c in values, f'{c} not expected to be part of {key} type. values: {values}'
 
 
+def test_char_class_special_escape():
+    escape = "&?!"
+    spec = _char_class_spec(data="special", escape=escape, escape_str="ESCAPED:")
+
+    records = datacraft.entries(spec, 3)
+    values = [r['name'] for r in records]
+    for val in values:
+        for char in escape:
+            if char in val:
+                assert 'ESCAPED:' + char in val
+
+
 def _verify_values(supplier, min_size, max_size, exclude='', iterations=100):
     for i in range(iterations):
         value = supplier.next(i)

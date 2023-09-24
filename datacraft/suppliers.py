@@ -242,7 +242,7 @@ def _wrap_with_multiple_value(**kwargs):
 
 def _is_decorated(**kwargs) -> bool:
     """ is this spec a decorated one """
-    return any(key in kwargs for key in ['prefix', 'suffix', 'quote'])
+    return any(key in kwargs for key in ['prefix', 'suffix', 'geo_type', 'quote'])
 
 
 def _is_cast(**kwargs) -> bool:
@@ -525,6 +525,8 @@ def character_class(data, **kwargs):
     Keyword Args:
         join_with (str): string to join characters with, default is ''
         exclude (str): set of characters to exclude from returned values
+        escape (str): set of characters to escape, i.e. " -> \" for example
+        escape_str (str): string to use for escaping, default is \
         mean (float): mean number of characters to produce
         stddev (float): standard deviation from the mean
         count (int): number of elements in list to use
@@ -538,6 +540,15 @@ def character_class(data, **kwargs):
     if 'exclude' in kwargs:
         for char_to_exclude in kwargs.get('exclude'):
             data = data.replace(char_to_exclude, '')
+    if 'escape' in kwargs:
+        # needs to be a list now, since replacements ar not single characters
+        data = list(data)
+        for char_to_escape in kwargs.get('escape'):
+            escape_str = kwargs.get('escape_str', '\\')
+            # just in case there is more than one occurrence
+            for i in range(len(data)):
+                if data[i] == char_to_escape:
+                    data[i] = escape_str + char_to_escape
     if utils.any_key_exists(kwargs, ['mean', 'stddev']):
         return list_stats_sampler(data, **kwargs)
     return list_count_sampler(data, **kwargs)
@@ -776,15 +787,15 @@ def geo_pair(**kwargs):
     return combine([long_supplier, lat_supplier], **combine_config)
 
 
-def _configure_geo_type(default_start, default_end, suffix, **kwargs):
+def _configure_geo_type(default_start, default_end, geo_type, **kwargs):
     precision = kwargs.get('precision', registries.get_default('geo_precision'))
     if not str(precision).isnumeric():
         raise SpecException(f'precision for geo should be valid integer >= 0: {json.dumps(kwargs)}')
-    start, end = _get_start_end(default_start, default_end, suffix, **kwargs)
+    start, end = _get_start_end(default_start, default_end, geo_type, **kwargs)
     return random_range(start, end, precision)
 
 
-def _get_start_end(default_start, default_end, suffix, **kwargs):
+def _get_start_end(default_start, default_end, geo_type, **kwargs):
     """ determines the valid range, changes if bbox in config """
     if 'bbox' in kwargs:
         bbox = kwargs['bbox']
@@ -792,16 +803,16 @@ def _get_start_end(default_start, default_end, suffix, **kwargs):
             raise SpecException(
                 'Bounding box must be list of size 4 with format: [min Longitude, min Latitude, max Longitude, '
                 'max Latitude]')
-        if 'lat' in suffix:
+        if 'lat' in geo_type:
             default_start = bbox[1]
             default_end = bbox[3]
         else:
             default_start = bbox[0]
             default_end = bbox[2]
     # start_lat or start_long overrides bbox or defaults
-    start = kwargs.get('start' + suffix, default_start)
+    start = kwargs.get('start' + geo_type, default_start)
     # end_lat or end_long overrides bbox or defaults
-    end = kwargs.get('end' + suffix, default_end)
+    end = kwargs.get('end' + geo_type, default_end)
     return start, end
 
 
