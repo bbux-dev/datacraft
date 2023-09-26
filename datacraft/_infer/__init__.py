@@ -1,8 +1,9 @@
-from typing import Any, Dict, Generator, List, Union
+from typing import Any, Dict, Generator, List, Union, Callable
 from collections import Counter
 
 import datacraft
 from datacraft import ValueListAnalyzer
+from datacraft.suppliers import REPLACEMENTS
 
 # using string keys, since 1, and 0 evaluate to True and False respectively
 _LOOKUP = {
@@ -14,131 +15,102 @@ _LOOKUP = {
 
 class IntValueAnalyzer(ValueListAnalyzer):
     def is_compatible(self, values: Generator[Any, None, None]) -> bool:
-        """
-        Check if all values are integers.
-
-        Args:
-            values (Generator[Any, None, None]): Generator producing values to check.
-
-        Returns:
-            bool: True if all values are integers, otherwise False.
-        """
-        for value in values:
-            if not isinstance(value, int):
-                return False
-        return True
+        return _simple_type_compatibility_check(values, int, _all_is_int)
 
     def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
-        """
-        Generate a specification for a list of integers.
-
-        Args:
-            values (List[Any]): List of integers to generate the spec for.
-
-        Returns:
-            Dict[str, Any]: Specification for the list of integers.
-        """
-        return {
-            "type": "int",
-            "min": min(values),
-            "max": max(values)
-        }
+        return _generate_numeric_spec(values)
 
 
 class FloatValueAnalyzer(ValueListAnalyzer):
     def is_compatible(self, values: Generator[Any, None, None]) -> bool:
-        """
-        Check if all values are floats.
-
-        Args:
-            values (Generator[Any, None, None]): Generator producing values to check.
-
-        Returns:
-            bool: True if all values are floats, otherwise False.
-        """
-        for value in values:
-            if not isinstance(value, float):
-                return False
-        return True
+        return _simple_type_compatibility_check(values, float, _all_is_float)
 
     def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
-        """
-        Generate a specification for a list of floats.
+        return _generate_numeric_spec(values)
 
-        Args:
-            values (List[Any]): List of floats to generate the spec for.
 
-        Returns:
-            Dict[str, Any]: Specification for the list of floats.
-        """
-        return {
-            "type": "float",
-            "min": min(values),
-            "max": max(values)
-        }
+def _generate_numeric_spec(values: List[Any]):
+    if _is_nested_lists(v for v in values):
+        return _compute_list_range(values)
+    if len(set(values)) > 1 and _all_is_numeric(values):
+        return _compute_range(values)
+    return {
+        "type": "values",
+        "data": list(set(values))
+    }
 
 
 class StringValueAnalyzer(ValueListAnalyzer):
     def is_compatible(self, values: Generator[Any, None, None]) -> bool:
-        """
-        Check if all values are strings.
-
-        Args:
-            values (Generator[Any, None, None]): Generator producing values to check.
-
-        Returns:
-            bool: True if all values are strings, otherwise False.
-        """
-        for value in values:
-            if not isinstance(value, str):
-                return False
-        return True
+        return _simple_type_compatibility_check(values, str, _all_is_str)
 
     def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
-        """
-        Generate a specification for a list of strings.
-
-        Args:
-            values (List[Any]): List of strings to generate the spec for.
-
-        Returns:
-            Dict[str, Any]: Specification for the list of strings.
-        """
+        if _is_nested_lists(v for v in values):
+            return _compute_str_list_spec(values)
         return {
-            "type": "string",
-            "unique_strings": len(set(values))
+            "type": "values",
+            "data": list(set(values))
         }
 
 
-def compute_spec(values: List[Any], max_inspect_count: int = 100) -> Dict[str, Any]:
-    """
-    Compute the specification for a list of values.
+def _simple_type_compatibility_check(values: Generator[Any, None, None],
+                                     type_check: type,
+                                     list_check_func: Callable):
+    """Checks to see if the values are of uniform type. This includes lists of lists of the values.
 
     Args:
-        values (List[Any]): List of values to compute the spec for.
-        max_inspect_count (int, optional): Maximum number of values to inspect. Defaults to 100.
+        values: generator for values to check
+        type_check: type of values to expect
+        list_check_func: function for testing lists of this type
 
     Returns:
-        Dict[str, Any]: Specification for the list of values.
-    """
-    analyzers = datacraft.registries.registered_analyzers()
+        (bool): if the values are compatible with this type
 
-    for analyzer in analyzers:
-        if analyzer.is_compatible((v for i, v in enumerate(values) if i < max_inspect_count)):
-            return analyzer.generate_spec(values)
-    return {"type": "unknown"}
+    Examples
+        >>> _simple_type_compatibility_check((v for v in [1, 2, 3]), int, _is_all_int)
+        True
+        >>> _simple_type_compatibility_check((v for v in [1, 'a', 3]), int, _is_all_int)
+        False
+        >>> _simple_type_compatibility_check((v for v in [[1], [2], [-3]), int, _is_all_int)
+        True
+        >>> _simple_type_compatibility_check((v for v in [[1, 2], 2, 3]), int, _is_all_int)
+        False
+    """
+    value_type = None
+    result = True
+    # since generator check one value at a time until condition invalidated
+    for value in values:
+        if isinstance(value, list):
+            if value_type is None:
+                value_type = 'lists'
+            elif value_type == str(type_check):
+                result = False
+                break
+            if not list_check_func(value):
+                result = False
+                break
+        elif not isinstance(value, type_check) or isinstance(value, bool):
+            result = False
+        else:
+            if value_type is None:
+                value_type = str(type_check)
+            elif value_type == 'lists':
+                result = False
+                break
+    return result
 
 
 class DefaultValueAnalyzer(ValueListAnalyzer):
     """ when nothing else works """
+
     def is_compatible(self, values: Generator[Any, None, None]) -> bool:
         return True
 
     def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
         # insert mechanism here to elegantly handle all the types of lists of values
         # handle leaf nodes that are lists
-        if isinstance(values, list) and isinstance(values[0], list):
-            if _is_numeric(values[0]):
+        if _is_nested_lists(v for v in values):
+            if _all_is_numeric(values[0]):
                 return _compute_list_range(values)
             if _all_list_is_str(values):
                 return _compute_str_list_spec(values)
@@ -146,7 +118,7 @@ class DefaultValueAnalyzer(ValueListAnalyzer):
                 "type": "values",
                 "data": values
             }
-        if len(set(values)) > 1 and _is_numeric(values):
+        if len(set(values)) > 1 and _all_is_numeric(values):
             return _compute_range(values)
         if _requires_substitution(values):
             values = _substitute(values)
@@ -169,7 +141,33 @@ def _default_analyzer() -> datacraft.ValueListAnalyzer:
     return DefaultValueAnalyzer()
 
 
-def _requires_substitution(values):
+@datacraft.registry.analyzers('integer')
+def _integer_analyzer() -> datacraft.ValueListAnalyzer:
+    return IntValueAnalyzer()
+
+
+@datacraft.registry.analyzers('float')
+def _float_analyzer() -> datacraft.ValueListAnalyzer:
+    return FloatValueAnalyzer()
+
+
+@datacraft.registry.analyzers('string')
+def _string_analyzer() -> datacraft.ValueListAnalyzer:
+    return StringValueAnalyzer()
+
+
+def _is_replacement(sublist):
+    return any(v in REPLACEMENTS for v in sublist)
+
+
+def _is_nested_lists(values: Generator[Any, None, None]):
+    for item in values:
+        if not isinstance(item, list):
+            return False
+    return True
+
+
+def _requires_substitution(values: List[Any]):
     return _any_is_boolean(values) or _any_is_none(values)
 
 
@@ -177,12 +175,28 @@ def _substitute(values):
     return [_LOOKUP.get(str(v), v) for v in values]
 
 
-def _is_numeric(values):
+def _all_is_numeric(values):
     return all((isinstance(value, (int, float)) and not isinstance(value, bool)) for value in values)
 
 
+def _all_is_int(values):
+    return all((isinstance(value, int) and not isinstance(value, bool)) for value in values)
+
+
+def _all_is_float(values):
+    return all((isinstance(value, float) and not isinstance(value, bool)) for value in values)
+
+
+def _all_is_str(values):
+    return all(isinstance(value, str) for value in values)
+
+
 def _all_lists_numeric(values):
-    return all(_is_numeric(sublist) for sublist in values)
+    return all(_all_is_numeric(sublist) for sublist in values)
+
+
+def _all_is_of_type(values, type_check):
+    return all(isinstance(val, type_check) for val in values)
 
 
 def _all_lists_of_type(lists, type_check):
@@ -211,7 +225,7 @@ def _compute_range(values: List[Union[int, float]]) -> Dict[str, Any]:
                 "data": [min, max]
             }
     """
-    if not _is_numeric(values):
+    if not _all_is_numeric(values):
         raise ValueError("All values in the list must be numeric.")
 
     type_key = "rand_range"

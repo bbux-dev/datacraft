@@ -55,51 +55,6 @@ class _Tree:
             else:
                 self.insert(value, node=node.children[key])
 
-    def leaf_nodes(self, node: Union[_TreeNode, None] = None) -> Generator[_TreeNode, None, None]:
-        """
-        Generator to iterate over the leaf nodes of the tree.
-
-        Args:
-            node (_TreeNode, optional): Node at which to start iteration. Defaults to the root.
-
-        Yields:
-            _TreeNode: Next leaf node in the tree.
-        """
-        if node is None:
-            node = self.root
-
-        if node.is_leaf():
-            yield node
-        else:
-            for child in node.children.values():
-                yield from self.leaf_nodes(child)
-
-    def to_dict(self,
-                node: Union[_TreeNode, None] = None,
-                func: Union[Callable, None] = None) -> Dict[str, Any]:
-        """
-        Convert the tree or subtree to a dictionary.
-
-        Args:
-            node (_TreeNode, optional): Node at which to start conversion. Defaults to the root.
-            func (Callable, optional): Function to apply on leaf node values. If provided,
-                                       this function is applied to the list of values at each
-                                       leaf node before they are returned.
-
-        Returns:
-            Dict[str, Any]: Dictionary representation of the tree or subtree.
-        """
-        if node is None:
-            node = self.root
-
-        if node.is_leaf():
-            return func(node.values) if func else node.values
-
-        data = {}
-        for key, child in node.children.items():
-            data[key] = self.to_dict(child, func)
-        return data
-
     def to_spec(self,
                 node: Union[_TreeNode, None] = None,
                 func: Union[Callable, None] = None) -> dict:
@@ -191,11 +146,12 @@ def _lookup_handler(values: List[Any]):
     for key in registries.registered_analyzers():
         if key == "default":
             continue
-        analyzer = registries.lookup_analyzer(key)
-        if analyzer is None or not isinstance(analyzer, ValueListAnalyzer):
+        candidate = registries.lookup_analyzer(key)
+        if candidate is None or not isinstance(candidate, ValueListAnalyzer):
             raise LookupError(f"Analyzer with name {key} registered but not valid: {analyzer}")
-        if analyzer.is_compatible(v for v in values):
-            return analyzer
+        if candidate.is_compatible(v for v in values):
+            analyzer = candidate
+            break
     return analyzer.generate_spec(values)
 
 

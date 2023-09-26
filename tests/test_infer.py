@@ -6,8 +6,10 @@ import pytest
 import datacraft
 from datacraft.infer import from_examples, csv_to_spec
 
-from datacraft._infer import (_is_numeric, _calculate_weights,
+from datacraft._infer import (_all_is_numeric, _calculate_weights,
                               _are_values_unique, _compute_range)
+
+from .test_utils import deep_sort
 
 EXAMPLES = [
     # 0. Empty List
@@ -74,9 +76,9 @@ EXAMPLES = [
 
 
 def test_is_numeric():
-    assert _is_numeric([1, 2, 3])
-    assert not _is_numeric([1, 2, '3'])
-    assert not _is_numeric([True, 1, 2])
+    assert _all_is_numeric([1, 2, 3])
+    assert not _all_is_numeric([1, 2, '3'])
+    assert not _all_is_numeric([True, 1, 2])
 
 
 def test_calculate_weights():
@@ -116,7 +118,7 @@ def test_from_example_simple():
         'bar': {'type': 'rand_range', 'data': [22.3, 44.5]},
         'baz': {'type': 'values', 'data': ['single', 'double']}
     }
-    assert from_examples(examples) == expected
+    assert deep_sort(from_examples(examples)) == deep_sort(expected)
 
 
 def test_from_examples_nested():
@@ -133,7 +135,7 @@ def test_from_examples_nested():
             }
         }
     }
-    assert from_examples(examples) == expected
+    assert deep_sort(from_examples(examples)) == deep_sort(expected)
 
 
 def test_from_examples_list_value():
@@ -186,14 +188,15 @@ def test_csv_to_spec(sample_csv_file):
         }
     }
 
-    assert result == expected
+    assert deep_sort(result) == deep_sort(expected)
 
 
 @pytest.mark.parametrize("input_data, expected_output", EXAMPLES)
 def test_from_examples(input_data, expected_output):
     actual = from_examples(input_data)
-    assert actual == expected_output, f"Actual not equal to expected: {json.dumps(actual, indent=2)}, " \
-                                      f"{json.dumps(expected_output, indent=2)}"
+    assert deep_sort(actual) == deep_sort(expected_output), f"Actual not equal to expected:" \
+                                                            f" {json.dumps(actual, indent=2)}, " \
+                                                            f"{json.dumps(expected_output, indent=2)}"
 
 
 def test_round_trip():

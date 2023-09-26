@@ -24,6 +24,14 @@ from .supplier.templated import templated_supplier
 from .supplier import network, ranges
 from .supplier.strings import cut_supplier
 
+REPLACEMENTS = {
+    '_NONE_': None,
+    '_NULL_': None,
+    '_NIL_': None,
+    '_TRUE_': True,
+    '_FALSE_': False
+}
+
 _log = logging.getLogger(__name__)
 
 
@@ -302,17 +310,10 @@ def weighted_values(data: dict, config: Union[dict, None] = None) -> ValueSuppli
         raise SpecException('Invalid Weights, no values defined')
     if config is None:
         config = {}
-    replacements = {
-        '_NONE_': None,
-        '_NULL_': None,
-        '_NIL_': None,
-        '_TRUE_': True,
-        '_FALSE_': False
-    }
     choices = []
     for key in data.keys():
-        if key in replacements:
-            choices.append(replacements.get(key))
+        if key in REPLACEMENTS:
+            choices.append(REPLACEMENTS.get(key))
         else:
             choices.append(key)
     weights = list(data.values())
