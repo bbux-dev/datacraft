@@ -96,7 +96,7 @@ class Registry:
             Used by the Data Spec inference tool chain to analyze the list of values for a given field to try to
             determine an appropriate Field Spec that can be used to approximate the data values present
 
-            >>> @datacraft.registry.analyzers('custom')
+            >>> @datacraft.registry.num_analyzers('custom')
             ... def _special_value_analyzer() -> datacraft.ValueListAnalyzer
             ...     # return a datacraft.ValueListAnalyzer
     """
@@ -109,7 +109,7 @@ class Registry:
     distribution = catalogue.create('datacraft', 'distribution')
     defaults = catalogue.create('datacraft', 'defaults')
     casters = catalogue.create('datacraft', 'casters')
-    analyzers = catalogue.create('datacraft', 'analyzers')
+    analyzers = catalogue.create('datacraft', 'num_analyzers')
 
 
 def lookup_type(key):
@@ -213,7 +213,7 @@ def registered_casters():
 
 
 def registered_analyzers():
-    """ list of registered analyzers """
+    """ list of registered num_analyzers """
     return list(Registry.analyzers.get_all().keys())
 
 

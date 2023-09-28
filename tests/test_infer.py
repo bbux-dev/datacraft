@@ -6,8 +6,8 @@ import pytest
 import datacraft
 from datacraft.infer import from_examples, csv_to_spec
 
-from datacraft._infer import (_all_is_numeric, _calculate_weights,
-                              _are_values_unique, _compute_range)
+from datacraft._infer.helpers import (_all_is_numeric, _calculate_weights, _are_values_unique)
+from datacraft._infer.num_analyzers import  _compute_range
 
 from .test_utils import deep_sort
 

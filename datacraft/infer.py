@@ -103,6 +103,8 @@ def _process_jsons(jsons: List[Dict[str, Any]],
     Returns:
         str: Data Spec from the tree.
     """
+    if not isinstance(jsons, list) or not isinstance(jsons[0], dict):
+        raise ValueError("Expected List of Dictionaries to infer data from")
     tree = _Tree()
     for data in jsons:
         tree.insert(data)
@@ -112,8 +114,14 @@ def _process_jsons(jsons: List[Dict[str, Any]],
 
 class ValueListAnalyzer(ABC):
     """Interface class for implementations that infer a Field Spec from a list of values"""
+    NOT_COMPATIBLE = 0
+    SOMEWHAT_COMPATIBLE = 0.25
+    MOSTLY_COMPATIBLE = 0.5
+    HIGHLY_COMPATIBLE = 0.75
+    TOTALLY_COMPATIBLE = 1.0
+
     @abstractmethod
-    def is_compatible(self, values: Generator[Any, None, None]) -> bool:
+    def compatibility_score(self, values: Generator[Any, None, None]) -> float:
         """
         Check if the analyzer is compatible with the provided values.
 
@@ -121,7 +129,7 @@ class ValueListAnalyzer(ABC):
             values (Generator[Any, None, None]): Generator producing values to check.
 
         Returns:
-            bool: True if the analyzer can handle the values, otherwise False.
+            int: 0, for not compatible with steps up to 1 for fully and totally compatible
         """
         raise NotImplementedError
 
@@ -143,15 +151,23 @@ def _lookup_handler(values: List[Any]):
     analyzer = registries.lookup_analyzer("default")
     if analyzer is None:
         raise LookupError("Unable to find default analyzer")
+    candidates = []
     for key in registries.registered_analyzers():
         if key == "default":
             continue
         candidate = registries.lookup_analyzer(key)
         if candidate is None or not isinstance(candidate, ValueListAnalyzer):
             raise LookupError(f"Analyzer with name {key} registered but not valid: {analyzer}")
-        if candidate.is_compatible(v for v in values):
-            analyzer = candidate
-            break
+        score = candidate.compatibility_score(v for v in values)
+        if score > 0:
+            candidates.append((candidate, score))
+    try:
+        # pick one with the highest score, first one that is
+        analyzer = max(candidates, key=lambda x: x[1])[0]
+    except ValueError:
+        # empty list
+        pass
+
     return analyzer.generate_spec(values)
 
 

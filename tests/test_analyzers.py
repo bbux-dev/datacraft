@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-import datacraft._infer as analyzers
+import datacraft._infer.num_analyzers as num_analyzers
+import datacraft._infer.str_analyzers as str_analyzers
 from .test_utils import compare_dicts_ignore_list_order
 
 
@@ -19,9 +20,12 @@ from .test_utils import compare_dicts_ignore_list_order
     ]
 )
 def test_int_value_analyzer_is_compatible(values, compatible):
-    analyzer = analyzers.IntValueAnalyzer()
+    analyzer = num_analyzers.IntValueAnalyzer()
 
-    assert analyzer.is_compatible(values) == compatible
+    if compatible:
+        assert analyzer.compatibility_score(values) > 0
+    else:
+        assert analyzer.compatibility_score(values) == 0
 
 
 def test_int_value_analyzer_generate_spec():
@@ -29,7 +33,7 @@ def test_int_value_analyzer_generate_spec():
         'type': 'rand_int_range',
         'data': [1, 10]
     }
-    analyzer = analyzers.IntValueAnalyzer()
+    analyzer = num_analyzers.IntValueAnalyzer()
     values = list(range(1, 10 + 1))
     generated = analyzer.generate_spec(values)
     assert generated == expected, f"Did not match. Generated: {json.dumps(generated)}, Expected: {json.dumps(expected)}"
@@ -49,8 +53,12 @@ def test_int_value_analyzer_generate_spec():
     ]
 )
 def test_float_value_analyzer_is_compatible(values, compatible):
-    analyzer = analyzers.FloatValueAnalyzer()
-    assert analyzer.is_compatible(values) == compatible
+    analyzer = num_analyzers.FloatValueAnalyzer()
+
+    if compatible:
+        assert analyzer.compatibility_score(values) > 0
+    else:
+        assert analyzer.compatibility_score(values) == 0
 
 
 def test_float_value_analyzer_generate_spec():
@@ -58,7 +66,7 @@ def test_float_value_analyzer_generate_spec():
         'type': 'rand_range',
         'data': [1.1, 10.1]
     }
-    analyzer = analyzers.FloatValueAnalyzer()
+    analyzer = num_analyzers.FloatValueAnalyzer()
     values = [x + 0.1 for x in range(1, 11)]  # [1.1, 2.1, ... 10.1]
     generated = analyzer.generate_spec(values)
     assert generated == expected, f"Did not match. Generated: {json.dumps(generated)}, Expected: {json.dumps(expected)}"
@@ -77,8 +85,12 @@ def test_float_value_analyzer_generate_spec():
     ]
 )
 def test_string_value_analyzer_is_compatible(values, compatible):
-    analyzer = analyzers.StringValueAnalyzer()
-    assert analyzer.is_compatible(values) == compatible
+    analyzer = str_analyzers.StringValueAnalyzer()
+
+    if compatible:
+        assert analyzer.compatibility_score(values) > 0
+    else:
+        assert analyzer.compatibility_score(values) == 0
 
 
 def test_string_value_analyzer_generate_spec():
@@ -86,7 +98,7 @@ def test_string_value_analyzer_generate_spec():
         'type': 'values',
         'data': ["a", "b", "c"]
     }
-    analyzer = analyzers.StringValueAnalyzer()
+    analyzer = str_analyzers.StringValueAnalyzer()
     values = ["a", "b", "c"]
     generated = analyzer.generate_spec(values)
     assert compare_dicts_ignore_list_order(generated, expected), f"Did not match. Generated:" \
