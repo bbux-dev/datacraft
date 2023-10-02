@@ -7,7 +7,7 @@ import datacraft
 from datacraft.infer import from_examples, csv_to_spec
 
 from datacraft._infer.helpers import (_all_is_numeric, _calculate_weights, _are_values_unique)
-from datacraft._infer.num_analyzers import  _compute_range
+from datacraft._infer.num_analyzers import _compute_range
 
 from .test_utils import deep_sort
 
@@ -217,3 +217,28 @@ def test_round_trip():
 
     for key, val in inferred_spec["basket"]["data"].items():
         assert math.isclose(weights[key], val, rel_tol=0.1)
+
+
+@pytest.mark.parametrize(
+    "input_str, expected_spec", [
+        ("12-05-2020", {"type": "date"}),
+        ("2020-05-12T14:20:30", {"type": "date.iso"}),
+        ("2020-05-12T14:20:30.123", {"type": "date.iso.ms"}),
+        ("2020-05-12T14:20:30.123456", {"type": "date.iso.us"}),
+    ]
+)
+def test_infer_dates(input_str, expected_spec):
+    records = [{"date": input_str}]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "date" in inferred_spec
+    assert inferred_spec["date"] == expected_spec
+
+
+def test_infer_dates_multiple_formats():
+    records = [
+        {"ts": "2020-05-12T14:20:30"},
+        {"ts": "2020-05-12T14:20:30.123456"}
+    ]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "ts" in inferred_spec
+    assert inferred_spec["ts"]["type"] == "weighted_ref"

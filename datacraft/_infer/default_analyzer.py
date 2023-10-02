@@ -14,7 +14,7 @@ class DefaultValueAnalyzer(ValueListAnalyzer):
     def compatibility_score(self, values: Generator[Any, None, None]) -> float:
         return ValueListAnalyzer.MOSTLY_COMPATIBLE
 
-    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         # insert mechanism here to elegantly handle all the types of lists of values
         # handle leaf nodes that are lists
         if _is_nested_lists(v for v in values):

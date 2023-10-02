@@ -78,7 +78,7 @@ class _Tree:
             node = self.root
 
         if node.is_leaf():
-            return func(node.values) if func else node.values
+            return func(node.key, node.values) if func else node.values
 
         data = {}
         for key, child in node.children.items():
@@ -118,7 +118,7 @@ def _process_jsons(jsons: List[Dict[str, Any]],
 
 class RefsAggregator:
     """Class for adding references to when building inferred specs"""
-    refs = {}
+    refs = {}  # type: dict
 
     def add(self, key: str, val: dict):
         """Add spec to refs section with given key/name
@@ -156,12 +156,13 @@ class ValueListAnalyzer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         """
         Generate a specification for the provided list of values. Adds any necessary refs
         to refs aggregator as needed.
 
         Args:
+            name: name of field this spec is being generated for
             values: List of values to generate the spec for.
             refs: for adding refs if needed for generated spec.
 
@@ -174,7 +175,7 @@ class ValueListAnalyzer(ABC):
 class _LookupHandler:
     ref_agg = RefsAggregator()
 
-    def handle(self, values: List[Any]):
+    def handle(self, name: str, values: List[Any]):
         analyzer = registries.lookup_analyzer("default")
         if analyzer is None:
             raise LookupError("Unable to find default analyzer")
@@ -195,7 +196,7 @@ class _LookupHandler:
             # empty list
             pass
 
-        return analyzer.generate_spec(values, self.ref_agg)
+        return analyzer.generate_spec(name, values, self.ref_agg)
 
 
 def from_examples(examples: List[dict]) -> dict:
@@ -226,7 +227,7 @@ def from_examples(examples: List[dict]) -> dict:
     return raw_spec
 
 
-def csv_to_spec(file_path: str) -> Dict[str, Union[str, Dict]]:
+def csv_to_spec(file_path: str) -> Union[None, dict]:
     """
     Read a CSV from the provided file path, convert it to JSON records,
     and then pass it to the from_examples function to get the spec.

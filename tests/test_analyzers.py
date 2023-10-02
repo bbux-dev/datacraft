@@ -35,7 +35,7 @@ def test_int_value_analyzer_generate_spec():
     }
     analyzer = num_analyzers.IntValueAnalyzer()
     values = list(range(1, 10 + 1))
-    generated = analyzer.generate_spec(values, None)
+    generated = analyzer.generate_spec("foo", values, None)
     assert generated == expected, f"Did not match. Generated: {json.dumps(generated)}, Expected: {json.dumps(expected)}"
 
 
@@ -68,7 +68,7 @@ def test_float_value_analyzer_generate_spec():
     }
     analyzer = num_analyzers.FloatValueAnalyzer()
     values = [x + 0.1 for x in range(1, 11)]  # [1.1, 2.1, ... 10.1]
-    generated = analyzer.generate_spec(values, None)
+    generated = analyzer.generate_spec("foo", values, None)
     assert generated == expected, f"Did not match. Generated: {json.dumps(generated)}, Expected: {json.dumps(expected)}"
 
 
@@ -100,7 +100,7 @@ def test_string_value_analyzer_generate_spec():
     }
     analyzer = str_analyzers.StringValueAnalyzer()
     values = ["a", "b", "c"]
-    generated = analyzer.generate_spec(values, None)
+    generated = analyzer.generate_spec("foo", values, None)
     assert compare_dicts_ignore_list_order(generated, expected), f"Did not match. Generated:" \
                                                                  f" {json.dumps(generated)}, Expected:" \
                                                                  f" {json.dumps(expected)}"

@@ -15,7 +15,7 @@ class IntValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.MOSTLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         return _generate_numeric_spec(values)
 
 
@@ -25,7 +25,7 @@ class FloatValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.MOSTLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         return _generate_numeric_spec(values)
 
 

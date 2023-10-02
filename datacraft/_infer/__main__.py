@@ -61,6 +61,8 @@ def main(argv):
     results = []
     for filepath, filetype in files_to_process:
         result = process_file(filepath, filetype)
+        if result is None:
+            continue
         results.append(result)
 
     if args.output:
