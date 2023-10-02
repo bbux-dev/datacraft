@@ -3,7 +3,7 @@ import re
 from typing import Generator, List, Any, Dict, Pattern
 
 import datacraft
-from datacraft import ValueListAnalyzer
+from datacraft import ValueListAnalyzer, RefsAggregator
 
 # Regular expression patterns for the date formats
 DATE_PATTERN = re.compile(r'\d{2}-\d{2}-\d{4}')
@@ -23,6 +23,8 @@ class DateStringAnalyzer(ValueListAnalyzer):
 
     def compatibility_score(self, values: Generator[str, None, None]) -> float:
         for value in values:
+            if not isinstance(value, str):
+                return 0.0
             if not (DATE_PATTERN.match(value) or
                     DATE_ISO_PATTERN.match(value) or
                     DATE_ISO_MS_PATTERN.match(value) or
@@ -31,9 +33,9 @@ class DateStringAnalyzer(ValueListAnalyzer):
 
         return ValueListAnalyzer.TOTALLY_COMPATIBLE
 
-    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         counts = count_regex_matches(values, KEY_TO_PATTERN)
-        max_key = max(counts, key=counts.get) # type: ignore
+        max_key = max(counts, key=counts.get)  # type: ignore
         return {
             "type": max_key
         }

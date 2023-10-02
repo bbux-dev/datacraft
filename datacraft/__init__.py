@@ -65,5 +65,5 @@ from .registries import registered_types, registered_formats, registered_casters
 # to trigger registered functions
 from . import cli
 from . import entrypoints
-from .infer import ValueListAnalyzer
+from .infer import ValueListAnalyzer, RefsAggregator
 entrypoints.load_eps()

@@ -1,9 +1,13 @@
+import json
 from abc import ABC, abstractmethod
+import logging
 
-import pandas as pd  # type: ignore
+
 from typing import Any, Dict, Generator, List, Union, Callable
 
 from . import registries
+
+_log = logging.getLogger(__name__)
 
 
 class _TreeNode:
@@ -112,6 +116,24 @@ def _process_jsons(jsons: List[Dict[str, Any]],
     return tree.to_spec(func=func)
 
 
+class RefsAggregator:
+    """Class for adding references to when building inferred specs"""
+    refs = {}
+
+    def add(self, key: str, val: dict):
+        """Add spec to refs section with given key/name
+
+        Args:
+            key: Name used to reference this spec
+            val: Field Spec for this key/name
+        """
+        if key in self.refs:
+            _log.warning("Key %s already in refs: %s, replacing with %s",
+                         key, json.dumps(self.refs.get(key)),
+                         json.dumps(val))
+        self.refs[key] = val
+
+
 class ValueListAnalyzer(ABC):
     """Interface class for implementations that infer a Field Spec from a list of values"""
     NOT_COMPATIBLE = 0
@@ -134,12 +156,14 @@ class ValueListAnalyzer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         """
-        Generate a specification for the provided list of values.
+        Generate a specification for the provided list of values. Adds any necessary refs
+        to refs aggregator as needed.
 
         Args:
-            values (List[Any]): List of values to generate the spec for.
+            values: List of values to generate the spec for.
+            refs: for adding refs if needed for generated spec.
 
         Returns:
             Dict[str, Any]: A dictionary with the inferred spec for the values.
@@ -147,28 +171,31 @@ class ValueListAnalyzer(ABC):
         raise NotImplementedError
 
 
-def _lookup_handler(values: List[Any]):
-    analyzer = registries.lookup_analyzer("default")
-    if analyzer is None:
-        raise LookupError("Unable to find default analyzer")
-    candidates = []
-    for key in registries.registered_analyzers():
-        if key == "default":
-            continue
-        candidate = registries.lookup_analyzer(key)
-        if candidate is None or not isinstance(candidate, ValueListAnalyzer):
-            raise LookupError(f"Analyzer with name {key} registered but not valid: {analyzer}")
-        score = candidate.compatibility_score(v for v in values)
-        if score > 0:
-            candidates.append((candidate, score))
-    try:
-        # pick one with the highest score, first one that is
-        analyzer = max(candidates, key=lambda x: x[1])[0]
-    except ValueError:
-        # empty list
-        pass
+class _LookupHandler:
+    ref_agg = RefsAggregator()
 
-    return analyzer.generate_spec(values)
+    def handle(self, values: List[Any]):
+        analyzer = registries.lookup_analyzer("default")
+        if analyzer is None:
+            raise LookupError("Unable to find default analyzer")
+        candidates = []
+        for key in registries.registered_analyzers():
+            if key == "default":
+                continue
+            candidate = registries.lookup_analyzer(key)
+            if candidate is None or not isinstance(candidate, ValueListAnalyzer):
+                raise LookupError(f"Analyzer with name {key} registered but not valid: {analyzer}")
+            score = candidate.compatibility_score(v for v in values)
+            if score > 0:
+                candidates.append((candidate, score))
+        try:
+            # pick one with the highest score, first one that is
+            analyzer = max(candidates, key=lambda x: x[1])[0]
+        except ValueError:
+            # empty list
+            pass
+
+        return analyzer.generate_spec(values, self.ref_agg)
 
 
 def from_examples(examples: List[dict]) -> dict:
@@ -192,7 +219,11 @@ def from_examples(examples: List[dict]) -> dict:
     """
     if examples is None or len(examples) == 0:
         return {}
-    return _process_jsons(examples, _lookup_handler)
+    handler = _LookupHandler()
+    raw_spec = _process_jsons(examples, handler.handle)
+    if len(handler.ref_agg.refs) > 0:
+        raw_spec["refs"] = handler.ref_agg.refs
+    return raw_spec
 
 
 def csv_to_spec(file_path: str) -> Dict[str, Union[str, Dict]]:
@@ -206,8 +237,13 @@ def csv_to_spec(file_path: str) -> Dict[str, Union[str, Dict]]:
     Returns:
         Dict[str, Union[str, Dict]]: The inferred data spec from the CSV data.
     """
+    try:
+        import pandas  # type: ignore
+    except ModuleNotFoundError:
+        _log.error('pandas not installed, please pip/conda install pandas to allow analysis of csv files')
+        return None
     # Read CSV using pandas
-    df = pd.read_csv(file_path)
+    df = pandas.read_csv(file_path)
 
     # Convert DataFrame to list of JSON records
     json_records = df.to_dict(orient='records')

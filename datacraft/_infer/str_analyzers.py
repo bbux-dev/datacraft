@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Tuple
 from typing import Generator, Union
 
 import datacraft
-from datacraft import ValueListAnalyzer
+from datacraft import ValueListAnalyzer, RefsAggregator
 from .helpers import (_simple_type_compatibility_check, _all_is_str, _is_nested_lists,
                       _calculate_list_size_weights)
 
@@ -21,7 +21,7 @@ class StringValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.SOMEWHAT_COMPATIBLE + .01
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         if _is_nested_lists(v for v in values):
             return _compute_str_list_spec(values)
         return {
@@ -36,7 +36,7 @@ class UuidValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.TOTALLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         counts = count_uuid_cases(values)
         # this is a regular UUID
         if counts["lower"] > 0:

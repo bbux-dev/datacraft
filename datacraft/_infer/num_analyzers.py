@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Callable, Union
 from typing import Generator
 
 import datacraft
-from datacraft import ValueListAnalyzer
+from datacraft import ValueListAnalyzer, RefsAggregator
 
 from .helpers import (_simple_type_compatibility_check, _all_is_int, _all_is_float,
                       _all_is_numeric, _is_nested_lists, _all_lists_of_type,
@@ -15,7 +15,7 @@ class IntValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.MOSTLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         return _generate_numeric_spec(values)
 
 
@@ -25,7 +25,7 @@ class FloatValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.MOSTLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, values: List[Any]) -> Dict[str, Any]:
+    def generate_spec(self, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
         return _generate_numeric_spec(values)
 
 
