@@ -137,7 +137,7 @@ def _calculate_weights(values: List[str]) -> Dict[str, float]:
     total_count = len(values)
     counts = Counter(values)
 
-    return {key: count / total_count for key, count in counts.items()}
+    return {key: round(count / total_count, 5) for key, count in counts.items()}
 
 
 def _are_values_unique(values: List) -> bool:

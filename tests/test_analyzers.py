@@ -4,6 +4,7 @@ import pytest
 
 import datacraft._infer.num_analyzers as num_analyzers
 import datacraft._infer.str_analyzers as str_analyzers
+import datacraft._infer.default_analyzer as default_analyzer
 from .test_utils import compare_dicts_ignore_list_order
 
 
@@ -104,3 +105,45 @@ def test_string_value_analyzer_generate_spec():
     assert compare_dicts_ignore_list_order(generated, expected), f"Did not match. Generated:" \
                                                                  f" {json.dumps(generated)}, Expected:" \
                                                                  f" {json.dumps(expected)}"
+
+
+# Tests for DefaultValueAnalyzer
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        # nested int lists
+        ([[1, 2, 103]],
+         {"type": "rand_int_range", "data": [1, 103], "config": {"count": {"3": 1.0}, "as_list": True}}),
+        # nested str lists
+        ([["do", "re", "me"], ["fa", "so"]],
+         {"type": "values", "data": ["do", "re", "me", "fa", "so"],
+          "config": {"count": {"3": 0.5, "2": 0.5}, "as_list": True}}),
+        # mixed nested lists
+        ([["do", "re", "me"], [1, 2, 3]],
+         {"type": "values", "data": [["do", "re", "me"], [1, 2, 3]]}),
+        # int lists
+        ([1, 2, 103],
+         {"type": "rand_int_range", "data": [1, 103]}),
+        # requires substitution
+        ([1, None, 103],
+         {"type": "values", "data": [1, '_NONE_', 103]}),
+        # unique strings
+        (["foo", "bar", "baz"],
+         {"type": "values", "data": ["foo", "bar", "baz"]}),
+        # weighted values
+        (["a", "a", "a", "b", "b", "c"],
+         {"type": "values", "data": {"a": 0.5, "b": 0.33333, "c": 0.16667}}),
+
+    ]
+)
+def test_default_analyzer(values, expected):
+    analyzer = default_analyzer.DefaultValueAnalyzer()
+    generated = analyzer.generate_spec("foo", values, None)
+    assert generated == expected, f"Did not match. Generated:" \
+                                  f" {json.dumps(generated)}, Expected:" \
+                                  f" {json.dumps(expected)}"
+
+
+def test_default_analyzer_compatibility():
+    # for coverage
+    assert default_analyzer.DefaultValueAnalyzer().compatibility_score([1, 2, 3]) == 0.5

@@ -242,3 +242,25 @@ def test_infer_dates_multiple_formats():
     inferred_spec = datacraft.infer.from_examples(records)
     assert "ts" in inferred_spec
     assert inferred_spec["ts"]["type"] == "weighted_ref"
+
+
+@pytest.mark.parametrize(
+    "input_str, expected_spec", [
+        ("192.168.1.1", {"type": "ip"}),
+        ("10.0.0.1", {"type": "ip"}),
+        ("00:1A:2B:3C:4D:5E", {"type": "net.mac"}),
+        ("00-1A-2B-3C-4D-5E", {"type": "net.mac"}),
+    ]
+)
+def test_infer_network_types(input_str, expected_spec):
+    records = [{"network": input_str}]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "network" in inferred_spec
+    assert inferred_spec["network"] == expected_spec
+
+
+def test_infer_invalid_ip():
+    records = [{"network": "111.222.333.444"}]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "network" in inferred_spec
+    assert inferred_spec["network"]["type"] != "ip"
