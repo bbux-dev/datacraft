@@ -144,6 +144,21 @@ def test_default_analyzer(values, expected):
                                   f" {json.dumps(expected)}"
 
 
+def test_default_analyzer_sample_size():
+    analyzer = default_analyzer.DefaultValueAnalyzer()
+    values = ["a", "b", "c", "d", "e", "f"]
+    generated = analyzer.generate_spec("foo", values, None, sample_size=3)
+    assert len(generated['data']) == 3
+
+
+def test_default_analyzer_sample_weighted():
+    analyzer = default_analyzer.DefaultValueAnalyzer()
+    values = ["a", "a", "a", "a", "b", "b", "b", "c", "c", "d", "e", "f"]
+    generated = analyzer.generate_spec("foo", values, None, sample_size=3, sample_weighted=True)
+    assert isinstance(generated['data'], dict)
+    assert len(generated['data']) == 3
+
+
 def test_default_analyzer_compatibility():
     # for coverage
     assert default_analyzer.DefaultValueAnalyzer().compatibility_score([1, 2, 3]) == 0.5

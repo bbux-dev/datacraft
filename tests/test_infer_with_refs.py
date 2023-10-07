@@ -20,7 +20,7 @@ class AnalyzerForTestOnly(ValueListAnalyzer):
             return ValueListAnalyzer.TOTALLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
         refs.add("one", {"fake": "spec"})
         return {"fake": "spec"}
 

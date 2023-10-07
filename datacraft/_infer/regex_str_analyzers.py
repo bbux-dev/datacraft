@@ -17,7 +17,7 @@ class RegexStringAnalyzer(ValueListAnalyzer):
                 return 0.0
         return ValueListAnalyzer.TOTALLY_COMPATIBLE
 
-    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
         counts = count_regex_matches(values, self.key_to_pattern)
         if len(counts) == 1:
             field_type = next(iter(counts))

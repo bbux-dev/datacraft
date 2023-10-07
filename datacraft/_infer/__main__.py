@@ -10,13 +10,15 @@ import datacraft.infer
 _log = logging.getLogger(__name__)
 
 
-def process_file(filepath, filetype):
+def process_file(filepath, filetype, args):
     if filetype == "json":
         with open(filepath, 'r', encoding='utf-8') as fp:
             records = json.load(fp)
         if not isinstance(records, list):
             records = [records]
-        return datacraft.infer.from_examples(records)
+        return datacraft.infer.from_examples(records,
+                                             sample_size=args.sample_size,
+                                             sample_weighted=args.sample_weighted)
     elif filetype == "csv":
         return datacraft.infer.csv_to_spec(filepath)
     else:
@@ -40,7 +42,10 @@ def main(argv):
     group.add_argument('--csv-dir', help='Directory path containing CSV files', type=str)
     group.add_argument('--json-dir', help='Directory path containing JSON files', type=str)
     parser.add_argument('--output', help='Output file to write results', type=str)
-
+    parser.add_argument('-s', '--sample-size', dest='sample_size', type=int,
+                        help='Size to sample data that ends up being a list of disparate values')
+    parser.add_argument('--sample-weighted', dest='sample_weighted', action='store_true',
+                        help='If weighted values are to be created, take top sample-size weights')
     args = parser.parse_args(argv)
 
     files_to_process = []
@@ -60,7 +65,7 @@ def main(argv):
 
     results = []
     for filepath, filetype in files_to_process:
-        result = process_file(filepath, filetype)
+        result = process_file(filepath, filetype, args)
         if result is None:
             continue
         results.append(result)

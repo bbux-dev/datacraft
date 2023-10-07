@@ -155,3 +155,26 @@ def _are_values_unique(values: List) -> bool:
 
 def _all_list_is_str(lists):
     return all(isinstance(val, str) for sublist in lists for val in sublist)
+
+
+def top_n_items(d, n):
+    """
+    Returns the top N key-value pairs from the dictionary based on the value.
+
+    Parameters:
+    - d (dict): The input dictionary.
+    - n (int): The number of top items to return.
+
+    Returns:
+    - dict: A dictionary containing the top N key-value pairs.
+    """
+
+    # If the dictionary size is less than or equal to N, return the original dictionary
+    if len(d) <= n or n <= 0:
+        return d
+
+    # Sort the dictionary by value in descending order
+    sorted_items = sorted(d.items(), key=lambda item: item[1], reverse=True)
+
+    # Create a new dictionary to store the top N items
+    return {key: value for key, value in sorted_items[:n]}

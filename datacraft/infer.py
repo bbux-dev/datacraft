@@ -2,7 +2,6 @@ import json
 from abc import ABC, abstractmethod
 import logging
 
-
 from typing import Any, Dict, Generator, List, Union, Callable
 
 from . import registries
@@ -156,7 +155,10 @@ class ValueListAnalyzer(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
+    def generate_spec(self, name: str,
+                      values: List[Any],
+                      refs: RefsAggregator,
+                      **kwargs) -> Dict[str, Any]:
         """
         Generate a specification for the provided list of values. Adds any necessary refs
         to refs aggregator as needed.
@@ -165,6 +167,10 @@ class ValueListAnalyzer(ABC):
             name: name of field this spec is being generated for
             values: List of values to generate the spec for.
             refs: for adding refs if needed for generated spec.
+
+        Keyword Args:
+            sample_size: sample large values lists to this size
+            sample_weighted: take top N sample_size weights
 
         Returns:
             Dict[str, Any]: A dictionary with the inferred spec for the values.
@@ -199,11 +205,15 @@ class _LookupHandler:
         return analyzer.generate_spec(name, values, self.ref_agg)
 
 
-def from_examples(examples: List[dict]) -> dict:
+def from_examples(examples: List[dict],
+                  sample_size: int = 0,
+                  sample_weighted: bool = False) -> dict:
     """
     Generates a Data Spec from the list of example JSON records
     Args:
-        examples (list): Data to infer Data Spec from
+        examples: Data to infer Data Spec from
+        sample_size: sample large values lists to this size
+        sample_weighted: take top N sample_size weights
 
     Returns:
         dict: Data Spec as dictionary

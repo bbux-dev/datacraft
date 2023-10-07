@@ -1,3 +1,4 @@
+import random
 from typing import Any, Dict, List, Callable, Union
 from typing import Generator
 
@@ -15,8 +16,8 @@ class IntValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.MOSTLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
-        return _generate_numeric_spec(values)
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
+        return _generate_numeric_spec(values, kwargs.get('sample_size', 0))
 
 
 class FloatValueAnalyzer(ValueListAnalyzer):
@@ -25,15 +26,18 @@ class FloatValueAnalyzer(ValueListAnalyzer):
             return ValueListAnalyzer.MOSTLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
-    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator) -> Dict[str, Any]:
-        return _generate_numeric_spec(values)
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
+        return _generate_numeric_spec(values, kwargs.get('sample_size', 0))
 
 
-def _generate_numeric_spec(values: List[Any]):
+def _generate_numeric_spec(values: List[Any], sample_size: int):
     if _is_nested_lists(v for v in values):
         return _compute_list_range(values)
     if len(set(values)) > 1 and _all_is_numeric(values):
         return _compute_range(values)
+
+    if sample_size > 0:
+        values = random.sample(values, sample_size)
     return {
         "type": "values",
         "data": list(set(values))
