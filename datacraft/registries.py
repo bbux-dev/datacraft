@@ -6,8 +6,6 @@ from typing import Any, Union
 
 import catalogue  # type: ignore
 
-from .infer import ValueListAnalyzer
-
 _log = logging.getLogger(__name__)
 
 
@@ -172,7 +170,7 @@ def lookup_caster(key):
     return caster_load_function()
 
 
-def lookup_analyzer(key) -> Union[ValueListAnalyzer, None]:
+def lookup_analyzer(key):
     """
     Looks up the analyzer in the registry
 

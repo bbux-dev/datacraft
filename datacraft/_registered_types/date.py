@@ -147,15 +147,15 @@ def _example_date_usage():
     }
 
 
-def register_example_date_usage(key):
+def register_example_date_usage(type_key):
     """registers a unique function for the basic usage"""
 
-    @datacraft.registry.usage(key)
+    @datacraft.registry.usage(type_key)
     def function():
-        suffix = key.replace('date', '')
+        suffix = type_key.replace('date', '')
         example = {
             "timestamp" + suffix: {
-                "type": key
+                "type": type_key
             }
         }
         return common.standard_example_usage(example, 3)

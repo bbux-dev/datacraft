@@ -1,7 +1,6 @@
 import json
-from abc import ABC, abstractmethod
 import logging
-
+from abc import ABC, abstractmethod
 from typing import Any, Dict, Generator, List, Union, Callable
 
 from . import registries
@@ -181,6 +180,10 @@ class ValueListAnalyzer(ABC):
 class _LookupHandler:
     ref_agg = RefsAggregator()
 
+    def __init__(self, **kwargs):
+        self.sample_size = kwargs.get('sample_size', 0)
+        self.sample_weighted = kwargs.get('sample_weighted', False)
+
     def handle(self, name: str, values: List[Any]):
         analyzer = registries.lookup_analyzer("default")
         if analyzer is None:
@@ -202,16 +205,21 @@ class _LookupHandler:
             # empty list
             pass
 
-        return analyzer.generate_spec(name, values, self.ref_agg)
+        _log.debug("Using %s analyzer for key: %s", type(analyzer), name)
+        return analyzer.generate_spec(name=name,
+                                      values=values,
+                                      refs=self.ref_agg,
+                                      sample_size=self.sample_size,
+                                      sample_weighted=self.sample_weighted)
 
 
-def from_examples(examples: List[dict],
-                  sample_size: int = 0,
-                  sample_weighted: bool = False) -> dict:
+def from_examples(examples: List[dict], **kwargs) -> dict:
     """
     Generates a Data Spec from the list of example JSON records
     Args:
         examples: Data to infer Data Spec from
+
+    Keyword Args:
         sample_size: sample large values lists to this size
         sample_weighted: take top N sample_size weights
 
@@ -230,14 +238,14 @@ def from_examples(examples: List[dict],
     """
     if examples is None or len(examples) == 0:
         return {}
-    handler = _LookupHandler()
+    handler = _LookupHandler(**kwargs)
     raw_spec = _process_jsons(examples, handler.handle)
     if len(handler.ref_agg.refs) > 0:
         raw_spec["refs"] = handler.ref_agg.refs
     return raw_spec
 
 
-def csv_to_spec(file_path: str) -> Union[None, dict]:
+def csv_to_spec(file_path: str, **kwargs) -> Union[None, dict]:
     """
     Read a CSV from the provided file path, convert it to JSON records,
     and then pass it to the from_examples function to get the spec.
@@ -245,19 +253,25 @@ def csv_to_spec(file_path: str) -> Union[None, dict]:
     Args:
         file_path (str): The path to the CSV file.
 
+    Keyword Args:
+        sample_size: sample large values lists to this size
+        sample_weighted: take top N sample_size weights
+
     Returns:
         Dict[str, Union[str, Dict]]: The inferred data spec from the CSV data.
     """
     try:
         import pandas  # type: ignore
+        import numpy as np
     except ModuleNotFoundError:
-        _log.error('pandas not installed, please pip/conda install pandas to allow analysis of csv files')
+        _log.error('pandas or numpy not installed, please pip/conda install these to allow analysis of csv files')
         return None
     # Read CSV using pandas
     df = pandas.read_csv(file_path)
+    df = df.replace({np.nan: None})
 
     # Convert DataFrame to list of JSON records
     json_records = df.to_dict(orient='records')
 
     # Get the spec using from_examples function
-    return from_examples(json_records)
+    return from_examples(json_records, **kwargs)
