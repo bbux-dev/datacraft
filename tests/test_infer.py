@@ -246,8 +246,8 @@ def test_infer_dates_multiple_formats():
 
 @pytest.mark.parametrize(
     "input_str, expected_spec", [
-        ("192.168.1.1", {"type": "ip"}),
-        ("10.0.0.1", {"type": "ip"}),
+        ("192.168.1.1", {"type": "ip", "config": {"base": "192.168.1"}}),
+        ("10.0.0.1", {"type": "ip", "config": {"base": "10.0.0"}}),
         ("00:1A:2B:3C:4D:5E", {"type": "net.mac"}),
         ("00-1A-2B-3C-4D-5E", {"type": "net.mac"}),
     ]

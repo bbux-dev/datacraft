@@ -49,14 +49,14 @@ def wrap_main():
 
 def main(argv):
     """Runs the tool """
-    parser = argparse.ArgumentParser(description="Process CSV or JSON data.")
+    parser = argparse.ArgumentParser(description="Infer Data Spec from given CSV or JSON sample data.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--csv', help='Path to CSV file', type=str)
     group.add_argument('--json', help='Path to JSON file', type=str)
     group.add_argument('--csv-dir', help='Directory path containing CSV files', type=str)
     group.add_argument('--json-dir', help='Directory path containing JSON files', type=str)
     parser.add_argument('--output', help='Output file to write results', type=str)
-    parser.add_argument('--limit', dest='limit', type=int,
+    parser.add_argument('--limit', dest='limit', type=int, default=0,
                         help='Max size of lists or weighted values to populate when unable to infer a more specific '
                              'type from data')
     parser.add_argument('--limit-weighted', dest='limit_weighted', action='store_true',
@@ -116,4 +116,4 @@ def _configure_logging(loglevel):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main(sys.argv[1:])

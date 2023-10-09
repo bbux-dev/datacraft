@@ -2,6 +2,53 @@ v0.8.0
 ------
 * added New `ref_list` type. For inject field values into positions in list/array objects.
 * added `escape` and `escape_str` params for `char_class` types.
+* Added new command line utility `infer-spec`. This will take example CSV or JSON data and will attempt to infer a
+Data Spec from the examples. This can be used to bootstrap Data Spec generation.
+
+```shell
+$ head -5 test.csv
+ip,lat,long,city,date
+192.168.1.1,34.0522,-118.2437,Los Angeles,2023-10-08T08:45:00
+192.168.1.2,40.7306,-73.9352,New York,2023-10-08T09:15:23
+192.168.1.3,51.5074,-0.1278,London,2023-10-08T10:32:50
+192.168.1.4,48.8566,2.3522,Paris,2023-10-08T11:05:31
+```
+```shell
+$ infer-spec --csv examples.csv
+INFO [09-Oct-2023 09:20:37 AM] Processing examples.csv...
+{
+    "ip": {
+        "type": "ip",
+        "config": {
+            "base": "192.168.1"
+        }
+    },
+    "lat": {
+        "type": "geo.lat"
+    },
+    "long": {
+        "type": "geo.long"
+    },
+    "city": {
+        "type": "values",
+        "data": [
+            "London",
+            "Los Angeles",
+            "Vancouver",
+            "New Delhi",
+            "Paris",
+            "New York",
+            "Tokyo",
+            "San Francisco",
+            "Berlin",
+            "Chicago"
+        ]
+    },
+    "date": {
+        "type": "date.iso"
+    }
+}
+```
 
 v0.7.3
 ------

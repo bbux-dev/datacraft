@@ -221,12 +221,13 @@ class _LookupHandler:
 def from_examples(examples: List[dict], **kwargs) -> dict:
     """
     Generates a Data Spec from the list of example JSON records
+
     Args:
-        examples: Data to infer Data Spec from
+        examples (list): Data to infer Data Spec from
 
     Keyword Args:
-        limit: for lists or weighted values, down sample to this size if needed
-        limit_weighted: take top N limit weights
+        limit (int): for lists or weighted values, down sample to this size if needed
+        limit_weighted (bool): take top N limit weights
 
     Returns:
         dict: Data Spec as dictionary
@@ -259,8 +260,8 @@ def csv_to_spec(file_path: str, **kwargs) -> Union[None, dict]:
         file_path (str): The path to the CSV file.
 
     Keyword Args:
-        limit: for lists or weighted values, down sample to this size if needed
-        limit_weighted: take top N limit weights
+        limit (int): for lists or weighted values, down sample to this size if needed
+        limit_weighted (bool): take top N limit weights
 
     Returns:
         Dict[str, Union[str, Dict]]: The inferred data spec from the CSV data.

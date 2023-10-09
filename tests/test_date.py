@@ -89,7 +89,7 @@ def test_date_offset():
 def test_date_center_date():
     config = {"center_date": "15-Feb-2050", "stddev_days": 5, "format": "%d-%b-%Y"}
     spec = _date_spec(**config)
-    _test_date_spec(spec, 'foo', 100, ['13-Feb-2050', '14-Feb-2050', '15-Feb-2050', '16-Feb-2050', '17-Feb-2050'])
+    _test_date_spec(spec, 'foo', 1000, ['13-Feb-2050', '14-Feb-2050', '15-Feb-2050', '16-Feb-2050', '17-Feb-2050'])
 
 
 def test_date_center_iso_date():

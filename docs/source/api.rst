@@ -158,3 +158,10 @@ Spec Formatters
 ---------------
 .. automodule:: datacraft.spec_formatters
    :members:
+
+.. _spec_inference_module:
+
+Data Spec Inference
+-------------------
+.. automodule:: datacraft.infer
+   :members:

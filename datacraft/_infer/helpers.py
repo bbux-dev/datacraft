@@ -178,3 +178,4 @@ def top_n_items(d, n):
 
     # Create a new dictionary to store the top N items
     return {key: value for key, value in sorted_items[:n]}
+
