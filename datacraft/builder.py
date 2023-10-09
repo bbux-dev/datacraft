@@ -56,7 +56,7 @@ def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
 
     Examples:
         >>> import datacraft
-        >>> spec = {
+        >>> field_spec = {
         ...     "id": {"type": "uuid"},
         ...     "timestamp": {"type": "date.iso.millis"},
         ...     "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
@@ -90,6 +90,25 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator
         the generator for the provided spec
     """
     return _DataSpecImpl(copy.deepcopy(raw_spec)).generator(iterations, **kwargs)
+
+
+def values_for(field_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
+    """
+    Creates n entries/records from the provided spec
+
+    Args:
+        field_spec: to create values from
+        iterations: number of iterations before max
+
+    Keyword Args:
+        enforce_schema (bool): If schema validation should be applied where possible
+
+    Returns:
+        the list of N values
+    """
+    raw_spec = {"temp": field_spec}
+    records = list(generator(raw_spec, iterations, **kwargs))
+    return [r['temp'] for r in records]
 
 
 class _DataSpecImpl(DataSpec):

@@ -50,7 +50,7 @@ from .supplier.model import (
 # programmatic spec building
 from . import builder
 # expose this at root too
-from .builder import parse_spec, entries, generator
+from .builder import parse_spec, entries, generator, values_for
 # exceptions and errors thrown
 from .exceptions import SpecException, ResourceError
 from .supplier.exceptions import SupplierException

@@ -2,9 +2,11 @@ import json
 
 import pytest
 
+import datacraft
 import datacraft._infer.num_analyzers as num_analyzers
 import datacraft._infer.str_analyzers as str_analyzers
 import datacraft._infer.default_analyzer as default_analyzer
+import datacraft._infer.geo_analyzers as geo_alalyzers
 from .test_utils import compare_dicts_ignore_list_order
 
 
@@ -162,3 +164,19 @@ def test_default_analyzer_limit_weighted():
 def test_default_analyzer_compatibility():
     # for coverage
     assert default_analyzer.DefaultValueAnalyzer().compatibility_score([1, 2, 3]) == 0.5
+
+
+def test_geo_analyzer_lats():
+    analyzer = geo_alalyzers.SimpleLatLongAnalyzer()
+    lat_values = datacraft.values_for({"type": "geo.lat"}, 1000)
+    assert analyzer.compatibility_score(v for v in lat_values) > 0
+    spec = analyzer.generate_spec("lat", lat_values, None)
+    assert spec == {"type": "geo.lat"}
+
+
+def test_geo_analyzer_longs():
+    analyzer = geo_alalyzers.SimpleLatLongAnalyzer()
+    lat_values = datacraft.values_for({"type": "geo.long", "config": {"start_long": -180.0, "end_long": -90.0}}, 1000)
+    assert analyzer.compatibility_score(v for v in lat_values) > 0
+    spec = analyzer.generate_spec("long", lat_values, None)
+    assert spec == {"type": "geo.long"}
