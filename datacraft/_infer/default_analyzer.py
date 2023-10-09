@@ -32,13 +32,13 @@ class DefaultValueAnalyzer(ValueListAnalyzer):
         if _requires_substitution(values):
             values = _substitute(values)
 
-        sample_size = kwargs.get('sample_size', 0)
-        sample_weights = kwargs.get('sample_weighted', False)
+        limit = kwargs.get('limit', 0)
+        sample_weights = kwargs.get('limit_weighted', False)
 
         # unique values, just rotate through them
         if _are_values_unique(values):
-            if sample_size > 0:
-                values = random.sample(values, sample_size)
+            if limit > 0 and len(values) > limit:
+                values = random.sample(values, limit)
             return {
                 "type": "values",
                 "data": values
@@ -46,7 +46,7 @@ class DefaultValueAnalyzer(ValueListAnalyzer):
         # use weighted values
         weighted_values = _calculate_weights(values)
         if sample_weights:
-            weighted_values = top_n_items(weighted_values, sample_size)
+            weighted_values = top_n_items(weighted_values, limit)
         return {
             "type": "values",
             "data": weighted_values

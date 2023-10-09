@@ -147,14 +147,14 @@ def test_default_analyzer(values, expected):
 def test_default_analyzer_sample_size():
     analyzer = default_analyzer.DefaultValueAnalyzer()
     values = ["a", "b", "c", "d", "e", "f"]
-    generated = analyzer.generate_spec("foo", values, None, sample_size=3)
+    generated = analyzer.generate_spec("foo", values, None, limit=3)
     assert len(generated['data']) == 3
 
 
-def test_default_analyzer_sample_weighted():
+def test_default_analyzer_limit_weighted():
     analyzer = default_analyzer.DefaultValueAnalyzer()
     values = ["a", "a", "a", "a", "b", "b", "b", "c", "c", "d", "e", "f"]
-    generated = analyzer.generate_spec("foo", values, None, sample_size=3, sample_weighted=True)
+    generated = analyzer.generate_spec("foo", values, None, limit=3, limit_weighted=True)
     assert isinstance(generated['data'], dict)
     assert len(generated['data']) == 3
 

@@ -25,9 +25,9 @@ class StringValueAnalyzer(ValueListAnalyzer):
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
         if _is_nested_lists(v for v in values):
             return _compute_str_list_spec(values)
-        sample_size = kwargs.get('sample_size', 0)
-        if sample_size > 0:
-            values = random.sample(values, sample_size)
+        limit = kwargs.get('limit', 0)
+        if limit > 0 and len(values) > limit:
+            values = random.sample(values, limit)
         return {
             "type": "values",
             "data": list(set(values))

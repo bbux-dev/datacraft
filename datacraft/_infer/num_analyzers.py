@@ -17,7 +17,7 @@ class IntValueAnalyzer(ValueListAnalyzer):
         return ValueListAnalyzer.NOT_COMPATIBLE
 
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
-        return _generate_numeric_spec(values, kwargs.get('sample_size', 0))
+        return _generate_numeric_spec(values, kwargs.get('limit', 0))
 
 
 class FloatValueAnalyzer(ValueListAnalyzer):
@@ -27,17 +27,17 @@ class FloatValueAnalyzer(ValueListAnalyzer):
         return ValueListAnalyzer.NOT_COMPATIBLE
 
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
-        return _generate_numeric_spec(values, kwargs.get('sample_size', 0))
+        return _generate_numeric_spec(values, kwargs.get('limit', 0))
 
 
-def _generate_numeric_spec(values: List[Any], sample_size: int):
+def _generate_numeric_spec(values: List[Any], limit: int):
     if _is_nested_lists(v for v in values):
         return _compute_list_range(values)
     if len(set(values)) > 1 and _all_is_numeric(values):
         return _compute_range(values)
 
-    if sample_size > 0:
-        values = random.sample(values, sample_size)
+    if limit > 0 and len(values) > limit:
+        values = random.sample(values, limit)
     return {
         "type": "values",
         "data": list(set(values))

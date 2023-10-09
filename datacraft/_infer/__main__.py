@@ -29,12 +29,12 @@ def process_file(filepath, filetype, args):
         if not isinstance(records, list):
             records = [records]
         return datacraft.infer.from_examples(records,
-                                             sample_size=args.sample_size,
-                                             sample_weighted=args.sample_weighted)
+                                             limit=args.limit,
+                                             limit_weighted=args.limit_weighted)
     elif filetype == "csv":
         return datacraft.infer.csv_to_spec(filepath,
-                                           sample_size=args.sample_size,
-                                           sample_weighted=args.sample_weighted)
+                                           limit=args.limit,
+                                           limit_weighted=args.limit_weighted)
     else:
         raise ValueError(f"Unsupported file type: {filetype}")
 
@@ -56,10 +56,11 @@ def main(argv):
     group.add_argument('--csv-dir', help='Directory path containing CSV files', type=str)
     group.add_argument('--json-dir', help='Directory path containing JSON files', type=str)
     parser.add_argument('--output', help='Output file to write results', type=str)
-    parser.add_argument('-s', '--sample-size', dest='sample_size', type=int,
-                        help='Size to sample data that ends up being a list of disparate values')
-    parser.add_argument('--sample-weighted', dest='sample_weighted', action='store_true',
-                        help='If weighted values are to be created, take top sample-size weights')
+    parser.add_argument('--limit', dest='limit', type=int,
+                        help='Max size of lists or weighted values to populate when unable to infer a more specific '
+                             'type from data')
+    parser.add_argument('--limit-weighted', dest='limit_weighted', action='store_true',
+                        help='If weighted values are to be created, take top limit weights')
     parser.add_argument('-l', '--log-level', dest='log_level', default="info", choices=_LOG_LEVELS,
                         help='Logging level verbosity, default is info')
     args = parser.parse_args(argv)

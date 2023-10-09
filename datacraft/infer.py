@@ -168,8 +168,8 @@ class ValueListAnalyzer(ABC):
             refs: for adding refs if needed for generated spec.
 
         Keyword Args:
-            sample_size: sample large values lists to this size
-            sample_weighted: take top N sample_size weights
+            limit: for lists or weighted values, down sample to this size if needed
+            limit_weighted: take top N limit weights
 
         Returns:
             Dict[str, Any]: A dictionary with the inferred spec for the values.
@@ -181,11 +181,13 @@ class _LookupHandler:
     ref_agg = RefsAggregator()
 
     def __init__(self, **kwargs):
-        self.sample_size = kwargs.get('sample_size', 0)
-        self.sample_weighted = kwargs.get('sample_weighted', False)
+        self.limit = kwargs.get('limit', 0)
+        self.limit_weighted = kwargs.get('limit_weighted', False)
 
     def handle(self, name: str, values: List[Any]):
         analyzer = registries.lookup_analyzer("default")
+        top_score = ValueListAnalyzer.SOMEWHAT_COMPATIBLE
+
         if analyzer is None:
             raise LookupError("Unable to find default analyzer")
         candidates = []
@@ -200,17 +202,20 @@ class _LookupHandler:
                 candidates.append((candidate, score))
         try:
             # pick one with the highest score, first one that is
-            analyzer = max(candidates, key=lambda x: x[1])[0]
+            analyzer, top_score = max(candidates, key=lambda x: x[1])
         except ValueError:
             # empty list
             pass
 
-        _log.debug("Using %s analyzer for key: %s", type(analyzer), name)
+        _log.debug("%s %s %s",
+                   f"Field: {name}".ljust(20),
+                   f"Analyzing with {analyzer.__class__.__name__}".ljust(35),
+                   f"Compatibility score: {top_score}".ljust(25))
         return analyzer.generate_spec(name=name,
                                       values=values,
                                       refs=self.ref_agg,
-                                      sample_size=self.sample_size,
-                                      sample_weighted=self.sample_weighted)
+                                      limit=self.limit,
+                                      limit_weighted=self.limit_weighted)
 
 
 def from_examples(examples: List[dict], **kwargs) -> dict:
@@ -220,8 +225,8 @@ def from_examples(examples: List[dict], **kwargs) -> dict:
         examples: Data to infer Data Spec from
 
     Keyword Args:
-        sample_size: sample large values lists to this size
-        sample_weighted: take top N sample_size weights
+        limit: for lists or weighted values, down sample to this size if needed
+        limit_weighted: take top N limit weights
 
     Returns:
         dict: Data Spec as dictionary
@@ -254,8 +259,8 @@ def csv_to_spec(file_path: str, **kwargs) -> Union[None, dict]:
         file_path (str): The path to the CSV file.
 
     Keyword Args:
-        sample_size: sample large values lists to this size
-        sample_weighted: take top N sample_size weights
+        limit: for lists or weighted values, down sample to this size if needed
+        limit_weighted: take top N limit weights
 
     Returns:
         Dict[str, Union[str, Dict]]: The inferred data spec from the CSV data.
