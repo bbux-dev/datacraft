@@ -1,10 +1,5 @@
-network types
--------------
-
-Network related types
-
 ip/ipv4
-^^^^^^^
+-------
 
 Ip addresses can be generated
 using `CIDR notation <https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing>`_
@@ -43,7 +38,7 @@ Examples:
     }
 
 ip.precise
-^^^^^^^^^^
+----------
 
 The default ip type only supports cidr masks of /8 /16 and /24. If you want more precise ip ranges you need to use the
 ``ip.precise`` type. This type requires a cidr as the single config param. The default mode for ``ip.precise`` is to
@@ -78,7 +73,7 @@ Examples:
     }
 
 net.mac
-^^^^^^^
+-------
 
 For creating MAC addresses
 

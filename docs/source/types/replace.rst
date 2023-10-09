@@ -58,9 +58,9 @@ Prototype:
         "type": "regex_replace",
         "ref": "<field or ref to source value from>",
         "data": {
-          "<value to replace 1>": "<value to replace with 1>",
+          "<regex 1>": "<value to replace with 1>",
           ...
-          "<value to replace N>": "<value to replace with N>",
+          "<regex N>": "<value to replace with N>",
         }
       }
     }

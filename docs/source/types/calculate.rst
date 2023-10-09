@@ -7,7 +7,7 @@ represented a users' height in inches and in centimeters, you would want them to
 correlate. You could use the `calculate` type to specify a `formula` to do this
 calculation. There are two ways to specify the fields to calculate a value from.
 The first is to use the `fields` and/or the `refs` keys with an array of fields
-or refs to use in the formula.  The second is the use a map where the field
+or refs to use in the formula.  The second is to use a map where the field
 or ref name to be used is mapped to a string that will be used as an alias for
 it in the formula. See second example below for the mapped alias version.
 
