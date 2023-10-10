@@ -77,28 +77,24 @@ def main(argv):
     elif args.csv_dir:
         _log.info("Processing CSVs from %s...", args.csv_dir)
         for filename in os.listdir(args.csv_dir):
-            if filename.endswith('.csv'):
-                files_to_process.append((os.path.join(args.csv_dir, filename), "csv"))
+            files_to_process.append((os.path.join(args.csv_dir, filename), "csv"))
     elif args.json_dir:
         _log.info("Processing JSONs from %s...", args.json_dir)
         for filename in os.listdir(args.json_dir):
-            if filename.endswith('.json'):
-                files_to_process.append((os.path.join(args.json_dir, filename), "json"))
+            files_to_process.append((os.path.join(args.json_dir, filename), "json"))
 
-    results = []
+    results = {}
     for filepath, filetype in files_to_process:
         result = process_file(filepath, filetype, args)
         if result is None:
             continue
-        results.append(result)
+        results.update(result)
 
     if args.output:
         with open(args.output, 'w') as outfile:
-            for result in results:
-                outfile.write(result + "\n")
+            json.dump(results, outfile, indent=4)
     else:
-        for result in results:
-            print(json.dumps(result, indent=4))
+        print(json.dumps(results, indent=4))
 
 
 def _configure_logging(loglevel):

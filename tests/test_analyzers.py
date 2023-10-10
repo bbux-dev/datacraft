@@ -96,17 +96,35 @@ def test_string_value_analyzer_is_compatible(values, compatible):
         assert analyzer.compatibility_score(values) == 0
 
 
-def test_string_value_analyzer_generate_spec():
-    expected = {
-        'type': 'values',
-        'data': ["a", "b", "c"]
-    }
+# Tests for StringValueAnalyzer
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        (["a"], {"type": "values", "data": ["a"]}),
+        (["a", "b", "c"], {"type": "values", "data": ["a", "b", "c"]}),
+        ([["a", "b"], ["c", "d"]],
+         {
+             "type": "values",
+             "data": ["a", "b", "c", "d"],
+             "config": {"count": {"2": 1.0}, "as_list": True}
+         }),
+        (["a", "a", "a", "b", "b", "c"],
+         {
+             "type": "values",
+             "data": {
+                 "a": 0.5,
+                 "b": 0.33333,
+                 "c": 0.16667
+             }
+         })
+    ]
+)
+def test_string_value_analyzer_generate_spec(values, expected):
     analyzer = str_analyzers.StringValueAnalyzer()
-    values = ["a", "b", "c"]
     generated = analyzer.generate_spec("foo", values, None)
-    assert compare_dicts_ignore_list_order(generated, expected), f"Did not match. Generated:" \
-                                                                 f" {json.dumps(generated)}, Expected:" \
-                                                                 f" {json.dumps(expected)}"
+    assert generated == expected, f"Did not match. Generated:" \
+                                  f" {json.dumps(generated)}, Expected:" \
+                                  f" {json.dumps(expected)}"
 
 
 # Tests for DefaultValueAnalyzer

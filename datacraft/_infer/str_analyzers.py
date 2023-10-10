@@ -7,7 +7,7 @@ from typing import Generator, Union
 import datacraft
 from datacraft import ValueListAnalyzer, RefsAggregator
 from .helpers import (_simple_type_compatibility_check, _all_is_str, _is_nested_lists,
-                      _calculate_list_size_weights)
+                      _calculate_list_size_weights, _are_values_unique, _calculate_weights, top_n_items)
 
 # UUID regex patterns
 UUID_PATTERN = re.compile(r"^[A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12}$")
@@ -25,12 +25,25 @@ class StringValueAnalyzer(ValueListAnalyzer):
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
         if _is_nested_lists(v for v in values):
             return _compute_str_list_spec(values)
+
         limit = kwargs.get('limit', 0)
-        if limit > 0 and len(values) > limit:
-            values = random.sample(values, limit)
+        sample_weights = kwargs.get('limit_weighted', False)
+
+        # unique values, just rotate through them
+        if _are_values_unique(values):
+            if limit > 0 and len(values) > limit:
+                values = random.sample(values, limit)
+            return {
+                "type": "values",
+                "data": values
+            }
+        # use weighted values
+        weighted_values = _calculate_weights(values)
+        if sample_weights:
+            weighted_values = top_n_items(weighted_values, limit)
         return {
             "type": "values",
-            "data": list(set(values))
+            "data": weighted_values
         }
 
 
