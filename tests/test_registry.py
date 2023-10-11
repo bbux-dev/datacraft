@@ -137,3 +137,10 @@ def test_lookup_caster():
     assert caster is None
     all_registered = registries.registered_casters()
     assert all_registered == ['test']
+
+
+def test_lookup_analyzer():
+    analyzer = registries.lookup_analyzer('default')
+    assert analyzer is not None
+    analyzer = registries.lookup_analyzer('Snuffliest')
+    assert analyzer is None
