@@ -219,7 +219,7 @@ with the ``--debug-spec`` command line argument. If we run this spec from the co
 
 .. code-block:: shell
 
-    $ datacraft -s refs_type.json -i 3 --log-level off --format json -x
+    $ datacraft -s refs_type.json -i 3 -r 1 --log-level off --format json -x
     {"outer": {"simple_uuid": "c77a5bee-83bb-4bae-a8e8-21be735f73c9", "complex_value": "'~4.028 microns per second'"}}
     {"outer": {"simple_uuid": "5d27eb03-c5a3-4167-9dd1-56c1f0b5a49c", "complex_value": "'~21.221 microns per second'"}}
     {"outer": {"simple_uuid": "6fa92f9f-d3ac-4118-ad2f-89b73bafb7c5", "complex_value": "'~27.432 microns per second'"}}
@@ -290,9 +290,9 @@ example from the Jinja2 documentation to work with datacraft:
 
    <h1>Members</h1>
    <ul>
-       {% for user in users %}
+       {%- for user in users %}
        <li>{{ user }}</li>
-       {% endfor %}
+       {%- endfor %}
    </ul>
 
 If a regular spec is used such as ``{"users":["bob","bobby","rob"]}`` the templating engine will not populate the
@@ -333,9 +333,9 @@ number of line items was desired, you could create a template like the following
 
    <h1>Members</h1>
    <ul>
-       {% for i in range(num_users | int) %}
+       {%- for i in range(num_users | int) %}
        <li>{{ users[i] }}</li>
-       {% endfor %}
+       {%- endfor %}
    </ul>
 
 The spec could then be updated to contain a ``num_users`` field:
@@ -371,8 +371,8 @@ that will be indexed. If it is less, then there will be empty line items wheneve
 Templating Specs
 ----------------
 
-There may be parts of a spec that you want to be variable. You can use the jinja2 templating format to template the
-parts of the spec that should be variable. For example:
+Instead of hard coding values or configuration parameters in your spec, you have the option to dynamically adjust them
+using command line arguments with the jinja2 templating format. For instance:
 
 .. code-block:: text
 
@@ -386,7 +386,7 @@ parts of the spec that should be variable. For example:
          "frisbee": 0.1,
          "puppy": 0.05,
          "diamond ring": 0.005,
-         "tesla": 0.0005
+         "{{ top_prize | default(1, tesla) }}": 0.0005
        },
        "config": {
          "count": {{ prize_count | default(1, true) | int }}
@@ -409,10 +409,10 @@ Now with ``prize_count`` set to 3
 
 .. code-block:: shell
 
-   $ datacraft -s vars_test.json -i 3 --log-level warn -v prize_count=3
+   $ datacraft -s vars_test.json -i 3 --log-level warn -v prize_count=3 top_prize='light saber'
    ['gum', 'big ball', 'ball']
    ['puppy', 'big ball', 'gum']
-   ['gum', 'ball', 'tesla']
+   ['gum', 'ball', 'light saber']
 
 NOTE: It is a good practice to use a default in case that a variable is not defined, or that the variable
 substitution flags are not specified. With no default, the value would become blank and render the JSON invalid.
@@ -533,7 +533,7 @@ Running this example:
 
 .. code-block:: shell
 
-   $ datacraft -s pets.json -i 10 -l off -x --format json
+   $ datacraft -s pets.json -i 10 -r 1 -l off -x --format json
    {"id": 1, "name": "Fido"}
    {"id": 2, "name": "Fluffy", "tag": "Agreeable"}
    {"id": 3, "name": "Bandit", "tag": "Affectionate"}
@@ -681,7 +681,7 @@ Running this spec would produce:
 
 .. code-block:: shell
 
-   $ datacraft --spec csv-select.yaml -i 5 --datadir ./data --format json --log-level off -x
+   $ datacraft --spec csv-select.yaml -i 5 -r 1 --datadir ./data --format json --log-level off -x
    {"geonameid": "2986043", "name": "Pic de Font Blanca", "latitude": "42.64991", "longitude": "1.53335", "country_code": "AD", "population": "0"}
    {"geonameid": "2994701", "name": "Roc M\u00e9l\u00e9", "latitude": "42.58765", "longitude": "1.74028", "country_code": "AD", "population": "0"}
    {"geonameid": "3007683", "name": "Pic des Langounelles", "latitude": "42.61203", "longitude": "1.47364", "country_code": "AD", "population": "0"}
