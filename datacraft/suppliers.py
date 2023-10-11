@@ -7,7 +7,6 @@ import json
 import logging
 from typing import Union, List, Dict, Any
 
-import datacraft.supplier.ranges
 from . import registries, casters, distributions, utils, template_engines
 from .exceptions import SpecException
 from .supplier.common import (SingleValue, MultipleValueSupplier, RotatingSupplierList, DecoratedSupplier,
@@ -24,6 +23,14 @@ from .supplier.unicode import unicode_range_supplier
 from .supplier.templated import templated_supplier
 from .supplier import network, ranges
 from .supplier.strings import cut_supplier
+
+REPLACEMENTS = {
+    '_NONE_': None,
+    '_NULL_': None,
+    '_NIL_': None,
+    '_TRUE_': True,
+    '_FALSE_': False
+}
 
 _log = logging.getLogger(__name__)
 
@@ -229,12 +236,12 @@ def alter(supplier, **kwargs) -> ValueSupplierInterface:
         supplier = decorated(supplier, **kwargs)
     if _is_buffered(**kwargs):
         supplier = buffered(supplier, **kwargs)
-    if _wrap_with_multiple_value(supplier, **kwargs):
+    if _wrap_with_multiple_value(**kwargs):
         return MultipleValueSupplier(supplier, count_supplier(**kwargs))
     return supplier
 
 
-def _wrap_with_multiple_value(supplier, **kwargs):
+def _wrap_with_multiple_value(**kwargs):
     """ checks if this supplier should be wrapped with multiple values supplier """
     has_count = 'count' in kwargs or 'count_dist' in kwargs
     as_list = utils.is_affirmative('as_list', kwargs)
@@ -243,7 +250,7 @@ def _wrap_with_multiple_value(supplier, **kwargs):
 
 def _is_decorated(**kwargs) -> bool:
     """ is this spec a decorated one """
-    return any(key in kwargs for key in ['prefix', 'suffix', 'quote'])
+    return any(key in kwargs for key in ['prefix', 'suffix', 'geo_type', 'quote'])
 
 
 def _is_cast(**kwargs) -> bool:
@@ -303,17 +310,10 @@ def weighted_values(data: dict, config: Union[dict, None] = None) -> ValueSuppli
         raise SpecException('Invalid Weights, no values defined')
     if config is None:
         config = {}
-    replacements = {
-        '_NONE_': None,
-        '_NULL_': None,
-        '_NIL_': None,
-        '_TRUE_': True,
-        '_FALSE_': False
-    }
     choices = []
     for key in data.keys():
-        if key in replacements:
-            choices.append(replacements.get(key))
+        if key in REPLACEMENTS:
+            choices.append(REPLACEMENTS.get(key))
         else:
             choices.append(key)
     weights = list(data.values())
@@ -408,7 +408,7 @@ def list_count_sampler(data: list, **kwargs) -> ValueSupplierInterface:
         >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, min=2, max=5)
         >>> pet_supplier.next(0)
         ['rabbit', 'cat', 'pig', 'cat']
-        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,stddev=1,min=1,max=3)")
+        >>> pet_supplier = datacraft.suppliers.list_count_sampler(pet_list, count_dist="normal(mean=2,stddev=1,min=1)")
         >>> pet_supplier.next(0)
         ['pig', 'horse']
     """
@@ -526,6 +526,8 @@ def character_class(data, **kwargs):
     Keyword Args:
         join_with (str): string to join characters with, default is ''
         exclude (str): set of characters to exclude from returned values
+        escape (str): set of characters to escape, i.e. " -> \" for example
+        escape_str (str): string to use for escaping, default is \
         mean (float): mean number of characters to produce
         stddev (float): standard deviation from the mean
         count (int): number of elements in list to use
@@ -539,6 +541,15 @@ def character_class(data, **kwargs):
     if 'exclude' in kwargs:
         for char_to_exclude in kwargs.get('exclude'):
             data = data.replace(char_to_exclude, '')
+    if 'escape' in kwargs:
+        # needs to be a list now, since replacements ar not single characters
+        data = list(data)
+        for char_to_escape in kwargs.get('escape'):
+            escape_str = kwargs.get('escape_str', '\\')
+            # just in case there is more than one occurrence
+            for i in range(len(data)):
+                if data[i] == char_to_escape:
+                    data[i] = escape_str + char_to_escape
     if utils.any_key_exists(kwargs, ['mean', 'stddev']):
         return list_stats_sampler(data, **kwargs)
     return list_count_sampler(data, **kwargs)
@@ -777,15 +788,15 @@ def geo_pair(**kwargs):
     return combine([long_supplier, lat_supplier], **combine_config)
 
 
-def _configure_geo_type(default_start, default_end, suffix, **kwargs):
+def _configure_geo_type(default_start, default_end, geo_type, **kwargs):
     precision = kwargs.get('precision', registries.get_default('geo_precision'))
     if not str(precision).isnumeric():
         raise SpecException(f'precision for geo should be valid integer >= 0: {json.dumps(kwargs)}')
-    start, end = _get_start_end(default_start, default_end, suffix, **kwargs)
+    start, end = _get_start_end(default_start, default_end, geo_type, **kwargs)
     return random_range(start, end, precision)
 
 
-def _get_start_end(default_start, default_end, suffix, **kwargs):
+def _get_start_end(default_start, default_end, geo_type, **kwargs):
     """ determines the valid range, changes if bbox in config """
     if 'bbox' in kwargs:
         bbox = kwargs['bbox']
@@ -793,16 +804,16 @@ def _get_start_end(default_start, default_end, suffix, **kwargs):
             raise SpecException(
                 'Bounding box must be list of size 4 with format: [min Longitude, min Latitude, max Longitude, '
                 'max Latitude]')
-        if 'lat' in suffix:
+        if 'lat' in geo_type:
             default_start = bbox[1]
             default_end = bbox[3]
         else:
             default_start = bbox[0]
             default_end = bbox[2]
     # start_lat or start_long overrides bbox or defaults
-    start = kwargs.get('start' + suffix, default_start)
+    start = kwargs.get('start' + geo_type, default_start)
     # end_lat or end_long overrides bbox or defaults
-    end = kwargs.get('end' + suffix, default_end)
+    end = kwargs.get('end' + geo_type, default_end)
     return start, end
 
 
@@ -1119,7 +1130,7 @@ def templated(supplier_map: Dict[str, ValueSupplierInterface],
     return templated_supplier(supplier_map, engine)
 
 
-def cut(supplier: datacraft.ValueSupplierInterface,
+def cut(supplier: ValueSupplierInterface,
         start: int = 0,
         end: Union[int, None] = None):
     """Trim output of given supplier from start to end, if length permits

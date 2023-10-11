@@ -39,6 +39,7 @@ test suite or application without have to use online tools or external services.
     examples
     cli
     api
+    infer
 
 
 Indices and tables

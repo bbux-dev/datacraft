@@ -139,6 +139,24 @@ is cast to an integer. See :ref:`casters` for details on available casting types
 weighted_csv
 ^^^^^^^^^^^^
 
+This is useful when you have a large number of weighted values that would not fit nicely into a JSON file. You can
+specify a value and a weight for that value. The default is that the first column in the csv is the value and the
+second column is the weight.  Example CSV:
+
+.. code-block::
+
+    city,weight
+    New York,0.65
+    Los Angeles,0.23
+    London,0.87
+    Paris,0.49
+    Tokyo,0.32
+    Sydney,0.91
+    Beijing,0.04
+    Rio de Janeiro,0.78
+    Mumbai,0.56
+    Cape Town,0.38
+
 Prototype:
 
 .. code-block:: python

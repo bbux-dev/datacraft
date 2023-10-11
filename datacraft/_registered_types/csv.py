@@ -54,7 +54,7 @@ def _configure_csv(field_spec, loader):
     """ Configures the csv value supplier for this field """
     config = datacraft.utils.load_config(field_spec, loader)
     datafile = config.get('datafile', datacraft.registries.get_default('csv_file'))
-    csv_path = f'{loader.datadir}/{datafile}'
+    csv_path = os.path.join(loader.datadir, datafile)
     if not os.path.exists(csv_path):
         raise datacraft.SpecException(f'Unable to locate data file: {datafile} in data dir: {loader.datadir} for spec: '
                                       + json.dumps(field_spec))

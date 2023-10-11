@@ -2,7 +2,7 @@
 Module for the datacraft registration system
 """
 import logging
-from typing import Any
+from typing import Any, Union
 
 import catalogue  # type: ignore
 
@@ -87,8 +87,16 @@ class Registry:
             to get a list of all the currently registered ones.
 
             >>> @datacraft.registry.casters('reverse')
-            ... def _cast_reverse_strings():
+            ... def _cast_reverse_strings() -> datacraft.CasterInterface:
             ...     # return a datacraft.CasterInterface
+
+        analyzers:
+            Used by the Data Spec inference tool chain to analyze the list of values for a given field to try to
+            determine an appropriate Field Spec that can be used to approximate the data values present
+
+            >>> @datacraft.registry.num_analyzers('custom')
+            ... def _special_value_analyzer() -> datacraft.ValueListAnalyzer
+            ...     # return a datacraft.ValueListAnalyzer
     """
     types = catalogue.create('datacraft', 'type')
     schemas = catalogue.create('datacraft', 'schemas')
@@ -99,6 +107,7 @@ class Registry:
     distribution = catalogue.create('datacraft', 'distribution')
     defaults = catalogue.create('datacraft', 'defaults')
     casters = catalogue.create('datacraft', 'casters')
+    analyzers = catalogue.create('datacraft', 'num_analyzers')
 
 
 def lookup_type(key):
@@ -161,6 +170,26 @@ def lookup_caster(key):
     return caster_load_function()
 
 
+def lookup_analyzer(key):
+    """
+    Looks up the analyzer in the registry
+
+    Args:
+        key: for analyzer to look up
+
+    Returns:
+        the analyzer if found
+    """
+    all_keys = list(Registry.analyzers.get_all().keys())
+    if key in all_keys:
+        analyzer_load_function = Registry.analyzers.get(key)
+    else:
+        _log.debug('No analyzer found for key %s', key)
+        return None
+
+    return analyzer_load_function()
+
+
 def registered_formats():
     """ list of registered formats """
     return list(Registry.formats.get_all().keys())
@@ -179,6 +208,11 @@ def registered_usage():
 def registered_casters():
     """ list of registered casters """
     return list(Registry.casters.get_all().keys())
+
+
+def registered_analyzers():
+    """ list of registered num_analyzers """
+    return list(Registry.analyzers.get_all().keys())
 
 
 def get_default(key):

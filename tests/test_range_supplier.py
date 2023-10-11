@@ -69,7 +69,7 @@ def test_range_wrap_around():
 
 invalid_range_specs = [
     {'field0': {'type': 'range'}},  # no data
-    {'field1': {'type': 'range', 'data': [1]}},  # single element in data
+    {'field1': {'type': 'range', 'data': []}},  # empty element in data
     {'field2': {'type': 'range', 'data': "1-10"}},  # data not list
     {'field3': {'type': 'range', 'data': [1, 10], 'config': {'precision': 'A'}}},  # nested invalid precision
     {'field4': {'type': 'range', 'data': [11, 10]}},  # end before start

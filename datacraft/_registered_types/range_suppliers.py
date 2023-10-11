@@ -39,9 +39,12 @@ def _configure_range_supplier(field_spec, _):
         raise datacraft.SpecException(f'No data element defined for: {json.dumps(field_spec)}')
 
     data = field_spec.get('data')
-    if not isinstance(data, list) or len(data) < 2:
+    if not isinstance(data, list) or len(data) == 0:
         raise datacraft.SpecException(
-            f'data element for ranges type must be list with at least two elements:{json.dumps(field_spec)}')
+            f'data element for ranges type must be list with at least one element:{json.dumps(field_spec)}')
+    if not isinstance(data[0], list) and len(data) == 1:
+        # special case
+        data = [0, data[0]]
     # we have the nested case
     if isinstance(data[0], list):
         suppliers_list = [_configure_range_supplier_for_data(field_spec, subdata) for subdata in data]
@@ -89,6 +92,8 @@ def _configure_range_supplier_for_data(field_spec, data):
     if precision and not str(precision).isnumeric():
         raise datacraft.SpecException(f'precision must be valid integer {json.dumps(field_spec)}')
 
+    if len(data) == 1:
+        data = [0, data[0]]
     start = data[0]
     # default for built in range function is exclusive end, we want to default to inclusive as this is the
     # more intuitive behavior
@@ -124,6 +129,16 @@ def _configure_rand_range_supplier(field_spec, loader):
     if not isinstance(data, list) or len(data) == 0:
         raise datacraft.SpecException(
             f'rand_range specs require data as array with at least one element: {json.dumps(field_spec)}')
+
+    if isinstance(data[0], list):
+        suppliers_list = [_configure_rand_range_supplier_for_data(field_spec, subdata) for subdata in data]
+        return datacraft.suppliers.from_list_of_suppliers(suppliers_list, True)
+    return _configure_rand_range_supplier_for_data(field_spec, data)
+
+
+def _configure_rand_range_supplier_for_data(field_spec, data):
+    config = field_spec.get('config', {})
+    precision = config.get('precision', None)
     start = 0
     end = 0
     if len(data) == 1:
@@ -131,9 +146,9 @@ def _configure_rand_range_supplier(field_spec, loader):
     if len(data) >= 2:
         start = data[0]
         end = data[1]
-    precision = None
     if len(data) > 2:
         precision = data[2]
+
     # config overrides third data element if specified
     precision = config.get('precision', precision)
     return datacraft.suppliers.random_range(start, end, precision)
