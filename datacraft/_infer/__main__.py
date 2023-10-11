@@ -30,11 +30,13 @@ def process_file(filepath, filetype, args):
             records = [records]
         return datacraft.infer.from_examples(records,
                                              limit=args.limit,
-                                             limit_weighted=args.limit_weighted)
+                                             limit_weighted=args.limit_weighted,
+                                             duplication_threshold=args.duplication_threshold)
     elif filetype == "csv":
         return datacraft.infer.csv_to_spec(filepath,
                                            limit=args.limit,
-                                           limit_weighted=args.limit_weighted)
+                                           limit_weighted=args.limit_weighted,
+                                           duplication_threshold=args.duplication_threshold)
     else:
         raise ValueError(f"Unsupported file type: {filetype}")
 
@@ -61,6 +63,12 @@ def main(argv):
                              'type from data')
     parser.add_argument('--limit-weighted', dest='limit_weighted', action='store_true',
                         help='If weighted values are to be created, take top limit weights')
+    parser.add_argument("-dt", "--duplication-threshold", dest='duplication_threshold',
+                        type=valid_range,
+                        default=0.2,
+                        help="Duplication ratio above which the lists of values are considered significantly "
+                             "duplicated. Value should be between 0 and 1 (inclusive). Measures the ratio of unique "
+                             "items to total items")
     parser.add_argument('-l', '--log-level', dest='log_level', default="info", choices=_LOG_LEVELS,
                         help='Logging level verbosity, default is info')
     args = parser.parse_args(argv)
@@ -95,6 +103,17 @@ def main(argv):
             json.dump(results, outfile, indent=4)
     else:
         print(json.dumps(results, indent=4))
+
+
+def valid_range(arg):
+    try:
+        value = float(arg)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Invalid float value: {arg}")
+    if 0 <= value <= 1:
+        return value
+    else:
+        raise argparse.ArgumentTypeError(f"Value {arg} is out of range [0, 1]")
 
 
 def _configure_logging(loglevel):

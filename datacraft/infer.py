@@ -170,6 +170,7 @@ class ValueListAnalyzer(ABC):
         Keyword Args:
             limit: for lists or weighted values, down sample to this size if needed
             limit_weighted: take top N limit weights
+            duplication_threshold (float): ratio of unique to total items, if above this threshold, use weighted values
 
         Returns:
             Dict[str, Any]: A dictionary with the inferred spec for the values.
@@ -183,6 +184,7 @@ class _LookupHandler:
     def __init__(self, **kwargs):
         self.limit = kwargs.get('limit', 0)
         self.limit_weighted = kwargs.get('limit_weighted', False)
+        self.duplication_threshold = kwargs.get('duplication_threshold', 0.2)
 
     def handle(self, name: str, values: List[Any]):
         analyzer = registries.lookup_analyzer("default")
@@ -215,7 +217,8 @@ class _LookupHandler:
                                       values=values,
                                       refs=self.ref_agg,
                                       limit=self.limit,
-                                      limit_weighted=self.limit_weighted)
+                                      limit_weighted=self.limit_weighted,
+                                      duplication_threshold=self.duplication_threshold)
 
 
 def from_examples(examples: List[dict], **kwargs) -> dict:
@@ -228,6 +231,7 @@ def from_examples(examples: List[dict], **kwargs) -> dict:
     Keyword Args:
         limit (int): for lists or weighted values, down sample to this size if needed
         limit_weighted (bool): take top N limit weights
+        duplication_threshold (float): ratio of unique to total items, if above this threshold, use weighted values
 
     Returns:
         dict: Data Spec as dictionary

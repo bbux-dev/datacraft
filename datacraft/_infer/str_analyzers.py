@@ -7,7 +7,8 @@ from typing import Generator, Union
 import datacraft
 from datacraft import ValueListAnalyzer, RefsAggregator
 from .helpers import (_simple_type_compatibility_check, _all_is_str, _is_nested_lists,
-                      _calculate_list_size_weights, _are_values_unique, _calculate_weights, top_n_items)
+                      _calculate_list_size_weights, _are_values_unique, _calculate_weights, top_n_items,
+                      is_significantly_duplicated)
 
 # UUID regex patterns
 UUID_PATTERN = re.compile(r"^[A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12}$")
@@ -28,9 +29,10 @@ class StringValueAnalyzer(ValueListAnalyzer):
 
         limit = kwargs.get('limit', 0)
         sample_weights = kwargs.get('limit_weighted', False)
+        duplication_threshold = kwargs.get('duplication_threshold', 0.2)
 
         # unique values, just rotate through them
-        if _are_values_unique(values):
+        if not is_significantly_duplicated(values, duplication_threshold):
             if limit > 0 and len(values) > limit:
                 values = random.sample(values, limit)
             return {

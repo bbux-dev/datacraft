@@ -3,11 +3,10 @@ import json
 import pytest
 
 import datacraft
-import datacraft._infer.num_analyzers as num_analyzers
-import datacraft._infer.str_analyzers as str_analyzers
 import datacraft._infer.default_analyzer as default_analyzer
 import datacraft._infer.geo_analyzers as geo_alalyzers
-from .test_utils import compare_dicts_ignore_list_order
+import datacraft._infer.num_analyzers as num_analyzers
+import datacraft._infer.str_analyzers as str_analyzers
 
 
 @pytest.mark.parametrize(
@@ -108,13 +107,15 @@ def test_string_value_analyzer_is_compatible(values, compatible):
              "data": ["a", "b", "c", "d"],
              "config": {"count": {"2": 1.0}, "as_list": True}
          }),
-        (["a", "a", "a", "b", "b", "c"],
+        (["a", "a", "a", "b", "b", "c", "d", "e"],
          {
              "type": "values",
              "data": {
-                 "a": 0.5,
-                 "b": 0.33333,
-                 "c": 0.16667
+                 "a": 0.375,
+                 "b": 0.25,
+                 "c": 0.125,
+                 "d": 0.125,
+                 "e": 0.125
              }
          })
     ]
