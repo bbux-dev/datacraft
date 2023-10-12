@@ -9,7 +9,7 @@ copyright = '2023, Brian Buxton'
 author = 'Brian Buxton'
 
 release = '0.8'
-version = '0.8.0'
+version = '0.8.1'
 
 # -- General configuration
 

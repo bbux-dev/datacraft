@@ -22,21 +22,21 @@ _LOG_LEVELS = [
 ]
 
 
-def process_file(filepath, filetype, args):
+def process_files(filepaths, filetype, args):
     if filetype == "json":
-        with open(filepath, 'r', encoding='utf-8') as fp:
-            records = json.load(fp)
-        if not isinstance(records, list):
-            records = [records]
+        records = combine_json_records(filepaths)
         return datacraft.infer.from_examples(records,
                                              limit=args.limit,
                                              limit_weighted=args.limit_weighted,
                                              duplication_threshold=args.duplication_threshold)
     elif filetype == "csv":
-        return datacraft.infer.csv_to_spec(filepath,
-                                           limit=args.limit,
-                                           limit_weighted=args.limit_weighted,
-                                           duplication_threshold=args.duplication_threshold)
+        results = {}
+        for filepath in filepaths:
+            result = datacraft.infer.csv_to_spec(filepath,
+                                                 limit=args.limit,
+                                                 limit_weighted=args.limit_weighted,
+                                                 duplication_threshold=args.duplication_threshold)
+            results.update(result)
     else:
         raise ValueError(f"Unsupported file type: {filetype}")
 
@@ -74,29 +74,29 @@ def main(argv):
     args = parser.parse_args(argv)
 
     files_to_process = []
+    filetype = None
 
     _configure_logging(args.log_level)
     if args.csv:
         _log.info("Processing %s...", args.csv)
-        files_to_process.append((args.csv, "csv"))
+        files_to_process.append(args.csv)
+        filetype = 'csv'
     elif args.json:
         _log.info("Processing %s...", args.json)
-        files_to_process.append((args.json, "json"))
+        files_to_process.append(args.json)
+        filetype = 'json'
     elif args.csv_dir:
         _log.info("Processing CSVs from %s...", args.csv_dir)
         for filename in os.listdir(args.csv_dir):
-            files_to_process.append((os.path.join(args.csv_dir, filename), "csv"))
+            files_to_process.append(os.path.join(args.csv_dir, filename))
+        filetype = 'csv'
     elif args.json_dir:
         _log.info("Processing JSONs from %s...", args.json_dir)
         for filename in os.listdir(args.json_dir):
-            files_to_process.append((os.path.join(args.json_dir, filename), "json"))
+            files_to_process.append(os.path.join(args.json_dir, filename))
+        filetype = 'json'
 
-    results = {}
-    for filepath, filetype in files_to_process:
-        result = process_file(filepath, filetype, args)
-        if result is None:
-            continue
-        results.update(result)
+    results = process_files(files_to_process, filetype, args)
 
     if args.output:
         with open(args.output, 'w') as outfile:
@@ -128,6 +128,29 @@ def _configure_logging(loglevel):
             level=numeric_level,
             datefmt='%d-%b-%Y %I:%M:%S %p'
         )
+
+
+def combine_json_records(file_paths):
+    combined_records = []
+
+    # List all files in the directory
+    for file_name in file_paths:
+        with open(file_name, 'r') as fp:
+            try:
+                data = json.load(fp)
+            except Exception as err:
+                _log.warning("%s contains invalid JSON: %s.", file_name, err)
+                continue
+            if len(data) == 0:
+                _log.warning(f"{file_name} contains empty data.")
+                continue
+            if isinstance(data, list):
+                combined_records.extend(data)
+            elif isinstance(data, dict):  # Assuming that individual records are dictionaries
+                combined_records.append(data)
+            else:
+                _log.warning(f"{file_name} contains neither a list nor a dictionary and was skipped.")
+    return combined_records
 
 
 if __name__ == "__main__":
