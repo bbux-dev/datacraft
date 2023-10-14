@@ -6,14 +6,16 @@ from typing import Generator, Union
 
 import datacraft
 from datacraft import ValueListAnalyzer, RefsAggregator
-from .helpers import (_simple_type_compatibility_check, _all_is_str, _is_nested_lists,
-                      _calculate_list_size_weights, _are_values_unique, _calculate_weights, top_n_items,
-                      is_significantly_duplicated)
+from .helpers import (_simple_type_compatibility_check, _all_is_str, is_nested_lists,
+                      calculate_list_size_weights, calculate_weights, top_n_items,
+                      is_significantly_duplicated, all_match_pattern)
+from .num_analyzers import generate_numeric_spec
 
 # UUID regex patterns
 UUID_PATTERN = re.compile(r"^[A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12}$")
 UUID_PATTERN_LOWER = re.compile(r"^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$")
 UUID_PATTERN_UPPER = re.compile(r"^[A-F\d]{8}-[A-F\d]{4}-[A-F\d]{4}-[A-F\d]{4}-[A-F\d]{12}$")
+INT_STRING_PATTERN = re.compile(r"^\d+$")
 
 
 class StringValueAnalyzer(ValueListAnalyzer):
@@ -24,8 +26,8 @@ class StringValueAnalyzer(ValueListAnalyzer):
         return ValueListAnalyzer.NOT_COMPATIBLE
 
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
-        if _is_nested_lists(v for v in values):
-            return _compute_str_list_spec(values)
+        if is_nested_lists(v for v in values):
+            return compute_str_list_spec(values)
 
         limit = kwargs.get('limit', 0)
         sample_weights = kwargs.get('limit_weighted', False)
@@ -40,7 +42,7 @@ class StringValueAnalyzer(ValueListAnalyzer):
                 "data": values
             }
         # use weighted values
-        weighted_values = _calculate_weights(values)
+        weighted_values = calculate_weights(values)
         if sample_weights:
             weighted_values = top_n_items(weighted_values, limit)
         return {
@@ -49,9 +51,23 @@ class StringValueAnalyzer(ValueListAnalyzer):
         }
 
 
+class IntStringValueAnalyzer(ValueListAnalyzer):
+    def compatibility_score(self, values: Generator[Any, None, None]) -> float:
+        if all_match_pattern(INT_STRING_PATTERN, values):
+            return ValueListAnalyzer.MOSTLY_COMPATIBLE + 0.01
+        return ValueListAnalyzer.NOT_COMPATIBLE
+
+    def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
+        spec = generate_numeric_spec([int(v) for v in values], kwargs.get('limit', 0))
+        if "config" not in spec:
+            spec["config"] = {}
+        spec["config"]["cast"] = "str"
+        return spec
+
+
 class UuidValueAnalyzer(ValueListAnalyzer):
     def compatibility_score(self, values: Generator[Any, None, None]) -> float:
-        if all_uuids(values):
+        if all_match_pattern(UUID_PATTERN, values):
             return ValueListAnalyzer.TOTALLY_COMPATIBLE
         return ValueListAnalyzer.NOT_COMPATIBLE
 
@@ -69,35 +85,6 @@ class UuidValueAnalyzer(ValueListAnalyzer):
                     "cast": "upper"
                 }
             }
-
-
-def all_uuids(gen: Generator[Union[str, int, float, bool], None, None]) -> bool:
-    """
-    Check if all values from a generator match a UUID pattern.
-
-    The function will return False as soon as:
-    - a value is not a string
-    - a string value does not match the UUID pattern.
-
-    Args:
-        gen (Generator[Union[str, int, float, bool], None, None]): A generator of values.
-
-    Returns:
-        bool: True if all values match the UUID pattern, False otherwise.
-
-    Examples:
-        >>> g = (str(i) for i in ["e6e08c98-ae5b-4cc6-8866-0787596c2b4c", "4B8C6898-1F11-4E06-BB6C-5A52BFDECC18"])
-        >>> all_uuids(g)
-        True
-
-        >>> g = (str(i) for i in ["e6e08c98-ae5b-4cc6-8866-0787596c2b4c", "invalid"])
-        >>> all_uuids(g)
-        False
-    """
-    for value in gen:
-        if not isinstance(value, str) or UUID_PATTERN.match(value) is None:
-            return False
-    return True
 
 
 def count_uuid_cases(uuids: List[str]) -> Dict[str, Any]:
@@ -125,7 +112,7 @@ def count_uuid_cases(uuids: List[str]) -> Dict[str, Any]:
     }
 
 
-def _compute_str_list_spec(values: list) -> dict:
+def compute_str_list_spec(values: list) -> dict:
     """
     Creates string spec from lists of list of strings
     Args:
@@ -135,7 +122,7 @@ def _compute_str_list_spec(values: list) -> dict:
         (dict): with appropriate string spec
     """
 
-    weights = _calculate_list_size_weights(values)
+    weights = calculate_list_size_weights(values)
     # Flatten the list of lists
     flat_list = [s for sublist in values for s in sublist]
 
@@ -165,6 +152,11 @@ def _compute_str_list_spec(values: list) -> dict:
 @datacraft.registry.analyzers('string')
 def _string_analyzer() -> datacraft.ValueListAnalyzer:
     return StringValueAnalyzer()
+
+
+@datacraft.registry.analyzers('int-string')
+def _int_string_analyzer() -> datacraft.ValueListAnalyzer:
+    return IntStringValueAnalyzer()
 
 
 @datacraft.registry.analyzers('uuid')

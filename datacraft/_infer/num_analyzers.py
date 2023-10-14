@@ -6,8 +6,8 @@ import datacraft
 from datacraft import ValueListAnalyzer, RefsAggregator
 
 from .helpers import (_simple_type_compatibility_check, _all_is_int, _all_is_float,
-                      _all_is_numeric, _is_nested_lists, _all_lists_of_type,
-                      _calculate_list_size_weights)
+                      all_is_numeric, is_nested_lists, _all_lists_of_type,
+                      calculate_list_size_weights)
 
 
 class IntValueAnalyzer(ValueListAnalyzer):
@@ -17,7 +17,7 @@ class IntValueAnalyzer(ValueListAnalyzer):
         return ValueListAnalyzer.NOT_COMPATIBLE
 
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
-        return _generate_numeric_spec(values, kwargs.get('limit', 0))
+        return generate_numeric_spec(values, kwargs.get('limit', 0))
 
 
 class FloatValueAnalyzer(ValueListAnalyzer):
@@ -27,14 +27,14 @@ class FloatValueAnalyzer(ValueListAnalyzer):
         return ValueListAnalyzer.NOT_COMPATIBLE
 
     def generate_spec(self, name: str, values: List[Any], refs: RefsAggregator, **kwargs) -> Dict[str, Any]:
-        return _generate_numeric_spec(values, kwargs.get('limit', 0))
+        return generate_numeric_spec(values, kwargs.get('limit', 0))
 
 
-def _generate_numeric_spec(values: List[Any], limit: int):
-    if _is_nested_lists(v for v in values):
-        return _compute_list_range(values)
-    if len(set(values)) > 1 and _all_is_numeric(values):
-        return _compute_range(values)
+def generate_numeric_spec(values: List[Any], limit: int):
+    if is_nested_lists(v for v in values):
+        return compute_list_range(values)
+    if len(set(values)) > 1 and all_is_numeric(values):
+        return compute_range(values)
 
     if limit > 0 and len(values) > limit:
         values = random.sample(values, limit)
@@ -44,7 +44,7 @@ def _generate_numeric_spec(values: List[Any], limit: int):
     }
 
 
-def _compute_range(values: List[Union[int, float]]) -> Dict[str, Any]:
+def compute_range(values: List[Union[int, float]]) -> Dict[str, Any]:
     """
     Compute the range from a list of numeric values.
 
@@ -58,7 +58,7 @@ def _compute_range(values: List[Union[int, float]]) -> Dict[str, Any]:
                 "data": [min, max]
             }
     """
-    if not _all_is_numeric(values):
+    if not all_is_numeric(values):
         raise ValueError("All values in the list must be numeric.")
 
     type_key = "rand_range"
@@ -71,7 +71,7 @@ def _compute_range(values: List[Union[int, float]]) -> Dict[str, Any]:
     }
 
 
-def _compute_list_range(values: list) -> dict:
+def compute_list_range(values: list) -> dict:
     """
     Creates rand_range spec for lists of values
     Args:
@@ -83,7 +83,7 @@ def _compute_list_range(values: list) -> dict:
     max_value = max(num for sublist in values for num in sublist)
     min_value = min(num for sublist in values for num in sublist)
 
-    weights = _calculate_list_size_weights(values)
+    weights = calculate_list_size_weights(values)
 
     if _all_lists_of_type(values, int):
         field_type = "rand_int_range"
