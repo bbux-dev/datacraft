@@ -1,3 +1,4 @@
+.. _spec_inference:
 Data Spec Inference
 ====================
 

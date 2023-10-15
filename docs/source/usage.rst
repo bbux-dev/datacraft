@@ -22,20 +22,20 @@ command below.
 
 .. code-block:: text
 
-    $ datacraft --inline "{demo: {type: uuid}}" --log-level off -i 5
+    $ datacraft  --iterations 5 --inline "{demo: {type: uuid}}" --log-level off
     d1e027bd-0836-4a07-b073-9d8c33aa432a
     258452c2-61a6-4764-96b9-a3b9b22f42c2
     47e45cd1-319a-41af-80b8-73987ca82fea
     3f9843a7-d8a4-45e5-b36b-88c4b5f88cd8
     a4704ff0-3305-456e-9e51-93327d1459d3
 
-This command uses an inline yaml syntax for the Data Spec. The spec consists of a single field ``demo``. The value
+The command line flags above instruct datacraft to generate values for 5 iterations from the inline Data Spec, which
+uses an inline yaml syntax. The Data Spec consists of a single field ``demo``. The value ``{type: uuid}``
 for the demo key is the Field Spec. The Field Spec has a type of ``uuid``, which is all that is needed for this spec.
-The command tells the datacraft tool to turn off logging and to generate 5 records from this inline spec. The default
-is for output to be printed to the console. Inline Data Specs can be useful for testing and development. Most Data
-Specs will be in JSON or YAML files. Use the ``--debug-spec`` flag to dump the inline spec out as JSON for easier
-additions and configuration changes. Use the ``--debug-spec-yaml`` flag if you prefer to work with the more compact
-YAML format.
+By default, the output is writen to the console. The are many forms that the output can take including JSON and
+csv files. Inline Data Specs can be useful for testing and development. Most Data Specs will be in JSON or YAML files.
+Use the ``--debug-spec`` flag to dump the inline spec out as JSON for easier additions and configuration changes.
+Use the ``--debug-spec-yaml`` flag if you prefer to work with the more compact YAML format.
 
 .. code-block:: text
 
@@ -46,7 +46,7 @@ YAML format.
             "type": "uuid"
         }
     }
-    $ datacraft -s demo.json --log-level off -i 5
+    $ datacraft -i 5 -s demo.json --log-level off
     5c4b45ed-4334-48bf-90c6-a3566a3af80b
     8b8bf4fa-f931-46fe-9f8c-f7317e59fbfe
     b2832228-e426-4fe5-a518-3a32d1dede2e
@@ -56,9 +56,9 @@ YAML format.
 Generating Records
 ------------------
 
-Many times we will want to generate some kind of record with more than one field in it.  A common format for generating
-records is to output them as JSON.  There is a ``--format`` flag that supports multiple output formats.  If we modify
-our example above to the following:
+Most records that a system deals with will contain more than one field.  A common format for generating
+records is to output them as JSON.  There is a ``--format`` flag that supports multiple output formats.
+If we modify our example above to the following:
 
 .. code-block:: json
 
@@ -82,8 +82,8 @@ integer between 1 and 100. If we run this spec and specify the ``--format json``
     {"id": "b6fbd17f-286b-4d58-aede-01901ae7a1d7", "timestamp": "2050-11-10T09:37:47", "count": 16}
     {"id": "f4923efa-28c5-424a-8560-49914dd2b2ac", "timestamp": "2050-11-19T17:28:13", "count": 29}
 
-There are other output formats available and a mechanism to register custom formatters. If a csv file is more suited
-for your needs:
+There are other output formats available and a mechanism to register :ref:`custom formatters<registry_decorators>`.
+If a csv file is more suited for your needs:
 
 .. code-block:: shell
 

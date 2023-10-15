@@ -37,6 +37,7 @@ def process_files(filepaths, filetype, args):
                                                  limit_weighted=args.limit_weighted,
                                                  duplication_threshold=args.duplication_threshold)
             results.update(result)
+        return results
     else:
         raise ValueError(f"Unsupported file type: {filetype}")
 
