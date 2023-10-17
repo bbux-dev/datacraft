@@ -1,7 +1,8 @@
 import json
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generator, List, Union, Callable
+from collections import Counter
+from typing import Any, Dict, Generator, List, Union, Callable, ForwardRef
 
 from . import registries
 
@@ -11,84 +12,133 @@ _log = logging.getLogger(__name__)
 class _TreeNode:
     def __init__(self, key: Union[str, None] = None):
         """
-        _TreeNode initialization.
+        Initialize a _TreeNode.
 
         Args:
-            key (str, optional): Key for the current tree node. Defaults to None.
+            key: Key for the current tree node. Defaults to None.
         """
         self.key = key
         self.children: Dict[str, '_TreeNode'] = {}
         self.values: List[Union[int, float, str, list, None]] = []
+        self.subtree: Union[None, _Tree] = None
+        self.child_tree_sizes: list = []
 
     def is_leaf(self) -> bool:
-        """
-        Check if the node is a leaf node.
+        """Return True if the node is a leaf, otherwise False."""
+        return len(self.children) == 0 and self.subtree is None
 
-        Returns:
-            bool: True if the node is leaf, otherwise False.
-        """
-        return len(self.children) == 0
+    def has_nested_children(self) -> bool:
+        """Return True if the children are nested objects, otherwise False."""
+        return self.subtree is not None
 
 
 class _Tree:
+    NESTED = "nested"
+
     def __init__(self):
-        """_Tree initialization."""
+        """Initialize _Tree."""
         self.root = _TreeNode()
 
-    def insert(self,
-               data_dict: Dict[str, Any],
-               node: Union[_TreeNode, None] = None) -> None:
+    def insert(self, data_dict: Dict[str, Any], node: Union[_TreeNode, None] = None) -> None:
         """
         Insert data into the tree.
 
         Args:
-            data_dict (Dict[str, Any]): Dictionary containing data to insert.
-            node (_TreeNode, optional): Node at which to start insertion. Defaults to the root.
+            data_dict: Dictionary containing data to insert.
+            node: Node at which to start insertion. Defaults to the root.
         """
         if node is None:
             node = self.root
 
         for key, value in data_dict.items():
-            if key not in node.children:
-                node.children[key] = _TreeNode(key=key)
-
-            if isinstance(value, (int, float, str, list, bool)) or value is None:
-                node.children[key].values.append(value)
+            if self._is_nested_object(value):
+                self._handle_nested_object(node, key, value)
             else:
-                self.insert(value, node=node.children[key])
+                self._insert_child_node(node, key, value)
 
-    def to_spec(self,
-                node: Union[_TreeNode, None] = None,
-                func: Union[Callable, None] = None) -> dict:
+    def _is_nested_object(self, value: Any) -> bool:
+        return isinstance(value, list) and isinstance(value[0], dict)
+
+    def _handle_nested_object(self, node: _TreeNode, key: str, value: Any):
+        child_node = self._get_or_create_child_node(node, key)
+        subtree = self._get_or_create_subtree(child_node)
+        for data in value:
+            subtree.insert(data)  # type: ignore
+        child_node.child_tree_sizes.append(len(value))
+
+    def _get_or_create_child_node(self, node: _TreeNode, key: str) -> _TreeNode:
+        if key not in node.children:
+            node.children[key] = _TreeNode(key=key)
+        return node.children[key]
+
+    def _get_or_create_subtree(self, node: _TreeNode):
+        if node.subtree is None:
+            node.subtree = _Tree()
+        return node.subtree
+
+    def _insert_child_node(self, node: _TreeNode, key: str, value: Any):
+        if key not in node.children:
+            node.children[key] = _TreeNode(key=key)
+
+        if isinstance(value, (int, float, str, list, bool)) or value is None:
+            node.children[key].values.append(value)
+        else:
+            self.insert(value, node=node.children[key])
+
+    def to_spec(self, node: Union[_TreeNode, None] = None, func: Union[Callable, None] = None) -> dict:
         """
         Convert the tree or subtree to a Data Spec.
 
         Args:
-            node (_TreeNode, optional): Node at which to start conversion. Defaults to the root.
-            func (Callable, optional): Function to apply on leaf node values. If provided,
-                                       this function is applied to the list of values at each
-                                       leaf node before they are returned.
+            node: Node at which to start conversion. Defaults to the root.
+            func: Function to apply on leaf node values.
 
         Returns:
-            Dict[str, Any]: Dictionary representation Data Spec.
+            A dictionary representation of the Data Spec.
         """
         if node is None:
             node = self.root
 
-        if node.is_leaf():
-            return func(node.key, node.values) if func else node.values
+        if node.has_nested_children():
+            return self._nested_child_to_spec(node, func)
 
-        data = {}
-        for key, child in node.children.items():
-            if child.is_leaf():
-                data[key] = self.to_spec(child, func)
-            else:
-                data[key] = {
-                    "type": "nested",
-                    "fields": self.to_spec(child, func)
-                }
+        return {key: self._child_to_spec(child, func) for key, child in node.children.items()}
 
-        return data
+    def _nested_child_to_spec(self, node: _TreeNode, func: Union[Callable, None] = None) -> dict:
+        count_weights = _compute_weighted_counts(node.child_tree_sizes)
+        return {
+            node.key: {
+                "type": self.NESTED,
+                "fields": self.to_spec(node.subtree.root, func),  # type: ignore
+                "config": {"count": count_weights, "as_list": True}
+            }
+        }
+
+    def _child_to_spec(self, child: _TreeNode, func: Union[Callable, None] = None) -> Union[list, dict]:
+        if child.has_nested_children():
+            return self._nested_child_to_spec(child, func)
+
+        if child.is_leaf():
+            return func(child.key, child.values) if func else child.values
+
+        return {"type": self.NESTED, "fields": self.to_spec(child, func)}
+
+
+def _compute_weighted_counts(counts: list) -> dict:
+    """
+    Compute a weighted dictionary from a list of counts.
+
+    Args:
+        counts (list): A list of count values.
+
+    Returns:
+        dict: A dictionary with keys as the unique count values converted to strings,
+              and values as their respective frequency.
+    """
+    total_counts = len(counts)
+    count_freq = Counter(counts)
+    weighted_dict = {str(k): v / total_counts for k, v in count_freq.items()}
+    return weighted_dict
 
 
 def _process_jsons(jsons: List[Dict[str, Any]],

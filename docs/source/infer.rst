@@ -1,3 +1,5 @@
+.. _spec_inference:
+
 Data Spec Inference
 ====================
 
@@ -201,19 +203,51 @@ We can now use the generated spec to produce test data:
 Advanced Options
 ^^^^^^^^^^^^^^^^
 
-The `from_examples` function supports some keyword arguments to fine-tune the inference:
+The `from_examples` function supports some keyword arguments to fine-tune the spec inference:
 
 - `limit`: If a spec will produce a list of values, this will be the max size of the list. It will be sampled to fit this size.
 - `limit_weighted`: Some analyzers will produce weighted values. These can also be large. If `limit_weighted` is set to True, then the top limit size weighted values will be retained.
+- `duplication_threshold`: ratio of unique to total items, if above this threshold, use weighted values
 
-For example:
+Examples:
 
 .. code-block:: python
 
-    spec = infer.from_examples(examples, limit=10, limit_weighted=True)
+    import datacraft.infer as infer
 
-Refer to the :ref:`function's docstring<spec_inference_module>` for a detailed breakdown and more examples.
+    # four records that contain four different values for the key "one"
+    examples = [
+        {"one": "a"},
+        {"one": "b"},
+        {"one": "c"},
+        {"one": "d"},
+    ]
+    # sample 3 of the values for our spec
+    print(infer.from_examples(examples, limit=3))
+    {'one': {'type': 'values', 'data': ['d', 'b', 'c']}}
 
+    # the value 'a' appears frequently in these records
+    # by default if the ratio of unique to total records is > 0.5, we use a weighted value scheme
+    examples = [
+        {"one": "a"},
+        {"one": "a"},
+        {"one": "a"},
+        {"one": "b"},
+        {"one": "c"},
+        {"one": "d"},
+    ]
+    # by default, if the weight values threshold is triggered, we don't limit it
+    print(infer.from_examples(examples, limit=3))
+    {'one': {'type': 'values', 'data': {'a': 0.5, 'b': 0.16667, 'c': 0.16667, 'd': 0.16667}}}
+
+    # to limit weighted values, set the limit_weighted parameter to True
+    print(infer.from_examples(examples, limit=3, limit_weighted=True))
+    # here we take the top three weighted values
+    {'one': {'type': 'values', 'data': {'a': 0.5, 'b': 0.16667, 'c': 0.16667}}}
+
+    print(infer.from_examples(examples, duplication_threshold=0.51))
+    # here we set the duplication threshold to over 50% and the values are retained as is
+    {'one': {'type': 'values', 'data': ['a', 'a', 'a', 'b', 'c', 'd']}}
 
 Notes
 -----
@@ -229,3 +263,25 @@ For the best results, it is helpful to have uniformly structured data for a spec
 having a directory with both customer profiles and product listings can lead to ambiguities or inaccuracies when
 inferring a Data Spec, as the fields and data types for each entity can vary significantly. This is especially true
 if there are field names that are the same but have different underlying data values.
+
+It is also helpful to have multiple examples of a record. A good practice is to have at least one example with minimum
+values and one with maximum. You infer a spec from a single example, but it might not be as helpful.
+
+There are some edge case structures that the tool is not set up to support at this time such as deeply nested
+lists:
+
+.. code-block:: python
+
+    examples = [
+        {
+            "crazy_list": [
+                [
+                    ["way", "down", "deep"]
+                ]
+            ]
+        }
+
+    ]
+    print(infer.from_examples(examples))
+    # this will just reproduce the example list over and over
+    {'crazy_list': {'type': 'values', 'data': [[[['way', 'down', 'deep']]]]}}

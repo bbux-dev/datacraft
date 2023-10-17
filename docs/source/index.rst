@@ -29,6 +29,15 @@ file. It is also easy to generate millions or billions of records to use for dev
 existing systems. Datacraft also has a python API so that you can generate your synthetic data as part of your
 test suite or application without have to use online tools or external services.
 
+In addition to its existing functionality, Datacraft now offers a :ref:`Data Spec inference<spec_inference>` capability.
+This feature streamlines the process of generating Data Specs by automatically inferring them from sample data
+fragments. Instead of manually defining each field and its properties, you can provide representative data, and
+Datacraft will generate a Data Spec for you. This enhancement simplifies the initial setup of your data generation
+projects, saving time and effort.
+
+
+
+
 .. toctree::
     :maxdepth: 2
     :caption: Contents:

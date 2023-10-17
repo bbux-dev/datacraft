@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from typing import Any, Dict, List, Callable
 from typing import Generator, Union
@@ -62,22 +63,22 @@ def _is_replacement(sublist):
     return any(v in REPLACEMENTS for v in sublist)
 
 
-def _is_nested_lists(values: Generator[Any, None, None]):
+def is_nested_lists(values: Generator[Any, None, None]):
     for item in values:
         if not isinstance(item, list):
             return False
     return True
 
 
-def _requires_substitution(values: List[Any]):
+def requires_substitution(values: List[Any]):
     return _any_is_boolean(values) or _any_is_none(values)
 
 
-def _substitute(values):
+def substitute(values):
     return [_LOOKUP.get(str(v), v) for v in values]
 
 
-def _all_is_numeric(values):
+def all_is_numeric(values):
     return all((isinstance(value, (int, float)) and not isinstance(value, bool)) for value in values)
 
 
@@ -94,7 +95,7 @@ def _all_is_str(values):
 
 
 def _all_lists_numeric(values):
-    return all(_all_is_numeric(sublist) for sublist in values)
+    return all(all_is_numeric(sublist) for sublist in values)
 
 
 def _all_is_of_type(values, type_check):
@@ -113,7 +114,7 @@ def _any_is_none(values):
     return any(v is None for v in values)
 
 
-def _calculate_list_size_weights(values):
+def calculate_list_size_weights(values):
     # Calculate the frequency of each sublist length
     length_freq = Counter(len(sublist) for sublist in values)
     # Calculate the total number of lists
@@ -123,7 +124,7 @@ def _calculate_list_size_weights(values):
     return weights
 
 
-def _calculate_weights(values: List[str]) -> Dict[str, float]:
+def calculate_weights(values: List[str]) -> Dict[str, float]:
     """
     Calculate the weights of occurrences of values from a list.
 
@@ -140,7 +141,7 @@ def _calculate_weights(values: List[str]) -> Dict[str, float]:
     return {key: round(count / total_count, 5) for key, count in counts.items()}
 
 
-def _are_values_unique(values: List) -> bool:
+def are_values_unique(values: List) -> bool:
     """
     Check if all values in the list are unique.
 
@@ -153,7 +154,7 @@ def _are_values_unique(values: List) -> bool:
     return len(values) == len(set(values))
 
 
-def _all_list_is_str(lists):
+def all_list_is_str(lists):
     return all(isinstance(val, str) for sublist in lists for val in sublist)
 
 
@@ -197,3 +198,24 @@ def is_significantly_duplicated(lst: List[str], threshold: float = 0.2) -> bool:
     unique_items = len(set(lst))
     dupiness_ratio = (total_items - unique_items) / total_items
     return dupiness_ratio > threshold
+
+
+def all_match_pattern(pattern: re.Pattern, gen: Generator[Union[str, int, float, bool], None, None]) -> bool:
+    """
+    Check if all values from a generator match a pattern.
+
+    The function will return False as soon as:
+    - a value is not a string
+    - a string value does not match the pattern.
+
+    Args:
+        pattern: regular expression pattern to math
+        gen: A generator of values.
+
+    Returns:
+        bool: True if all values match the pattern, False otherwise.
+    """
+    for value in gen:
+        if not isinstance(value, str) or pattern.match(value) is None:
+            return False
+    return True

@@ -1,3 +1,8 @@
+v0.8.1
+------
+* Fix for infer on multiple JSON files to combine them before inference
+* Fix to handle nested Objects in inference
+
 v0.8.0
 ------
 * added New `ref_list` type. For inject field values into positions in list/array objects.
