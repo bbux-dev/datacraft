@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["type", "data", "ref"],
   "properties": {
-    "type": {  "type": "string", "pattern": "^(regex_)?replace"},
+    "type": {  "type": "string", "pattern": "^((regex_)?replace)|masked"},
     "config": {
       "type": "object",
       "properties": {
@@ -24,7 +24,8 @@
       "description": "Mapping of value in output of referenced supplier to replacement value",
       "examples": [
         {"00000": "NNNNN"},
-        {"SECRET": "REPLACE_THIS"}
+        {"SECRET": "REPLACE_THIS"},
+        {"^.*": "XXX-XX-XXXX"}
       ]
     }
   }

@@ -48,6 +48,7 @@ regex_replace
 -------------
 
 Replace one or more parts of the output of a field or reference using regular expressions to match the value strings.
+Note that ``masked`` is an alias for this type.
 
 Prototype:
 
@@ -55,13 +56,15 @@ Prototype:
 
     {
       "<field name>": {
-        "type": "regex_replace",
+        "type": "regex_replace|masked",
         "ref": "<field or ref to source value from>",
         "data": {
           "<regex 1>": "<value to replace with 1>",
           ...
           "<regex N>": "<value to replace with N>",
         }
+        OR
+        "data": "<replace all values with this>
       }
     }
 
@@ -100,3 +103,38 @@ replacement.
     {"phone": "(632) 956-3481"}
     {"phone": "(575) 307-4587"}
     {"phone": "(279) 788-3403"}
+
+Masked Example
+^^^^^^^^^^^^^^
+
+The ``masked`` type is an alias for ``regex_replace``. One mode for these type is to replace
+all the values with a specified value for example:
+
+.. code-block:: json
+
+    {
+      "masked_ssn": {
+        "type": "masked",
+        "ref": "ssn",
+        "data": "NNN-NN-NNNN"
+      },
+      "age:rand_int_range": [18, 99],
+      "refs": {
+        "ssn": [
+          "123-45-6789",
+          "111-22-3333",
+          "555-55-5555"
+        ]
+      }
+    }
+
+.. code-block:: text
+
+    $  datacraft.exe -s ssn.json -i 3 --format csvh -x -l off
+    masked_ssn,age
+    NNN-NN-NNNN,40
+    NNN-NN-NNNN,42
+    NNN-NN-NNNN,73
+
+
+
