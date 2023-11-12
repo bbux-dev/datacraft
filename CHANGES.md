@@ -1,3 +1,41 @@
+v0.9.0
+------
+
+* Added `masked` type as alias for `regex_replace`. Added feature where single
+  value for data element is treated as replace all values with this e.g.
+
+```json
+{
+  "ssn": {
+    "type": "masked",
+    "ref": "raw_ssn",
+    "data": "NNN-NN-NNNN"
+  },
+  "refs": {
+    "raw_ssn": ["123-45-6789", "555-55-5555"]
+  }
+}
+```
+* Added `--endpoint-spec` argument. This specifies the path to a spec like file where each key
+is an endpoint and each value is the spec to generate data for that endpoint e.g:
+
+```json
+{
+  "/products/list": {
+    "product_id": { "type": "uuid" }
+  },
+  "/orders/recent": {
+    "order_id": { "type": "uuid" },
+    "customer_id": { "type": "uuid" }
+  }
+}
+```
+
+Here when you run data craft with the arg `--endpoint-spec /path/to/epspec.json` the tool will spin up a flask server
+with two endpoints one for `/products/list` and one for `/orders/recent`
+
+* Added `--csv-select` option to infer-spec cli. This allows a csv file to be turned into a csv_select spec.
+
 v0.8.1
 ------
 * Fix for infer on multiple JSON files to combine them before inference

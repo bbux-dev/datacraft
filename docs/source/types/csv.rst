@@ -80,6 +80,8 @@ Examples:
       }
     }
 
+.. _csv_select:
+
 csv_select
 ^^^^^^^^^^
 

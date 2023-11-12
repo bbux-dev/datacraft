@@ -2,16 +2,14 @@
 """
 Entry point for datacraft tool
 """
-import json
 import os.path
 import sys
 
 from . import cli, suppliers
-from .supplier.exceptions import SupplierException
+from .logging_handler import *
 # this activates the decorators, so they will be discoverable
 from .preprocessor import *
-from .logging_handler import *
-
+from .supplier.exceptions import SupplierException
 
 _log = logging.getLogger(__name__)
 
@@ -68,3 +66,7 @@ def run_server(args):
                    delay=args.server_delay)
     except ModuleNotFoundError:
         _log.warning('--server mode requires flask, pip/conda install flask and rerun command')
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -58,6 +58,7 @@ def main(argv):
     group.add_argument('--json', help='Path to JSON file', type=str)
     group.add_argument('--csv-dir', help='Directory path containing CSV files', type=str)
     group.add_argument('--json-dir', help='Directory path containing JSON files', type=str)
+    group.add_argument('--csv-select', help='Path to CSV file, infers a csv-select spec from file', type=str)
     parser.add_argument('--output', help='Output file to write results', type=str)
     parser.add_argument('--limit', dest='limit', type=int, default=0,
                         help='Max size of lists or weighted values to populate when unable to infer a more specific '
@@ -78,7 +79,10 @@ def main(argv):
     filetype = None
 
     _configure_logging(args.log_level)
-    if args.csv:
+    if args.csv_select:
+        write_results(args, generate_csv_select(args))
+        return
+    elif args.csv:
         _log.info("Processing %s...", args.csv)
         files_to_process.append(args.csv)
         filetype = 'csv'
@@ -98,7 +102,14 @@ def main(argv):
         filetype = 'json'
 
     results = process_files(files_to_process, filetype, args)
+    write_results(args, results)
 
+
+def generate_csv_select(args):
+    return datacraft.infer.infer_csv_select(args.csv_select)
+
+
+def write_results(args, results):
     if args.output:
         with open(args.output, 'w') as outfile:
             json.dump(results, outfile, indent=4)

@@ -34,6 +34,9 @@ Options:
 --json-dir JSON_DIR
    Directory path containing multiple JSON files for batch processing.
 
+--csv-select CSV_SELECT
+   Path to CSV file, infers a csv-select spec from file
+
 --output OUTPUT
    Specifies the output file to write the inferred Data Spec results.
 
@@ -112,6 +115,70 @@ Running this through `infer-spec` tool will produce the following Data Spec:
     }
 
 Keep in mind that while the generated data will resemble the source CSV, it won't retain the original's correlations.
+
+CSV Select
+----------
+
+The :ref:`csv_select` type can be used to simplify including externalized data into a Data Spec. To simplify the
+creation of these types of specs, you can use the ``--csv-select /path/to/file.csv`` command line option. For example
+if you had a csv like:
+
+.. code-block:: text
+
+    player_id,name,level,event_id,event_type
+    1001,Alice,10,E101,Quest
+    1002,Bob,12,E102,Battle
+    1003,Charlie,8,E103,Trade
+    1004,Diana,15,E104,Exploration
+    1005,Ethan,9,E105,Duel
+    1006,Fiona,11,E106,Tournament
+    1007,George,14,E107,Quest
+    1008,Hannah,7,E108,Battle
+    1009,Ian,13,E109,Trade
+
+Running the ``infer-spec`` cli tool with the ``--csv-select`` against this csv would result in a Data Spec like this:
+
+.. code-block:: shell
+
+    $ infer-spec.exe --csv-select game.csv
+    {
+        "placeholder": {
+            "type": "csv_select",
+            "data": {
+                "player_id": 1,
+                "name": 2,
+                "level": 3,
+                "event_id": 4,
+                "event_type": 5
+            },
+            "config": {
+                "datafile": "game.csv",
+                "headers": true
+            }
+        }
+    }
+
+Note that if the CSV file does not include headers, the names of the fields will be the first value in each field:
+
+.. code-block:: shell
+
+    $ infer-spec.exe --csv-select game-no-headers.csv
+    {
+        "placeholder": {
+            "type": "csv_select",
+            "data": {
+                "1001": 1,
+                "Alice": 2,
+                "10": 3,
+                "E101": 4,
+                "Quest": 5
+            },
+            "config": {
+                "datafile": "game-no-headers.csv",
+                "headers": true
+            }
+        }
+    }
 
 API Usage
 ---------
@@ -265,7 +332,8 @@ inferring a Data Spec, as the fields and data types for each entity can vary sig
 if there are field names that are the same but have different underlying data values.
 
 It is also helpful to have multiple examples of a record. A good practice is to have at least one example with minimum
-values and one with maximum. You infer a spec from a single example, but it might not be as helpful.
+values and one with maximum. You infer a spec from a single example, but it might not be as helpful. In this way a csv
+file with example values might be easier to start with.
 
 There are some edge case structures that the tool is not set up to support at this time such as deeply nested
 lists:
