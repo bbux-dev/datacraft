@@ -366,11 +366,7 @@ def _load_json_or_yaml(data_path, template_vars):
         _log.error('Unable to load data from path: %s', data_path)
         return None
 
-    with open(data_path) as f:
-        content = f.read()
-    has_jinja_markers = bool(re.search(r'{{.*?}}', content))
-
-    if len(template_vars) > 0 or has_jinja_markers:
+    if len(template_vars) > 0:
         _log.debug('Applying %s template vars to raw spec', len(template_vars))
         spec_str = template_engines.for_file(data_path).process(template_vars)
         _log.debug('Attempting to load data as JSON')
