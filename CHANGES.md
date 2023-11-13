@@ -35,6 +35,7 @@ Here when you run data craft with the arg `--endpoint-spec /path/to/epspec.json`
 with two endpoints one for `/products/list` and one for `/orders/recent`
 
 * Added `--csv-select` option to infer-spec cli. This allows a csv file to be turned into a csv_select spec.
+* Fixed broken `caclulate` type
 
 v0.8.1
 ------
