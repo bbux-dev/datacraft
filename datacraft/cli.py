@@ -147,6 +147,8 @@ def parseargs(argv):
                         help="Run a flask http server with the generated content")
     parser.add_argument("--server-endpoint", dest='endpoint', default='/data',
                         help="End point to host data service on")
+    parser.add_argument("--endpoint-spec", dest='endpoint_spec',
+                        help="Special formatted spec with keys as endpoints and specs for each endpoint as values")
     parser.add_argument("--server-port", dest='port', default=5000, type=int,
                         help="Server port")
     parser.add_argument('--server-delay', type=float, dest='server_delay',
@@ -180,7 +182,7 @@ def process_args(args):
     # Set Up
     ###################
 
-    _configure_logging(args)
+    configure_logging(args)
     _log.info('Starting Loading Configurations...')
     _log.debug('Parsing Args')
 
@@ -249,13 +251,16 @@ def process_args(args):
         writer.write(engine.process(spec))
         return None
 
+    return generator_for_spec(args, spec)
+
+
+def generator_for_spec(args, spec):
     ###################
     # Regular Flow
     ##################
     processor = outputs.processor(args.template, args.format)
     writer = _get_writer(args)
     output = _get_output(args, processor, writer)
-
     generator = builder.generator(
         spec,
         args.iterations,
@@ -264,7 +269,6 @@ def process_args(args):
         exclude_internal=args.exclude_internal,
         output=output,
         processor=processor)
-
     return generator
 
 
@@ -362,11 +366,7 @@ def _load_json_or_yaml(data_path, template_vars):
         _log.error('Unable to load data from path: %s', data_path)
         return None
 
-    with open(data_path) as f:
-        content = f.read()
-    has_jinja_markers = bool(re.search(r'{{.*?}}', content))
-
-    if len(template_vars) > 0 or has_jinja_markers:
+    if len(template_vars) > 0:
         _log.debug('Applying %s template vars to raw spec', len(template_vars))
         spec_str = template_engines.for_file(data_path).process(template_vars)
         _log.debug('Attempting to load data as JSON')
@@ -413,7 +413,7 @@ def _parse_spec_string(inline: str, template_vars: dict) -> dict:
     raise SpecException(f'Unable to load spec from string: {inline}, Please verify it is valid JSON or YAML')
 
 
-def _configure_logging(args):
+def configure_logging(args):
     """
     Use each logging element from the registry to configure logging
     """

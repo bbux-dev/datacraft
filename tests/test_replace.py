@@ -27,6 +27,31 @@ def test_regex_replacement():
     assert values == ['val_1', 'val_2', 'val_3_1', 'val_3_2']
 
 
+def test_masked_replacement():
+    spec = {
+        "ssn": ["111-11-1111", "222-22-2222", "555-55-5555"],
+        "replacement": builder.masked(ref="ssn",
+                                      data={
+                                          "^.*": "NNN-NN-NNNN"
+                                      })
+    }
+
+    entries = datacraft.entries(spec, 4)
+    values = [e['replacement'] for e in entries]
+    assert values == ["NNN-NN-NNNN", "NNN-NN-NNNN", "NNN-NN-NNNN", "NNN-NN-NNNN"]
+
+
+def test_masked_replacement_default_all():
+    spec = {
+        "ssn": ["111-11-1111", "222-22-2222", "555-55-5555"],
+        "replacement": builder.masked(ref="ssn", data="NNN-NN-NNNN")
+    }
+
+    entries = datacraft.entries(spec, 4)
+    values = [e['replacement'] for e in entries]
+    assert values == ["NNN-NN-NNNN", "NNN-NN-NNNN", "NNN-NN-NNNN", "NNN-NN-NNNN"]
+
+
 def _drop_key(data: dict, key_to_drop: str) -> dict:
     data.pop(key_to_drop, None)
     return data
@@ -38,6 +63,9 @@ bad_specs = [
     },
     {
         "field": _drop_key(builder.regex_replace("foo", {"foo": "bar"}), "data")
+    },
+    {
+        "field": _drop_key(builder.masked("foo", {"foo": "bar"}), "data")
     },
 ]
 

@@ -32,7 +32,7 @@ simple_calc_data = [
 def test_simple_calculation(alias_to_values, formula, expected_first_value):
     mapping = {key: datacraft.suppliers.values(values) for key, values in alias_to_values.items()}
 
-    supplier = datacraft.supplier.calculate._CalculateSupplier(mapping, datacraft.template_engines.string(formula))
+    supplier = datacraft.suppliers.calculate(mapping, formula)
 
     assert supplier.next(0) == expected_first_value
 

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from abc import ABC, abstractmethod
 from collections import Counter
 from typing import Any, Dict, Generator, List, Union, Callable, ForwardRef
@@ -335,3 +336,37 @@ def csv_to_spec(file_path: str, **kwargs) -> Union[None, dict]:
 
     # Get the spec using from_examples function
     return from_examples(json_records, **kwargs)
+
+
+def infer_csv_select(file_path):
+    """
+    Infers a csv_select spec from the given csv file
+
+    Args:
+        file_path (str): The path to the CSV file.
+
+    Returns:
+        Dict[str, Union[str, Dict]]: The csv_select Data Spec for the given csv data.
+    """
+    try:
+        import pandas  # type: ignore
+    except ModuleNotFoundError:
+        _log.error('pandas not installed, please pip/conda install it to allow analysis of csv files')
+        return None
+    name = os.path.basename(file_path)
+    result = {
+        "placeholder": {
+            "type": "csv_select",
+            "data": {
+                # to be filled in
+            },
+            "config": {
+                "datafile": name,
+                "headers": True,
+            }
+        }
+    }
+    df = pandas.read_csv(file_path)
+    data = {val: idx + 1 for idx, val in enumerate(df.columns)}
+    result["placeholder"]["data"] = data
+    return result

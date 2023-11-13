@@ -1109,10 +1109,13 @@ http://127.0.0.1:5000/data. If using a template, each call to the endpoint will 
 single record to the template data. If you specify one of the ``--format`` flags, the formatted record will be returned
 as a string. If neither a formatter or a template are applied, the record for each iteration will be returned as JSON.
 Note that using the ``--records-per-file`` with a number greater than one and a --format of json or json-pretty, will
-produce escaped JSON, which is probably not what you want.
+produce escaped JSON, which is probably not what you want. By default the tool will only host a single end point
+either /data or whatever you specify with ``--server-endpoint``. If you want more that one end point to serve data
+from multiple specs use the ``--endpoint-spec /path/to/epspec.json`` argument.  See second example below.
 
-Example
-^^^^^^^
+
+Single End Point
+^^^^^^^^^^^^^^^^
 
 For this example we use the inline yaml spec: ``{id:uuid: {}, ts:date.iso: {}}`` as the data we want returned from our
 endpoint. The command below will spin up a flask server that will format the record using the json-pretty formatter.
@@ -1154,3 +1157,41 @@ Here is the client side of the transaction, where we perform a GET request on th
 
 In this exchange, three requests are made.  The first two return the generated data formatted. The third returns a 204
 or No Content response code.  This is because the number of iterations was set to 2.
+
+Multiple End Points
+^^^^^^^^^^^^^^^^^^^
+
+In this example, we aim to host two endpoints, each providing synthetic data records based on our specifications.
+For this purpose, we utilize a variation of the Data Spec, known as an Endpoint Spec. This is a JSON file where each
+key represents an endpoint path, and the corresponding values are the Data Specs tailored for that specific endpoint.
+For instance:
+
+.. code-block:: json
+
+    {
+      "/products/list": {
+        "product_id": { "type": "uuid"  },
+        "price": {
+          "type": "rand_int_range",
+          "data": [10, 1000]
+        },
+        "in_stock": {
+          "_TRUE_": 0.85, "_FALSE_": 0.15
+        }
+      },
+      "/orders/recent": {
+        "order_id":  { "type": "uuid"  },
+        "customer_id":  { "type": "uuid"  },
+        "order_total": {
+          "type": "rand_int_range",
+          "data": [20, 2000]
+        },
+        "order_date": {
+          "type": "date.iso"
+        }
+      }
+    }
+
+Here we have two end points ``/products/list`` and ``/orders/recent``. Each end point will
+return different records that look like the data in production. One thing to note, is that
+there will not be any correlation between the data records.

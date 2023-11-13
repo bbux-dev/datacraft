@@ -1403,6 +1403,25 @@ def regex_replace(ref: str,
     return spec
 
 
+def masked(ref: str,
+           data: dict,
+           **config) -> dict:
+    """
+    Constructs a masked Field Spec
+
+    Args:
+        ref: ref/field to replace values from
+        data: mapping of regex to replacement
+        config: in kwargs format
+
+    Returns:
+        the masked spec
+    """
+    spec = replace(ref, data, **config)
+    spec['type'] = 'masked'
+    return spec
+
+
 def _simple_spec(key, config):
     spec = {
         "type": key
