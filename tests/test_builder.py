@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass
 
 import pytest
 
@@ -397,3 +398,20 @@ def test_entries_2():
     }
     records = datacraft.entries(spec, 5)
     assert len(records) == 5
+
+
+@dataclass
+class Entry:
+    foo: str
+
+
+@dataclass
+class SuperPower:
+    super_power: str
+
+
+def test_record_entries_1():
+    spec = {'foo': {'type': 'values', 'data': ['one', 'two']}}
+
+    entries = datacraft.record_entries(Entry, spec, 2)
+    assert entries == [Entry(foo='one'), Entry(foo='two')]

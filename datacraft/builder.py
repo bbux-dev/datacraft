@@ -3,8 +3,9 @@ Module for parsing and helper functions for specs
 """
 import copy
 import logging
-from typing import Dict, List
+from typing import Dict, List, TypeVar, Type
 from typing import Generator
+from dataclasses import dataclass, fields
 
 from . import registries
 from .loader import preprocess_spec, field_loader
@@ -13,6 +14,23 @@ from .supplier import key_suppliers
 from .supplier.model import DataSpec, RecordProcessor
 
 _log = logging.getLogger(__name__)
+
+T = TypeVar('T')
+
+
+def _from_dict(data_class: Type[T], data: dict) -> T:
+    """
+    Convert a dictionary to an instance of a given data class.
+
+    Args:
+        data_class: The data class to convert to.
+        data: The dictionary to convert.
+
+    Returns:
+        An instance of the data class populated with the data from the dictionary.
+    """
+    field_types = {f.name: f.type for f in fields(data_class)}
+    return data_class(**{f: _from_dict(field_types[f], data[f]) if isinstance(data[f], dict) else data[f] for f in data})
 
 
 def parse_spec(raw_spec: dict) -> DataSpec:
@@ -67,6 +85,44 @@ def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
         {'id': '474a439a-8582-46a2-84d6-58bfbfa10bca', 'timestamp': '2050-11-29T18:08:44.971', 'handle': '@XDvquPI'}
     """
     return list(generator(raw_spec, iterations, **kwargs))
+
+
+def record_entries(data_class: Type[T], raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[T]:
+    """
+    Creates a list of instances of a given data class from the provided spec.
+
+    Args:
+        data_class: The data class to create instances of.
+        raw_spec: Specification to create entries for.
+        iterations: Number of iterations before max.
+
+    Keyword Args:
+        processor: (RecordProcessor): For any Record Level transformations such templating or formatters.
+        output: (OutputHandlerInterface): For any field or record level output.
+        data_dir (str): Path to the data directory with CSV files and such.
+        enforce_schema (bool): If schema validation should be applied where possible.
+
+    Returns:
+        List of instances of the data class.
+
+    Examples:
+        >>> @dataclass
+        >>> class Entry:
+        ...     id: str
+        ...     timestamp: str
+        ...     handle: str
+        >>> raw_spec = {
+        ...     "id": {"type": "uuid"},
+        ...     "timestamp": {"type": "date.iso.millis"},
+        ...     "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+        ... }
+        >>> print(*record_entries(Entry, raw_spec, 3), sep='\\n')
+        Entry(id='example-id', timestamp='example-timestamp', handle='example-handle')
+        Entry(id='example-id', timestamp='example-timestamp', handle='example-handle')
+        Entry(id='example-id', timestamp='example-timestamp', handle='example-handle')
+    """
+    list_of_maps = entries(raw_spec, iterations, **kwargs)
+    return [_from_dict(data_class, entry) for entry in list_of_maps]
 
 
 def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator:
