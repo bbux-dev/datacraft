@@ -144,9 +144,9 @@ def record_entries(data_class: Type[T], raw_spec: Dict[str, Dict], iterations: i
         ...     "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
         ... }
         >>> print(*record_entries(Entry, raw_spec, 3), sep='\\n')
-        Entry(id='example-id', timestamp='example-timestamp', handle='example-handle')
-        Entry(id='example-id', timestamp='example-timestamp', handle='example-handle')
-        Entry(id='example-id', timestamp='example-timestamp', handle='example-handle')
+        Entry(id='d5aeb7fa-374c-4228-8645-e8953165f163', timestamp='2024-07-03T04:10:10.016', handle='@DAHQDSsF')
+        Entry(id='acde6f46-4692-45a7-8f0c-d0a8736c4386', timestamp='2024-07-06T17:43:36.653', handle='@vBTf71sP')
+        Entry(id='4bb5542f-bf7d-4237-a972-257e24a659dd', timestamp='2024-08-01T03:06:49.724', handle='@gzfY_akS')
     """
     _ensure_dataclass(data_class)
     list_of_maps = entries(raw_spec, iterations, **kwargs)

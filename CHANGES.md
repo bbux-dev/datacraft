@@ -1,3 +1,28 @@
+v0.10.0
+-------
+* Added `record_entries` and `record_generator` methods. These are used with to generate Data Classes instead of raw
+dictionaries.
+```python
+import datacraft
+
+@dataclass
+class Entry:
+    id: str
+    timestamp: str
+    handle: str
+    
+raw_spec = {
+    "id": {"type": "uuid"},
+    "timestamp": {"type": "date.iso.millis"},
+    "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+}
+print(*datacraft.record_entries(Entry, raw_spec, 3), sep='\\n')
+#Entry(id='d5aeb7fa-374c-4228-8645-e8953165f163', timestamp='2024-07-03T04:10:10.016', handle='@DAHQDSsF')
+#Entry(id='acde6f46-4692-45a7-8f0c-d0a8736c4386', timestamp='2024-07-06T17:43:36.653', handle='@vBTf71sP')
+#Entry(id='4bb5542f-bf7d-4237-a972-257e24a659dd', timestamp='2024-08-01T03:06:49.724', handle='@gzfY_akS')
+```
+* Fix for infer spec when nested objects are in a list
+
 v0.9.0
 ------
 
