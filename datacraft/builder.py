@@ -200,7 +200,6 @@ def record_generator(data_class: Type[T], raw_spec: Dict[str, Dict], iterations:
     """
     _ensure_dataclass(data_class)
 
-    # Assuming _DataSpecImpl is your actual implementation for generating raw entries
     data_spec_impl = _DataSpecImpl(copy.deepcopy(raw_spec))
     for entry in data_spec_impl.generator(iterations, **kwargs):
         yield _from_dict(data_class, entry)
