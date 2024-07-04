@@ -54,7 +54,7 @@ from .exceptions import SpecException, ResourceError
 from .supplier.exceptions import SupplierException
 # commonly used by client code
 from .loader import preprocess_spec, preprocess_and_format, Loader
-from . import suppliers
+from . import suppliers, outputs
 from .usage import build_api_help as type_usage
 from .usage import build_cli_help as cli_usage
 # registry decorators

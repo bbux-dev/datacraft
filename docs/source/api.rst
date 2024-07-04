@@ -62,13 +62,30 @@ function.
     }
 
     print(*datacraft.record_entries(Entry, spec, 3), sep='\n')
-    # Entry(id='1a5d8158-f095-49f2-abaf-eef2e33b4075', timestamp='2024-07-11T18:58:30.376', handle='@g7Lu0Vd4')
-    # Entry(id='f9e23a54-f9e8-4aa4-b3f5-aca45d89dd2c', timestamp='2024-07-21T20:00:32.290', handle='@kBCD7')
-    # Entry(id='61239ab0-2d3d-420f-be01-15ec5d730fd1', timestamp='2024-07-04T13:53:07.322', handle='@GlWfzV6r')
+    # Entry(id='1a5d8158-f095-49f2-abaf-eef2e33b4075', timestamp='2050-07-11T18:58:30.376', handle='@g7Lu0Vd4')
+    # Entry(id='f9e23a54-f9e8-4aa4-b3f5-aca45d89dd2c', timestamp='2050-07-21T20:00:32.290', handle='@kBCD7')
+    # Entry(id='61239ab0-2d3d-420f-be01-15ec5d730fd1', timestamp='2050-07-04T13:53:07.322', handle='@GlWfzV6r')
 
     # or if you prefer a generator
     for record in datacraft.record_generator(Entry, spec, 3_000_000):
         pass
+
+`values_for`
+^^^^^^^^^^^^
+
+If you only want the generated values for a specific field, say you want 100 uuids, then you can use the
+`datacraft.values_for` function
+
+.. code-block:: python
+
+    import datacraft
+
+    datacraft.values_for({"type": "uuid"}, 3)
+    # ['3ab92d2f-58d5-4328-a60e-72ee616199eb', 'cd5d5b64-ff25-4a2f-b69e-5a8c39841fc2', '2326f5c4-1b47-4913-8575-a71950f0fcce']
+    datacraft.values_for({"type": "ip", "config": {"prefix": "address:"}}, 3)
+    # ['address:243.228.123.130', 'address:4.22.163.89', 'address:175.230.40.87']
+    datacraft.values_for({"type": "date.iso"}, 3)
+    # ['2050-07-21T17:08:41', '2050-07-19T11:33:04', '2050-07-06T20:08:36']
 
 `registered_types` and `type_usage`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

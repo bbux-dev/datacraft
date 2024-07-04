@@ -2,6 +2,7 @@
 Module for parsing and helper functions for specs
 """
 import copy
+import json
 import logging
 from typing import Dict, List, TypeVar, Type
 from typing import Generator
@@ -12,6 +13,7 @@ from .loader import preprocess_spec, field_loader
 from .outputs import OutputHandlerInterface
 from .supplier import key_suppliers
 from .supplier.model import DataSpec, RecordProcessor
+from .exceptions import SpecException
 
 _log = logging.getLogger(__name__)
 
@@ -218,7 +220,24 @@ def values_for(field_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[d
 
     Returns:
         the list of N values
+
+    Raises:
+        SpecException if field_spec is not valid
+
+    Examples:
+        >>> import datacraft
+        >>> datacraft.values_for({"type": "uuid"}, 3)
+        ['3ab92d2f-58d5-4328-a60e-72ee616199eb', 'cd5d5b64-ff25-4a2f-b69e-5a8c39841fc2',
+ '2326f5c4-1b47-4913-8575-a71950f0fcce']
+        >>> datacraft.values_for({"type": "ip", "config": {"prefix": "address:"}}, 3)
+['address:243.228.123.130', 'address:4.22.163.89', 'address:175.230.40.87']
+        >>> datacraft.values_for({"type": "values", "data": ["cat", "dog", "dragon"]}, 3)
+['cat', 'dog', 'dragon']
     """
+    if field_spec is None or not isinstance(field_spec, dict):
+        raise SpecException('Field spec must be a dictionary')
+    if 'type' not in field_spec:
+        raise SpecException(f'Invalid field spec, no type included: {json.dumps(field_spec)}')
     raw_spec = {"temp": field_spec}
     records = list(generator(raw_spec, iterations, **kwargs))
     return [r['temp'] for r in records]

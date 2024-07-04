@@ -444,3 +444,21 @@ def test_record_generator_1():
 
     generator = datacraft.record_generator(Entry, spec, 2)
     assert list(generator) == [Entry(foo='one'), Entry(foo='two')]
+
+
+def test_values_for():
+    field_spec = {'type': 'uuid'}
+    values = datacraft.values_for(field_spec, 3)
+    assert len(values) == 3
+
+
+def test_values_for_not_dict():
+    with pytest.raises(SpecException):
+        datacraft.values_for(None, 100)
+    with pytest.raises(SpecException):
+        datacraft.values_for([{"type", "uuid"}], 100)
+
+
+def test_values_for_invalid_field_spec():
+    with pytest.raises(SpecException):
+        datacraft.values_for({"field": {"type": "uuid"}}, 100)
