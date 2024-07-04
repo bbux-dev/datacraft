@@ -135,12 +135,12 @@ class _LoaderImpl(Loader):
         if key in self.cache:
             return self.cache[key]
 
-        data_spec = self.specs.get(key)
-        if data_spec is None:
-            data_spec = self.refs.get(key)
-        if data_spec is None:
+        field_spec = self.specs.get(key)
+        if field_spec is None:
+            field_spec = self.refs.get(key)
+        if field_spec is None:
             raise SpecException("No key " + key + " found in specs")
-        supplier = self.get_from_spec(data_spec)
+        supplier = self.get_from_spec(field_spec)
         self.cache[key] = supplier
         return supplier
 

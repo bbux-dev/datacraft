@@ -264,3 +264,36 @@ def test_infer_invalid_ip():
     inferred_spec = datacraft.infer.from_examples(records)
     assert "network" in inferred_spec
     assert inferred_spec["network"]["type"] != "ip"
+
+
+def test_infer_nested():
+    records = [
+        {
+            "outer": {
+                "ip": "192.168.1.1",
+                "ts": "2020-05-12T14:20:30"
+            }
+        }
+    ]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "outer" in inferred_spec
+    assert inferred_spec["outer"]["type"] == "nested"
+
+
+def test_infer_nested_list():
+    records = [
+        {
+            "outer": [
+                {
+                    "ip": "192.168.1.1",
+                    "ts": "2020-05-12T14:20:30"
+                }
+            ]
+        }
+    ]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "outer" in inferred_spec
+    outer = inferred_spec["outer"]
+    assert outer["type"] == "nested"
+    assert "as_list" in outer["config"]
+    assert outer["config"]["as_list"] is True

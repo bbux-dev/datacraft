@@ -1,4 +1,5 @@
 import json
+from dataclasses import dataclass
 
 import pytest
 
@@ -397,3 +398,49 @@ def test_entries_2():
     }
     records = datacraft.entries(spec, 5)
     assert len(records) == 5
+
+
+@dataclass
+class Entry:
+    foo: str
+
+
+@dataclass
+class SuperPower:
+    super_power: str
+
+
+def test_record_entries_1():
+    spec = {'foo': {'type': 'values', 'data': ['one', 'two']}}
+
+    entries = datacraft.record_entries(Entry, spec, 2)
+    assert entries == [Entry(foo='one'), Entry(foo='two')]
+
+
+def test_record_entries_mismatch():
+    @dataclass
+    class MisMatchEntry:
+        id: str
+        timestamp: str
+        handle: str
+
+    # spec does not match data class
+    spec = {
+        "id": {"type": "uuid"},
+        "timestamp": ["dat"],
+        "name": ["bob", "joann"]
+    }
+    with pytest.raises(KeyError):
+        datacraft.record_entries(MisMatchEntry, spec, 2)
+
+
+def test_not_dataclass_raises_type_error():
+    with pytest.raises(TypeError):
+        datacraft.record_entries("StringNotDataclass", {"foo": "bar"}, 2)
+
+
+def test_record_generator_1():
+    spec = {'foo': {'type': 'values', 'data': ['one', 'two']}}
+
+    generator = datacraft.record_generator(Entry, spec, 2)
+    assert list(generator) == [Entry(foo='one'), Entry(foo='two')]

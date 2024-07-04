@@ -47,16 +47,14 @@ print(*datacraft.entries(spec, 3), sep='\\n')
 from .supplier.model import (
     DataSpec, ValueSupplierInterface, Distribution, CasterInterface, RecordProcessor, OutputHandlerInterface,
     ResettableIterator, KeyProviderInterface)
-# programmatic spec building
-from . import builder
 # expose this at root too
-from .builder import parse_spec, entries, generator, values_for
+from .builder import parse_spec, entries, generator, values_for, record_entries, record_generator
 # exceptions and errors thrown
 from .exceptions import SpecException, ResourceError
 from .supplier.exceptions import SupplierException
 # commonly used by client code
 from .loader import preprocess_spec, preprocess_and_format, Loader
-from . import loader, suppliers, distributions, outputs, utils
+from . import suppliers
 from .usage import build_api_help as type_usage
 from .usage import build_cli_help as cli_usage
 # registry decorators

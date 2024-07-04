@@ -9,7 +9,7 @@ The Datacraft API is can be used to generate data in a similar way to the comman
 as dictionaries and follow the JSON based format and schemas. Most of the time you can copy a JSON spec from a file
 and assign it to a variable and it will generate the same data as the command line ``datacraft`` tool.
 
-Example:
+Examples:
 
 .. code-block:: python
 
@@ -29,6 +29,35 @@ Example:
     # or if you prefer a generator
     for record in datacraft.generator(spec, 3_000_000):
         pass
+
+
+Record Entries
+--------------
+
+If you are using Data classes, you can tell datacraft to return your data as a data class using the `record_entries`
+function.
+
+.. code-block:: python
+
+    import datacraft
+    from dataclasses import dataclass
+
+    @dataclass
+    class Entry:
+        id: str
+        timestamp: str
+        handle: str
+
+    spec = {
+        "id": {"type": "uuid"},
+        "timestamp": {"type": "date.iso.millis"},
+        "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+    }
+
+    print(*datacraft.record_entries(Entry, spec, 3), sep='\n')
+    Entry(id='1a5d8158-f095-49f2-abaf-eef2e33b4075', timestamp='2024-07-11T18:58:30.376', handle='@g7Lu0Vd4')
+    Entry(id='f9e23a54-f9e8-4aa4-b3f5-aca45d89dd2c', timestamp='2024-07-21T20:00:32.290', handle='@kBCD7')
+    Entry(id='61239ab0-2d3d-420f-be01-15ec5d730fd1', timestamp='2024-07-04T13:53:07.322', handle='@GlWfzV6r')
 
 
 There are some functions that can be helpful for getting the list of registered types as well as examples for

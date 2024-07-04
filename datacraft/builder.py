@@ -3,8 +3,9 @@ Module for parsing and helper functions for specs
 """
 import copy
 import logging
-from typing import Dict, List
+from typing import Dict, List, TypeVar, Type
 from typing import Generator
+from dataclasses import dataclass, fields, MISSING, is_dataclass
 
 from . import registries
 from .loader import preprocess_spec, field_loader
@@ -13,6 +14,50 @@ from .supplier import key_suppliers
 from .supplier.model import DataSpec, RecordProcessor
 
 _log = logging.getLogger(__name__)
+
+T = TypeVar('T')
+
+
+def _ensure_dataclass(data_class: Type[T]):
+    """
+    Ensures that the provided class is a data class.
+
+    Args:
+        data_class: The class to check.
+
+    Raises:
+        TypeError: If the provided class is not a data class.
+    """
+    if not is_dataclass(data_class):
+        raise TypeError(f"Expected a dataclass type, got {type(data_class).__name__}")
+
+
+def _from_dict(data_class: Type[T], data: dict) -> T:
+    """
+    Convert a dictionary to an instance of a given data class.
+
+    Args:
+        data_class: The data class to convert to.
+        data: The dictionary to convert.
+
+    Returns:
+        An instance of the data class populated with the data from the dictionary.
+    """
+    field_types = {f.name: f.type for f in fields(data_class)}
+    kwargs = {}
+    for f in fields(data_class):
+        if f.name in data:
+            value = data[f.name]
+            if isinstance(value, dict) and not isinstance(field_types[f.name], type):
+                value = _from_dict(field_types[f.name], value)
+            kwargs[f.name] = value
+        elif f.default is not MISSING:
+            kwargs[f.name] = f.default
+        elif f.default_factory is not MISSING:  # For fields with default_factory
+            kwargs[f.name] = f.default_factory()
+        else:
+            raise KeyError(f"Missing required field: {f.name} for {data_class.__name__}")
+    return data_class(**kwargs)
 
 
 def parse_spec(raw_spec: dict) -> DataSpec:
@@ -69,6 +114,45 @@ def entries(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
     return list(generator(raw_spec, iterations, **kwargs))
 
 
+def record_entries(data_class: Type[T], raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[T]:
+    """
+    Creates a list of instances of a given data class from the provided spec.
+
+    Args:
+        data_class: The data class to create instances of.
+        raw_spec: Specification to create entries for.
+        iterations: Number of iterations before max.
+
+    Keyword Args:
+        processor: (RecordProcessor): For any Record Level transformations such templating or formatters.
+        output: (OutputHandlerInterface): For any field or record level output.
+        data_dir (str): Path to the data directory with CSV files and such.
+        enforce_schema (bool): If schema validation should be applied where possible.
+
+    Returns:
+        List of instances of the data class.
+
+    Examples:
+        >>> @dataclass
+        >>> class Entry:
+        ...     id: str
+        ...     timestamp: str
+        ...     handle: str
+        >>> raw_spec = {
+        ...     "id": {"type": "uuid"},
+        ...     "timestamp": {"type": "date.iso.millis"},
+        ...     "handle": {"type": "cc-word", "config": { "min": 4, "max": 8, "prefix": "@" } }
+        ... }
+        >>> print(*record_entries(Entry, raw_spec, 3), sep='\\n')
+        Entry(id='d5aeb7fa-374c-4228-8645-e8953165f163', timestamp='2024-07-03T04:10:10.016', handle='@DAHQDSsF')
+        Entry(id='acde6f46-4692-45a7-8f0c-d0a8736c4386', timestamp='2024-07-06T17:43:36.653', handle='@vBTf71sP')
+        Entry(id='4bb5542f-bf7d-4237-a972-257e24a659dd', timestamp='2024-08-01T03:06:49.724', handle='@gzfY_akS')
+    """
+    _ensure_dataclass(data_class)
+    list_of_maps = entries(raw_spec, iterations, **kwargs)
+    return [_from_dict(data_class, entry) for entry in list_of_maps]
+
+
 def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator:
     """
     Creates a generator for the raw spec for the specified iterations
@@ -90,6 +174,35 @@ def generator(raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator
         the generator for the provided spec
     """
     return _DataSpecImpl(copy.deepcopy(raw_spec)).generator(iterations, **kwargs)
+
+
+def record_generator(data_class: Type[T], raw_spec: Dict[str, Dict], iterations: int, **kwargs) -> Generator[
+    T, None, None]:
+    """
+    Creates a generator that yields instances of a given data class from the provided spec.
+
+    Args:
+        data_class: The data class to create instances of.
+        raw_spec: Specification to create generator for.
+        iterations: Number of iterations before max.
+
+    Keyword Args:
+        processor: (RecordProcessor): For any Record Level transformations such templating or formatters.
+        output: (OutputHandlerInterface): For any field or record level output.
+        data_dir (str): Path to the data directory with CSV files and such.
+        enforce_schema (bool): If schema validation should be applied where possible.
+
+    Yields:
+        Instances of the data class.
+
+    Returns:
+        The generator for the provided spec.
+    """
+    _ensure_dataclass(data_class)
+
+    data_spec_impl = _DataSpecImpl(copy.deepcopy(raw_spec))
+    for entry in data_spec_impl.generator(iterations, **kwargs):
+        yield _from_dict(data_class, entry)
 
 
 def values_for(field_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[dict]:
