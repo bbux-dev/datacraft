@@ -129,9 +129,6 @@ using them with the API.
     {'field': 'baz', 'replacement': 'fiz'}
     """
 
-.. contents::
-   :depth: 2
-
 .. _core_clasess:
 
 Core Classes
