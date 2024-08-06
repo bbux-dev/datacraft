@@ -17,7 +17,7 @@ def test_server(mocker, one):
 
     gen = datacraft.parse_spec(spec).generator(1)
 
-    datacraft.server.run({'/test': gen}, port=None, data_is_json=True, count_supplier=one)
+    datacraft.server.run({'/test': gen}, port=None, host=None, data_is_json=True, count_supplier=one)
 
 
 def test_server_callback_stop_iteration(mocker, one):
@@ -26,7 +26,7 @@ def test_server_callback_stop_iteration(mocker, one):
 
     gen = datacraft.parse_spec(spec).generator(1)
 
-    server = datacraft.server._Server({'/test': gen}, port=None, data_is_json=True, count_supplier=one)
+    server = server_for_generator(gen, one, True)
     callback = server.generate_view_func(gen)
     # two calls should trigger the StopIteration
     callback()
@@ -39,8 +39,12 @@ def test_server_callback(mocker, one):
     processor = datacraft.outputs.processor(format_name='json-pretty')
     gen = datacraft.parse_spec(spec).generator(1, processor=processor)
 
-    server = datacraft.server._Server({'/test': gen}, port=None, data_is_json=False, count_supplier=one)
+    server = server_for_generator(gen, one, False)
     callback = server.generate_view_func(gen)
 
     record = callback()
     assert record == json.dumps({'test': 42}, indent=4)
+
+
+def server_for_generator(gen, one, is_json):
+    return datacraft.server._Server({'/test': gen}, port=None, host=None, data_is_json=is_json, count_supplier=one)

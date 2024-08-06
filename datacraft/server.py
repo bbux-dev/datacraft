@@ -19,11 +19,13 @@ class _Server:
     def __init__(self,
                  endpoint_specs: dict,
                  port: int,
+                 host: str,
                  data_is_json: bool,
                  count_supplier: datacraft.ValueSupplierInterface,
                  delay: Union[float, None] = None):
         self.endpoint_specs = endpoint_specs
         self.port = port
+        self.host = host
         self.data_is_json = data_is_json
         self.count_supplier = count_supplier
         self.delay = delay
@@ -69,11 +71,12 @@ class _Server:
                              view_func=view_func,
                              methods=['POST', 'GET'])
 
-        app.run(port=self.port)
+        app.run(port=self.port, host=self.host)
 
 
 def run(endpoint_map: dict,
         port: int,
+        host: str,
         data_is_json: bool,
         count_supplier: datacraft.ValueSupplierInterface,
         delay: Union[float, None] = None):
@@ -84,9 +87,10 @@ def run(endpoint_map: dict,
     Args:
         endpoint_map: endpoint to generator that provides response data as dictionary for that end point
         port: to serve data on e.g. 8080
+        host: to list to traffic on e.g. localhost, 192.168.1.10
         data_is_json: if the data should be returned as JSON, default is as string
         count_supplier: supplies the number of values to generate for each call
         delay: number of seconds to pause between request and response
     """
-    server = _Server(endpoint_map, port, data_is_json, count_supplier, delay)
+    server = _Server(endpoint_map, port, host, data_is_json, count_supplier, delay)
     server.run()

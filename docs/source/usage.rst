@@ -527,9 +527,22 @@ along with the fields that should be output together.
      }
    }
 
-The keys of the ``field_groups`` must all be floating point numbers as strings.
+The keys of the ``field_groups`` must all be floating point numbers as strings. Note that keys in a map must be unique.
+So having two weights of 0.5, will not work. This can be over come by adding a small decimal offset e.g.:
 
-Running this example:
+.. code-block:: json
+
+   {
+     "one": "...",
+     "two": "...",
+     "tre": "...",
+     "field_groups": {
+       "0.50001": ["one", "two"],
+       "0.50002": ["one", "two", "tre"]
+     }
+   }
+
+Running the first example:
 
 .. code-block:: shell
 

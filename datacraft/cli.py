@@ -153,6 +153,8 @@ def parseargs(argv):
                         help="Special formatted spec with keys as endpoints and specs for each endpoint as values")
     parser.add_argument("--server-port", dest='port', default=5000, type=int,
                         help="Server port")
+    parser.add_argument("--server-host", dest='host', default="127.0.0.1",
+                        help="Server host")
     parser.add_argument('--server-delay', type=float, dest='server_delay',
                         help="Number of seconds before response is returned")
     parser.add_argument("--suppress-output", dest='suppress_output', action='store_true',
@@ -308,11 +310,10 @@ def _handle_defaults(args):
 
 
 def _get_writer(args):
-    """ get the write from the args """
+    """ get the writer from the args """
     return outputs.get_writer(args.outdir,
                               outfile_prefix=args.outfile_prefix,
                               extension=args.outfile_extension,
-                              server=args.server,
                               suppress_output=(args.suppress_output or args.server))
 
 

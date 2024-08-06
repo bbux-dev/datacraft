@@ -227,12 +227,11 @@ def values_for(field_spec: Dict[str, Dict], iterations: int, **kwargs) -> List[d
     Examples:
         >>> import datacraft
         >>> datacraft.values_for({"type": "uuid"}, 3)
-        ['3ab92d2f-58d5-4328-a60e-72ee616199eb', 'cd5d5b64-ff25-4a2f-b69e-5a8c39841fc2',
- '2326f5c4-1b47-4913-8575-a71950f0fcce']
+        ['3ab92d2f-58d5-4328-a60e-72ee616199eb', 'cd5d5b64-ff25-4a2f-b69e-5a8c39841fc2', '2326f5c4-1b47-4913-8575-a71950f0fcce']
         >>> datacraft.values_for({"type": "ip", "config": {"prefix": "address:"}}, 3)
-['address:243.228.123.130', 'address:4.22.163.89', 'address:175.230.40.87']
+        ['address:243.228.123.130', 'address:4.22.163.89', 'address:175.230.40.87']
         >>> datacraft.values_for({"type": "values", "data": ["cat", "dog", "dragon"]}, 3)
-['cat', 'dog', 'dragon']
+        ['cat', 'dog', 'dragon']
     """
     if field_spec is None or not isinstance(field_spec, dict):
         raise SpecException('Field spec must be a dictionary')

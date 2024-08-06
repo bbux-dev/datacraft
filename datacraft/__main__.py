@@ -61,6 +61,7 @@ def run_server(args):
             records_per_file = 1
         server.run(mappings,
                    args.port,
+                   args.host,
                    data_is_json=(not using_template_or_formatter),
                    count_supplier=suppliers.count_supplier(count=records_per_file),
                    delay=args.server_delay)
