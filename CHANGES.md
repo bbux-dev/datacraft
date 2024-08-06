@@ -1,3 +1,9 @@
+v0.10.1
+-------
+* Added `--type-schema <type>` cli arg to print out the JSON schema for a specific type if defined
+* Added `--server-host <HOST>` cli arg for specifying the Flask server host parameter
+* Added abbreviations `--format j` for json and `--format jp` for json-pretty
+
 v0.10.0
 -------
 * Added `record_entries` and `record_generator` methods. These are used with to generate Data Classes instead of raw
