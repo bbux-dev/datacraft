@@ -30,15 +30,6 @@ def _configure_replace_supplier(field_spec: dict, loader: datacraft.Loader):
     mappings, wrapped = _validate_and_load_replace(field_spec, loader)
     return _ReplaceSupplier(wrapped=wrapped, replacements=mappings)
 
-
-@datacraft.registry.types(_MASKED_KEY)
-@datacraft.registry.types(_REGEX_REPLACE_KEY)
-def _configure_regex_replace_supplier(field_spec: dict, loader: datacraft.Loader):
-    """ configures supplier for regex_replace type """
-    mappings, wrapped = _validate_and_load_regex_replace(field_spec, loader)
-    return _RegexReplaceSupplier(wrapped=wrapped, replacements=mappings)
-
-
 def _validate_and_load_replace(field_spec, loader):
     if any(key not in field_spec for key in ["ref", "data"]):
         raise datacraft.SpecException('ref and data fields required for replace spec: ' + json.dumps(field_spec))
@@ -50,6 +41,16 @@ def _validate_and_load_replace(field_spec, loader):
     # turn values into value suppliers
     mappings = {k: datacraft.suppliers.values(v) for k, v in mappings.items()}
     return mappings, wrapped
+
+@datacraft.registry.types(_MASKED_KEY)
+@datacraft.registry.types(_REGEX_REPLACE_KEY)
+def _configure_regex_replace_supplier(field_spec: dict, loader: datacraft.Loader):
+    """ configures supplier for regex_replace type """
+    mappings, wrapped = _validate_and_load_regex_replace(field_spec, loader)
+    return _RegexReplaceSupplier(wrapped=wrapped, replacements=mappings)
+
+
+
 
 
 def _validate_and_load_regex_replace(field_spec, loader):

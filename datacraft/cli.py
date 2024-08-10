@@ -130,6 +130,8 @@ def parseargs(argv):
     debug_group.add_argument('--type-help', dest='type_help', metavar='TYPE_NAME', default=argparse.SUPPRESS, nargs='*',
                              help='Write out the help for registered types, specify one or more types to limit help '
                                   'to, no arguments means show help for all types')
+    debug_group.add_argument('--type-schema', dest='type_schema', metavar='TYPE_SCHEMA', default=argparse.SUPPRESS,
+                             help='Display the JSON schema for one type, if provided')
     debug_group.add_argument('--cast-list', dest='cast_list', action='store_true',
                              help='Write out the list of registered casters')
     debug_group.add_argument('--format-list', dest='format_list', action='store_true',
@@ -151,6 +153,8 @@ def parseargs(argv):
                         help="Special formatted spec with keys as endpoints and specs for each endpoint as values")
     parser.add_argument("--server-port", dest='port', default=5000, type=int,
                         help="Server port")
+    parser.add_argument("--server-host", dest='host', default="127.0.0.1",
+                        help="Server host")
     parser.add_argument('--server-delay', type=float, dest='server_delay',
                         help="Number of seconds before response is returned")
     parser.add_argument("--suppress-output", dest='suppress_output', action='store_true',
@@ -216,6 +220,12 @@ def process_args(args):
     if 'type_help' in args:
         usage_str = usage.build_cli_help(*args.type_help)
         return _write_info(info=usage_str, dest_name='type_help.txt', outdir=args.outdir)
+    if 'type_schema' in args:
+        schema = registries.lookup_schema(args.type_schema)
+        if schema is None:
+            _log.warning(f"No schema for type {args.type_schema} found")
+            return
+        return _write_info(info=json.dumps(schema, indent=2), dest_name='type_schema.json', outdir=args.outdir)
     if args.cast_list:
         caster_names = casters.all_names()
         return _write_info(info=caster_names, dest_name='cast_list.txt', outdir=args.outdir)
@@ -300,11 +310,10 @@ def _handle_defaults(args):
 
 
 def _get_writer(args):
-    """ get the write from the args """
+    """ get the writer from the args """
     return outputs.get_writer(args.outdir,
                               outfile_prefix=args.outfile_prefix,
                               extension=args.outfile_extension,
-                              server=args.server,
                               suppress_output=(args.suppress_output or args.server))
 
 

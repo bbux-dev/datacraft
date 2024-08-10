@@ -16,12 +16,14 @@ from .exceptions import SpecException
 _log = logging.getLogger(__name__)
 
 
+@registries.Registry.formats('j')
 @registries.Registry.formats('json')
 def _format_json(record: Union[list, dict]) -> str:
     """formats the record as compressed json  """
     return json.dumps(record, ensure_ascii=registries.get_default('format_json_ascii'))
 
 
+@registries.Registry.formats('jp')
 @registries.Registry.formats('json-pretty')
 def _format_json_pretty(record: Union[list, dict]) -> str:
     """pretty prints the record as json  """
