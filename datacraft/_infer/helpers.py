@@ -98,6 +98,10 @@ def _all_lists_numeric(values):
     return all(all_is_numeric(sublist) for sublist in values)
 
 
+def _all_lists_empty(values):
+    return all(len(sublist) == 0 for sublist in values)
+
+
 def _all_is_of_type(values, type_check):
     return all(isinstance(val, type_check) for val in values)
 

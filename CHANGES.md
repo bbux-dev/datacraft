@@ -1,3 +1,7 @@
+v0.10.2
+-------
+* Fix for `infer-spec` when data lists are empty
+
 v0.10.1
 -------
 * Added `--type-schema <type>` cli arg to print out the JSON schema for a specific type if defined

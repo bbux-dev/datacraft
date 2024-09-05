@@ -7,7 +7,7 @@ from datacraft import ValueListAnalyzer, RefsAggregator
 
 from .helpers import (_simple_type_compatibility_check, _all_is_int, _all_is_float,
                       all_is_numeric, is_nested_lists, _all_lists_of_type,
-                      calculate_list_size_weights)
+                      calculate_list_size_weights, _all_lists_empty)
 
 
 class IntValueAnalyzer(ValueListAnalyzer):
@@ -80,6 +80,11 @@ def compute_list_range(values: list) -> dict:
     Returns:
         (dict): rand_range or rand_int_range spec
     """
+    if _all_lists_empty(values):
+        return {
+            "type": "values",
+            "data": [[]]
+        }
     max_value = max(num for sublist in values for num in sublist)
     min_value = min(num for sublist in values for num in sublist)
 

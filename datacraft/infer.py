@@ -58,7 +58,7 @@ class _Tree:
                 self._insert_child_node(node, key, value)
 
     def _is_nested_object(self, value: Any) -> bool:
-        return isinstance(value, list) and isinstance(value[0], dict)
+        return isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict)
 
     def _handle_nested_object(self, node: _TreeNode, key: str, value: Any):
         child_node = self._get_or_create_child_node(node, key)

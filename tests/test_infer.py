@@ -297,3 +297,16 @@ def test_infer_nested_list():
     assert outer["type"] == "nested"
     assert "as_list" in outer["config"]
     assert outer["config"]["as_list"] is True
+
+
+def test_infer_empty_lists():
+    records = [
+        {"list": []},
+        {"list": []},
+        {"list": []},
+        {"list": []},
+    ]
+    inferred_spec = datacraft.infer.from_examples(records)
+    assert "list" in inferred_spec
+    field_spec = inferred_spec["list"]
+    assert field_spec["type"] == "values"
