@@ -107,11 +107,16 @@ class _Tree:
 
     def _nested_child_to_spec(self, node: _TreeNode, func: Union[Callable, None] = None) -> dict:
         count_weights = _compute_weighted_counts(node.child_tree_sizes)
-        return {
+        spec = {
             "type": self.NESTED,
             "fields": self.to_spec(node.subtree.root, func),  # type: ignore
-            "config": {"count": count_weights, "as_list": True}
         }
+        if len(count_weights) > 1:
+            spec["config"] = {"count": count_weights, "as_list": True}
+        else:
+            spec["config"] = {"as_list": True}
+        return spec
+
 
     def _child_to_spec(self, child: _TreeNode, func: Union[Callable, None] = None) -> Union[list, dict]:
         if child.has_nested_children():

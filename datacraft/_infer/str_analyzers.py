@@ -2,7 +2,7 @@ import random
 import re
 from collections import Counter
 from typing import Any, Dict, List, Tuple
-from typing import Generator, Union
+from typing import Generator
 
 import datacraft
 from datacraft import ValueListAnalyzer, RefsAggregator
@@ -127,24 +127,11 @@ def compute_str_list_spec(values: list) -> dict:
     flat_list = [s for sublist in values for s in sublist]
 
     # Determine the number of unique strings
-    unique_strings = set(flat_list)
-    num_unique = len(unique_strings)
-
-    # Determine the range of sizes of the strings
-    sizes = [len(s) for s in unique_strings]
-    min_size = min(sizes)
-    max_size = max(sizes)
-    avg_size = sum(sizes) / num_unique
-
-    # Count occurrences of each string
-    counts = Counter(flat_list)
-
-    # Filter and count the strings that appear more than once
-    repeated_count = sum(1 for count in counts.values() if count > 1)
+    unique_strings = sorted(list(set(flat_list)))
 
     return {
         "type": "values",
-        "data": flat_list,
+        "data": unique_strings,
         "config": {"count": weights, "as_list": True}
     }
 

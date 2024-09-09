@@ -137,7 +137,7 @@ def test_string_value_analyzer_generate_spec(values, expected):
          {"type": "rand_int_range", "data": [1, 103], "config": {"count": {"3": 1.0}, "as_list": True}}),
         # nested str lists
         ([["do", "re", "me"], ["fa", "so"]],
-         {"type": "values", "data": ["do", "re", "me", "fa", "so"],
+         {"type": "values", "data": ["do", "fa", "me", "re", "so"],
           "config": {"count": {"3": 0.5, "2": 0.5}, "as_list": True}}),
         # mixed nested lists
         ([["do", "re", "me"], [1, 2, 3]],

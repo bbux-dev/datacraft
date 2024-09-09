@@ -185,25 +185,6 @@ def top_n_items(d, n):
     return {key: value for key, value in sorted_items[:n]}
 
 
-def is_significantly_duplicated(lst: List[str], threshold: float = 0.2) -> bool:
-    """
-    Determine if a list has a significant amount of duplicates, excluding potential outlier items.
-
-    Dupiness Ratio = (Total Items - Unique Items) / Total Items
-
-    Args:
-    - lst: List of items to check for significant duplication.
-    - threshold: ratio above which the list is considered significantly duplicated.
-
-    Returns:
-    - bool: True if list is significantly duplicated, False otherwise.
-    """
-    total_items = len(lst)
-    unique_items = len(set(lst))
-    dupiness_ratio = (total_items - unique_items) / total_items
-    return dupiness_ratio > threshold
-
-
 def all_match_pattern(pattern: re.Pattern, gen: Generator[Union[str, int, float, bool], None, None]) -> bool:
     """
     Check if all values from a generator match a pattern.
@@ -223,3 +204,22 @@ def all_match_pattern(pattern: re.Pattern, gen: Generator[Union[str, int, float,
         if not isinstance(value, str) or pattern.match(value) is None:
             return False
     return True
+
+
+def is_significantly_duplicated(lst: List[str], threshold: float = 0.2) -> bool:
+    """
+    Determine if a list has a significant amount of duplicates, excluding potential outlier items.
+
+    Dupiness Ratio = (Total Items - Unique Items) / Total Items
+
+    Args:
+    - lst: List of items to check for significant duplication.
+    - threshold: ratio above which the list is considered significantly duplicated.
+
+    Returns:
+    - bool: True if list is significantly duplicated, False otherwise.
+    """
+    total_items = len(lst)
+    unique_items = len(set(lst))
+    dupiness_ratio = (total_items - unique_items) / total_items
+    return dupiness_ratio > threshold
