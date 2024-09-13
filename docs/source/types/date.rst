@@ -16,15 +16,15 @@ from the datetime module.
    * - date
      - 11-18-2050
    * - date.iso
-     - 2050-12-01T01:44:35
+     - 2050-12-01T01:44:35Z
    * - date.iso.ms
-     - 2050-12-01T05:11:20.543
+     - 2050-12-01T05:11:20.543Z
    * - date.iso.millis
-     - 2050-12-01T05:11:20.543
+     - 2050-12-01T05:11:20.543Z
    * - date.iso.us
-     - 2050-12-01T06:19:02.752373
+     - 2050-12-01T06:19:02.752373Z
    * - date.iso.micros
-     - 2050-12-01T06:17:05.487878
+     - 2050-12-01T06:17:05.487878Z
    * - date.epoch
      - 1669825519
    * - date.epoch.ms
@@ -150,7 +150,7 @@ ISO Date Centered at 1 Jun 2050, with weighted hours of the day
       "start_time": {
         "type": "date.iso",
         "config": {
-          "center_date": "2050-06-01T12:00:00",
+          "center_date": "2050-06-01T12:00:00Z",
           "hours": { "type": "values", "data": { "7": 0.1, "8": 0.2, "9": 0.4, "10": 0.2, "11": 0.1 } }
         }
       }
@@ -189,3 +189,55 @@ Equivalent to
         "data": "%d-%b-%Y %H:%M"
       }
     }
+
+.now Variations
+^^^^^^^^^^^^^^^
+
+All date-type variations support a ``.now`` extension, allowing you to generate the current date and time in different
+formats based on your specific needs. These formats can include human-readable strings, epoch timestamps in various
+precisions, or ISO standard formats. The flexibility of the ``.now`` variations ensures that your data can align with
+different system requirements.
+
+For example, using the ``.now`` extension with a specific format string will generate the current date and time as
+follows:
+
+.. code-block:: json
+
+   {
+     "event_date": {
+       "type": "date.now",
+       "data": "%d-%b-%Y %H:%M:%S"
+     }
+   }
+
+This produces output like: ``15-Sep-2044 10:35:20``, which is useful for generating consistent, formatted timestamps.
+
+Available ``.now`` Variations:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each of the following ``.now`` types generates the current date and time in a specific format:
+
+.. list-table::
+   :header-rows: 0
+
+   * - ``date.now``
+     - Outputs the current date in a human-readable string, supports custom formats.
+   * - ``date.epoch.now``
+     - Generates the current Unix timestamp (seconds since 1 January 1970).
+   * - ``date.epoch.millis.now``
+     - Returns the Unix timestamp with millisecond precision.
+   * - ``date.epoch.ms.now``
+     - Alias for ``date.epoch.millis.now``.
+   * - ``date.iso.now``
+     - Produces the current date and time in ISO 8601 format
+   * - ``date.iso.micros.now``
+     - Provides the ISO 8601 format with microsecond precision.
+   * - ``date.iso.us.now``
+     - Alias for ``date.iso.micros.now``.
+   * - ``date.iso.millis.now``
+     - Outputs the ISO 8601 format with millisecond precision.
+   * - ``date.iso.ms.now``
+     - Alias for ``date.iso.millis.now``.
+
+These variations work well when using the ``--server`` command line option to serve up the data over REST.
+

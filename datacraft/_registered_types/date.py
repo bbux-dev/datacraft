@@ -27,8 +27,8 @@ _DATE_EPOCH_MS_KEY = 'date.epoch.ms'
 _DATE_EPOCH_MS_NOW_KEY = 'date.epoch.ms.now'
 _DATE_EPOCH_MILLIS_KEY = 'date.epoch.millis'
 _DATE_EPOCH_MILLIS_NOW_KEY = 'date.epoch.millis.now'
-_ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S'
-_ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f'
+_ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S"Z"'
+_ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f"Z"'
 
 
 @datacraft.registry.schemas(_DATE_KEY)
@@ -280,14 +280,18 @@ def _configure_supplier_custom_date_format(field_spec, loader, output_date_forma
 
 
 class _DateNowSupplier(datacraft.ValueSupplierInterface):
-    def __init__(self, date_format: str | None):
+    def __init__(self, date_format: str | None, is_utc: bool=False):
         self.date_format = date_format
+        self.is_utc = is_utc
 
     def next(self, iteration):
-        next_date = datetime.datetime.now()
+        if self.is_utc:
+            next_date = datetime.datetime.utcnow()
+        else:
+            next_date = datetime.datetime.now()
         if self.date_format:
             return next_date.strftime(self.date_format)
-        return next_date.replace(microsecond=0).isoformat()
+        return next_date.replace(microsecond=0).isoformat() + 'Z'
 
 
 class _EpochNowSupplier(datacraft.ValueSupplierInterface):
@@ -305,19 +309,19 @@ class _EpochNowSupplier(datacraft.ValueSupplierInterface):
 @datacraft.registry.types(_DATE_ISO_NOW_KEY)
 def _configure_supplier_iso_now(_: dict, __: datacraft.Loader):
     """ configures the date.iso.now value supplier """
-    return _DateNowSupplier(_ISO_FORMAT_NO_MICRO)
+    return _DateNowSupplier(_ISO_FORMAT_NO_MICRO, is_utc=True)
 
 
 @datacraft.registry.types(_DATE_ISO_US_NOW_KEY)
 @datacraft.registry.types(_DATE_ISO_MICROS_NOW_KEY)
 def _configure_supplier_iso_microseconds_now(_: dict, __: datacraft.Loader):
     """ configures the date.iso.us.now value supplier """
-    return _DateNowSupplier(_ISO_FORMAT_WITH_MICRO)
+    return _DateNowSupplier(_ISO_FORMAT_WITH_MICRO, is_utc=True)
 
 
 @datacraft.registry.types(_DATE_ISO_MS_NOW_KEY)
 @datacraft.registry.types(_DATE_ISO_MILLIS_NOW_KEY)
-def _configure_supplier_iso_milliseconds_now(field_spec: dict, loader: datacraft.Loader):
+def _configure_supplier_iso_milliseconds_now(_: dict, __: datacraft.Loader):
     """ configures the date.iso.ms.now value supplier """
-    micros_supplier = _DateNowSupplier(_ISO_FORMAT_WITH_MICRO)
+    micros_supplier = _DateNowSupplier(_ISO_FORMAT_WITH_MICRO, is_utc=True)
     return datacraft.suppliers.cut(micros_supplier, start=0, end=23)
