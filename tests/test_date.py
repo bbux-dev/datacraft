@@ -93,7 +93,7 @@ def test_date_center_date():
 
 
 def test_date_center_iso_date():
-    config = {"center_date": "2050-02-15T12:00:00", "stddev_days": 5}
+    config = {"center_date": "2050-02-15T12:00:00Z", "stddev_days": 5}
     spec = _date_iso_spec(**config)
     loader = datacraft.loader.field_loader(spec)
     supplier = loader.get('foo')

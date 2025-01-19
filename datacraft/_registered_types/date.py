@@ -27,8 +27,8 @@ _DATE_EPOCH_MS_KEY = 'date.epoch.ms'
 _DATE_EPOCH_MS_NOW_KEY = 'date.epoch.ms.now'
 _DATE_EPOCH_MILLIS_KEY = 'date.epoch.millis'
 _DATE_EPOCH_MILLIS_NOW_KEY = 'date.epoch.millis.now'
-_ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%S"Z"'
-_ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%f"Z"'
+_ISO_FORMAT_NO_MICRO = '%Y-%m-%dT%H:%M:%SZ'
+_ISO_FORMAT_WITH_MICRO = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 @datacraft.registry.schemas(_DATE_KEY)
