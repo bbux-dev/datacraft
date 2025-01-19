@@ -311,6 +311,15 @@ In order to apply the data to the template, use the ``-t`` flag:
         <total>592.08</total>
     </order>
 
+The ``-t`` flag will also work for an inline template as a string e.g.:
+
+.. code-block:: text
+
+   $ datacraft -s sample.json  -i 3 -t 'Ingredients: {{ ingredients | safe }}' -l off
+   Ingredients: "garlic", "onions"
+   Ingredients: "mushrooms", "potatoes", "garlic", "bell peppers"
+   Ingredients: "potatoes", "mushrooms"
+
 Apply Raw
 ---------
 
