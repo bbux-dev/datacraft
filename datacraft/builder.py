@@ -45,13 +45,13 @@ def _from_dict(data_class: Type[T], data: dict) -> T:
     Returns:
         An instance of the data class populated with the data from the dictionary.
     """
-    field_types = {f.name: f.type for f in fields(data_class)}
+    field_types = {f.name: f.type for f in fields(data_class)}  # type: ignore[arg-type]
     kwargs = {}
-    for f in fields(data_class):
+    for f in fields(data_class):  # type: ignore[arg-type]
         if f.name in data:
             value = data[f.name]
             if isinstance(value, dict) and not isinstance(field_types[f.name], type):
-                value = _from_dict(field_types[f.name], value)
+                value = _from_dict(field_types[f.name], value)  # type: ignore[arg-type]
             kwargs[f.name] = value
         elif f.default is not MISSING:
             kwargs[f.name] = f.default

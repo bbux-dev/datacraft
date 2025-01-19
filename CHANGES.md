@@ -1,3 +1,19 @@
+v0.11.0
+-------
+* Addition of <date.type>.now e.g.
+```
+date.now
+date.epoch.now
+date.epoch.millis.now
+date.epoch.ms.now
+date.iso.now
+date.iso.micros.now
+date.iso.us.now
+date.iso.millis.now
+date.iso.ms.now
+```
+These give the date in the specified format for the current time on the local system.
+
 v0.10.2
 -------
 * Fix for `infer-spec` when data lists are empty

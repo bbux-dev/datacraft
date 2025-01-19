@@ -1,16 +1,16 @@
 # build
-setuptools~=45.2.0
+setuptools>=45.2.0
 # config
-pyyaml~=5.1
+pyyaml>=6.0.2
 # custom code
-catalogue~=2.0.1
+catalogue>=2.0.1
 # templating
-jinja2~=3.0.3
+jinja2>=3.0.3
 # json schema
-jsonschema~=3.2.0
+jsonschema>=3.2.0
 # for calculate
-asteval~=0.9.25
+asteval>=0.9.25
 # for 3.6 builds
-importlib-resources~=5.2.2
+importlib-resources>=5.2.2
 # for custom code loading
-importlib-metadata~=4.8.2
+importlib-metadata>=4.8.2

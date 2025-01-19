@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/date.schema.json",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {  "type": "string", "pattern": "^date(\\.iso(\\.ms|\\.millis|\\.us|\\.micros)?)?.now$"},
+    "data": {
+      "type":  "string",
+      "description": "For date type, this is a short cut for config.format, invalid for any other type",
+      "examples": [
+        "%Y%m%d",
+        "%m/%d/%Y",
+        "%H:%M:%S"
+      ]
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "prefix": {"$ref": "#/definitions/prefix"},
+        "suffix": {"$ref": "#/definitions/suffix"},
+        "quote": {"$ref": "#/definitions/quote"},
+        "count": {"$ref": "#/definitions/count"},
+        "format": {
+          "description": "Valid datetime format string",
+          "default": "%d-%m-%Y",
+          "examples": [
+            "%Y%m%d",
+            "%m/%d/%Y",
+            "%H:%M:%S"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}
