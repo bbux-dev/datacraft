@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 import datacraft
+from datacraft import SpecException
 from . import builder
 
 
@@ -175,6 +176,13 @@ def test_date_restrict_hours():
         date = next(gen)['foo']
         dt = datetime.datetime.strptime(date, date_format)
         assert 6 <= dt.hour <= 21
+
+
+def test_data_and_format_cannot_both_be_specified():
+    date_format = "%d-%m-%Y %H"
+    spec = builder.date(date_format, format=date_format)
+    with pytest.raises(SpecException):
+        datacraft.entries(spec, 1)
 
 
 def _get_unique_values(spec, key, iterations=100):
