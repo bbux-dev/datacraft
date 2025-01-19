@@ -263,6 +263,53 @@ Examples:
    datacraft --inline "{timestamp:date: {}}" -i 4 -r 1 --log-level off --format json -x
    [{"timestamp": "22-04-2050"}, {"timestamp": "03-04-2050"}, {"timestamp": "10-04-2050"}, {"timestamp": "06-04-2050"}]
 
+Templated Data
+--------------
+
+If you have a fragment of data that is templated, you can use Datacraft to inject data from the DataSpec into the
+templated file. We make use of the  the `Jinja2 <https://pypi.org/project/Jinja2/>`_ templating engine format for
+specifying variable names to substitute. For example:
+
+.. code-block:: html
+
+    <order>
+        <product>
+            <id>{{product_id}}</id>
+            <name>Widget 22</name>
+            <quantity>{{quantity}}</quantity>
+        </product>
+        <total>{{total_price}}</total>
+    </order>
+
+You could then write a spec like:
+
+.. code-block:: json
+
+    {
+      "product_id": {
+        "type": "cc-number", "config": { "count": 13 }
+      },
+      "quantity": {
+        "type": "rand_int_range", "data": [1, 10]
+      },
+      "total_price": {
+        "type": "rand_range", "data": [1.75, 1111.75], "config": { "cast": "round2" }
+      }
+    }
+
+In order to apply the data to the template, use the ``-t`` flag:
+
+.. code-block:: text
+
+    $ datacraft -s spec.json -t template.xml -i 1 -l off
+    <order>
+        <product>
+            <id>1837671592021</id>
+            <name>Widget 22</name>
+            <quantity>6</quantity>
+        </product>
+        <total>592.08</total>
+    </order>
 
 Apply Raw
 ---------
