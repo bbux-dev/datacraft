@@ -10,6 +10,7 @@ _log = logging.getLogger(__name__)
 _RANGE_KEY = 'range'
 _RAND_RANGE_KEY = 'rand_range'
 _RAND_INT_RANGE_KEY = 'rand_int_range'
+_INTEGER_KEY = 'integer'  # Alias for rand_int_range
 
 
 @datacraft.registry.schemas(_RANGE_KEY)
@@ -26,6 +27,7 @@ def _get_rand_range_schema():
 
 
 @datacraft.registry.schemas(_RAND_INT_RANGE_KEY)
+@datacraft.registry.schemas(_INTEGER_KEY)
 def _get_rand_int_range_schema():
     """ schema for rand int range type """
     # This shares a schema with range
@@ -75,6 +77,7 @@ def _example_rand_range_usage():
 
 
 @datacraft.registry.usage(_RAND_INT_RANGE_KEY)
+@datacraft.registry.usage(_INTEGER_KEY)
 def _example_range_int_range_usage():
     example = {
         "rand_0_to_99": {
@@ -111,6 +114,7 @@ def _configure_range_supplier_for_data(field_spec, data):
 
 
 @datacraft.registry.types(_RAND_INT_RANGE_KEY)
+@datacraft.registry.types(_INTEGER_KEY)
 def _configure_rand_int_range_supplier(field_spec, loader):
     """ configures the random int range value supplier """
     config = datacraft.utils.load_config(field_spec, loader)

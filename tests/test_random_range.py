@@ -17,6 +17,7 @@ def test_random_range_exponent():
 valid_tests = [
     ("rand_range", [-180.0, -90.0], -180, -90),
     ("rand_int_range", [1.5, 5.5], 1, 6),
+    ("integer", [1, 100], 1, 100),
     ("rand_range", [10.5], 0, 10.5),
     ("rand_range", [0.123000, 0.124999, 3], 0.123, 0.125),
 ]
@@ -32,7 +33,8 @@ def test_random_range_parameterized(field_type, data, lower, upper):
 
 field_type_keys = [
     "rand_range",
-    "rand_int_range"
+    "rand_int_range",
+    "integer"
 ]
 
 
@@ -47,7 +49,8 @@ def test_random_range_invalid_missing_data(field_type):
 invalid_data_type = [
     ("rand_range", None),
     ("rand_int_range", {'foo': 'bar'}),
-    ("rand_range", [])
+    ("rand_range", []),
+    ("integer", "not-valid")
 ]
 
 

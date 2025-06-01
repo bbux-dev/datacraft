@@ -4,7 +4,7 @@
   "type": "object",
   "required": ["type", "data"],
   "properties": {
-    "type": {  "type": "string", "pattern": "^(rand_(int_)?)?range$"},
+    "type": {  "type": "string", "pattern": "^integer|(rand_(int_)?)?range$"},
     "config": {
       "type": "object",
       "properties": {
