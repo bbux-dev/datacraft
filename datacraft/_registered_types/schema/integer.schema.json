@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/bbux-dev/datacraft/schemas/range.schema.json",
+  "$id": "https://github.com/bbux-dev/datacraft/schemas/integer.schema.json",
   "type": "object",
-  "required": ["type", "data"],
+  "required": ["type"],
   "properties": {
-    "type": {  "type": "string", "pattern": "^(rand_(int_)?)?range$"},
+    "type": {"type": "string", "pattern": "^integer$"},
     "config": {
       "type": "object",
       "properties": {
@@ -18,12 +18,14 @@
     },
     "data": {
       "oneOf": [
+        {"type": "null"},
+        {"type": "object"},
         {
           "type": "array",
-          "minItems": 1,
+          "minItems": 0,
           "maxItems": 3,
           "uniqueItems": false,
-          "items": { "type": "number" }
+          "items": {"type": "number"}
         },
         {
           "type": "array",
@@ -33,7 +35,7 @@
             "minItems": 1,
             "maxItems": 3,
             "uniqueItems": false,
-            "items": { "type": "number" }
+            "items": {"type": "number"}
           }
         }
       ]

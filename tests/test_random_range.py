@@ -33,8 +33,7 @@ def test_random_range_parameterized(field_type, data, lower, upper):
 
 field_type_keys = [
     "rand_range",
-    "rand_int_range",
-    "integer"
+    "rand_int_range"
 ]
 
 

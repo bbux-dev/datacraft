@@ -96,3 +96,40 @@ Examples:
         "data": [1, 100]
       }
     }
+
+.. code-block:: json
+
+    {
+      "int_in_range": {
+        "type": "rand_int_range",
+        "data": [1, 100]
+      }
+    }
+
+integer
+^^^^^^^
+
+The `integer` type is similar to `rand_int_range` and uses the same configuration. The only difference is that the
+data element is not required. If no data element is specified, the range of numbers created will be between +- one
+billion.
+
+.. code-block:: json
+
+    {
+      "int_no_args": {
+        "type": "integer"
+      }
+    }
+
+
+.. code-block:: json
+
+    {
+      "int_with_args": {
+        "type": "integer",
+        "data": [
+            [1, 5], [7, 11], [20, 122]
+        ]
+      }
+    }
+

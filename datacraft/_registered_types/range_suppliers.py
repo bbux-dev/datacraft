@@ -27,11 +27,17 @@ def _get_rand_range_schema():
 
 
 @datacraft.registry.schemas(_RAND_INT_RANGE_KEY)
-@datacraft.registry.schemas(_INTEGER_KEY)
 def _get_rand_int_range_schema():
     """ schema for rand int range type """
     # This shares a schema with range
     return schemas.load(_RANGE_KEY)
+
+
+@datacraft.registry.schemas(_INTEGER_KEY)
+def _get_integer_schema():
+    """ schema for integer type """
+    # This shares a schema with range
+    return schemas.load(_INTEGER_KEY)
 
 
 @datacraft.registry.types(_RANGE_KEY)
@@ -77,7 +83,6 @@ def _example_rand_range_usage():
 
 
 @datacraft.registry.usage(_RAND_INT_RANGE_KEY)
-@datacraft.registry.usage(_INTEGER_KEY)
 def _example_range_int_range_usage():
     example = {
         "rand_0_to_99": {
@@ -86,6 +91,29 @@ def _example_range_int_range_usage():
         }
     }
     return common.standard_example_usage(example, 3)
+
+
+@datacraft.registry.usage(_INTEGER_KEY)
+def _example_integer_usage():
+    example_one = {
+        "some_int_value": {
+            "type": _INTEGER_KEY
+        }
+    }
+    example_two = {
+        "integer_0_to_99": {
+            "type": _INTEGER_KEY,
+            "data": [0, 100]
+        }
+    }
+    examples = [example_one, example_two]
+    clis = [common.standard_cli_example_usage(example, 3, pretty=True) for example in examples]
+    apis = [common.standard_api_example_usage(example, 3) for example in examples]
+
+    return {
+        'cli': '\n'.join(clis),
+        'api': '\n'.join(apis)
+    }
 
 
 def _configure_range_supplier_for_data(field_spec, data):
@@ -114,12 +142,26 @@ def _configure_range_supplier_for_data(field_spec, data):
 
 
 @datacraft.registry.types(_RAND_INT_RANGE_KEY)
-@datacraft.registry.types(_INTEGER_KEY)
 def _configure_rand_int_range_supplier(field_spec, loader):
     """ configures the random int range value supplier """
     config = datacraft.utils.load_config(field_spec, loader)
     config['cast'] = 'int'
     field_spec['config'] = config
+    return _configure_rand_range_supplier(field_spec, loader)
+
+
+@datacraft.registry.types(_INTEGER_KEY)
+def _configure_integer_supplier(field_spec, loader):
+    """ configures the integer value supplier """
+    config = datacraft.utils.load_config(field_spec, loader)
+    config['cast'] = 'int'
+    field_spec['config'] = config
+    data = field_spec.get('data')
+    if data is None or len(data) == 0:
+        min_int = -1_000_000_000
+        max_int = 1_000_000_000
+        field_spec['data'] = [min_int, max_int]
+
     return _configure_rand_range_supplier(field_spec, loader)
 
 
