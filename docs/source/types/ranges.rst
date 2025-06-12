@@ -133,3 +133,29 @@ billion.
       }
     }
 
+number
+^^^^^^^
+
+The `number` type is similar to `rand_range` and uses the same configuration. The only difference is that the
+data element is not required. If no data element is specified, the range of numbers created will be between +- one
+billion.
+
+.. code-block:: json
+
+    {
+      "num_no_args": {
+        "type": "number"
+      }
+    }
+
+
+.. code-block:: json
+
+    {
+      "num_with_args": {
+        "type": "number",
+        "data": [
+            [1.1, 5.5], [7.1, 11.33], [20.5, 122.66]
+        ]
+      }
+    }
