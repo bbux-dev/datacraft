@@ -45,7 +45,8 @@ TEST_FILES = [
     "ref_list.tests.json",
     "weighted_ref.tests.json",
     "distribution.tests.json",
-    "templated.tests.json"
+    "templated.tests.json",
+    "integer.tests.json"
 ]
 
 
@@ -60,7 +61,10 @@ def test_run_validation(test_file_name):
             continue
         schema = datacraft.registries.lookup_schema(field_type)
         for should_be_valid in type_tests[ASSUMED_VALID]:
-            jsonschema.validate(should_be_valid[INSTANCE], schema=schema)
+            try:
+                jsonschema.validate(should_be_valid[INSTANCE], schema=schema)
+            except ValidationError as e:
+                pytest.fail(f'{json.dumps(should_be_valid)} failed', e)
         for should_not_be_valid in type_tests[ASSUMED_INVALID]:
             log.debug(json.dumps(should_not_be_valid))
             try:
