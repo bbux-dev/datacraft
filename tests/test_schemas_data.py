@@ -46,7 +46,8 @@ TEST_FILES = [
     "weighted_ref.tests.json",
     "distribution.tests.json",
     "templated.tests.json",
-    "integer.tests.json"
+    "integer.tests.json",
+    "number.tests.json"
 ]
 
 
@@ -54,10 +55,16 @@ TEST_FILES = [
 def test_run_validation(test_file_name):
     tests = load_test_file(test_file_name)
     should_have_failed = {}
-    for file, type_tests in tests.items():
+    # data format is:
+    # {
+    #   "<type>.schema.json": {
+    #     "valid": [ ... ]
+    #     "invalid": [ ... ]
+    # }
+    for schema_file, type_tests in tests.items():
         # old way we used the actual file name and loaded that, now just need type name
-        field_type = file.replace('.schema.json', '')
-        if 'EXAMPLE' in file:
+        field_type = schema_file.replace('.schema.json', '')
+        if 'EXAMPLE' in schema_file:
             continue
         schema = datacraft.registries.lookup_schema(field_type)
         for should_be_valid in type_tests[ASSUMED_VALID]:
@@ -71,11 +78,11 @@ def test_run_validation(test_file_name):
                 jsonschema.validate(should_not_be_valid[INSTANCE], schema=schema)
             except ValidationError:
                 continue
-            failed_for_file = should_have_failed.get(file)
+            failed_for_file = should_have_failed.get(schema_file)
             if failed_for_file is None:
                 failed_for_file = []
             failed_for_file.append(should_not_be_valid)
-            should_have_failed[file] = failed_for_file
+            should_have_failed[schema_file] = failed_for_file
     log_should_have_failed(should_have_failed)
     if len(should_have_failed) > 0:
         pytest.fail('Some invalid specs did not fail validation')
