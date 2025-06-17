@@ -196,11 +196,29 @@ def _configure_integer_supplier(field_spec, loader):
     return _configure_rand_range_supplier(field_spec, loader)
 
 
+for i in range(1, 8):
+    def make_supplier(i):
+        @datacraft.registry.types(f'{_NUMBER_KEY}.{i}')
+        def _configure_number_supplier_dot_n(field_spec, loader):
+            config = datacraft.utils.load_config(field_spec, loader)
+            if 'cast' in config:
+                parts = config['cast'].split(';')
+                parts.append(f'round{i}')
+                config['cast'] = ';'.join(parts)
+            else:
+                config['cast'] = f'round{i}'
+            field_spec['config'] = config
+            return _configure_number_supplier(field_spec, loader)
+
+        return _configure_number_supplier_dot_n
+
+
+    make_supplier(i)  # call to bind the current i
+
+
 @datacraft.registry.types(_NUMBER_KEY)
 def _configure_number_supplier(field_spec, loader):
     """ configures the number value supplier """
-    config = datacraft.utils.load_config(field_spec, loader)
-    field_spec['config'] = config
     data = field_spec.get('data')
     if data is None or len(data) == 0:
         min_int = -1_000_000_000

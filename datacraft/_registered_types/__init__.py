@@ -10,7 +10,7 @@ from . import (
     geo,
     nested,
     network,
-    range_suppliers,
+    numeric_suppliers,
     refs,
     ref_list,
     sample,
