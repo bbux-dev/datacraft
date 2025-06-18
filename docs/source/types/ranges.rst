@@ -159,3 +159,71 @@ billion.
         ]
       }
     }
+
+number.N
+^^^^^^^^
+
+The `number.N` type is a specialized version of the `number` type that automatically truncates decimal places to exactly N digits. 
+This type is available for N = 1 through 7. It uses the same configuration as the `number` type but automatically applies 
+a `roundN` cast to ensure consistent decimal precision.
+
+Prototype:
+
+.. code-block:: python
+
+    {
+      "<field name>": {
+        "type": "number.<N>",
+        "data": [<lower>, <upper>] (optional),
+        or
+        "data": [
+          [<lower>, <upper>],
+          [<lower>, <upper>],
+          ...
+          [<lower>, <upper>],
+        ],
+      }
+    }
+
+    N: (int) - Number of decimal places (1-7)
+    lower: (Union[int, float]) - lower limit of random range
+    upper: (Union[int, float]) - upper limit of random range
+
+Examples:
+
+.. code-block:: json
+
+    {
+      "two_decimal_places": {
+        "type": "number.2",
+        "data": [0, 10]
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "three_decimal_places": {
+        "type": "number.3",
+        "data": [1.1, 5.5]
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "one_decimal_place": {
+        "type": "number.1",
+        "data": [
+            [0, 5], [10, 15]
+        ]
+      }
+    }
+
+.. code-block:: json
+
+    {
+      "four_decimal_places": {
+        "type": "number.4"
+      }
+    }
