@@ -1,3 +1,9 @@
+v0.12.0
+-------
+* Added `integer`, `number`, and `number.N` types. These are similar to `rand_range` and `rand_int_range`, but do not
+require bounds for the numbers. The default is to produce numbers in the +- one billion range.
+* The `number.N` type will truncate the output to N or less decimal digits.
+
 v0.11.1
 -------
 * Added `iteration` and alias type `rownum`. This is used to indicate the number of the record that is being generated.
