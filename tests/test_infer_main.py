@@ -1,3 +1,4 @@
+import argparse
 import os
 import pytest
 from datacraft._infer import __main__ as entrypoint
@@ -54,6 +55,12 @@ def test_limit_option():
 def test_duplication_threshold():
     csv_file = os.path.join(test_dir, 'test.csv')
     entrypoint.main(['--csv', csv_file, '-dt', '0.5'])
+
+
+@pytest.mark.parametrize('threshold', [1.5, "foo"])
+def test_invalid_duplication_thresholds(threshold):
+    with pytest.raises(argparse.ArgumentTypeError):
+        entrypoint.valid_range(threshold)
 
 
 # Test log level

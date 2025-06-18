@@ -162,7 +162,10 @@ def get(name):
     """
     if name is None:
         return None
-    names = name.split(";")
+    if isinstance(name, list):
+        names = name
+    else:
+        names = name.split(";")
     casters = [_lookup_name(caster_name) for caster_name in names]
     if any(caster is None for caster in casters):
         raise SpecException('Unknown caster name in: ' + name)

@@ -246,11 +246,16 @@ class _DataSpecImpl(DataSpec):
     """ Implementation for DataSpec """
 
     def generator(self, iterations: int, **kwargs):
-        processor: RecordProcessor = kwargs.get('processor', None)
+        processor = kwargs.get('processor', None)
+        if processor is not None and not isinstance(processor, RecordProcessor):
+            raise TypeError(f"Expected a RecordProcessor, got {type(processor).__name__}")
         data_dir = kwargs.get('data_dir', registries.get_default('data_dir'))
         enforce_schema = kwargs.get('enforce_schema', False)
         exclude_internal = kwargs.get('exclude_internal', False)
-        output: OutputHandlerInterface = kwargs.get('output', None)
+        output = kwargs.get('output', None)
+        if output is not None and not isinstance(output, OutputHandlerInterface):
+            raise TypeError(f"Expected a OutputHandlerInterface, got {type(output).__name__}")
+
         loader = field_loader(self.raw_spec, data_dir=data_dir, enforce_schema=enforce_schema)
 
         key_provider = key_suppliers.from_spec(loader.spec)

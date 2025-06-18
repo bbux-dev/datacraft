@@ -45,7 +45,9 @@ TEST_FILES = [
     "ref_list.tests.json",
     "weighted_ref.tests.json",
     "distribution.tests.json",
-    "templated.tests.json"
+    "templated.tests.json",
+    "integer.tests.json",
+    "number.tests.json"
 ]
 
 
@@ -53,25 +55,34 @@ TEST_FILES = [
 def test_run_validation(test_file_name):
     tests = load_test_file(test_file_name)
     should_have_failed = {}
-    for file, type_tests in tests.items():
+    # data format is:
+    # {
+    #   "<type>.schema.json": {
+    #     "valid": [ ... ]
+    #     "invalid": [ ... ]
+    # }
+    for schema_file, type_tests in tests.items():
         # old way we used the actual file name and loaded that, now just need type name
-        field_type = file.replace('.schema.json', '')
-        if 'EXAMPLE' in file:
+        field_type = schema_file.replace('.schema.json', '')
+        if 'EXAMPLE' in schema_file:
             continue
         schema = datacraft.registries.lookup_schema(field_type)
         for should_be_valid in type_tests[ASSUMED_VALID]:
-            jsonschema.validate(should_be_valid[INSTANCE], schema=schema)
+            try:
+                jsonschema.validate(should_be_valid[INSTANCE], schema=schema)
+            except ValidationError as e:
+                pytest.fail(f'{json.dumps(should_be_valid)} failed', e)
         for should_not_be_valid in type_tests[ASSUMED_INVALID]:
             log.debug(json.dumps(should_not_be_valid))
             try:
                 jsonschema.validate(should_not_be_valid[INSTANCE], schema=schema)
             except ValidationError:
                 continue
-            failed_for_file = should_have_failed.get(file)
+            failed_for_file = should_have_failed.get(schema_file)
             if failed_for_file is None:
                 failed_for_file = []
             failed_for_file.append(should_not_be_valid)
-            should_have_failed[file] = failed_for_file
+            should_have_failed[schema_file] = failed_for_file
     log_should_have_failed(should_have_failed)
     if len(should_have_failed) > 0:
         pytest.fail('Some invalid specs did not fail validation')

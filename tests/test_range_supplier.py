@@ -80,3 +80,9 @@ invalid_range_specs = [
 def test_invalid_range_specs(spec):
     with pytest.raises(datacraft.SpecException):
         datacraft.entries(spec, 1)
+
+
+def test_integer_alias():
+    spec = {'type': 'integer', 'data': []}
+    values = datacraft.values_for(spec, 10)
+    assert len(values) == 10

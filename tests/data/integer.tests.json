@@ -1,0 +1,28 @@
+{
+  "integer.schema.json": {
+    "valid": [
+      {"instance": {"type": "integer"}, "note": "empty data valid"},
+      {"instance": {"type": "integer", "data":  null}, "note": "null data valid"},
+      {"instance": {"type": "integer", "data":  []}, "note": "empty list data valid"},
+      {"instance": {"type": "integer", "data":  {}}, "note": "empty map data valid"},
+      {"instance": {"type": "integer", "data": [10]}, "note": "upper bound only"},
+      {"instance": {"type": "integer", "data": [0, 10]}},
+      {"instance": {"type": "integer", "data": [0, 10, 2]}, "note": "start stop step"},
+      {"instance": {"type": "integer", "data": [[0, 10]]}, "note": "single nested"},
+      {"instance": {"type": "integer", "data": [[0, 10, 2]]}, "note":  "single nested start stop step"},
+      {
+        "note": "multi sized nested",
+        "instance": {"type": "integer", "data": [[10], [10, 100, 2], [100, 1000, 100]]}
+      }
+    ],
+    "invalid": [
+      {"instance": {}, "note": "empty"},
+      {"instance": {"type": "integers"}, "note": "misspelled"},
+      {"instance": {"type": "integer", "data": [1, 10, 2, 4]}, "note": "too many entries"},
+      {
+        "note": "invalid count type,",
+        "instance": {"type": "integer", "data": [0, 10], "config": {"count": "blue"}}
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@ import json
 import pytest
 
 import datacraft
-from datacraft.infer import from_examples, csv_to_spec
+from datacraft.infer import from_examples, csv_to_spec, infer_csv_select
 
 from datacraft._infer.helpers import (all_is_numeric, calculate_weights, are_values_unique)
 from datacraft._infer.num_analyzers import compute_range
@@ -189,6 +189,27 @@ def test_csv_to_spec(sample_csv_file):
     }
 
     assert deep_sort(result) == deep_sort(expected)
+
+
+def test_infer_csv_select(sample_csv_file):
+    result = infer_csv_select(sample_csv_file)
+    
+    expected = {
+        "placeholder": {
+            "type": "csv_select",
+            "data": {
+                "foo": 1,
+                "bar": 2,
+                "baz": 3
+            },
+            "config": {
+                "datafile": "sample.csv",
+                "headers": True,
+            }
+        }
+    }
+    
+    assert result == expected
 
 
 @pytest.mark.parametrize("input_data, expected_output", EXAMPLES)
