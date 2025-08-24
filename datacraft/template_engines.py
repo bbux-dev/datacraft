@@ -3,23 +3,25 @@ Handles loading and creating the templating engine
 """
 import os
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 
 from jinja2 import Environment, FileSystemLoader, BaseLoader, select_autoescape  # type: ignore
 
 from .supplier.model import RecordProcessor
 
 
-def for_file(template_file: Union[str, Path]) -> RecordProcessor:
+def for_file(template_file: Union[str, Path]) -> Optional[RecordProcessor]:
     """
-    Loads the templating engine for the template file specified
+    Loads the templating engine for the template file specified.
 
     Args:
-        template_file: to fill in, string or Path
+        template_file: string or Path to the template file.
 
     Returns:
-        the templating engine
+        The templating engine, or None if the file does not exist.
     """
+    if not os.path.exists(template_file):
+        return None
     return _Jinja2Engine(template_file)
 
 

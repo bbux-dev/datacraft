@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import time
+from typing import Optional
 
 import datacraft
 from . import common
@@ -280,7 +281,7 @@ def _configure_supplier_custom_date_format(field_spec, loader, output_date_forma
 
 
 class _DateNowSupplier(datacraft.ValueSupplierInterface):
-    def __init__(self, date_format: str | None, is_utc: bool=False):
+    def __init__(self, date_format: Optional[str], is_utc: bool=False):
         self.date_format = date_format
         self.is_utc = is_utc
 

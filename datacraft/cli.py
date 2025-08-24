@@ -257,6 +257,9 @@ def process_args(args):
     # apply the spec as data to the template
     if args.apply_raw:
         engine = template_engines.for_file(args.template)
+        if engine is None:
+            _log.warning('Unable to locate template file at %s', args.template)
+            return None
         writer = _get_writer(args)
         writer.write(engine.process(spec))
         return None
@@ -380,7 +383,11 @@ def _load_json_or_yaml(data_path, template_vars):
         has_jinja_default = bool(re.search(r'{{.*default.*?}}', content))
     if len(template_vars) > 0 or has_jinja_default:
         _log.debug('Applying %s template vars to raw spec', len(template_vars))
-        spec_str = template_engines.for_file(data_path).process(template_vars)
+        engine = template_engines.for_file(data_path)
+        if engine is None:
+            _log.warning('Unable to find data file at path %s', data_path)
+            return None
+        spec_str = engine.process(template_vars)
         _log.debug('Attempting to load data as JSON')
     else:
         spec_str = utils.load_file_as_string(data_path)

@@ -1,3 +1,9 @@
+v0.12.1
+-------
+* Bug fixes for python 3.9 compatibility
+* Better error handling for invalid file paths
+* Bug fix for when --server-endpoint doesn't start with a /, we just prepend it
+
 v0.12.0
 -------
 * Added `integer`, `number`, and `number.N` types. These are similar to `rand_range` and `rand_int_range`, but do not

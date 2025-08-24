@@ -64,6 +64,8 @@ class _Server:
         """ run the Flask app """
         app = flask.Flask(__name__)
         for endpoint_path, generator in self.endpoint_specs.items():
+            if not endpoint_path.startswith('/'):
+                endpoint_path = '/' + endpoint_path
             _log.info('Adding endpoint to server: %s', endpoint_path)
             view_func = self.generate_view_func(generator)
             app.add_url_rule(endpoint_path,
